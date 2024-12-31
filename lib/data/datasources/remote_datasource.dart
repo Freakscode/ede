@@ -1,281 +1,174 @@
-import 'dart:io';
-
-import 'package:ede_final_app/config/database/database_config.dart';
-import 'package:ede_final_app/data/models/user_model.dart';
-import 'package:postgres/postgres.dart';
+import 'dart:convert';
+import 'package:ede_final_app/environment.dart';
+import 'package:http/http.dart' as http;
 import 'dart:developer' as developer;
 
 class RemoteDatasource {
-  Connection? _conn;
-  bool _isConnected = false;
-  static const _maxRetries = 3;
-
-  final String host;
-  final int port;
-  final String database;
-  final String username;
-  final String password;
+  final String baseUrl;
+  final http.Client client;
+  // Auth credentials
+  final String username = Environment.userBackend;
+  final String password = Environment.passwordBackend;
 
   RemoteDatasource._({
-    required this.host,
-    required this.port,
-    required this.database,
-    required this.username,
-    required this.password,
+    required this.baseUrl,
+    required this.client,
   });
 
+  String get _authHeader =>
+      'Basic ${base64Encode(utf8.encode('$username:$password'))}';
+
   static Future<RemoteDatasource> create() async {
-    final datasource = RemoteDatasource._(
-      host: DatabaseConfig.host,
-      port: DatabaseConfig.port, 
-      database: DatabaseConfig.database,
-      username: DatabaseConfig.username,
-      password: DatabaseConfig.password,
-    );
-
-    await datasource._tryConnection();
-    return datasource;
+    // Update baseUrl to point to your Django API
+    const baseUrl = 'http://192.168.1.139:8000/api/v1';
+    final client = http.Client();
+    developer.log('RemoteDataSource initialized with baseUrl: $baseUrl', name: 'API');
+    return RemoteDatasource._(baseUrl: baseUrl, client: client);
   }
 
-  Future<void> _tryConnection() async {
-    for (var i = 0; i < _maxRetries; i++) {
-      try {
-        await openConnection();
-        return;
-      } catch (e) {
-        developer.log(
-          'Connection attempt ${i + 1} failed: $e',
-          name: 'RemoteDataSource',
-        );
-        if (i == _maxRetries - 1) rethrow;
-        await Future.delayed(Duration(seconds: 1));
-      }
-    }
-  }
-
-  Future<void> openConnection() async {
-    try {
-      if (_conn == null || !_isConnected) {
-        developer.log('''
-Attempting PostgreSQL connection with:
-- Host: $host
-- Port: $port
-- Database: $database
-- Username: $username
-''', name: 'RemoteDataSource');
-
-        _conn = await Connection.open(
-          Endpoint(
-            host: host,
-            port: port,
-            database: database,
-            username: username,
-            password: password,
-          ),
-          settings: const ConnectionSettings(
-            sslMode: SslMode.disable,
-            connectTimeout: Duration(seconds: 30),
-          ),
-        );
-        _isConnected = true;
-        developer.log('PostgreSQL connection established successfully', 
-          name: 'RemoteDataSource');
-      }
-    } on SocketException catch (e) {
-      _isConnected = false;
-      developer.log('''
-Connection failed with SocketException:
-- Error: ${e.message}
-- Port: ${e.port}
-- Address: ${e.address}
-''', name: 'RemoteDataSource', error: e);
-      throw DatabaseException('PostgreSQL service may not be running: ${e.message}');
-    } catch (e) {
-      _isConnected = false;
-      developer.log('Unexpected connection error: $e', 
-        name: 'RemoteDataSource', error: e);
-      throw DatabaseException('Connection failed: $e');
-    }
-  }
-
-  Future<UserModel?> verifyCredentials({
+  Future<Map<String, dynamic>?> verifyCredentials({
     required String cedula,
-    required String passwordHash,
+    required String password,
   }) async {
+    final url = Uri.parse('$baseUrl/auth/login/');
+    final requestBody = {
+      'cedula': cedula,
+      'password': password,
+    };
+
     try {
-      developer.log('Intentando verificar credenciales', name: 'RemoteDataSource');
-      developer.log('Cédula: $cedula', name: 'RemoteDataSource');
-      developer.log('PasswordHash: $passwordHash', name: 'RemoteDataSource');
-
-      await openConnection();
-      developer.log('Conexión a la base de datos abierta', name: 'RemoteDataSource');
-
-      final results = await _conn!.execute(
-        Sql.named('''
-          SELECT user_id, cedula, nombre_completo, dependencia, firma, created_at
-          FROM users 
-          WHERE cedula = @cedula AND password_hash = @passwordHash
-        '''),
-        parameters: {
-          'cedula': cedula,
-          'passwordHash': passwordHash,
-        },
+      developer.log(
+        'Sending POST to $url with body: ${jsonEncode(requestBody)}',
+        name: 'RemoteDatasource'
+      );
+      final response = await client.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(requestBody),
       );
 
-      developer.log('Consulta ejecutada', name: 'RemoteDataSource');
-      developer.log('Resultado: ${results.length} filas', name: 'RemoteDataSource');
+      developer.log(
+        'Response status: ${response.statusCode}, body: ${response.body}',
+        name: 'RemoteDatasource'
+      );
 
-      if (results.isEmpty) {
-        developer.log('No se encontró el usuario', name: 'RemoteDataSource');
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return data;
+      } else {
         return null;
       }
-
-      final row = results.first.toColumnMap();
-      final user = UserModel.fromRow(row);
-      developer.log('Usuario encontrado: ${user.userId}', name: 'RemoteDataSource');
-      return user;
-    } catch (e) {
-      developer.log('Error en verifyCredentials: $e', name: 'RemoteDataSource', error: e);
-      throw DatabaseException('Verificación de credenciales fallida: $e');
-    }
-  }
-
-  Future<List<UserModel>> fetchAllUsers() async {
-    try {
-      await openConnection();
-      final result = await _conn?.execute(
-        'SELECT user_id, nombre_completo, dependencia, firma, email FROM users ORDER BY user_id',
+    } catch (e, stacktrace) {
+      developer.log(
+        'Error during verifyCredentials',
+        name: 'RemoteDatasource',
+        error: e,
+        stackTrace: stacktrace
       );
-      if (result == null) return [];
-
-      return result.map((row) {
-        final dataMap = row.toColumnMap();
-        return UserModel.fromRow(dataMap);
-      }).toList();
-    } catch (e) {
-      throw DatabaseException('Fetch all users failed: $e');
-    }
-  }
-
-  Future<List<UserModel>> fetchUserById(int id) async {
-    try {
-      await openConnection();
-      final result = await _conn?.execute(
-        Sql.named(
-            'SELECT user_id, nombre_completo, dependencia, firma, email FROM users WHERE user_id = @id'),
-        parameters: {'id': id},
-      );
-      if (result == null) return [];
-
-      return result.map((row) {
-        final dataMap = row.toColumnMap();
-        return UserModel.fromRow(dataMap);
-      }).toList();
-    } catch (e) {
-      throw DatabaseException('Fetch user by id failed: $e');
-    }
-  }
-
-  Future<void> initDatabase() async {
-    try {
-      await openConnection();
-      await _conn?.execute('''
-        CREATE TABLE IF NOT EXISTS a_table (
-          id TEXT NOT NULL,
-          totals INTEGER NOT NULL DEFAULT 0
-        )
-      ''');
-    } catch (e) {
-      throw DatabaseException('Init database failed: $e');
-    }
-  }
-
-  Future<void> insertRow(String id) async {
-    try {
-      await openConnection();
-      final result = await _conn?.execute(
-        r'INSERT INTO a_table (id) VALUES ($1)',
-        parameters: [id],
-      );
-      print('Inserted ${result?.affectedRows} rows');
-    } catch (e) {
-      throw DatabaseException('Insert failed: $e');
-    }
-  }
-
-  Future<Map<String, dynamic>?> getRow(String id) async {
-    try {
-      await openConnection();
-      final result = await _conn?.execute(
-        Sql.named('SELECT * FROM a_table WHERE id=@id'),
-        parameters: {'id': id},
-      );
-      return result?.first.toColumnMap();
-    } catch (e) {
-      throw DatabaseException('Query failed: $e');
-    }
-  }
-
-  Future<void> runTransaction() async {
-    try {
-      await openConnection();
-      await _conn?.runTx((ctx) async {
-        final rs = await ctx.execute('SELECT count(*) FROM a_table');
-        await ctx.execute(
-          r'UPDATE a_table SET totals=$1 WHERE id=$2',
-          parameters: [rs[0][0], 'xyz'],
-        );
-      });
-    } catch (e) {
-      throw DatabaseException('Transaction failed: $e');
-    }
-  }
-
-  Future<void> closeConnection() async {
-    try {
-      if (_conn != null && _isConnected) {
-        await _conn!.close();
-        _isConnected = false;
-      }
-    } catch (e) {
-      throw DatabaseException('Close connection failed: $e');
-    }
-  }
-
-  Future<List<Map<String, dynamic>>> fetch() async {
-    try {
-      await openConnection();
-
-      final result = await _conn?.execute(
-        'SELECT * FROM a_table ORDER BY id',
-      );
-
-      if (result == null) {
-        return [];
-      }
-
-      return result.map((row) => row.toColumnMap()).toList();
-    } catch (e) {
-      throw DatabaseException('Fetch failed: $e');
+      throw DatabaseException('Error de autenticación: $e');
     }
   }
 
   Future<List<Map<String, dynamic>>> fetchById(String id) async {
     try {
-      await openConnection();
-
-      final result = await _conn?.execute(
-        Sql.named('SELECT * FROM a_table WHERE id = @id'),
-        parameters: {'id': id},
+      final response = await client.get(
+        Uri.parse('$baseUrl/users/$id'),
       );
 
-      if (result == null) {
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body) as List;
+        return data.map((item) => item as Map<String, dynamic>).toList();
+      } else {
         return [];
       }
-
-      return result.map((row) => row.toColumnMap()).toList();
     } catch (e) {
-      throw DatabaseException('Fetch by id failed: $e');
+      throw DatabaseException('Error al obtener datos: $e');
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> fetchAllData() async {
+    try {
+      final response = await client.get(Uri.parse('$baseUrl/v1/data/'));
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body) as List;
+        return data.map((e) => e as Map<String, dynamic>).toList();
+      } else {
+        return [];
+      }
+    } catch (e) {
+      throw DatabaseException('Error al obtener datos: $e');
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> fetchAllUsers() async {
+    try {
+      developer.log('Fetching users from: $baseUrl/v1/users/', name: 'API');
+      
+      final response = await client.get(
+        Uri.parse('$baseUrl/v1/users/'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': _authHeader,
+        },
+      );
+
+      developer.log('Response status: ${response.statusCode}', name: 'API');
+
+      switch (response.statusCode) {
+        case 200:
+          final data = jsonDecode(response.body) as List;
+          return data.map((e) => e as Map<String, dynamic>).toList();
+        case 401:
+        case 403:
+          throw DatabaseException('Authentication failed');
+        default:
+          throw DatabaseException(
+            'Server error: ${response.statusCode}\nBody: ${response.body}'
+          );
+      }
+    } catch (e, stackTrace) {
+      developer.log(
+        'Failed to fetch users', 
+        name: 'API',
+        error: e,
+        stackTrace: stackTrace
+      );
+      rethrow;
+    }
+  }
+
+  Future<void> createUser(Map<String, dynamic> userData) async {
+    try {
+      final response = await client.post(
+        Uri.parse('$baseUrl/v1/users/'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(userData),
+      );
+      if (response.statusCode != 201) {
+        throw DatabaseException('Error al crear usuario: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw DatabaseException('Error de red al crear usuario: $e');
+    }
+  }
+
+  Future<Map<String, dynamic>?> refreshToken(String token) async {
+    try {
+      final response = await client.post(
+        Uri.parse('$baseUrl/auth/token/refresh/'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      }
+      return null;
+    } catch (e) {
+      developer.log('Token refresh failed: $e', name: 'API');
+      throw DatabaseException('Token refresh failed: $e');
     }
   }
 }

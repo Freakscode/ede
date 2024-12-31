@@ -26,4 +26,15 @@ class UserModel {
       createdAt: row['created_at'] as DateTime,
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'user_id': userId,
+      'cedula': cedula,
+      'nombre_completo': nombreCompleto,
+      'dependencia': dependencia,
+      'firma': firma,
+      'created_at': createdAt,
+    };
+  }
 }

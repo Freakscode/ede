@@ -25,14 +25,14 @@ GoRouter getAppRouter(BuildContext context) {
       }
 
       if (authState is AuthAuthenticated && isLoginRoute) {
-        return '/';
+        return '/home';
       }
 
       return null;
     },
     routes: [
       GoRoute(
-        path: '/',
+        path: '/home',
         builder: (context, state) => const HomeScreen(),
       ),
       GoRoute(

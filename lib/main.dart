@@ -13,20 +13,26 @@ import 'data/datasources/local_database_provider.dart';
 import 'data/datasources/local_datasource.dart';
 import 'data/datasources/remote_datasource.dart';
 import 'data/repositories/data_repository.dart';
-
+import 'presentation/blocs/users/users_bloc.dart';
+import 'presentation/blocs/users/users_event.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   try {
-    // 1. Open the local DB
+    developer.log('Starting app initialization...', name: 'App');
+    
+    // 1. Open local DB
+    developer.log('Opening local database...', name: 'App');
     final database = await LocalDatabaseProvider.open();
-
-    // 2. Create data sources with retry
+    
+    // 2. Create data sources
+    developer.log('Creating data sources...', name: 'App');
     final localDataSource = LocalDataSource(database);
     final remoteDataSource = await RemoteDatasource.create();
-
+    
     // 3. Create repositories
+    developer.log('Creating repositories...', name: 'App');
     final authRepository = AuthRepository(
       remoteDatasource: remoteDataSource,
     );
@@ -36,16 +42,21 @@ Future<void> main() async {
       remoteDataSource: remoteDataSource,
     );
 
-    // 4. Run app
+    developer.log('App initialization complete', name: 'App');
+    
     runApp(
       MainApp(
         dataRepository: dataRepository,
         authRepository: authRepository,
       ),
     );
-  } catch (e) {
-    developer.log('Failed to initialize app: $e', error: e);
-    // Handle startup errors appropriately
+  } catch (e, stackTrace) {
+    developer.log(
+      'Failed to initialize app',
+      name: 'App',
+      error: e,
+      stackTrace: stackTrace
+    );
     rethrow;
   }
 }
@@ -53,22 +64,32 @@ Future<void> main() async {
 class MainApp extends StatelessWidget {
   final DataRepository dataRepository;
   final AuthRepository authRepository;
-  const MainApp({super.key,
+  
+  const MainApp({
+    super.key,
     required this.dataRepository,
     required this.authRepository,
   });
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) {
-        final authBloc = AuthBloc(
-          authRepository: authRepository,
-        );
-        // Check auth state on app start
-        authBloc.add(AppStarted());
-        return authBloc;
-      },
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<AuthBloc>(
+          create: (context) {
+            final bloc = AuthBloc(authRepository: authRepository);
+            bloc.add(AppStarted());
+            return bloc;
+          },
+        ),
+        BlocProvider<UsersBloc>(
+          create: (context) {
+            final bloc = UsersBloc(repository: dataRepository);
+            bloc.add(FetchUsers()); // Trigger initial fetch
+            return bloc;
+          },
+        ),
+      ],
       child: Builder(
         builder: (context) {
           return MaterialApp.router(
