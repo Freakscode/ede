@@ -43,3 +43,10 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+/android/local.properties
+
+# Archivos de configuración
+lib/config/secrets.dart
+
+# Archivos de configuración
+lib/config/secrets.dart

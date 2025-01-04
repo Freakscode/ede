@@ -12,6 +12,8 @@ import '../../presentation/blocs/auth/auth_state.dart';
 
 import '../../presentation/pages/home/home_screen.dart';
 import '../../presentation/pages/login/login_screen.dart';
+import '../../presentation/pages/eval/sect_1/id_evaluacion_page.dart';
+import '../../presentation/pages/eval/sect_2/id_edificacion_page.dart';
 
 GoRouter getAppRouter(BuildContext context) {
   return GoRouter(
@@ -32,13 +34,21 @@ GoRouter getAppRouter(BuildContext context) {
     },
     routes: [
       GoRoute(
-        path: '/home',
+        path: '/',
         builder: (context, state) => const HomeScreen(),
       ),
       GoRoute(
         path: '/login',
         builder: (context, state) => const LoginScreen(),
-      )
+      ),
+      GoRoute(
+        path: '/id_evaluacion',
+        builder: (context, state) => const EvaluacionWizardPage(),
+      ),
+      GoRoute(
+        path: '/id_edificacion',
+        builder: (context, state) => const EdificacionPageWrapper(),
+      ),
     ],
     refreshListenable: GoRouterRefreshStream(
       context.read<AuthBloc>().stream,

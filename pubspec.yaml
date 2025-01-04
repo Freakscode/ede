@@ -18,6 +18,13 @@ dependencies:
   crypto: ^3.0.6
   flutter_secure_storage: ^9.2.2
   dart_jsonwebtoken: ^2.14.2
+  image_picker: ^1.1.2
+  permission_handler: ^11.3.1
+  path_provider: ^2.1.2
+  app_settings: ^5.1.1
+  google_maps_flutter: ^2.10.0
+  geolocator: ^13.0.2
+  geocoding: ^3.0.0
 
 dev_dependencies:
   flutter_test:

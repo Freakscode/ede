@@ -20,8 +20,13 @@ class EvaluacionState {
   final String? firma;
   final TipoEvento? eventoSeleccionado;
   final String? descripcionOtro;
+  final String? idEvento;
+  final String? direccion;
+  final String? comuna;
+  final String? barrio;
 
   EvaluacionState({
+    this.idEvento,
     this.fechaInspeccion,
     this.horaInspeccion,
     this.nombreEvaluador,
@@ -30,9 +35,13 @@ class EvaluacionState {
     this.firma,
     this.eventoSeleccionado,
     this.descripcionOtro,
+    this.direccion,
+    this.comuna,
+    this.barrio,
   });
 
   EvaluacionState copyWith({
+    String? idEvento,
     DateTime? fechaInspeccion,
     TimeOfDay? horaInspeccion,
     String? nombreEvaluador,
@@ -41,8 +50,12 @@ class EvaluacionState {
     String? firma,
     TipoEvento? eventoSeleccionado,
     String? descripcionOtro,
+    String? direccion,
+    String? comuna,
+    String? barrio,
   }) {
     return EvaluacionState(
+      idEvento: idEvento ?? this.idEvento,
       fechaInspeccion: fechaInspeccion ?? this.fechaInspeccion,
       horaInspeccion: horaInspeccion ?? this.horaInspeccion,
       nombreEvaluador: nombreEvaluador ?? this.nombreEvaluador,
@@ -51,6 +64,9 @@ class EvaluacionState {
       firma: firma ?? this.firma,
       eventoSeleccionado: eventoSeleccionado ?? this.eventoSeleccionado,
       descripcionOtro: descripcionOtro ?? this.descripcionOtro,
+      direccion: direccion ?? this.direccion,
+      comuna: comuna ?? this.comuna,
+      barrio: barrio ?? this.barrio,
     );
   }
 }

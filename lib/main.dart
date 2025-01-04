@@ -15,6 +15,8 @@ import 'data/datasources/remote_datasource.dart';
 import 'data/repositories/data_repository.dart';
 import 'presentation/blocs/users/users_bloc.dart';
 import 'presentation/blocs/users/users_event.dart';
+import 'presentation/blocs/form/identificacionEvaluacion/id_evaluacion_bloc.dart';
+import 'presentation/pages/eval/eval_wrapper.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -73,30 +75,21 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider<AuthBloc>(
-          create: (context) {
-            final bloc = AuthBloc(authRepository: authRepository);
-            bloc.add(AppStarted());
-            return bloc;
-          },
-        ),
-        BlocProvider<UsersBloc>(
-          create: (context) {
-            final bloc = UsersBloc(repository: dataRepository);
-            bloc.add(FetchUsers()); // Trigger initial fetch
-            return bloc;
-          },
-        ),
-      ],
-      child: Builder(
-        builder: (context) {
-          return MaterialApp.router(
+    return EvalWrapper(
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider<AuthBloc>(
+            create: (_) => AuthBloc(authRepository: authRepository)..add(AppStarted()),
+          ),
+          BlocProvider<UsersBloc>(
+            create: (_) => UsersBloc(repository: dataRepository),
+          ),
+        ],
+        child: Builder(
+          builder: (context) => MaterialApp.router(
             routerConfig: getAppRouter(context),
-            debugShowCheckedModeBanner: false,
-          );
-        },
+          ),
+        ),
       ),
     );
   }

@@ -1,0 +1,131 @@
+abstract class EdificacionEvent {}
+
+// Eventos para Datos Generales
+class SetNombreEdificacion extends EdificacionEvent {
+  final String nombre;
+  SetNombreEdificacion(this.nombre);
+}
+
+class SetDireccion extends EdificacionEvent {
+  final String direccion;
+  SetDireccion(this.direccion);
+}
+
+class SetComuna extends EdificacionEvent {
+  final String comuna;
+  SetComuna(this.comuna);
+}
+
+class SetBarrio extends EdificacionEvent {
+  final String barrio;
+  SetBarrio(this.barrio);
+}
+
+class SetCodigoBarrio extends EdificacionEvent {
+  final String codigo;
+  SetCodigoBarrio(this.codigo);
+}
+
+// Eventos para Identificación Catastral
+class SetCBML extends EdificacionEvent {
+  final String cbml;
+  SetCBML(this.cbml);
+}
+
+class SetMatriculaInmobiliaria extends EdificacionEvent {
+  final String matricula;
+  SetMatriculaInmobiliaria(this.matricula);
+}
+
+class SetNumeroPisos extends EdificacionEvent {
+  final String numeroPisos;
+  SetNumeroPisos(this.numeroPisos);
+}
+
+class SetSubterraneos extends EdificacionEvent {
+  final String subterraneos;
+  SetSubterraneos(this.subterraneos);
+}
+
+class SetYearConstruccion extends EdificacionEvent {
+  final int year;
+  SetYearConstruccion(this.year);
+}
+
+// Eventos para Persona de Contacto
+class SetNombreContacto extends EdificacionEvent {
+  final String nombre;
+  SetNombreContacto(this.nombre);
+}
+
+class SetTelefonoContacto extends EdificacionEvent {
+  final String telefono;
+  SetTelefonoContacto(this.telefono);
+}
+
+class SetEmailContacto extends EdificacionEvent {
+  final String email;
+  SetEmailContacto(this.email);
+}
+
+class SetOcupacion extends EdificacionEvent {
+  final String ocupacion;
+  SetOcupacion(this.ocupacion);
+}
+
+class LoadTemporaryData extends EdificacionEvent {
+  LoadTemporaryData();
+}
+
+class SetCoordenadas extends EdificacionEvent {
+  final double latitud;
+  final double longitud;
+  
+  SetCoordenadas({required this.latitud, required this.longitud});
+}
+
+class SetNumeroVia extends EdificacionEvent {
+  final String numeroVia;
+  SetNumeroVia(this.numeroVia);
+}
+
+class SetApendiceVia extends EdificacionEvent {
+  final String apendiceVia;
+  SetApendiceVia(this.apendiceVia);
+}
+
+class SetOrientacionVia extends EdificacionEvent {
+  final String orientacionVia;
+  SetOrientacionVia(this.orientacionVia);
+}
+
+class SetTipoVia extends EdificacionEvent {
+  final String tipoVia;
+  
+  SetTipoVia(this.tipoVia);
+}
+
+class SetNumeroCruce extends EdificacionEvent {
+  final String numeroCruce;
+  SetNumeroCruce(this.numeroCruce);
+}
+
+class SetApendiceCruce extends EdificacionEvent {
+  final String apendiceCruce;
+  SetApendiceCruce(this.apendiceCruce);
+}
+
+class SetOrientacionCruce extends EdificacionEvent {
+  final String orientacionCruce;
+  SetOrientacionCruce(this.orientacionCruce);
+}
+
+class SetNumero extends EdificacionEvent {
+  final String numero;
+  SetNumero(this.numero);
+}
+
+class SetComplemento extends EdificacionEvent {
+  final String complemento;
+  SetComplemento(this.complemento);
+} 
