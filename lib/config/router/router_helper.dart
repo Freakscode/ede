@@ -14,6 +14,13 @@ import '../../presentation/pages/home/home_screen.dart';
 import '../../presentation/pages/login/login_screen.dart';
 import '../../presentation/pages/eval/sect_1/id_evaluacion_page.dart';
 import '../../presentation/pages/eval/sect_2/id_edificacion_page.dart';
+import '../../presentation/pages/eval/sect_3/descripcion_edificacion_page.dart';
+import '../../presentation/pages/eval/sect_4/riesgos_externos_page.dart';
+import '../../presentation/pages/eval/sect_5/evaluacion_danos_page.dart';
+import '../../presentation/pages/eval/sect_6/nivel_dano_page.dart';
+import '../../presentation/pages/eval/sect_7/habitabilidad_page.dart';
+import '../../presentation/pages/eval/sect_8/acciones_page.dart';
+import '../../presentation/pages/eval/resumen_evaluacion_page.dart';
 
 GoRouter getAppRouter(BuildContext context) {
   return GoRouter(
@@ -48,6 +55,34 @@ GoRouter getAppRouter(BuildContext context) {
       GoRoute(
         path: '/id_edificacion',
         builder: (context, state) => const EdificacionPageWrapper(),
+      ),
+      GoRoute(
+        path: '/descripcion_edificacion',
+        builder: (context, state) => const DescripcionEdificacionPage(),
+      ),
+      GoRoute(
+        path: '/riesgos_externos',
+        builder: (context, state) => const RiesgosExternosPage(),
+      ),
+      GoRoute(
+        path: '/evaluacion_danos',
+        builder: (context, state) => const EvaluacionDanosPage(),
+      ),
+      GoRoute(
+        path: '/nivel_dano',
+        builder: (context, state) => const NivelDanoPage(),
+      ),
+      GoRoute(
+        path: '/habitabilidad',
+        builder: (context, state) => const HabitabilidadPage(),
+      ),
+      GoRoute(
+        path: '/acciones',
+        builder: (context, state) => const AccionesPage(),
+      ),
+      GoRoute(
+        path: '/resumen',
+        builder: (context, state) => const ResumenEvaluacionPage(),
       ),
     ],
     refreshListenable: GoRouterRefreshStream(

@@ -194,4 +194,13 @@ class DescripcionEdificacionState {
       usoPrincipal: usoPrincipal ?? this.usoPrincipal,
     );
   }
+
+  Map<String, dynamic> toJson() => {
+    'numeroPisos': numeroPisos,
+    'numeroSotanos': numeroSotanos,
+    'areaConstruida': areaConstruida,
+    'anoConstruccion': anoConstruccion,
+    'usoPrincipal': usoPrincipal,
+    'sistemaEstructural': sistemaEstructural,
+  };
 } 

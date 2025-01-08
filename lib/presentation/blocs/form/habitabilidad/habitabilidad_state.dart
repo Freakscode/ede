@@ -16,4 +16,9 @@ class HabitabilidadState {
       clasificacion: clasificacion ?? this.clasificacion,
     );
   }
+
+  Map<String, dynamic> toJson() => {
+    'criterioHabitabilidad': criterioHabitabilidad,
+    'clasificacion': clasificacion,
+  };
 } 

@@ -69,4 +69,14 @@ class EvaluacionState {
       barrio: barrio ?? this.barrio,
     );
   }
+
+  Map<String, dynamic> toJson() => {
+    'fechaInspeccion': fechaInspeccion?.toIso8601String(),
+    'horaInspeccion': horaInspeccion?.toString(),
+    'idGrupo': idGrupo,
+    'idEvento': idEvento,
+    'eventoSeleccionado': eventoSeleccionado?.name,
+    'descripcionOtro': descripcionOtro,
+    'dependenciaEntidad': dependenciaEntidad,
+  };
 }

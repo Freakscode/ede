@@ -20,4 +20,10 @@ class NivelDanoState {
       nivelDano: nivelDano ?? this.nivelDano,
     );
   }
+
+  Map<String, dynamic> toJson() => {
+    'porcentajeAfectacion': porcentajeAfectacion,
+    'severidadDanos': severidadDanos,
+    'nivelDano': nivelDano,
+  };
 } 

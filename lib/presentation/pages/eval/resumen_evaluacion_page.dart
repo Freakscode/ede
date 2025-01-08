@@ -19,6 +19,8 @@ import 'package:ede_final_app/presentation/blocs/form/descripcionEdificacion/des
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import '../../../domain/models/evaluacion_model.dart';
+import '../../blocs/evaluacion/evaluacion_bloc.dart' as eval;
 
 
 
@@ -91,6 +93,23 @@ class ResumenEvaluacionPage extends StatelessWidget {
 
   void _handleSendCSV(BuildContext context) {
     // TODO: Implementar envío de CSV
+  }
+
+  void _guardarEvaluacion(BuildContext context) {
+    final evaluacion = EvaluacionModel(
+      identificacionEvaluacion: context.read<EvaluacionBloc>().state.toJson(),
+      identificacionEdificacion: context.read<EdificacionBloc>().state.toJson(),
+      descripcionEdificacion: context.read<DescripcionEdificacionBloc>().state.toJson(),
+      riesgosExternos: context.read<RiesgosExternosBloc>().state.toJson(),
+      evaluacionDanos: context.read<EvaluacionDanosBloc>().state.toJson(),
+      nivelDano: context.read<NivelDanoBloc>().state.toJson(),
+      habitabilidad: context.read<HabitabilidadBloc>().state.toJson(),
+      acciones: context.read<AccionesBloc>().state.toJson(),
+      ultimaModificacion: DateTime.now(),
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+    );
+
+    context.read<eval.EvaluacionBloc>().add(eval.GuardarEvaluacion(evaluacion));
   }
 
   Widget _buildSeccionIdentificacionEvaluacion() {

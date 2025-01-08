@@ -16,6 +16,14 @@ class RiesgosExternosState {
       otroRiesgo: otroRiesgo ?? this.otroRiesgo,
     );
   }
+
+  Map<String, dynamic> toJson() => {
+    'riesgos': riesgos.map((key, value) => MapEntry(key, {
+      'existeRiesgo': value.existeRiesgo,
+      'comprometeEstabilidad': value.comprometeEstabilidad,
+      'comprometeFuncionalidad': value.comprometeFuncionalidad,
+    })),
+  };
 }
 
 class RiesgoItem {

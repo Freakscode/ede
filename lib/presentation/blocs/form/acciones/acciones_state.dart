@@ -53,4 +53,11 @@ class AccionesState {
       otraEntidad: otraEntidad ?? this.otraEntidad,
     );
   }
+
+  Map<String, dynamic> toJson() => {
+    'evaluacionAdicional': evaluacionAdicional,
+    'recomendaciones': recomendaciones,
+    'entidadesRecomendadas': entidadesRecomendadas,
+    'otraEntidad': otraEntidad,
+  };
 } 

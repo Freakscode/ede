@@ -115,4 +115,16 @@ class EdificacionState {
       complemento: complemento ?? this.complemento,
     );
   }
+
+  Map<String, dynamic> toJson() => {
+    'nombreEdificacion': nombreEdificacion,
+    'direccion': direccion,
+    'comuna': comuna,
+    'barrio': barrio,
+    'cbml': cbml,
+    'nombreContacto': nombreContacto,
+    'telefonoContacto': telefonoContacto,
+    'latitud': latitud,
+    'longitud': longitud,
+  };
 } 

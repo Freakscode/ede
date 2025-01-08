@@ -30,4 +30,9 @@ class EvaluacionDanosState {
       alcanceInterior: alcanceInterior ?? this.alcanceInterior,
     );
   }
+
+  Map<String, dynamic> toJson() => {
+    'condicionesExistentes': condicionesExistentes,
+    'nivelesElementos': nivelesElementos,
+  };
 } 
