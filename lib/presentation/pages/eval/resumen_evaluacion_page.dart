@@ -24,57 +24,167 @@ import '../../blocs/evaluacion/evaluacion_bloc.dart' as eval;
 
 
 
-class ResumenEvaluacionPage extends StatelessWidget {
+class ResumenEvaluacionPage extends StatefulWidget {
   const ResumenEvaluacionPage({super.key});
+
+  @override
+  State<ResumenEvaluacionPage> createState() => _ResumenEvaluacionPageState();
+}
+
+class _ResumenEvaluacionPageState extends State<ResumenEvaluacionPage> {
+  @override
+  void initState() {
+    super.initState();
+    _cargarEvaluacionGuardada();
+  }
+
+  Future<void> _cargarEvaluacionGuardada() async {
+    // TODO: Implementar carga de última evaluación
+  }
+
+  bool _validarDatosRequeridos(BuildContext context) {
+    final evalState = context.read<EvaluacionBloc>().state;
+    final edifState = context.read<EdificacionBloc>().state;
+
+    if (evalState.idGrupo == null || evalState.idGrupo!.isEmpty) {
+      _mostrarError('El ID de grupo es requerido');
+      return false;
+    }
+
+    if (edifState.direccion == null || edifState.direccion!.isEmpty) {
+      _mostrarError('La dirección es requerida');
+      return false;
+    }
+
+    return true;
+  }
+
+  void _mostrarError(String mensaje) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(mensaje),
+        backgroundColor: Colors.red,
+      ),
+    );
+  }
+
+  void _mostrarResultadoOperacion(bool exito, String mensaje) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(mensaje),
+        backgroundColor: exito ? Colors.green : Colors.red,
+      ),
+    );
+  }
+
+  void _guardarEvaluacion(BuildContext context) async {
+    if (!_validarDatosRequeridos(context)) {
+      return;
+    }
+
+    final evaluacion = EvaluacionModel(
+      identificacionEvaluacion: context.read<EvaluacionBloc>().state.toJson(),
+      identificacionEdificacion: context.read<EdificacionBloc>().state.toJson(),
+      descripcionEdificacion: context.read<DescripcionEdificacionBloc>().state.toJson(),
+      riesgosExternos: context.read<RiesgosExternosBloc>().state.toJson(),
+      evaluacionDanos: context.read<EvaluacionDanosBloc>().state.toJson(),
+      nivelDano: context.read<NivelDanoBloc>().state.toJson(),
+      habitabilidad: context.read<HabitabilidadBloc>().state.toJson(),
+      acciones: context.read<AccionesBloc>().state.toJson(),
+      ultimaModificacion: DateTime.now(),
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+    );
+
+    context.read<eval.EvaluacionBloc>().add(eval.GuardarEvaluacion(evaluacion));
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Resumen de la Evaluación'),
+        actions: [
+          _buildSyncIndicator(),
+        ],
       ),
-      floatingActionButton: SpeedDial(
-        icon: Icons.menu,
-        activeIcon: Icons.close,
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          SpeedDialChild(
-            child: const Icon(Icons.download),
-            label: 'Descargar PDF',
-            onTap: () => _handleDownloadPDF(context),
+          FloatingActionButton(
+            heroTag: 'guardar',
+            onPressed: () => _guardarEvaluacion(context),
+            child: const Icon(Icons.save),
           ),
-          SpeedDialChild(
-            child: const Icon(Icons.send),
-            label: 'Enviar PDF',
-            onTap: () => _handleSendPDF(context),
-          ),
-          SpeedDialChild(
-            child: const Icon(Icons.file_download),
-            label: 'Descargar CSV',
-            onTap: () => _handleDownloadCSV(context),
-          ),
-          SpeedDialChild(
-            child: const Icon(Icons.share),
-            label: 'Enviar CSV',
-            onTap: () => _handleSendCSV(context),
+          const SizedBox(height: 16),
+          SpeedDial(
+            icon: Icons.menu,
+            activeIcon: Icons.close,
+            children: [
+              SpeedDialChild(
+                child: const Icon(Icons.download),
+                label: 'Descargar PDF',
+                onTap: () => _handleDownloadPDF(context),
+              ),
+              SpeedDialChild(
+                child: const Icon(Icons.send),
+                label: 'Enviar PDF',
+                onTap: () => _handleSendPDF(context),
+              ),
+              SpeedDialChild(
+                child: const Icon(Icons.file_download),
+                label: 'Descargar CSV',
+                onTap: () => _handleDownloadCSV(context),
+              ),
+              SpeedDialChild(
+                child: const Icon(Icons.share),
+                label: 'Enviar CSV',
+                onTap: () => _handleSendCSV(context),
+              ),
+            ],
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildSeccionIdentificacionEvaluacion(),
-            _buildSeccionIdentificacionEdificacion(),
-            _buildSeccionDescripcionEdificacion(),
-            _buildSeccionRiesgosExternos(),
-            _buildSeccionEvaluacionDanos(),
-            _buildSeccionNivelDano(),
-            _buildSeccionHabitabilidad(),
-            _buildSeccionAcciones(),
-          ],
+      body: BlocListener<eval.EvaluacionBloc, eval.EvaluacionState>(
+        listener: (context, state) {
+          if (state is eval.EvaluacionGuardada) {
+            _mostrarResultadoOperacion(true, 'Evaluación guardada correctamente');
+          } else if (state is eval.EvaluacionError) {
+            _mostrarResultadoOperacion(false, state.mensaje);
+          } else if (state is eval.EvaluacionSincronizada) {
+            _mostrarResultadoOperacion(true, 'Evaluación sincronizada correctamente');
+          }
+        },
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildSeccionIdentificacionEvaluacion(),
+              _buildSeccionIdentificacionEdificacion(),
+              _buildSeccionDescripcionEdificacion(),
+              _buildSeccionRiesgosExternos(),
+              _buildSeccionEvaluacionDanos(),
+              _buildSeccionNivelDano(),
+              _buildSeccionHabitabilidad(),
+              _buildSeccionAcciones(),
+            ],
+          ),
         ),
       ),
+    );
+  }
+
+  Widget _buildSyncIndicator() {
+    return BlocBuilder<eval.EvaluacionBloc, eval.EvaluacionState>(
+      builder: (context, state) {
+        if (state is eval.EvaluacionSincronizando) {
+          return const Padding(
+            padding: EdgeInsets.all(16.0),
+            child: CircularProgressIndicator(color: Colors.white),
+          );
+        }
+        return Container();
+      },
     );
   }
 
@@ -93,23 +203,6 @@ class ResumenEvaluacionPage extends StatelessWidget {
 
   void _handleSendCSV(BuildContext context) {
     // TODO: Implementar envío de CSV
-  }
-
-  void _guardarEvaluacion(BuildContext context) {
-    final evaluacion = EvaluacionModel(
-      identificacionEvaluacion: context.read<EvaluacionBloc>().state.toJson(),
-      identificacionEdificacion: context.read<EdificacionBloc>().state.toJson(),
-      descripcionEdificacion: context.read<DescripcionEdificacionBloc>().state.toJson(),
-      riesgosExternos: context.read<RiesgosExternosBloc>().state.toJson(),
-      evaluacionDanos: context.read<EvaluacionDanosBloc>().state.toJson(),
-      nivelDano: context.read<NivelDanoBloc>().state.toJson(),
-      habitabilidad: context.read<HabitabilidadBloc>().state.toJson(),
-      acciones: context.read<AccionesBloc>().state.toJson(),
-      ultimaModificacion: DateTime.now(),
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-    );
-
-    context.read<eval.EvaluacionBloc>().add(eval.GuardarEvaluacion(evaluacion));
   }
 
   Widget _buildSeccionIdentificacionEvaluacion() {
