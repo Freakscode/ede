@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'id_edificacion_event.dart';
 import 'id_edificacion_state.dart';
 import 'dart:developer' as developer;
+import 'package:flutter/material.dart';
 
 class EdificacionBloc extends Bloc<EdificacionEvent, EdificacionState> {
   EdificacionBloc() : super(EdificacionState()) {
@@ -91,8 +92,27 @@ class EdificacionBloc extends Bloc<EdificacionEvent, EdificacionState> {
     });
 
     on<SetOrientacionVia>((event, emit) {
-      emit(state.copyWith(orientacionVia: event.orientacionVia));
-      developer.log('SetOrientacionVia: ${event.orientacionVia}', name: 'EdificacionBloc');
+      final tipoVia = state.tipoVia;
+      if (tipoVia != null) {
+        if ((tipoVia == 'CL' && event.orientacionVia == 'ESTE') ||
+            (tipoVia == 'CR' && event.orientacionVia == 'SUR')) {
+          // Emitir estado con orientación vacía
+          emit(state.copyWith(orientacionVia: ''));
+          // Mostrar SnackBar con advertencia
+          ScaffoldMessenger.of(event.context).showSnackBar(
+            SnackBar(
+              content: Text(
+                tipoVia == 'CL' 
+                  ? 'Las Calles solo pueden tener orientación SUR'
+                  : 'Las Carreras solo pueden tener orientación ESTE'
+              ),
+              backgroundColor: Colors.orange,
+            ),
+          );
+        } else {
+          emit(state.copyWith(orientacionVia: event.orientacionVia));
+        }
+      }
     });
 
     on<SetTipoVia>((event, emit) {
@@ -111,8 +131,27 @@ class EdificacionBloc extends Bloc<EdificacionEvent, EdificacionState> {
     });
 
     on<SetOrientacionCruce>((event, emit) {
-      emit(state.copyWith(orientacionCruce: event.orientacionCruce));
-      developer.log('SetOrientacionCruce: ${event.orientacionCruce}', name: 'EdificacionBloc');
+      final tipoVia = state.tipoVia;
+      if (tipoVia != null) {
+        if ((tipoVia == 'CL' && event.orientacionCruce == 'ESTE') ||
+            (tipoVia == 'CR' && event.orientacionCruce == 'SUR')) {
+          // Emitir estado con orientación vacía
+          emit(state.copyWith(orientacionCruce: ''));
+          // Mostrar SnackBar con advertencia
+          ScaffoldMessenger.of(event.context).showSnackBar(
+            SnackBar(
+              content: Text(
+                tipoVia == 'CL' 
+                  ? 'Las Calles solo pueden tener orientación SUR'
+                  : 'Las Carreras solo pueden tener orientación ESTE'
+              ),
+              backgroundColor: Colors.orange,
+            ),
+          );
+        } else {
+          emit(state.copyWith(orientacionCruce: event.orientacionCruce));
+        }
+      }
     });
 
     on<SetNumero>((event, emit) {

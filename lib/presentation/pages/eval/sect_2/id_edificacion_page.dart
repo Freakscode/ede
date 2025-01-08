@@ -1,3 +1,5 @@
+// ignore_for_file: unused_field
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../blocs/form/identificacionEdificacion/id_edificacion_bloc.dart';
@@ -8,6 +10,7 @@ import '../../../widgets/navigation_fab_menu.dart';
 import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../../../widgets/map_widget.dart';
+import '../../../widgets/direccion_preview.dart';
 
 enum TipoIdentificacion { medellin, areaMetropolitana }
 
@@ -554,210 +557,255 @@ class _EdificacionPageState extends State<EdificacionPage>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        const DireccionPreview(),
+        const SizedBox(height: 24),
+        
         // Vía Principal
-        Row(
-          children: [
-            Expanded(
-              child: DropdownButtonFormField<String>(
-                decoration: const InputDecoration(
-                  labelText: 'Tipo de Vía',
-                  border: OutlineInputBorder(),
+        Card(
+          elevation: 2,
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Vía Principal',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-                items: ['CL', 'CR', 'CQ', 'TV', 'DG']
-                    .map((e) => DropdownMenuItem(
-                          value: e,
-                          child: Text(e == 'CL' ? 'Calle' :
-                                   e == 'CR' ? 'Carrera' :
-                                   e == 'CQ' ? 'Circular' :
-                                   e == 'TV' ? 'Transversal' : 'Diagonal'),
-                        ))
-                    .toList(),
-                onChanged: (value) {
-                  context.read<EdificacionBloc>().add(SetTipoVia(value ?? ''));
-                },
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Este campo es requerido';
-                  }
-                  return null;
-                },
-              ),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: TextFormField(
-                decoration: const InputDecoration(
-                  labelText: 'Número de Vía',
-                  border: OutlineInputBorder(),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(
+                      flex: 3,
+                      child: DropdownButtonFormField<String>(
+                        decoration: const InputDecoration(
+                          labelText: 'Tipo de Vía',
+                          border: OutlineInputBorder(),
+                        ),
+                        items: ['CL', 'CR', 'CQ', 'TV', 'DG']
+                            .map((e) => DropdownMenuItem(
+                                  value: e,
+                                  child: Text(e == 'CL' ? 'Calle' :
+                                           e == 'CR' ? 'Carrera' :
+                                           e == 'CQ' ? 'Circular' :
+                                           e == 'TV' ? 'Transversal' : 'Diagonal'),
+                                ))
+                            .toList(),
+                        onChanged: (value) {
+                          context.read<EdificacionBloc>().add(SetTipoVia(value ?? ''));
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      flex: 2,
+                      child: TextFormField(
+                        decoration: const InputDecoration(
+                          labelText: 'Número',
+                          border: OutlineInputBorder(),
+                        ),
+                        keyboardType: TextInputType.number,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                          LengthLimitingTextInputFormatter(3),
+                        ],
+                        onChanged: (value) {
+                          context.read<EdificacionBloc>().add(SetNumeroVia(value));
+                        },
+                      ),
+                    ),
+                  ],
                 ),
-                keyboardType: TextInputType.number,
-                inputFormatters: [
-                  FilteringTextInputFormatter.digitsOnly,
-                  LengthLimitingTextInputFormatter(3),
-                ],
-                validator: (value) {
-                  if (value == null || value.isEmpty) return 'Requerido';
-                  final number = int.tryParse(value);
-                  if (number == null || number < 1 || number > 999) {
-                    return 'Entre 1 y 999';
-                  }
-                  return null;
-                },
-                onChanged: (value) {
-                  context.read<EdificacionBloc>().add(SetNumeroVia(value));
-                },
-              ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(
+                      flex: 2,
+                      child: TextFormField(
+                        decoration: const InputDecoration(
+                          labelText: 'Apéndice',
+                          border: OutlineInputBorder(),
+                          hintText: 'A-H, AA-HH',
+                        ),
+                        inputFormatters: [
+                          UpperCaseTextFormatter(),
+                          LengthLimitingTextInputFormatter(2),
+                        ],
+                        onChanged: (value) {
+                          context.read<EdificacionBloc>().add(SetApendiceVia(value));
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      flex: 3,
+                      child: DropdownButtonFormField<String>(
+                        isExpanded: true,
+                        decoration: const InputDecoration(
+                          labelText: 'Orientación',
+                          border: OutlineInputBorder(),
+                        ),
+                        value: context.watch<EdificacionBloc>().state.orientacionVia?.isEmpty ?? true 
+                            ? null 
+                            : context.watch<EdificacionBloc>().state.orientacionVia,
+                        items: [
+                          const DropdownMenuItem(value: '', child: Text('Sin orientación')),
+                          if (context.watch<EdificacionBloc>().state.tipoVia == 'CL')
+                            const DropdownMenuItem(value: 'SUR', child: Text('SUR'))
+                          else if (context.watch<EdificacionBloc>().state.tipoVia == 'CR')
+                            const DropdownMenuItem(value: 'ESTE', child: Text('ESTE')),
+                        ],
+                        onChanged: (value) {
+                          context.read<EdificacionBloc>().add(
+                            SetOrientacionVia(value ?? '', context),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
-          ],
+          ),
         ),
         const SizedBox(height: 16),
-        Row(
-          children: [
-            Expanded(
-              child: TextFormField(
-                decoration: const InputDecoration(
-                  labelText: 'Apéndice Vía',
-                  border: OutlineInputBorder(),
-                  hintText: 'A-H, AA-HH',
-                ),
-                inputFormatters: [
-                  UpperCaseTextFormatter(),
-                  LengthLimitingTextInputFormatter(2),
-                ],
-                onChanged: (value) {
-                  context.read<EdificacionBloc>().add(SetApendiceVia(value));
-                },
-              ),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: DropdownButtonFormField<String>(
-                decoration: const InputDecoration(
-                  labelText: 'Orientación Vía',
-                  border: OutlineInputBorder(),
-                ),
-                items: ['SUR', 'ESTE']
-                    .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                    .toList(),
-                onChanged: (value) {
-                  context.read<EdificacionBloc>().add(SetOrientacionVia(value ?? ''));
-                },
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 24),
+        
         // Cruce
-        const Text(
-          'Cruce',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
+        Card(
+          elevation: 2,
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Cruce',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  decoration: const InputDecoration(
+                    labelText: 'Número',
+                    border: OutlineInputBorder(),
+                  ),
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.digitsOnly,
+                    LengthLimitingTextInputFormatter(3),
+                  ],
+                  onChanged: (value) {
+                    context.read<EdificacionBloc>().add(SetNumeroCruce(value));
+                  },
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(
+                      flex: 2,
+                      child: TextFormField(
+                        decoration: const InputDecoration(
+                          labelText: 'Apéndice',
+                          border: OutlineInputBorder(),
+                          hintText: 'A-H, AA-HH',
+                        ),
+                        inputFormatters: [
+                          UpperCaseTextFormatter(),
+                          LengthLimitingTextInputFormatter(2),
+                        ],
+                        onChanged: (value) {
+                          context.read<EdificacionBloc>().add(SetApendiceCruce(value));
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      flex: 3,
+                      child: DropdownButtonFormField<String>(
+                        isExpanded: true,
+                        decoration: const InputDecoration(
+                          labelText: 'Orientación',
+                          border: OutlineInputBorder(),
+                        ),
+                        value: context.watch<EdificacionBloc>().state.orientacionCruce?.isEmpty ?? true 
+                            ? null 
+                            : context.watch<EdificacionBloc>().state.orientacionCruce,
+                        items: [
+                          const DropdownMenuItem(value: '', child: Text('Sin orientación')),
+                          if (context.watch<EdificacionBloc>().state.tipoVia == 'CL')
+                            const DropdownMenuItem(value: 'SUR', child: Text('SUR'))
+                          else if (context.watch<EdificacionBloc>().state.tipoVia == 'CR')
+                            const DropdownMenuItem(value: 'ESTE', child: Text('ESTE')),
+                        ],
+                        onChanged: (value) {
+                          context.read<EdificacionBloc>().add(
+                            SetOrientacionCruce(value ?? '', context),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
         const SizedBox(height: 16),
-        TextFormField(
-          decoration: const InputDecoration(
-            labelText: 'Número de Cruce',
-            border: OutlineInputBorder(),
-          ),
-          keyboardType: TextInputType.number,
-          inputFormatters: [
-            FilteringTextInputFormatter.digitsOnly,
-            LengthLimitingTextInputFormatter(3),
-          ],
-          validator: (value) {
-            if (value?.isNotEmpty ?? false) {
-              final number = int.tryParse(value!);
-              if (number == null || number < 1 || number > 999) {
-                return 'Entre 1 y 999';
-              }
-            }
-            return null;
-          },
-          onChanged: (value) {
-            context.read<EdificacionBloc>().add(SetNumeroCruce(value));
-          },
-        ),
-        const SizedBox(height: 16),
-        Row(
-          children: [
-            Expanded(
-              child: TextFormField(
-                decoration: const InputDecoration(
-                  labelText: 'Apéndice Cruce',
-                  border: OutlineInputBorder(),
-                  hintText: 'A-H, AA-HH',
-                ),
-                inputFormatters: [
-                  UpperCaseTextFormatter(),
-                  LengthLimitingTextInputFormatter(2),
-                ],
-                onChanged: (value) {
-                  context.read<EdificacionBloc>().add(SetApendiceCruce(value));
-                },
-              ),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: DropdownButtonFormField<String>(
-                decoration: const InputDecoration(
-                  labelText: 'Orientación Cruce',
-                  border: OutlineInputBorder(),
-                ),
-                items: ['SUR', 'ESTE']
-                    .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                    .toList(),
-                onChanged: (value) {
-                  context.read<EdificacionBloc>().add(SetOrientacionCruce(value ?? ''));
-                },
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 24),
+        
         // Número y Complemento
-        Row(
-          children: [
-            Expanded(
-              child: TextFormField(
-                decoration: const InputDecoration(
-                  labelText: 'Número',
-                  border: OutlineInputBorder(),
+        Card(
+          elevation: 2,
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Número y Complemento',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-                keyboardType: TextInputType.number,
-                inputFormatters: [
-                  FilteringTextInputFormatter.digitsOnly,
-                  LengthLimitingTextInputFormatter(3),
-                ],
-                validator: (value) {
-                  if (value?.isNotEmpty ?? false) {
-                    final number = int.tryParse(value!);
-                    if (number == null || number < 1 || number > 999) {
-                      return 'Entre 1 y 999';
-                    }
-                  }
-                  return null;
-                },
-                onChanged: (value) {
-                  context.read<EdificacionBloc>().add(SetNumero(value));
-                },
-              ),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: TextFormField(
-                decoration: const InputDecoration(
-                  labelText: 'Complemento',
-                  border: OutlineInputBorder(),
-                  hintText: 'Edificio, Manzana, etc.',
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextFormField(
+                        decoration: const InputDecoration(
+                          labelText: 'Número',
+                          border: OutlineInputBorder(),
+                        ),
+                        keyboardType: TextInputType.number,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                          LengthLimitingTextInputFormatter(3),
+                        ],
+                        onChanged: (value) {
+                          context.read<EdificacionBloc>().add(SetNumero(value));
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: TextFormField(
+                        decoration: const InputDecoration(
+                          labelText: 'Complemento',
+                          border: OutlineInputBorder(),
+                          hintText: 'Edificio, Manzana, etc.',
+                        ),
+                        onChanged: (value) {
+                          context.read<EdificacionBloc>().add(SetComplemento(value));
+                        },
+                      ),
+                    ),
+                  ],
                 ),
-                onChanged: (value) {
-                  context.read<EdificacionBloc>().add(SetComplemento(value));
-                },
-              ),
+              ],
             ),
-          ],
+          ),
         ),
       ],
     );

@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 abstract class EdificacionEvent {}
 
 // Eventos para Datos Generales
@@ -96,7 +98,9 @@ class SetApendiceVia extends EdificacionEvent {
 
 class SetOrientacionVia extends EdificacionEvent {
   final String orientacionVia;
-  SetOrientacionVia(this.orientacionVia);
+  final BuildContext context;
+  
+  SetOrientacionVia(this.orientacionVia, this.context);
 }
 
 class SetTipoVia extends EdificacionEvent {
@@ -117,7 +121,9 @@ class SetApendiceCruce extends EdificacionEvent {
 
 class SetOrientacionCruce extends EdificacionEvent {
   final String orientacionCruce;
-  SetOrientacionCruce(this.orientacionCruce);
+  final BuildContext context;
+  
+  SetOrientacionCruce(this.orientacionCruce, this.context);
 }
 
 class SetNumero extends EdificacionEvent {

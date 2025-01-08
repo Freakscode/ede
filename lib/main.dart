@@ -17,6 +17,7 @@ import 'presentation/blocs/users/users_bloc.dart';
 import 'presentation/blocs/users/users_event.dart';
 import 'presentation/blocs/form/identificacionEvaluacion/id_evaluacion_bloc.dart';
 import 'presentation/pages/eval/eval_wrapper.dart';
+import 'core/providers.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -47,9 +48,12 @@ Future<void> main() async {
     developer.log('App initialization complete', name: 'App');
     
     runApp(
-      MainApp(
-        dataRepository: dataRepository,
-        authRepository: authRepository,
+      MultiBlocProvider(
+        providers: globalProviders,
+        child: MainApp(
+          dataRepository: dataRepository,
+          authRepository: authRepository,
+        ),
       ),
     );
   } catch (e, stackTrace) {
