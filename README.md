@@ -206,8 +206,3 @@ Estas opciones están integradas como botones flotantes accesibles desde la pant
 La aplicación de Evaluación de Edificaciones está diseñada con una arquitectura modular y escalable, utilizando patrones de diseño modernos que facilitan el mantenimiento y la extensión de funcionalidades. El uso de BLoC asegura una gestión eficiente del estado, mientras que la interfaz de usuario intuitiva permite a los usuarios realizar evaluaciones detalladas y generar reportes de manera sencilla.
 
 Se recomienda continuar expandiendo las funcionalidades según las necesidades específicas, implementando pruebas unitarias para garantizar la robustez del sistema y optimizando la interfaz para una mejor experiencia de usuario.
-
----
-
-**Nota:** Asegúrate de tener todas las dependencias necesarias instaladas y correctamente configuradas en el archivo `pubspec.yaml`, incluyendo `flutter_bloc` y `flutter_speed_dial`, para el correcto funcionamiento de la aplicación.
-
