@@ -177,7 +177,3 @@ La aplicación de Evaluación de Edificaciones está diseñada con una arquitect
 
 Se recomienda continuar expandiendo las funcionalidades según las necesidades específicas, implementando pruebas unitarias para garantizar la robustez del sistema y optimizando la interfaz para una mejor experiencia de usuario.
 
----
-
-**Nota:** Asegúrate de tener todas las dependencias necesarias instaladas y correctamente configuradas en el archivo `pubspec.yaml`, incluyendo `flutter_bloc` y `flutter_speed_dial`, para el correcto funcionamiento de la aplicación.
-
