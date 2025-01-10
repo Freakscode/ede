@@ -685,7 +685,7 @@ class _DescripcionEdificacionPageState extends State<DescripcionEdificacionPage>
                           ),
                       ],
                     );
-                  }).toList(),
+                  }),
                   
                   const SizedBox(height: 16),
                   // Observaciones
@@ -829,7 +829,7 @@ class _DescripcionEdificacionPageState extends State<DescripcionEdificacionPage>
                           ),
                         ),
                     ],
-                  )).toList(),
+                  )),
 
                   if (state.materialEntrepiso == 'Otro')
                     Padding(
@@ -940,7 +940,7 @@ class _DescripcionEdificacionPageState extends State<DescripcionEdificacionPage>
                           ),
                         ),
                     ],
-                  )).toList(),
+                  )),
 
                   const Divider(height: 32),
 
@@ -991,7 +991,7 @@ class _DescripcionEdificacionPageState extends State<DescripcionEdificacionPage>
                           ),
                         ),
                     ],
-                  )).toList(),
+                  )),
                 ],
               );
             },
@@ -1088,7 +1088,7 @@ class _DescripcionEdificacionPageState extends State<DescripcionEdificacionPage>
                           ),
                         ),
                     ],
-                  )).toList(),
+                  )),
 
                   const Divider(height: 32),
 
@@ -1140,7 +1140,7 @@ class _DescripcionEdificacionPageState extends State<DescripcionEdificacionPage>
                           ),
                         ),
                     ],
-                  )).toList(),
+                  )),
 
                   if (mostrarEscaleras) ...[
                     const Divider(height: 32),
@@ -1193,7 +1193,7 @@ class _DescripcionEdificacionPageState extends State<DescripcionEdificacionPage>
                             ),
                           ),
                       ],
-                    )).toList(),
+                    )),
                   ],
                 ],
               );

@@ -9,11 +9,13 @@ import 'dart:developer' as developer;
 import '../../domain/repositories/auth_repository.dart';
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import '../datasources/remote_datasource.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthRepository implements IAuthRepository {
   static const ACCESS_TOKEN_KEY = 'access_token';
   static const REFRESH_TOKEN_KEY = 'refresh_token';
   static const LAST_SYNC_KEY = 'last_sync';
+  static const SIGNATURE_KEY = 'user_signature';
   
   final RemoteDatasource remoteDatasource;
   final _storage = const FlutterSecureStorage();
@@ -24,6 +26,26 @@ class AuthRepository implements IAuthRepository {
     final bytes = utf8.encode(password);
     final digest = sha256.convert(bytes);
     return digest.toString();
+  }
+
+  Future<String?> getToken() async {
+    return await _storage.read(key: ACCESS_TOKEN_KEY);
+  }
+
+  Future<void> deleteToken() async {
+    await _storage.delete(key: ACCESS_TOKEN_KEY);
+  }
+
+  Future<void> saveSignature(String signaturePath) async {
+    await _storage.write(key: SIGNATURE_KEY, value: signaturePath);
+  }
+
+  Future<String?> getSignature() async {
+    return await _storage.read(key: SIGNATURE_KEY);
+  }
+
+  Future<void> deleteSignature() async {
+    await _storage.delete(key: SIGNATURE_KEY);
   }
 
   @override
@@ -129,11 +151,6 @@ class AuthRepository implements IAuthRepository {
       await logout();
       return false;
     }
-  }
-
-  @override
-  Future<String?> getToken() async {
-    return await _storage.read(key: ACCESS_TOKEN_KEY);
   }
 
   @override

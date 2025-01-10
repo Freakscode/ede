@@ -3,12 +3,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:dio/dio.dart';
 import 'dart:developer' as developer;
 
 import 'presentation/blocs/auth/auth_bloc.dart';
 import 'presentation/blocs/auth/auth_event.dart';
 import 'config/router/router_helper.dart';
 import 'data/repositories/auth_repository.dart';
+import 'data/repositories/evaluacion_repository.dart';
 import 'data/datasources/local_database_provider.dart';
 import 'data/datasources/local_datasource.dart';
 import 'data/datasources/remote_datasource.dart';
@@ -18,6 +21,7 @@ import 'presentation/blocs/users/users_event.dart';
 import 'presentation/blocs/form/identificacionEvaluacion/id_evaluacion_bloc.dart';
 import 'presentation/pages/eval/eval_wrapper.dart';
 import 'core/providers.dart';
+import 'config/theme/app_theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,73 +29,59 @@ Future<void> main() async {
   try {
     developer.log('Starting app initialization...', name: 'App');
     
-    // 1. Open local DB
-    developer.log('Opening local database...', name: 'App');
-    final database = await LocalDatabaseProvider.open();
+    // Inicializar SharedPreferences
+    final prefs = await SharedPreferences.getInstance();
     
-    // 2. Create data sources
-    developer.log('Creating data sources...', name: 'App');
-    final localDataSource = LocalDataSource(database);
+    // Inicializar Dio
+    final dio = Dio();
+    
+    // Crear repositorios
+    final evaluacionRepository = EvaluacionRepository(
+      prefs: prefs,
+      dio: dio,
+      baseUrl: 'https://api.example.com', // Reemplazar con la URL real
+    );
+
     final remoteDataSource = await RemoteDatasource.create();
-    
-    // 3. Create repositories
-    developer.log('Creating repositories...', name: 'App');
     final authRepository = AuthRepository(
       remoteDatasource: remoteDataSource,
     );
 
-    final dataRepository = DataRepository(
-      localDataSource: localDataSource,
-      remoteDataSource: remoteDataSource,
-    );
-
-    developer.log('App initialization complete', name: 'App');
-    
-    runApp(
-      MultiBlocProvider(
-        providers: globalProviders,
-        child: MainApp(
-          dataRepository: dataRepository,
-          authRepository: authRepository,
-        ),
-      ),
-    );
-  } catch (e, stackTrace) {
-    developer.log(
-      'Failed to initialize app',
-      name: 'App',
-      error: e,
-      stackTrace: stackTrace
-    );
+    runApp(MyApp(
+      evaluacionRepository: evaluacionRepository,
+      authRepository: authRepository,
+    ));
+  } catch (e) {
+    developer.log('Error during initialization: $e', name: 'App', error: e);
     rethrow;
   }
 }
 
-class MainApp extends StatelessWidget {
-  final DataRepository dataRepository;
+class MyApp extends StatelessWidget {
+  final EvaluacionRepository evaluacionRepository;
   final AuthRepository authRepository;
-  
-  const MainApp({
+
+  const MyApp({
     super.key,
-    required this.dataRepository,
+    required this.evaluacionRepository,
     required this.authRepository,
   });
 
   @override
   Widget build(BuildContext context) {
-    return EvalWrapper(
+    return MultiRepositoryProvider(
+      providers: [
+        RepositoryProvider.value(value: evaluacionRepository),
+        RepositoryProvider.value(value: authRepository),
+      ],
       child: MultiBlocProvider(
-        providers: [
-          BlocProvider<AuthBloc>(
-            create: (_) => AuthBloc(authRepository: authRepository)..add(AppStarted()),
-          ),
-          BlocProvider<UsersBloc>(
-            create: (_) => UsersBloc(repository: dataRepository),
-          ),
-        ],
+        providers: getGlobalProviders(evaluacionRepository, authRepository),
         child: Builder(
           builder: (context) => MaterialApp.router(
+            title: 'EDE App',
+            theme: AppTheme.theme,
             routerConfig: getAppRouter(context),
+            debugShowCheckedModeBanner: false,
           ),
         ),
       ),

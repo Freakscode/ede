@@ -123,24 +123,46 @@ class _EdificacionPageState extends State<EdificacionPage>
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Identificación de la Edificación'),
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          elevation: 2,
           bottom: TabBar(
             controller: _tabController,
             isScrollable: true,
+            labelColor: Theme.of(context).colorScheme.secondary,
+            unselectedLabelColor: Colors.white,
+            indicatorColor: Theme.of(context).colorScheme.secondary,
+            indicatorWeight: 3,
+            labelStyle: const TextStyle(fontWeight: FontWeight.bold),
+            unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.normal),
+            indicator: UnderlineTabIndicator(
+              borderSide: BorderSide(
+                width: 3,
+                color: Theme.of(context).colorScheme.secondary,
+              ),
+            ),
+            overlayColor: WidgetStateProperty.resolveWith<Color?>(
+              (Set<WidgetState> states) {
+                if (states.contains(WidgetState.pressed)) {
+                  return Theme.of(context).colorScheme.secondary.withOpacity(0.1);
+                }
+                return null;
+              },
+            ),
             tabs: const [
               Tab(
-                icon: Icon(Icons.description),
+                icon: Icon(Icons.description, size: 24),
                 text: 'Datos Generales',
               ),
               Tab(
-                icon: Icon(Icons.location_city),
+                icon: Icon(Icons.location_city, size: 24),
                 text: 'Dirección',
               ),
               Tab(
-                icon: Icon(Icons.location_on),
+                icon: Icon(Icons.location_on, size: 24),
                 text: 'Catastro',
               ),
               Tab(
-                icon: Icon(Icons.person),
+                icon: Icon(Icons.person, size: 24),
                 text: 'Contacto',
               ),
             ],
@@ -223,15 +245,22 @@ class _EdificacionPageState extends State<EdificacionPage>
           children: [
             Expanded(
               child: DropdownButtonFormField<String>(
+                isExpanded: true,
+                menuMaxHeight: 300,
                 decoration: const InputDecoration(
                   labelText: 'Departamento',
                   border: OutlineInputBorder(),
+                  contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
                 ),
                 value: 'Antioquia',
                 items: ['Antioquia'].map((String value) {
                   return DropdownMenuItem<String>(
                     value: value,
-                    child: Text(value),
+                    child: Text(
+                      value,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   );
                 }).toList(),
                 onChanged: (value) {
@@ -242,15 +271,22 @@ class _EdificacionPageState extends State<EdificacionPage>
             const SizedBox(width: 16),
             Expanded(
               child: DropdownButtonFormField<String>(
+                isExpanded: true,
+                menuMaxHeight: 300,
                 decoration: const InputDecoration(
                   labelText: 'Municipio',
                   border: OutlineInputBorder(),
+                  contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
                 ),
                 value: 'Medellín',
                 items: ['Medellín'].map((String value) {
                   return DropdownMenuItem<String>(
                     value: value,
-                    child: Text(value),
+                    child: Text(
+                      value,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   );
                 }).toList(),
                 onChanged: (value) {
@@ -265,15 +301,22 @@ class _EdificacionPageState extends State<EdificacionPage>
           children: [
             Expanded(
               child: DropdownButtonFormField<String>(
+                isExpanded: true,
+                menuMaxHeight: 300,
                 decoration: const InputDecoration(
                   labelText: 'Comuna',
                   border: OutlineInputBorder(),
+                  contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
                 ),
                 items: List.generate(16, (index) => 'Comuna ${index + 1}')
                     .map((String value) {
                   return DropdownMenuItem<String>(
                     value: value,
-                    child: Text(value),
+                    child: Text(
+                      value,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   );
                 }).toList(),
                 onChanged: (value) {
@@ -290,9 +333,12 @@ class _EdificacionPageState extends State<EdificacionPage>
             const SizedBox(width: 16),
             Expanded(
               child: DropdownButtonFormField<String>(
+                isExpanded: true,
+                menuMaxHeight: 300,
                 decoration: const InputDecoration(
                   labelText: 'Barrio',
                   border: OutlineInputBorder(),
+                  contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
                 ),
                 items: const [], // Cargar según la comuna seleccionada
                 onChanged: (value) {
@@ -580,6 +626,7 @@ class _EdificacionPageState extends State<EdificacionPage>
                     Expanded(
                       flex: 3,
                       child: DropdownButtonFormField<String>(
+                        isExpanded: true,
                         decoration: const InputDecoration(
                           labelText: 'Tipo de Vía',
                           border: OutlineInputBorder(),
@@ -587,10 +634,13 @@ class _EdificacionPageState extends State<EdificacionPage>
                         items: ['CL', 'CR', 'CQ', 'TV', 'DG']
                             .map((e) => DropdownMenuItem(
                                   value: e,
-                                  child: Text(e == 'CL' ? 'Calle' :
-                                           e == 'CR' ? 'Carrera' :
-                                           e == 'CQ' ? 'Circular' :
-                                           e == 'TV' ? 'Transversal' : 'Diagonal'),
+                                  child: Text(
+                                    e == 'CL' ? 'Calle' :
+                                    e == 'CR' ? 'Carrera' :
+                                    e == 'CQ' ? 'Circular' :
+                                    e == 'TV' ? 'Transversal' : 'Diagonal',
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
                                 ))
                             .toList(),
                         onChanged: (value) {
@@ -646,16 +696,26 @@ class _EdificacionPageState extends State<EdificacionPage>
                         decoration: const InputDecoration(
                           labelText: 'Orientación',
                           border: OutlineInputBorder(),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
                         ),
                         value: context.watch<EdificacionBloc>().state.orientacionVia?.isEmpty ?? true 
                             ? null 
                             : context.watch<EdificacionBloc>().state.orientacionVia,
                         items: [
-                          const DropdownMenuItem(value: '', child: Text('Sin orientación')),
+                          const DropdownMenuItem(
+                            value: '', 
+                            child: Text('Sin orientación', overflow: TextOverflow.ellipsis),
+                          ),
                           if (context.watch<EdificacionBloc>().state.tipoVia == 'CL')
-                            const DropdownMenuItem(value: 'SUR', child: Text('SUR'))
+                            const DropdownMenuItem(
+                              value: 'SUR', 
+                              child: Text('SUR', overflow: TextOverflow.ellipsis),
+                            )
                           else if (context.watch<EdificacionBloc>().state.tipoVia == 'CR')
-                            const DropdownMenuItem(value: 'ESTE', child: Text('ESTE')),
+                            const DropdownMenuItem(
+                              value: 'ESTE', 
+                              child: Text('ESTE', overflow: TextOverflow.ellipsis),
+                            ),
                         ],
                         onChanged: (value) {
                           context.read<EdificacionBloc>().add(

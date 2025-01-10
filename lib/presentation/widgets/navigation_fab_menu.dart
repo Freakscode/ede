@@ -11,133 +11,150 @@ class NavigationFabMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    
     return FloatingActionButton(
       onPressed: () {
         showModalBottomSheet(
           context: context,
+          isScrollControlled: true,
+          backgroundColor: theme.colorScheme.surface,
           builder: (BuildContext context) {
             return Container(
-              padding: const EdgeInsets.symmetric(vertical: 16.0),
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(context).size.height * 0.8,
+              ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text(
-                    'Navegación',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+                  // Barra de arrastre
+                  Container(
+                    width: 40,
+                    height: 4,
+                    margin: const EdgeInsets.symmetric(vertical: 8),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.primary.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(2),
                     ),
                   ),
-                  const Divider(),
-                  ListTile(
-                    leading: const Icon(Icons.assignment),
-                    title: const Text('1. Identificación de la Evaluación'),
-                    selected: currentRoute == '/id_evaluacion',
-                    onTap: () {
-                      context.pop();
-                      if (currentRoute != '/id_evaluacion') {
-                        context.go('/id_evaluacion');
-                      }
-                    },
+                  // Título
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text(
+                      'Navegación',
+                      style: theme.textTheme.titleLarge,
+                    ),
                   ),
-                  ListTile(
-                    leading: const Icon(Icons.business),
-                    title: const Text('2. Identificación de la Edificación'),
-                    selected: currentRoute == '/id_edificacion',
-                    onTap: () {
-                      context.pop();
-                      if (currentRoute != '/id_edificacion') {
-                        context.go('/id_edificacion');
-                      }
-                    },
-                  ),
-                  ListTile(
-                    leading: const Icon(Icons.description),
-                    title: const Text('3. Descripción de la Edificación'),
-                    selected: currentRoute == '/descripcion_edificacion',
-                    onTap: () {
-                      context.pop();
-                      if (currentRoute != '/descripcion_edificacion') {
-                        context.go('/descripcion_edificacion');
-                      }
-                    },
-                  ),
-                  ListTile(
-                    leading: const Icon(Icons.warning),
-                    title: const Text('4. Riesgos Externos'),
-                    selected: currentRoute == '/riesgos_externos',
-                    onTap: () {
-                      context.pop();
-                      if (currentRoute != '/riesgos_externos') {
-                        context.go('/riesgos_externos');
-                      }
-                    },
-                  ),
-                  ListTile(
-                    leading: const Icon(Icons.build),
-                    title: const Text('5. Evaluación de Daños'),
-                    selected: currentRoute == '/evaluacion_danos',
-                    onTap: () {
-                      context.pop();
-                      if (currentRoute != '/evaluacion_danos') {
-                        context.go('/evaluacion_danos');
-                      }
-                    },
-                  ),
-                  ListTile(
-                    leading: const Icon(Icons.assessment),
-                    title: const Text('6. Nivel de Daño'),
-                    selected: currentRoute == '/nivel_dano',
-                    onTap: () {
-                      context.pop();
-                      if (currentRoute != '/nivel_dano') {
-                        context.go('/nivel_dano');
-                      }
-                    },
-                  ),
-                  ListTile(
-                    leading: const Icon(Icons.home),
-                    title: const Text('7. Habitabilidad'),
-                    selected: currentRoute == '/habitabilidad',
-                    onTap: () {
-                      context.pop();
-                      if (currentRoute != '/habitabilidad') {
-                        context.go('/habitabilidad');
-                      }
-                    },
-                  ),
-                  ListTile(
-                    leading: const Icon(Icons.recommend),
-                    title: const Text('8. Acciones Recomendadas'),
-                    selected: currentRoute == '/acciones',
-                    onTap: () {
-                      context.pop();
-                      if (currentRoute != '/acciones') {
-                        context.go('/acciones');
-                      }
-                    },
-                  ),
-                  ListTile(
-                    leading: const Icon(Icons.summarize),
-                    title: const Text('Resumen'),
-                    selected: currentRoute == '/resumen',
-                    onTap: () {
-                      context.pop();
-                      if (currentRoute != '/resumen') {
-                        context.go('/resumen');
-                      }
-                    },
+                  const Divider(height: 1),
+                  // Lista scrolleable
+                  Flexible(
+                    child: ListView(
+                      shrinkWrap: true,
+                      children: [
+                        _buildNavigationItem(
+                          context,
+                          'id_evaluacion',
+                          '1. Identificación de la Evaluación',
+                          Icons.assignment,
+                        ),
+                        _buildNavigationItem(
+                          context,
+                          'id_edificacion',
+                          '2. Identificación de la Edificación',
+                          Icons.business,
+                        ),
+                        _buildNavigationItem(
+                          context,
+                          'descripcion_edificacion',
+                          '3. Descripción de la Edificación',
+                          Icons.description,
+                        ),
+                        _buildNavigationItem(
+                          context,
+                          'riesgos_externos',
+                          '4. Riesgos Externos',
+                          Icons.warning,
+                        ),
+                        _buildNavigationItem(
+                          context,
+                          'evaluacion_danos',
+                          '5. Evaluación de Daños',
+                          Icons.build,
+                        ),
+                        _buildNavigationItem(
+                          context,
+                          'nivel_dano',
+                          '6. Nivel de Daño',
+                          Icons.assessment,
+                        ),
+                        _buildNavigationItem(
+                          context,
+                          'habitabilidad',
+                          '7. Habitabilidad',
+                          Icons.home,
+                        ),
+                        _buildNavigationItem(
+                          context,
+                          'acciones',
+                          '8. Acciones Recomendadas',
+                          Icons.recommend,
+                        ),
+                        _buildNavigationItem(
+                          context,
+                          'resumen',
+                          'Resumen',
+                          Icons.summarize,
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
             );
           },
           shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            borderRadius: BorderRadius.vertical(
+              top: Radius.circular(20),
+            ),
           ),
         );
       },
+      backgroundColor: theme.colorScheme.secondary,
+      foregroundColor: theme.colorScheme.primary,
       child: const Icon(Icons.menu),
+    );
+  }
+
+  Widget _buildNavigationItem(
+    BuildContext context,
+    String route,
+    String title,
+    IconData icon,
+  ) {
+    final theme = Theme.of(context);
+    final bool isSelected = currentRoute == '/$route';
+    
+    return ListTile(
+      dense: true,
+      leading: Icon(
+        icon,
+        color: isSelected ? theme.colorScheme.secondary : theme.colorScheme.primary,
+      ),
+      title: Text(
+        title,
+        style: TextStyle(
+          color: isSelected ? theme.colorScheme.secondary : theme.colorScheme.primary,
+          fontWeight: isSelected ? FontWeight.bold : null,
+        ),
+      ),
+      selected: isSelected,
+      selectedTileColor: theme.colorScheme.secondary.withOpacity(0.1),
+      onTap: () {
+        Navigator.pop(context);
+        if (!isSelected) {
+          context.go('/$route');
+        }
+      },
     );
   }
 } 

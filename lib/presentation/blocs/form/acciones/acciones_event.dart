@@ -30,4 +30,10 @@ class SetEntidadRecomendada extends AccionesEvent {
     required this.valor,
     this.otraEntidad,
   });
+}
+
+class SetRecomendacionesEspecificas extends AccionesEvent {
+  final String recomendaciones;
+  
+  SetRecomendacionesEspecificas(this.recomendaciones);
 } 

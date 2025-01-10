@@ -9,6 +9,7 @@ import 'package:go_router/go_router.dart';
 import '../../presentation/blocs/auth/auth_bloc.dart';
 import '../../presentation/blocs/auth/auth_event.dart';
 import '../../presentation/blocs/auth/auth_state.dart';
+import '../../presentation/blocs/form/evaluacion/evaluacion_bloc.dart';
 
 import '../../presentation/pages/home/home_screen.dart';
 import '../../presentation/pages/login/login_screen.dart';
@@ -25,20 +26,6 @@ import '../../presentation/pages/eval/resumen_evaluacion_page.dart';
 GoRouter getAppRouter(BuildContext context) {
   return GoRouter(
     initialLocation: '/',
-    redirect: (BuildContext context, GoRouterState state) {
-      final bool isLoginRoute = state.matchedLocation == '/login';
-      final authState = context.read<AuthBloc>().state;
-
-      if (authState is AuthUnauthenticated && !isLoginRoute) {
-        return '/login';
-      }
-
-      if (authState is AuthAuthenticated && isLoginRoute) {
-        return '/home';
-      }
-
-      return null;
-    },
     routes: [
       GoRoute(
         path: '/',
@@ -48,43 +35,62 @@ GoRouter getAppRouter(BuildContext context) {
         path: '/login',
         builder: (context, state) => const LoginScreen(),
       ),
-      GoRoute(
-        path: '/id_evaluacion',
-        builder: (context, state) => const EvaluacionWizardPage(),
-      ),
-      GoRoute(
-        path: '/id_edificacion',
-        builder: (context, state) => const EdificacionPageWrapper(),
-      ),
-      GoRoute(
-        path: '/descripcion_edificacion',
-        builder: (context, state) => const DescripcionEdificacionPage(),
-      ),
-      GoRoute(
-        path: '/riesgos_externos',
-        builder: (context, state) => const RiesgosExternosPage(),
-      ),
-      GoRoute(
-        path: '/evaluacion_danos',
-        builder: (context, state) => const EvaluacionDanosPage(),
-      ),
-      GoRoute(
-        path: '/nivel_dano',
-        builder: (context, state) => const NivelDanoPage(),
-      ),
-      GoRoute(
-        path: '/habitabilidad',
-        builder: (context, state) => const HabitabilidadPage(),
-      ),
-      GoRoute(
-        path: '/acciones',
-        builder: (context, state) => const AccionesPage(),
-      ),
-      GoRoute(
-        path: '/resumen',
-        builder: (context, state) => const ResumenEvaluacionPage(),
+      ShellRoute(
+        builder: (context, state, child) => child,
+        routes: [
+          GoRoute(
+            path: '/id_evaluacion',
+            builder: (context, state) => const EvaluacionWizardPage(),
+          ),
+          GoRoute(
+            path: '/id_edificacion',
+            builder: (context, state) => const EdificacionPageWrapper(),
+          ),
+          GoRoute(
+            path: '/descripcion_edificacion',
+            builder: (context, state) => const DescripcionEdificacionPage(),
+          ),
+          GoRoute(
+            path: '/riesgos_externos',
+            builder: (context, state) => const RiesgosExternosPage(),
+          ),
+          GoRoute(
+            path: '/evaluacion_danos',
+            builder: (context, state) => const EvaluacionDanosPage(),
+          ),
+          GoRoute(
+            path: '/nivel_dano',
+            builder: (context, state) => const NivelDanoPage(),
+          ),
+          GoRoute(
+            path: '/habitabilidad',
+            builder: (context, state) => const HabitabilidadPage(),
+          ),
+          GoRoute(
+            path: '/acciones',
+            builder: (context, state) => const AccionesPage(),
+          ),
+          GoRoute(
+            path: '/resumen',
+            builder: (context, state) => const ResumenEvaluacionPage(),
+          ),
+        ],
       ),
     ],
+    redirect: (context, state) {
+      final authBloc = context.read<AuthBloc>();
+      final bool isLoginRoute = state.matchedLocation == '/login';
+
+      if (authBloc.state is AuthUnauthenticated && !isLoginRoute) {
+        return '/login';
+      }
+
+      if (authBloc.state is AuthAuthenticated && isLoginRoute) {
+        return '/home';
+      }
+
+      return null;
+    },
     refreshListenable: GoRouterRefreshStream(
       context.read<AuthBloc>().stream,
     ),

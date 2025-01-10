@@ -42,5 +42,11 @@ class AccionesBloc extends Bloc<AccionesEvent, AccionesState> {
           'SetEntidadRecomendada: ${event.entidad} - ${event.valor}${event.otraEntidad != null ? ' - ${event.otraEntidad}' : ''}',
           name: 'AccionesBloc');
     });
+
+    on<SetRecomendacionesEspecificas>((event, emit) {
+      emit(state.copyWith(recomendacionesEspecificas: event.recomendaciones));
+      developer.log('SetRecomendacionesEspecificas: ${event.recomendaciones}',
+          name: 'AccionesBloc');
+    });
   }
 } 

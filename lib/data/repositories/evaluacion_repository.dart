@@ -10,6 +10,8 @@ class EvaluacionRepository {
   final Dio dio;
   final String baseUrl;
   static const timeout = Duration(seconds: 30);
+  static const String FIRMA_KEY = 'firma_evaluador';
+  static const String FIRMA_DEFAULT_KEY = 'firma_default';
 
   EvaluacionRepository({
     required this.prefs,
@@ -161,5 +163,27 @@ class EvaluacionRepository {
     } catch (e) {
       throw Exception('Error al obtener la evaluación: $e');
     }
+  }
+
+  // Guardar firma del evaluador
+  Future<void> guardarFirmaEvaluador(String firmaPath) async {
+    try {
+      await prefs.setString(FIRMA_KEY, firmaPath);
+    } catch (e) {
+      throw Exception('Error al guardar la firma: $e');
+    }
+  }
+
+  // Obtener firma del evaluador
+  String? obtenerFirmaEvaluador() {
+    try {
+      return prefs.getString(FIRMA_KEY);
+    } catch (e) {
+      throw Exception('Error al obtener la firma: $e');
+    }
+  }
+
+  Future<void> eliminarFirmaEvaluador() async {
+    await prefs.remove(FIRMA_KEY);
   }
 } 

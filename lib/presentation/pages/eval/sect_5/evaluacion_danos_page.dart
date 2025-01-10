@@ -3,26 +3,37 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../presentation/blocs/form/evaluacionDanos/evaluacion_danos_bloc.dart';
 import '../../../../presentation/blocs/form/evaluacionDanos/evaluacion_danos_event.dart';
 import '../../../../presentation/blocs/form/evaluacionDanos/evaluacion_danos_state.dart';
+import '../../../../presentation/widgets/navigation_fab_menu.dart';
 
 class EvaluacionDanosPage extends StatelessWidget {
   const EvaluacionDanosPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    
     return Scaffold(
+      backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
-        title: const Text('Evaluación de Daños en la Edificación'),
+        title: const Text('Evaluación de Daños'),
+        backgroundColor: theme.colorScheme.surface,
+        elevation: 2,
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
+      floatingActionButton: const NavigationFabMenu(
+        currentRoute: '/evaluacion_danos',
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24.0),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _buildCondicionesExistentes(),
+              _buildCondicionesExistentes(theme),
               const SizedBox(height: 24),
-              _buildNivelesElementos(),
+              _buildNivelesElementos(theme),
               const SizedBox(height: 24),
-              _buildAlcanceEvaluacion(),
+              _buildAlcanceEvaluacion(theme),
+              const SizedBox(height: 32),
             ],
           ),
         ),
@@ -30,7 +41,7 @@ class EvaluacionDanosPage extends StatelessWidget {
     );
   }
 
-  Widget _buildCondicionesExistentes() {
+  Widget _buildCondicionesExistentes(ThemeData theme) {
     final condiciones = {
       '5.1': 'Colapso total',
       '5.2': 'Colapso parcial',
@@ -41,46 +52,71 @@ class EvaluacionDanosPage extends StatelessWidget {
     };
 
     return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(24.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Determinar la existencia de las siguientes Condiciones:',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            Text(
+              '5.1 Condiciones Existentes',
+              style: theme.textTheme.titleLarge,
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 8),
+            Text(
+              'Determinar la existencia de las siguientes condiciones:',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.primary.withOpacity(0.7),
+              ),
+            ),
+            const SizedBox(height: 24),
             BlocBuilder<EvaluacionDanosBloc, EvaluacionDanosState>(
               builder: (context, state) {
                 return Column(
                   children: condiciones.entries.map((entry) {
-                    return ListTile(
-                      title: Text(entry.value),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Radio<bool>(
-                            value: true,
-                            groupValue: state.condicionesExistentes[entry.key],
-                            onChanged: (value) {
-                              context.read<EvaluacionDanosBloc>().add(
-                                SetCondicionExistente(entry.key, value),
-                              );
-                            },
+                    final isSelected = state.condicionesExistentes[entry.key] == true;
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 16),
+                      decoration: BoxDecoration(
+                        color: isSelected ? theme.colorScheme.secondary.withOpacity(0.1) : null,
+                        border: Border.all(
+                          color: isSelected 
+                              ? theme.colorScheme.secondary
+                              : theme.colorScheme.primary.withOpacity(0.1),
+                        ),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: ListTile(
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        title: Text(
+                          entry.value,
+                          style: theme.textTheme.bodyLarge?.copyWith(
+                            color: isSelected ? theme.colorScheme.primary : null,
                           ),
-                          const Text('Sí'),
-                          Radio<bool>(
-                            value: false,
-                            groupValue: state.condicionesExistentes[entry.key],
-                            onChanged: (value) {
-                              context.read<EvaluacionDanosBloc>().add(
-                                SetCondicionExistente(entry.key, value),
-                              );
-                            },
-                          ),
-                          const Text('No'),
-                        ],
+                        ),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            _buildRadioOption(
+                              context,
+                              entry.key,
+                              true,
+                              'Sí',
+                              state.condicionesExistentes[entry.key],
+                              theme,
+                            ),
+                            const SizedBox(width: 16),
+                            _buildRadioOption(
+                              context,
+                              entry.key,
+                              false,
+                              'No',
+                              state.condicionesExistentes[entry.key],
+                              theme,
+                            ),
+                          ],
+                        ),
                       ),
                     );
                   }).toList(),
@@ -93,7 +129,7 @@ class EvaluacionDanosPage extends StatelessWidget {
     );
   }
 
-  Widget _buildNivelesElementos() {
+  Widget _buildNivelesElementos(ThemeData theme) {
     final elementos = {
       '5.7': 'Daño en muros de carga, columnas, y otros elementos estructurales primordiales',
       '5.8': 'Daño en sistemas de contrapiso, entrepiso, muros de contención',
@@ -105,45 +141,109 @@ class EvaluacionDanosPage extends StatelessWidget {
     final niveles = ['Sin daño', 'Leve', 'Moderado', 'Severo'];
 
     return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(24.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Establecer el nivel de daño de los siguientes elementos:',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            Text(
+              '5.2 Nivel de Daño en Elementos',
+              style: theme.textTheme.titleLarge,
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 8),
+            Text(
+              'Establecer el nivel de daño de los siguientes elementos:',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.primary.withOpacity(0.7),
+              ),
+            ),
+            const SizedBox(height: 24),
             BlocBuilder<EvaluacionDanosBloc, EvaluacionDanosState>(
               builder: (context, state) {
                 return Column(
                   children: elementos.entries.map((entry) {
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(entry.value),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: niveles.map((nivel) {
-                            return Row(
-                              children: [
-                                Radio<String>(
-                                  value: nivel,
-                                  groupValue: state.nivelesElementos[entry.key],
-                                  onChanged: (value) {
-                                    context.read<EvaluacionDanosBloc>().add(
-                                      SetNivelElemento(entry.key, value!),
-                                    );
-                                  },
-                                ),
-                                Text(nivel),
-                              ],
-                            );
-                          }).toList(),
+                    final nivel = state.nivelesElementos[entry.key];
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 24),
+                      padding: const EdgeInsets.all(24),
+                      decoration: BoxDecoration(
+                        color: _getNivelColor(nivel, theme).withOpacity(0.05),
+                        border: Border.all(
+                          color: nivel != null
+                              ? _getNivelColor(nivel, theme)
+                              : theme.colorScheme.primary.withOpacity(0.1),
+                          width: nivel != null ? 2 : 1,
                         ),
-                        const Divider(),
-                      ],
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(
+                                _getNivelIcon(nivel),
+                                color: _getNivelColor(nivel, theme),
+                                size: 24,
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  entry.value,
+                                  style: theme.textTheme.titleMedium?.copyWith(
+                                    color: nivel != null
+                                        ? theme.colorScheme.primary
+                                        : theme.colorScheme.primary.withOpacity(0.7),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          Wrap(
+                            spacing: 16,
+                            runSpacing: 12,
+                            children: niveles.map((nivelOption) {
+                              final isSelected = nivel == nivelOption;
+                              return InkWell(
+                                onTap: () {
+                                  context.read<EvaluacionDanosBloc>().add(
+                                    SetNivelElemento(entry.key, nivelOption),
+                                  );
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 8,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: isSelected
+                                        ? theme.colorScheme.secondary.withOpacity(0.1)
+                                        : theme.colorScheme.surface,
+                                    borderRadius: BorderRadius.circular(20),
+                                    border: Border.all(
+                                      color: isSelected
+                                          ? theme.colorScheme.secondary
+                                          : theme.colorScheme.primary.withOpacity(0.2),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    nivelOption,
+                                    style: theme.textTheme.bodyMedium?.copyWith(
+                                      color: isSelected
+                                          ? theme.colorScheme.primary
+                                          : theme.colorScheme.primary.withOpacity(0.7),
+                                      fontWeight: isSelected ? FontWeight.bold : null,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ],
+                      ),
                     );
                   }).toList(),
                 );
@@ -155,94 +255,94 @@ class EvaluacionDanosPage extends StatelessWidget {
     );
   }
 
-  Widget _buildAlcanceEvaluacion() {
+  Widget _buildAlcanceEvaluacion(ThemeData theme) {
     return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(24.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Alcance de la evaluación realizada',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            Text(
+              '5.3 Alcance de la Evaluación',
+              style: theme.textTheme.titleLarge,
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 8),
+            Text(
+              'Indique el alcance de la evaluación realizada:',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.primary.withOpacity(0.7),
+              ),
+            ),
+            const SizedBox(height: 24),
             BlocBuilder<EvaluacionDanosBloc, EvaluacionDanosState>(
               builder: (context, state) {
-                return Row(
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text('Exterior:'),
-                          Row(
-                            children: [
-                              Radio<String>(
-                                value: 'Parcial',
-                                groupValue: state.alcanceExterior,
-                                onChanged: (value) {
-                                  context.read<EvaluacionDanosBloc>().add(
-                                    SetAlcanceEvaluacion(alcanceExterior: value),
-                                  );
-                                },
-                              ),
-                              const Text('Parcial'),
-                              Radio<String>(
-                                value: 'Completa',
-                                groupValue: state.alcanceExterior,
-                                onChanged: (value) {
-                                  context.read<EvaluacionDanosBloc>().add(
-                                    SetAlcanceEvaluacion(alcanceExterior: value),
-                                  );
-                                },
-                              ),
-                              const Text('Completa'),
-                            ],
-                          ),
-                        ],
+                    Text(
+                      'Evaluación Exterior',
+                      style: theme.textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 16),
+                    _buildAlcanceOption(
+                      context,
+                      'Parcial',
+                      'Se evaluó parcialmente el exterior',
+                      state.alcanceExterior == 'Parcial',
+                      theme,
+                      (value) => context.read<EvaluacionDanosBloc>().add(
+                        SetAlcanceEvaluacion(alcanceExterior: value),
                       ),
                     ),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text('Interior:'),
-                          Row(
-                            children: [
-                              Radio<String>(
-                                value: 'No Ingreso',
-                                groupValue: state.alcanceInterior,
-                                onChanged: (value) {
-                                  context.read<EvaluacionDanosBloc>().add(
-                                    SetAlcanceEvaluacion(alcanceInterior: value),
-                                  );
-                                },
-                              ),
-                              const Text('No Ingreso'),
-                              Radio<String>(
-                                value: 'Parcial',
-                                groupValue: state.alcanceInterior,
-                                onChanged: (value) {
-                                  context.read<EvaluacionDanosBloc>().add(
-                                    SetAlcanceEvaluacion(alcanceInterior: value),
-                                  );
-                                },
-                              ),
-                              const Text('Parcial'),
-                              Radio<String>(
-                                value: 'Completa',
-                                groupValue: state.alcanceInterior,
-                                onChanged: (value) {
-                                  context.read<EvaluacionDanosBloc>().add(
-                                    SetAlcanceEvaluacion(alcanceInterior: value),
-                                  );
-                                },
-                              ),
-                              const Text('Completa'),
-                            ],
-                          ),
-                        ],
+                    const SizedBox(height: 16),
+                    _buildAlcanceOption(
+                      context,
+                      'Completa',
+                      'Se evaluó completamente el exterior',
+                      state.alcanceExterior == 'Completa',
+                      theme,
+                      (value) => context.read<EvaluacionDanosBloc>().add(
+                        SetAlcanceEvaluacion(alcanceExterior: value),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    Text(
+                      'Evaluación Interior',
+                      style: theme.textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 16),
+                    _buildAlcanceOption(
+                      context,
+                      'No Ingreso',
+                      'No se pudo ingresar al interior',
+                      state.alcanceInterior == 'No Ingreso',
+                      theme,
+                      (value) => context.read<EvaluacionDanosBloc>().add(
+                        SetAlcanceEvaluacion(alcanceInterior: value),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    _buildAlcanceOption(
+                      context,
+                      'Parcial',
+                      'Se evaluó parcialmente el interior',
+                      state.alcanceInterior == 'Parcial',
+                      theme,
+                      (value) => context.read<EvaluacionDanosBloc>().add(
+                        SetAlcanceEvaluacion(alcanceInterior: value),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    _buildAlcanceOption(
+                      context,
+                      'Completa',
+                      'Se evaluó completamente el interior',
+                      state.alcanceInterior == 'Completa',
+                      theme,
+                      (value) => context.read<EvaluacionDanosBloc>().add(
+                        SetAlcanceEvaluacion(alcanceInterior: value),
                       ),
                     ),
                   ],
@@ -253,5 +353,132 @@ class EvaluacionDanosPage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Widget _buildRadioOption(
+    BuildContext context,
+    String key,
+    bool value,
+    String label,
+    bool? groupValue,
+    ThemeData theme,
+  ) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Radio<bool>(
+          value: value,
+          groupValue: groupValue,
+          activeColor: theme.colorScheme.secondary,
+          onChanged: (newValue) {
+            context.read<EvaluacionDanosBloc>().add(
+              SetCondicionExistente(key, newValue),
+            );
+          },
+        ),
+        Text(
+          label,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: groupValue == value
+                ? theme.colorScheme.primary
+                : theme.colorScheme.primary.withOpacity(0.7),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAlcanceOption(
+    BuildContext context,
+    String title,
+    String description,
+    bool isSelected,
+    ThemeData theme,
+    Function(String) onSelected,
+  ) {
+    return InkWell(
+      onTap: () => onSelected(title),
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: isSelected ? theme.colorScheme.secondary.withOpacity(0.1) : theme.colorScheme.surface,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected ? theme.colorScheme.secondary : theme.colorScheme.outline.withOpacity(0.2),
+            width: isSelected ? 2 : 1,
+          ),
+          boxShadow: isSelected ? [
+            BoxShadow(
+              color: theme.colorScheme.secondary.withOpacity(0.1),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ] : null,
+        ),
+        child: Row(
+          children: [
+            Radio<String>(
+              value: title,
+              groupValue: isSelected ? title : null,
+              onChanged: (value) => onSelected(value!),
+              activeColor: theme.colorScheme.secondary,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      color: isSelected ? theme.colorScheme.secondary : theme.colorScheme.onSurface,
+                      fontWeight: isSelected ? FontWeight.bold : null,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    description,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.onSurface.withOpacity(0.7),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Color _getNivelColor(String? nivel, ThemeData theme) {
+    switch (nivel) {
+      case 'Sin daño':
+        return Colors.green;
+      case 'Leve':
+        return Colors.lightGreen;
+      case 'Moderado':
+        return Colors.orange;
+      case 'Severo':
+        return Colors.red;
+      default:
+        return theme.colorScheme.primary;
+    }
+  }
+
+  IconData _getNivelIcon(String? nivel) {
+    switch (nivel) {
+      case 'Sin daño':
+        return Icons.check_circle;
+      case 'Leve':
+        return Icons.info;
+      case 'Moderado':
+        return Icons.warning;
+      case 'Severo':
+        return Icons.error;
+      default:
+        return Icons.help;
+    }
   }
 } 

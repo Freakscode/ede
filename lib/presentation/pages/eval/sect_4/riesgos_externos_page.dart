@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../presentation/blocs/form/riesgosExternos/riesgos_externos_bloc.dart';
 import '../../../../presentation/blocs/form/riesgosExternos/riesgos_externos_event.dart';
 import '../../../../presentation/blocs/form/riesgosExternos/riesgos_externos_state.dart';
+import '../../../../presentation/widgets/navigation_fab_menu.dart';
 
 class RiesgosExternosPage extends StatelessWidget {
   const RiesgosExternosPage({super.key});
@@ -42,7 +43,7 @@ class RiesgosExternosPage extends StatelessWidget {
                       riesgo.key,
                       riesgo.value,
                       state.riesgos[riesgo.key],
-                    )).toList(),
+                    )),
                     _buildOtroRiesgo(context, state),
                   ],
                 );
@@ -50,6 +51,9 @@ class RiesgosExternosPage extends StatelessWidget {
             ),
           ),
         ),
+      ),
+      floatingActionButton: const NavigationFabMenu(
+        currentRoute: '/riesgos_externos',
       ),
     );
   }

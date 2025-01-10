@@ -3,12 +3,14 @@ class AccionesState {
   final Map<String, bool> recomendaciones;
   final Map<String, bool> entidadesRecomendadas;
   final String? otraEntidad;
+  final String? recomendacionesEspecificas;
 
   AccionesState({
     Map<String, String>? evaluacionAdicional,
     Map<String, bool>? recomendaciones,
     Map<String, bool>? entidadesRecomendadas,
     this.otraEntidad,
+    this.recomendacionesEspecificas,
   }) : 
     evaluacionAdicional = evaluacionAdicional ?? {
       'Estructural': '',
@@ -45,12 +47,14 @@ class AccionesState {
     Map<String, bool>? recomendaciones,
     Map<String, bool>? entidadesRecomendadas,
     String? otraEntidad,
+    String? recomendacionesEspecificas,
   }) {
     return AccionesState(
       evaluacionAdicional: evaluacionAdicional ?? this.evaluacionAdicional,
       recomendaciones: recomendaciones ?? this.recomendaciones,
       entidadesRecomendadas: entidadesRecomendadas ?? this.entidadesRecomendadas,
       otraEntidad: otraEntidad ?? this.otraEntidad,
+      recomendacionesEspecificas: recomendacionesEspecificas ?? this.recomendacionesEspecificas,
     );
   }
 
@@ -59,5 +63,6 @@ class AccionesState {
     'recomendaciones': recomendaciones,
     'entidadesRecomendadas': entidadesRecomendadas,
     'otraEntidad': otraEntidad,
+    'recomendacionesEspecificas': recomendacionesEspecificas,
   };
 } 
