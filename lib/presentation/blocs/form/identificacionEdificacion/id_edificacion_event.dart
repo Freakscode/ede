@@ -134,4 +134,14 @@ class SetNumero extends EdificacionEvent {
 class SetComplemento extends EdificacionEvent {
   final String complemento;
   SetComplemento(this.complemento);
+}
+
+class SetDepartamento extends EdificacionEvent {
+  final String departamento;
+  SetDepartamento(this.departamento);
+}
+
+class SetMunicipio extends EdificacionEvent {
+  final String municipio;
+  SetMunicipio(this.municipio);
 } 

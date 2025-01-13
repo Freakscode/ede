@@ -36,6 +36,9 @@ class _EvaluacionWizardPageState extends State<EvaluacionWizardPage> with Single
   late TabController _tabController;
   bool _showValidationErrors = false;
   Timer? _debounceTimer;
+  Timer? _nombreDebounceTimer;
+  Timer? _idGrupoDebounceTimer;
+  Timer? _dependenciaDebounceTimer;
 
   @override
   void initState() {
@@ -47,14 +50,7 @@ class _EvaluacionWizardPageState extends State<EvaluacionWizardPage> with Single
       });
     });
     
-    // Iniciar la evaluación y cargar datos
     _initializeData();
-
-    // Agregar listeners para los cambios en los campos
-    _nombreController.addListener(_onNombreChanged);
-    _idGrupoController.addListener(_onIdGrupoChanged);
-    _dependenciaController.addListener(_onDependenciaChanged);
-    _otroEventoController.addListener(_onOtroEventoChanged);
   }
 
   Future<void> _initializeData() async {
@@ -118,16 +114,15 @@ class _EvaluacionWizardPageState extends State<EvaluacionWizardPage> with Single
 
   @override
   void dispose() {
+    _nombreDebounceTimer?.cancel();
+    _idGrupoDebounceTimer?.cancel();
+    _dependenciaDebounceTimer?.cancel();
     _debounceTimer?.cancel();
-    _nombreController.removeListener(_onNombreChanged);
-    _idGrupoController.removeListener(_onIdGrupoChanged);
-    _dependenciaController.removeListener(_onDependenciaChanged);
-    _otroEventoController.removeListener(_onOtroEventoChanged);
     _nombreController.dispose();
     _idGrupoController.dispose();
     _dependenciaController.dispose();
-    _pageController.dispose();
     _otroEventoController.dispose();
+    _tabController.dispose();
     super.dispose();
   }
 
@@ -356,7 +351,7 @@ class _EvaluacionWizardPageState extends State<EvaluacionWizardPage> with Single
             bottom: PreferredSize(
               preferredSize: const Size.fromHeight(85),
               child: Column(
-                children: [
+                  children: [
                   TabBar(
                     controller: _tabController,
                     tabs: const [
@@ -453,7 +448,7 @@ class _EvaluacionWizardPageState extends State<EvaluacionWizardPage> with Single
                   ),
                 ),
               ],
-            ),
+                ),
               ),
             ),
             const SizedBox(height: 16),
@@ -466,16 +461,26 @@ class _EvaluacionWizardPageState extends State<EvaluacionWizardPage> with Single
                     Text(
                       'Información del Evaluador',
                       style: theme.textTheme.titleMedium,
-                    ),
-                    const SizedBox(height: 16),
-                    TextFormField(
-                      controller: _nombreController,
+            ),
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: _nombreController,
                       decoration: const InputDecoration(
                         labelText: 'Nombre del Evaluador *',
                         prefixIcon: Icon(Icons.person_outline),
                         hintText: 'Ingrese su nombre completo',
                       ),
                       validator: (value) => _validateField(value, 'nombre'),
+                      onChanged: (value) {
+                        _nombreDebounceTimer?.cancel();
+                        _nombreDebounceTimer = Timer(const Duration(milliseconds: 500), () {
+                          if (mounted) {
+                            context.read<EvaluacionBloc>().add(SetEvaluacionData(
+                              nombreEvaluador: value,
+                            ));
+                          }
+                        });
+              },
             ),
             const SizedBox(height: 16),
             TextFormField(
@@ -486,6 +491,16 @@ class _EvaluacionWizardPageState extends State<EvaluacionWizardPage> with Single
                         hintText: 'Ingrese el ID de su grupo',
                       ),
                       validator: (value) => _validateField(value, 'ID de grupo'),
+                      onChanged: (value) {
+                        _idGrupoDebounceTimer?.cancel();
+                        _idGrupoDebounceTimer = Timer(const Duration(milliseconds: 500), () {
+                          if (mounted) {
+                            context.read<EvaluacionBloc>().add(SetEvaluacionData(
+                              idGrupo: value,
+                            ));
+                          }
+                        });
+              },
             ),
             const SizedBox(height: 16),
             TextFormField(
@@ -496,6 +511,16 @@ class _EvaluacionWizardPageState extends State<EvaluacionWizardPage> with Single
                         hintText: 'Ingrese su dependencia o entidad',
                       ),
                       validator: (value) => _validateField(value, 'dependencia'),
+                      onChanged: (value) {
+                        _dependenciaDebounceTimer?.cancel();
+                        _dependenciaDebounceTimer = Timer(const Duration(milliseconds: 500), () {
+                          if (mounted) {
+                            context.read<EvaluacionBloc>().add(SetEvaluacionData(
+                              dependenciaEntidad: value,
+                            ));
+                          }
+                        });
+                      },
                     ),
                     const SizedBox(height: 8),
                     Text(
@@ -842,21 +867,21 @@ class _EvaluacionWizardPageState extends State<EvaluacionWizardPage> with Single
         ));
       },
       child: Container(
-        decoration: BoxDecoration(
-          color: isSelected ? theme.primaryColor : Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
+      decoration: BoxDecoration(
+        color: isSelected ? theme.primaryColor : Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
             color: isSelected 
                 ? theme.colorScheme.secondary 
                 : const Color(0xFFFAD502),
             width: isSelected ? 2.5 : 2,
           ),
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Expanded(
-              flex: 3,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Expanded(
+                flex: 3,
               child: Stack(
                 alignment: Alignment.center,
                 children: [
@@ -889,19 +914,19 @@ class _EvaluacionWizardPageState extends State<EvaluacionWizardPage> with Single
                       ),
                     ),
                 ],
+                ),
               ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              titulo,
-              style: TextStyle(
+              const SizedBox(height: 12),
+              Text(
+                titulo,
+                style: TextStyle(
                 color: isSelected ? Colors.white : theme.primaryColor,
-                fontWeight: FontWeight.bold,
-                fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 12,
+                ),
+                textAlign: TextAlign.center,
               ),
-              textAlign: TextAlign.center,
-            ),
-          ],
+            ],
         ),
       ),
     );

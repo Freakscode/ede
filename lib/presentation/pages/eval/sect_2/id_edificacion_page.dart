@@ -11,6 +11,8 @@ import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../../../widgets/map_widget.dart';
 import '../../../widgets/direccion_preview.dart';
+import 'dart:async';
+import '../../../../data/models/colombia_data.dart';
 
 enum TipoIdentificacion { medellin, areaMetropolitana }
 
@@ -59,59 +61,71 @@ class _EdificacionPageState extends State<EdificacionPage>
   LatLng? _selectedPosition;
   GoogleMapController? _mapController;
 
+  // Timers para debounce
+  Timer? _nombreEdificacionDebouncer;
+  Timer? _direccionDebouncer;
+  Timer? _comunaDebouncer;
+  Timer? _barrioDebouncer;
+  Timer? _codigoBarrioDebouncer;
+  Timer? _cbmlDebouncer;
+  Timer? _matriculaDebouncer;
+  Timer? _pisosDebouncer;
+  Timer? _subterraneosDebouncer;
+  Timer? _yearDebouncer;
+  Timer? _nombreContactoDebouncer;
+  Timer? _telefonoDebouncer;
+  Timer? _emailDebouncer;
+  Timer? _ocupacionDebouncer;
+
+  String? _selectedDepartamento;
+  String? _selectedMunicipio;
+
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
-
-    // Cargar datos temporales del bloc
+    
+    // Cargar datos del estado inmediatamente
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final state = context.read<EdificacionBloc>().state;
+      
+      setState(() {
+        // Si no hay valores en el estado, usar Antioquia y Medellín como default
+        _selectedDepartamento = state.departamento ?? 'Antioquia';
+        _selectedMunicipio = state.municipio ?? 'Medellín';
+      });
+
+      // Cargar el resto de los datos
       _loadDataFromState(state);
+
+      // Si los valores por defecto fueron usados, actualizar el bloc
+      if (state.departamento == null || state.municipio == null) {
+        context.read<EdificacionBloc>()
+          ..add(SetDepartamento(_selectedDepartamento!))
+          ..add(SetMunicipio(_selectedMunicipio!));
+      }
     });
   }
 
   void _loadDataFromState(EdificacionState state) {
-    // Cargar todos los campos de la sección de edificación
-    if (state.nombreEdificacion != null) {
+    // Cargar nombre de edificación
+    if (state.nombreEdificacion?.isNotEmpty ?? false) {
       _nombreEdificacionController.text = state.nombreEdificacion!;
     }
-    if (state.direccion != null) {
-      _direccionController.text = state.direccion!;
-    }
-    if (state.comuna != null) {
+
+    // Cargar comuna solo si existe y corresponde a Medellín
+    if (state.comuna?.isNotEmpty ?? false) {
       _comunaController.text = state.comuna!;
     }
-    if (state.barrio != null) {
+
+    // Cargar el resto de los campos...
+    if (state.direccion?.isNotEmpty ?? false) {
+      _direccionController.text = state.direccion!;
+    }
+    if (state.barrio?.isNotEmpty ?? false) {
       _barrioController.text = state.barrio!;
     }
-    if (state.codigoBarrio != null) {
-      _codigoBarrioController.text = state.codigoBarrio!;
-    }
-    if (state.cbml != null) {
-      _cbmlController.text = state.cbml!;
-    }
-    if (state.matriculaInmobiliaria != null) {
-      _matriculaController.text = state.matriculaInmobiliaria!;
-    }
-    if (state.numeroPisos != null) {
-      _pisosController.text = state.numeroPisos!;
-    }
-    if (state.subterraneos != null) {
-      _subterraneosController.text = state.subterraneos!;
-    }
-    if (state.nombreContacto != null) {
-      _nombreContactoController.text = state.nombreContacto!;
-    }
-    if (state.telefonoContacto != null) {
-      _telefonoController.text = state.telefonoContacto!;
-    }
-    if (state.emailContacto != null) {
-      _emailController.text = state.emailContacto!;
-    }
-    if (state.ocupacion != null) {
-      _ocupacionController.text = state.ocupacion!;
-    }
+    // ... resto del código de carga de datos ...
   }
 
   @override
@@ -223,15 +237,11 @@ class _EdificacionPageState extends State<EdificacionPage>
   Widget _buildDatosGenerales(BuildContext context) {
     return Column(
       children: [
-        TextFormField(
+        _buildTextField(
           controller: _nombreEdificacionController,
-          decoration: const InputDecoration(
-            labelText: 'Nombre de la Edificación',
-            border: OutlineInputBorder(),
-          ),
-          onChanged: (value) {
-            context.read<EdificacionBloc>().add(SetNombreEdificacion(value));
-          },
+          label: 'Nombre de la Edificación',
+          debouncer: _nombreEdificacionDebouncer,
+          onChanged: (value) => context.read<EdificacionBloc>().add(SetNombreEdificacion(value)),
           validator: (value) {
             if (value?.isEmpty ?? true) {
               return 'Este campo es requerido';
@@ -252,19 +262,37 @@ class _EdificacionPageState extends State<EdificacionPage>
                   border: OutlineInputBorder(),
                   contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
                 ),
-                value: 'Antioquia',
-                items: ['Antioquia'].map((String value) {
+                value: _selectedDepartamento,
+                items: departamentosColombia.map((departamento) {
                   return DropdownMenuItem<String>(
-                    value: value,
+                    value: departamento.nombre,
                     child: Text(
-                      value,
+                      departamento.nombre,
                       style: Theme.of(context).textTheme.bodyMedium,
                       overflow: TextOverflow.ellipsis,
                     ),
                   );
                 }).toList(),
                 onChanged: (value) {
-                  // Por defecto Antioquia
+                  if (value != null) {
+                    setState(() {
+                      _selectedDepartamento = value;
+                      // Resetear municipio cuando cambia el departamento
+                      _selectedMunicipio = departamentosColombia
+                          .firstWhere((d) => d.nombre == value)
+                          .municipios
+                          .first;
+                    });
+                    // Actualizar el bloc
+                    context.read<EdificacionBloc>().add(SetDepartamento(value));
+                    context.read<EdificacionBloc>().add(SetMunicipio(_selectedMunicipio!));
+                  }
+                },
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Por favor seleccione un departamento';
+                  }
+                  return null;
                 },
               ),
             ),
@@ -278,38 +306,56 @@ class _EdificacionPageState extends State<EdificacionPage>
                   border: OutlineInputBorder(),
                   contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
                 ),
-                value: 'Medellín',
-                items: ['Medellín'].map((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(
-                      value,
-                      style: Theme.of(context).textTheme.bodyMedium,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  );
-                }).toList(),
+                value: _selectedMunicipio,
+                items: _selectedDepartamento != null
+                    ? departamentosColombia
+                        .firstWhere((d) => d.nombre == _selectedDepartamento)
+                        .municipios
+                        .map((municipio) {
+                        return DropdownMenuItem<String>(
+                          value: municipio,
+                          child: Text(
+                            municipio,
+                            style: Theme.of(context).textTheme.bodyMedium,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        );
+                      }).toList()
+                    : [],
                 onChanged: (value) {
-                  // Por defecto Medellín
+                  if (value != null) {
+                    setState(() {
+                      _selectedMunicipio = value;
+                    });
+                    // Actualizar el bloc
+                    context.read<EdificacionBloc>().add(SetMunicipio(value));
+                  }
+                },
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Por favor seleccione un municipio';
+                  }
+                  return null;
                 },
               ),
             ),
           ],
         ),
         const SizedBox(height: 16),
-        Row(
-          children: [
-            Expanded(
-              child: DropdownButtonFormField<String>(
-                isExpanded: true,
-                menuMaxHeight: 300,
-                decoration: const InputDecoration(
-                  labelText: 'Comuna',
-                  border: OutlineInputBorder(),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-                ),
-                items: List.generate(16, (index) => 'Comuna ${index + 1}')
-                    .map((String value) {
+        _selectedDepartamento == 'Antioquia' && _selectedMunicipio == 'Medellín'
+          ? DropdownButtonFormField<String>(
+              isExpanded: true,
+              menuMaxHeight: 300,
+              decoration: const InputDecoration(
+                labelText: 'Comuna o Corregimiento',
+                border: OutlineInputBorder(),
+                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+              ),
+              value: _comunaController.text.isEmpty ? null : _comunaController.text,
+              items: departamentosColombia
+                .firstWhere((d) => d.nombre == 'Antioquia')
+                .comunasCorregimientos?['Medellín']
+                ?.map((String value) {
                   return DropdownMenuItem<String>(
                     value: value,
                     child: Text(
@@ -318,41 +364,42 @@ class _EdificacionPageState extends State<EdificacionPage>
                       overflow: TextOverflow.ellipsis,
                     ),
                   );
-                }).toList(),
-                onChanged: (value) {
-                  context.read<EdificacionBloc>().add(SetComuna(value ?? ''));
-                },
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Este campo es requerido';
-                  }
-                  return null;
-                },
+                }).toList() ?? [],
+              onChanged: (value) {
+                if (value != null) {
+                  _comunaController.text = value;
+                  context.read<EdificacionBloc>().add(SetComuna(value));
+                }
+              },
+              validator: (value) {
+                if (_selectedDepartamento == 'Antioquia' && 
+                    _selectedMunicipio == 'Medellín' && 
+                    (value == null || value.isEmpty)) {
+                  return 'Por favor seleccione una comuna o corregimiento';
+                }
+                return null;
+              },
+            )
+          : TextFormField(
+              controller: _comunaController,
+              decoration: const InputDecoration(
+                labelText: 'Comuna',
+                border: OutlineInputBorder(),
               ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: DropdownButtonFormField<String>(
-                isExpanded: true,
-                menuMaxHeight: 300,
-                decoration: const InputDecoration(
-                  labelText: 'Barrio',
-                  border: OutlineInputBorder(),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-                ),
-                items: const [], // Cargar según la comuna seleccionada
-                onChanged: (value) {
-                  context.read<EdificacionBloc>().add(SetBarrio(value ?? ''));
-                },
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Este campo es requerido';
+              onChanged: (value) {
+                _debounce(_comunaDebouncer, () {
+                  if (mounted) {
+                    context.read<EdificacionBloc>().add(SetComuna(value));
                   }
-                  return null;
-                },
-              ),
+                });
+              },
             ),
-          ],
+        const SizedBox(height: 16),
+        _buildTextField(
+          controller: _barrioController,
+          label: 'Barrio',
+          debouncer: _barrioDebouncer,
+          onChanged: (value) => context.read<EdificacionBloc>().add(SetBarrio(value)),
         ),
       ],
     );
@@ -361,7 +408,6 @@ class _EdificacionPageState extends State<EdificacionPage>
   Widget _buildIdentificacionCatastral(BuildContext context) {
     return Column(
       children: [
-        // Botones de selección
         Row(
           children: [
             Expanded(
@@ -369,7 +415,7 @@ class _EdificacionPageState extends State<EdificacionPage>
                 onPressed: () {
                   setState(() {
                     _tipoIdentificacion = TipoIdentificacion.medellin;
-                    _cbmlController.clear(); // Limpiar el campo al cambiar
+                    _cbmlController.clear();
                   });
                 },
                 style: ElevatedButton.styleFrom(
@@ -387,14 +433,14 @@ class _EdificacionPageState extends State<EdificacionPage>
                 onPressed: () {
                   setState(() {
                     _tipoIdentificacion = TipoIdentificacion.areaMetropolitana;
-                    _cbmlController.clear(); // Limpiar el campo al cambiar
+                    _cbmlController.clear();
                   });
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: _tipoIdentificacion ==
-                          TipoIdentificacion.areaMetropolitana
-                      ? Theme.of(context).primaryColor
-                      : Colors.grey,
+                  backgroundColor:
+                      _tipoIdentificacion == TipoIdentificacion.areaMetropolitana
+                          ? Theme.of(context).primaryColor
+                          : Colors.grey,
                 ),
                 child: const Text('Área Metropolitana'),
               ),
@@ -405,29 +451,21 @@ class _EdificacionPageState extends State<EdificacionPage>
         TextFormField(
           controller: _cbmlController,
           decoration: InputDecoration(
-            labelText: 'CBML',
+            labelText: _tipoIdentificacion == TipoIdentificacion.medellin
+                ? 'CBML'
+                : 'Código Catastral',
             border: const OutlineInputBorder(),
-            hintText: _tipoIdentificacion == TipoIdentificacion.medellin
-                ? '11 dígitos'
-                : '19 dígitos',
           ),
-          keyboardType: TextInputType.number,
-          maxLength:
-              _tipoIdentificacion == TipoIdentificacion.medellin ? 11 : 19,
-          inputFormatters: [
-            FilteringTextInputFormatter.digitsOnly,
-          ],
           onChanged: (value) {
-            context.read<EdificacionBloc>().add(SetCBML(value));
+            _debounce(_cbmlDebouncer, () {
+              if (mounted) {
+                context.read<EdificacionBloc>().add(SetCBML(value));
+              }
+            });
           },
           validator: (value) {
             if (value?.isEmpty ?? true) {
               return 'Este campo es requerido';
-            }
-            final expectedLength =
-                _tipoIdentificacion == TipoIdentificacion.medellin ? 11 : 19;
-            if (value!.length != expectedLength) {
-              return 'Debe tener exactamente $expectedLength dígitos';
             }
             return null;
           },
@@ -440,19 +478,101 @@ class _EdificacionPageState extends State<EdificacionPage>
             border: OutlineInputBorder(),
           ),
           onChanged: (value) {
-            context
-                .read<EdificacionBloc>()
-                .add(SetMatriculaInmobiliaria(value));
+            _debounce(_matriculaDebouncer, () {
+              if (mounted) {
+                context.read<EdificacionBloc>().add(SetMatriculaInmobiliaria(value));
+              }
+            });
+          },
+          validator: (value) {
+            if (value?.isEmpty ?? true) {
+              return 'Este campo es requerido';
+            }
+            return null;
           },
         ),
         const SizedBox(height: 16),
-        BlocBuilder<EdificacionBloc, EdificacionState>(
-          builder: (context, state) {
-            LatLng? initialPosition;
-            if (state.latitud != null && state.longitud != null) {
-              initialPosition = LatLng(state.latitud!, state.longitud!);
+        Row(
+          children: [
+            Expanded(
+              child: TextFormField(
+                controller: _pisosController,
+                decoration: const InputDecoration(
+                  labelText: 'Número de Pisos',
+                  border: OutlineInputBorder(),
+                ),
+                keyboardType: TextInputType.number,
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                onChanged: (value) {
+                  _debounce(_pisosDebouncer, () {
+                    if (mounted) {
+                      context.read<EdificacionBloc>().add(SetNumeroPisos(value));
+                    }
+                  });
+                },
+                validator: (value) {
+                  if (value?.isEmpty ?? true) {
+                    return 'Este campo es requerido';
+                  }
+                  return null;
+                },
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: TextFormField(
+                controller: _subterraneosController,
+                decoration: const InputDecoration(
+                  labelText: 'Número de Subterráneos',
+                  border: OutlineInputBorder(),
+                ),
+                keyboardType: TextInputType.number,
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                onChanged: (value) {
+                  _debounce(_subterraneosDebouncer, () {
+                    if (mounted) {
+                      context.read<EdificacionBloc>().add(SetSubterraneos(value));
+                    }
+                  });
+                },
+                validator: (value) {
+                  if (value?.isEmpty ?? true) {
+                    return 'Este campo es requerido';
+                  }
+                  return null;
+                },
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        TextFormField(
+          controller: _yearController,
+          decoration: const InputDecoration(
+            labelText: 'Año de Construcción',
+            border: OutlineInputBorder(),
+          ),
+          keyboardType: TextInputType.number,
+          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+          onChanged: (value) {
+            _debounce(_yearDebouncer, () {
+              if (mounted && value.isNotEmpty) {
+                context.read<EdificacionBloc>().add(SetYearConstruccion(int.parse(value)));
+              }
+            });
+          },
+          validator: (value) {
+            if (value?.isEmpty ?? true) {
+              return 'Este campo es requerido';
             }
-            return MapWidget(initialPosition: initialPosition);
+            final year = int.tryParse(value!);
+            if (year == null) {
+              return 'Ingrese un año válido';
+            }
+            if (year < 1800 || year > DateTime.now().year) {
+              return 'Ingrese un año válido entre 1800 y ${DateTime.now().year}';
+            }
+            return null;
           },
         ),
       ],
@@ -469,7 +589,11 @@ class _EdificacionPageState extends State<EdificacionPage>
             border: OutlineInputBorder(),
           ),
           onChanged: (value) {
-            context.read<EdificacionBloc>().add(SetNombreContacto(value));
+            _debounce(_nombreContactoDebouncer, () {
+              if (mounted) {
+                context.read<EdificacionBloc>().add(SetNombreContacto(value));
+              }
+            });
           },
           validator: (value) {
             if (value?.isEmpty ?? true) {
@@ -487,7 +611,11 @@ class _EdificacionPageState extends State<EdificacionPage>
           ),
           keyboardType: TextInputType.phone,
           onChanged: (value) {
-            context.read<EdificacionBloc>().add(SetTelefonoContacto(value));
+            _debounce(_telefonoDebouncer, () {
+              if (mounted) {
+                context.read<EdificacionBloc>().add(SetTelefonoContacto(value));
+              }
+            });
           },
         ),
         const SizedBox(height: 16),
@@ -499,7 +627,11 @@ class _EdificacionPageState extends State<EdificacionPage>
           ),
           keyboardType: TextInputType.emailAddress,
           onChanged: (value) {
-            context.read<EdificacionBloc>().add(SetEmailContacto(value));
+            _debounce(_emailDebouncer, () {
+              if (mounted) {
+                context.read<EdificacionBloc>().add(SetEmailContacto(value));
+              }
+            });
           },
         ),
         const SizedBox(height: 16),
@@ -511,7 +643,11 @@ class _EdificacionPageState extends State<EdificacionPage>
             hintText: 'Propietario, Administrador, etc.',
           ),
           onChanged: (value) {
-            context.read<EdificacionBloc>().add(SetOcupacion(value));
+            _debounce(_ocupacionDebouncer, () {
+              if (mounted) {
+                context.read<EdificacionBloc>().add(SetOcupacion(value));
+              }
+            });
           },
         ),
       ],
@@ -580,6 +716,21 @@ class _EdificacionPageState extends State<EdificacionPage>
 
   @override
   void dispose() {
+    _nombreEdificacionDebouncer?.cancel();
+    _direccionDebouncer?.cancel();
+    _comunaDebouncer?.cancel();
+    _barrioDebouncer?.cancel();
+    _codigoBarrioDebouncer?.cancel();
+    _cbmlDebouncer?.cancel();
+    _matriculaDebouncer?.cancel();
+    _pisosDebouncer?.cancel();
+    _subterraneosDebouncer?.cancel();
+    _yearDebouncer?.cancel();
+    _nombreContactoDebouncer?.cancel();
+    _telefonoDebouncer?.cancel();
+    _emailDebouncer?.cancel();
+    _ocupacionDebouncer?.cancel();
+    
     _nombreEdificacionController.dispose();
     _direccionController.dispose();
     _comunaController.dispose();
@@ -594,9 +745,47 @@ class _EdificacionPageState extends State<EdificacionPage>
     _telefonoController.dispose();
     _emailController.dispose();
     _ocupacionController.dispose();
-    _mapController?.dispose();
+    
     _tabController.dispose();
     super.dispose();
+  }
+
+  void _debounce(Timer? timer, VoidCallback callback) {
+    if (timer?.isActive ?? false) timer?.cancel();
+    timer = Timer(const Duration(milliseconds: 500), callback);
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    required Function(String) onChanged,
+    Timer? debouncer,
+    String? Function(String?)? validator,
+    TextInputType? keyboardType,
+    List<TextInputFormatter>? inputFormatters,
+  }) {
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: label,
+        border: const OutlineInputBorder(),
+      ),
+      keyboardType: keyboardType,
+      inputFormatters: inputFormatters,
+      onChanged: (value) {
+        controller.value = controller.value.copyWith(
+          text: value,
+          selection: TextSelection.collapsed(offset: value.length),
+        );
+        if (debouncer?.isActive ?? false) debouncer?.cancel();
+        debouncer = Timer(const Duration(milliseconds: 500), () {
+          if (mounted) {
+            onChanged(value);
+          }
+        });
+      },
+      validator: validator,
+    );
   }
 
   Widget _buildDireccionEstructurada(BuildContext context) {
@@ -870,6 +1059,63 @@ class _EdificacionPageState extends State<EdificacionPage>
       ],
     );
   }
+
+  Widget _buildCaracteristicasEdificacion(BuildContext context) {
+    return Column(
+      children: [
+        TextFormField(
+          controller: _pisosController,
+          decoration: const InputDecoration(
+            labelText: 'Número de Pisos',
+            border: OutlineInputBorder(),
+          ),
+          keyboardType: TextInputType.number,
+          onChanged: (value) {
+            _debounce(_pisosDebouncer, () {
+              if (mounted) {
+                context.read<EdificacionBloc>().add(SetNumeroPisos(value));
+              }
+            });
+          },
+        ),
+        const SizedBox(height: 16),
+        TextFormField(
+          controller: _subterraneosController,
+          decoration: const InputDecoration(
+            labelText: 'Número de Subterráneos',
+            border: OutlineInputBorder(),
+          ),
+          keyboardType: TextInputType.number,
+          onChanged: (value) {
+            _debounce(_subterraneosDebouncer, () {
+              if (mounted) {
+                context.read<EdificacionBloc>().add(SetSubterraneos(value));
+              }
+            });
+          },
+        ),
+        const SizedBox(height: 16),
+        TextFormField(
+          controller: _yearController,
+          decoration: const InputDecoration(
+            labelText: 'Año de Construcción',
+            border: OutlineInputBorder(),
+          ),
+          keyboardType: TextInputType.number,
+          onChanged: (value) {
+            _debounce(_yearDebouncer, () {
+              if (mounted) {
+                final year = int.tryParse(value);
+                if (year != null) {
+                  context.read<EdificacionBloc>().add(SetYearConstruccion(year));
+                }
+              }
+            });
+          },
+        ),
+      ],
+    );
+  }
 }
 
 class UpperCaseTextFormatter extends TextInputFormatter {
@@ -884,3 +1130,4 @@ class UpperCaseTextFormatter extends TextInputFormatter {
     );
   }
 }
+

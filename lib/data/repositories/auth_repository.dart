@@ -9,7 +9,6 @@ import 'dart:developer' as developer;
 import '../../domain/repositories/auth_repository.dart';
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import '../datasources/remote_datasource.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthRepository implements IAuthRepository {
   static const ACCESS_TOKEN_KEY = 'access_token';

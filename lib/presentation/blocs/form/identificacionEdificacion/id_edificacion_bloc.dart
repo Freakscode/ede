@@ -163,5 +163,19 @@ class EdificacionBloc extends Bloc<EdificacionEvent, EdificacionState> {
       emit(state.copyWith(complemento: event.complemento));
       developer.log('SetComplemento: ${event.complemento}', name: 'EdificacionBloc');
     });
+
+    on<SetDepartamento>((event, emit) {
+      emit(state.copyWith(
+        departamento: event.departamento,
+        // Resetear municipio cuando cambia el departamento
+        municipio: null,
+      ));
+      developer.log('SetDepartamento: ${event.departamento}', name: 'EdificacionBloc');
+    });
+
+    on<SetMunicipio>((event, emit) {
+      emit(state.copyWith(municipio: event.municipio));
+      developer.log('SetMunicipio: ${event.municipio}', name: 'EdificacionBloc');
+    });
   }
 } 

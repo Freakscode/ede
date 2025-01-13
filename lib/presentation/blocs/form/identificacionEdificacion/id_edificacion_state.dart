@@ -32,6 +32,9 @@ class EdificacionState {
   final String? numero;
   final String? complemento;
 
+  final String? departamento;
+  final String? municipio;
+
   EdificacionState({
     this.nombreEdificacion,
     this.direccion,
@@ -58,6 +61,8 @@ class EdificacionState {
     this.orientacionCruce,
     this.numero,
     this.complemento,
+    this.departamento,
+    this.municipio,
   });
 
   EdificacionState copyWith({
@@ -86,6 +91,8 @@ class EdificacionState {
     String? orientacionCruce,
     String? numero,
     String? complemento,
+    String? departamento,
+    String? municipio,
   }) {
     return EdificacionState(
       nombreEdificacion: nombreEdificacion ?? this.nombreEdificacion,
@@ -113,6 +120,8 @@ class EdificacionState {
       orientacionCruce: orientacionCruce ?? this.orientacionCruce,
       numero: numero ?? this.numero,
       complemento: complemento ?? this.complemento,
+      departamento: departamento ?? this.departamento,
+      municipio: municipio ?? this.municipio,
     );
   }
 
