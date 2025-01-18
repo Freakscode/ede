@@ -50,12 +50,14 @@
 	<key>NSCameraUsageDescription</key>
 	<string>Esta aplicación necesita acceso a la cámara para tomar fotos de firma.</string>
 	<key>GMSApiKey</key>
-	<string>$(MAPS_API_KEY)</string>
+	<string>AIzaSyBWukdvFMDVz-CjVmOQ6Q8xVoQH8U6H6Ng</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Esta aplicación necesita acceso a la ubicación para mostrar su posición en el mapa.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>Esta aplicación necesita acceso a la ubicación para mostrar su posición en el mapa.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>Esta aplicación necesita acceso a la ubicación para mostrar su posición en el mapa.</string>
+	<key>io.flutter.embedded_views_preview</key>
+	<true/>
 </dict>
 </plist>

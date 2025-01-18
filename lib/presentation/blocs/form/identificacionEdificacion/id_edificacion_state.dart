@@ -7,10 +7,6 @@ class EdificacionState {
   
   // Identificación Catastral
   final String? cbml;
-  final String? matriculaInmobiliaria;
-  final String? numeroPisos;
-  final String? subterraneos;
-  final int? yearConstruccion;
   
   // Persona de Contacto
   final String? nombreContacto;
@@ -42,10 +38,6 @@ class EdificacionState {
     this.barrio,
     this.codigoBarrio,
     this.cbml,
-    this.matriculaInmobiliaria,
-    this.numeroPisos,
-    this.subterraneos,
-    this.yearConstruccion,
     this.nombreContacto,
     this.telefonoContacto,
     this.emailContacto,
@@ -72,10 +64,6 @@ class EdificacionState {
     String? barrio,
     String? codigoBarrio,
     String? cbml,
-    String? matriculaInmobiliaria,
-    String? numeroPisos,
-    String? subterraneos,
-    int? yearConstruccion,
     String? nombreContacto,
     String? telefonoContacto,
     String? emailContacto,
@@ -101,10 +89,6 @@ class EdificacionState {
       barrio: barrio ?? this.barrio,
       codigoBarrio: codigoBarrio ?? this.codigoBarrio,
       cbml: cbml ?? this.cbml,
-      matriculaInmobiliaria: matriculaInmobiliaria ?? this.matriculaInmobiliaria,
-      numeroPisos: numeroPisos ?? this.numeroPisos,
-      subterraneos: subterraneos ?? this.subterraneos,
-      yearConstruccion: yearConstruccion ?? this.yearConstruccion,
       nombreContacto: nombreContacto ?? this.nombreContacto,
       telefonoContacto: telefonoContacto ?? this.telefonoContacto,
       emailContacto: emailContacto ?? this.emailContacto,

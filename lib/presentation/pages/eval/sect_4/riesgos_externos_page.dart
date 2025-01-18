@@ -181,23 +181,128 @@ class RiesgosExternosPage extends StatelessWidget {
           '4.6 Otro:',
           style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
-        TextFormField(
-          decoration: const InputDecoration(
-            hintText: 'Especifique otro riesgo',
+        Row(
+          children: [
+            Expanded(
+              flex: 2,
+              child: TextFormField(
+                decoration: const InputDecoration(
+                  hintText: 'Especifique otro riesgo',
+                ),
+                initialValue: state.otroRiesgo,
+                onChanged: (value) {
+                  context.read<RiesgosExternosBloc>().add(
+                    SetOtroRiesgo(value),
+                  );
+                },
+              ),
+            ),
+            Expanded(
+              child: CheckboxListTile(
+                title: const Text(''),
+                value: state.riesgos['4.6']?.existeRiesgo ?? false,
+                onChanged: (value) {
+                  context.read<RiesgosExternosBloc>().add(
+                    SetRiesgoExterno(
+                      riesgoId: '4.6',
+                      existeRiesgo: value ?? false,
+                      comprometeFuncionalidad: state.riesgos['4.6']?.comprometeFuncionalidad,
+                      comprometeEstabilidad: state.riesgos['4.6']?.comprometeEstabilidad,
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+        if (state.riesgos['4.6']?.existeRiesgo ?? false) ...[
+          Padding(
+            padding: const EdgeInsets.only(left: 16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('b) Compromete accesos/ocupantes de la edificación'),
+                Row(
+                  children: [
+                    Expanded(
+                      child: RadioListTile<bool>(
+                        title: const Text('Sí'),
+                        value: true,
+                        groupValue: state.riesgos['4.6']?.comprometeFuncionalidad,
+                        onChanged: (value) {
+                          context.read<RiesgosExternosBloc>().add(
+                            SetRiesgoExterno(
+                              riesgoId: '4.6',
+                              existeRiesgo: true,
+                              comprometeFuncionalidad: value,
+                              comprometeEstabilidad: state.riesgos['4.6']?.comprometeEstabilidad,
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    Expanded(
+                      child: RadioListTile<bool>(
+                        title: const Text('No'),
+                        value: false,
+                        groupValue: state.riesgos['4.6']?.comprometeFuncionalidad,
+                        onChanged: (value) {
+                          context.read<RiesgosExternosBloc>().add(
+                            SetRiesgoExterno(
+                              riesgoId: '4.6',
+                              existeRiesgo: true,
+                              comprometeFuncionalidad: value,
+                              comprometeEstabilidad: state.riesgos['4.6']?.comprometeEstabilidad,
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                const Text('c) Compromete estabilidad de la edificación'),
+                Row(
+                  children: [
+                    Expanded(
+                      child: RadioListTile<bool>(
+                        title: const Text('Sí'),
+                        value: true,
+                        groupValue: state.riesgos['4.6']?.comprometeEstabilidad,
+                        onChanged: (value) {
+                          context.read<RiesgosExternosBloc>().add(
+                            SetRiesgoExterno(
+                              riesgoId: '4.6',
+                              existeRiesgo: true,
+                              comprometeFuncionalidad: state.riesgos['4.6']?.comprometeFuncionalidad,
+                              comprometeEstabilidad: value,
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    Expanded(
+                      child: RadioListTile<bool>(
+                        title: const Text('No'),
+                        value: false,
+                        groupValue: state.riesgos['4.6']?.comprometeEstabilidad,
+                        onChanged: (value) {
+                          context.read<RiesgosExternosBloc>().add(
+                            SetRiesgoExterno(
+                              riesgoId: '4.6',
+                              existeRiesgo: true,
+                              comprometeFuncionalidad: state.riesgos['4.6']?.comprometeFuncionalidad,
+                              comprometeEstabilidad: value,
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
-          initialValue: state.otroRiesgo,
-          onChanged: (value) {
-            context.read<RiesgosExternosBloc>().add(
-              SetOtroRiesgo(value),
-            );
-          },
-        ),
-        _buildRiesgoItem(
-          context,
-          '4.6',
-          state.otroRiesgo ?? '',
-          state.riesgos['4.6'],
-        ),
+        ],
       ],
     );
   }

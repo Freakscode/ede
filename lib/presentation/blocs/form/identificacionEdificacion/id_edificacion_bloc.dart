@@ -37,11 +37,6 @@ class EdificacionBloc extends Bloc<EdificacionEvent, EdificacionState> {
       developer.log('SetCBML: ${event.cbml}', name: 'EdificacionBloc');
     });
 
-    on<SetMatriculaInmobiliaria>((event, emit) {
-      emit(state.copyWith(matriculaInmobiliaria: event.matricula));
-      developer.log('SetMatriculaInmobiliaria: ${event.matricula}', name: 'EdificacionBloc');
-    });
-
     // Manejadores para Persona de Contacto
     on<SetNombreContacto>((event, emit) {
       emit(state.copyWith(nombreContacto: event.nombre));

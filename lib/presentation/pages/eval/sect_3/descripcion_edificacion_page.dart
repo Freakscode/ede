@@ -94,18 +94,62 @@ class _DescripcionEdificacionPageState extends State<DescripcionEdificacionPage>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Descripción de la Edificación'),
+        title: const Text('Descripción'),
+        elevation: 2,
         bottom: TabBar(
           controller: _tabController,
           isScrollable: true,
+          labelColor: Theme.of(context).colorScheme.secondary,
+          unselectedLabelColor: Theme.of(context).colorScheme.surface,
+          indicatorColor: Theme.of(context).colorScheme.secondary,
+          indicatorWeight: 3,
+          labelStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
+          unselectedLabelStyle: Theme.of(context).textTheme.bodyLarge,
+          indicator: UnderlineTabIndicator(
+            borderSide: BorderSide(
+              width: 3,
+              color: Theme.of(context).colorScheme.secondary,
+            ),
+          ),
+          overlayColor: MaterialStateProperty.resolveWith<Color?>(
+            (Set<MaterialState> states) {
+              if (states.contains(MaterialState.pressed)) {
+                return Theme.of(context).colorScheme.secondary.withOpacity(0.1);
+              }
+              return null;
+            },
+          ),
           tabs: const [
-            Tab(text: 'Características\nGenerales'),
-            Tab(text: 'Usos\nPredominantes'),
-            Tab(text: 'Sistema Estructural\ny Material'),
-            Tab(text: 'Sistemas de\nEntrepiso'),
-            Tab(text: 'Sistemas de\nCubierta'),
-            Tab(text: 'Elementos No\nEstructurales'),
-            Tab(text: 'Datos\nAdicionales'),
+            Tab(
+              icon: Icon(Icons.home_work, size: 24),
+              text: 'Características',
+            ),
+            Tab(
+              icon: Icon(Icons.business, size: 24),
+              text: 'Usos',
+            ),
+            Tab(
+              icon: Icon(Icons.architecture, size: 24),
+              text: 'Estructural',
+            ),
+            Tab(
+              icon: Icon(Icons.layers, size: 24),
+              text: 'Entrepisos',
+            ),
+            Tab(
+              icon: Icon(Icons.roofing, size: 24),
+              text: 'Cubierta',
+            ),
+            Tab(
+              icon: Icon(Icons.view_compact_alt, size: 24),
+              text: 'No Estructural',
+            ),
+            Tab(
+              icon: Icon(Icons.info, size: 24),
+              text: 'Adicionales',
+            ),
           ],
         ),
       ),
@@ -132,10 +176,6 @@ class _DescripcionEdificacionPageState extends State<DescripcionEdificacionPage>
 
   Widget _buildCaracteristicasGenerales() {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16.0),
-      child: Card(
-        elevation: 2,
-        child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -145,6 +185,7 @@ class _DescripcionEdificacionPageState extends State<DescripcionEdificacionPage>
                 children: [
                   Expanded(
                     child: TextFormField(
+                  controller: _pisosSobreTerrenoController,
                       decoration: const InputDecoration(
                         labelText: 'No. de pisos sobre el terreno',
                         border: OutlineInputBorder(),
@@ -162,6 +203,7 @@ class _DescripcionEdificacionPageState extends State<DescripcionEdificacionPage>
                   const SizedBox(width: 16),
                   Expanded(
                     child: TextFormField(
+                  controller: _sotanosController,
                       decoration: const InputDecoration(
                         labelText: 'Sótanos',
                         border: OutlineInputBorder(),
@@ -178,18 +220,22 @@ class _DescripcionEdificacionPageState extends State<DescripcionEdificacionPage>
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
+          const SizedBox(height: 24),
               
               // Dimensiones
               Text(
                 'Dimensiones aproximadas',
-                style: Theme.of(context).textTheme.titleMedium,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.primary,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-              const SizedBox(height: 8),
+          const SizedBox(height: 16),
               Row(
                 children: [
                   Expanded(
                     child: TextFormField(
+                  controller: _frenteController,
                       decoration: const InputDecoration(
                         labelText: 'Frente (m)',
                         border: OutlineInputBorder(),
@@ -214,6 +260,7 @@ class _DescripcionEdificacionPageState extends State<DescripcionEdificacionPage>
                   const SizedBox(width: 16),
                   Expanded(
                     child: TextFormField(
+                  controller: _fondoController,
                       decoration: const InputDecoration(
                         labelText: 'Fondo (m)',
                         border: OutlineInputBorder(),
@@ -237,15 +284,24 @@ class _DescripcionEdificacionPageState extends State<DescripcionEdificacionPage>
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
+          const SizedBox(height: 24),
               
               // Unidades
+          Text(
+            'Unidades',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              color: Theme.of(context).colorScheme.primary,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 16),
               Row(
                 children: [
                   Expanded(
                     child: TextFormField(
+                  controller: _unidadesResidencialesController,
                       decoration: const InputDecoration(
-                        labelText: 'Unidades residenciales',
+                    labelText: 'Residenciales',
                         border: OutlineInputBorder(),
                       ),
                       keyboardType: TextInputType.number,
@@ -261,8 +317,9 @@ class _DescripcionEdificacionPageState extends State<DescripcionEdificacionPage>
                   const SizedBox(width: 16),
                   Expanded(
                     child: TextFormField(
+                  controller: _unidadesComercialesController,
                       decoration: const InputDecoration(
-                        labelText: 'Unidades comerciales',
+                    labelText: 'Comerciales',
                         border: OutlineInputBorder(),
                       ),
                       keyboardType: TextInputType.number,
@@ -278,11 +335,10 @@ class _DescripcionEdificacionPageState extends State<DescripcionEdificacionPage>
                 ],
               ),
               const SizedBox(height: 16),
-              
-              // Unidades no habitadas
               TextFormField(
+            controller: _unidadesNoHabitadasController,
                 decoration: const InputDecoration(
-                  labelText: 'Número de unidades no habitadas',
+              labelText: 'No habitadas',
                   border: OutlineInputBorder(),
                 ),
                 keyboardType: TextInputType.number,
@@ -294,10 +350,19 @@ class _DescripcionEdificacionPageState extends State<DescripcionEdificacionPage>
                   }
                 },
               ),
-              const SizedBox(height: 16),
-              
-              // Número de ocupantes
+          const SizedBox(height: 24),
+          
+          // Ocupantes y Víctimas
+          Text(
+            'Ocupantes y Víctimas',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              color: Theme.of(context).colorScheme.primary,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 16),
               TextFormField(
+            controller: _numeroOcupantesController,
                 decoration: const InputDecoration(
                   labelText: 'Número de ocupantes',
                   border: OutlineInputBorder(),
@@ -312,122 +377,197 @@ class _DescripcionEdificacionPageState extends State<DescripcionEdificacionPage>
                 },
               ),
               const SizedBox(height: 16),
-              
-              // Muertos y Heridos
               BlocBuilder<DescripcionEdificacionBloc, DescripcionEdificacionState>(
                 builder: (context, state) {
                   return Column(
                     children: [
+                      if (state.noSeSabe != true) ...[
                       Row(
                         children: [
                           Expanded(
                             child: TextFormField(
+                                controller: _muertosController,
                               decoration: const InputDecoration(
                                 labelText: 'Muertos',
                                 border: OutlineInputBorder(),
                               ),
-                              enabled: !(state.noSeSabe ?? false),
                               keyboardType: TextInputType.number,
                               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                               onChanged: (value) {
+                                  if (value.isNotEmpty) {
                                 context.read<DescripcionEdificacionBloc>().add(
                                   SetMuertosHeridos(
-                                    muertos: value.isNotEmpty ? int.parse(value) : null,
+                                        muertos: int.parse(value),
                                     heridos: state.heridos,
                                     noSeSabe: state.noSeSabe ?? false,
                                   ),
                                 );
+                                  }
                               },
                             ),
                           ),
                           const SizedBox(width: 16),
                           Expanded(
                             child: TextFormField(
+                                controller: _heridosController,
                               decoration: const InputDecoration(
                                 labelText: 'Heridos',
                                 border: OutlineInputBorder(),
                               ),
-                              enabled: !(state.noSeSabe ?? false),
                               keyboardType: TextInputType.number,
                               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                               onChanged: (value) {
+                                  if (value.isNotEmpty) {
                                 context.read<DescripcionEdificacionBloc>().add(
                                   SetMuertosHeridos(
                                     muertos: state.muertos,
-                                    heridos: value.isNotEmpty ? int.parse(value) : null,
+                                        heridos: int.parse(value),
                                     noSeSabe: state.noSeSabe ?? false,
                                   ),
                                 );
+                                  }
                               },
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 8),
-                      CheckboxListTile(
-                        title: const Text('No se sabe'),
-                        value: state.noSeSabe ?? false,
-                        onChanged: (value) {
+                      ],
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: () {
                           context.read<DescripcionEdificacionBloc>().add(
                             SetMuertosHeridos(
-                              muertos: value! ? null : state.muertos,
-                              heridos: value ? null : state.heridos,
-                              noSeSabe: value,
+                                    muertos: state.noSeSabe == true ? null : state.muertos,
+                                    heridos: state.noSeSabe == true ? null : state.heridos,
+                                    noSeSabe: !(state.noSeSabe ?? false),
                             ),
                           );
                         },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: state.noSeSabe == true
+                                    ? Theme.of(context).colorScheme.secondary
+                                    : Theme.of(context).colorScheme.surface,
+                                foregroundColor: Theme.of(context).colorScheme.primary,
+                                elevation: 0,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 12,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                  side: BorderSide(
+                                    color: Theme.of(context).colorScheme.primary,
+                                    width: 1,
+                                  ),
+                                ),
+                              ),
+                              child: Text(
+                                'No se sabe',
+                                style: Theme.of(context).textTheme.bodyMedium,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   );
                 },
               ),
-              const SizedBox(height: 16),
+          const SizedBox(height: 24),
               
               // Acceso a la edificación
               Text(
-                'Acceso a la edificación:',
-                style: Theme.of(context).textTheme.titleMedium,
+                'Acceso a la edificación',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.primary,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 16),
               BlocBuilder<DescripcionEdificacionBloc, DescripcionEdificacionState>(
                 builder: (context, state) {
-                  return Row(
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 24.0),
+                    child: Row(
                     children: [
                       Expanded(
-                        child: CheckboxListTile(
-                          title: const Text('Obstruido'),
-                          value: state.accesoObstruido ?? false,
-                          onChanged: (value) {
+                          child: ElevatedButton(
+                            onPressed: () {
                             context.read<DescripcionEdificacionBloc>().add(
                               SetAcceso(
-                                obstruido: value ?? false,
-                                libre: value ?? false ? false : state.accesoLibre ?? false,
+                                  obstruido: !(state.accesoObstruido ?? false),
+                                  libre: state.accesoLibre ?? false,
                               ),
                             );
                           },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: state.accesoObstruido == true
+                                  ? Theme.of(context).colorScheme.secondary
+                                  : Theme.of(context).colorScheme.surface,
+                              foregroundColor: Theme.of(context).colorScheme.primary,
+                              elevation: 0,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 12,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                side: BorderSide(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  width: 1,
+                                ),
+                              ),
+                            ),
+                            child: Text(
+                              'Obstruido',
+                              style: Theme.of(context).textTheme.bodyMedium,
+                            ),
+                          ),
                         ),
-                      ),
+                        const SizedBox(width: 16),
                       Expanded(
-                        child: CheckboxListTile(
-                          title: const Text('Libre'),
-                          value: state.accesoLibre ?? false,
-                          onChanged: (value) {
+                          child: ElevatedButton(
+                            onPressed: () {
                             context.read<DescripcionEdificacionBloc>().add(
                               SetAcceso(
-                                obstruido: value ?? false ? false : state.accesoObstruido ?? false,
-                                libre: value ?? false,
+                                  obstruido: state.accesoObstruido ?? false,
+                                  libre: !(state.accesoLibre ?? false),
                               ),
                             );
                           },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: state.accesoLibre == true
+                                  ? Theme.of(context).colorScheme.secondary
+                                  : Theme.of(context).colorScheme.surface,
+                              foregroundColor: Theme.of(context).colorScheme.primary,
+                              elevation: 0,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 12,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                side: BorderSide(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  width: 1,
+                                ),
+                              ),
+                            ),
+                            child: Text(
+                              'Libre',
+                              style: Theme.of(context).textTheme.bodyMedium,
+                            ),
                         ),
                       ),
                     ],
+                    ),
                   );
                 },
               ),
             ],
-          ),
-        ),
       ),
     );
   }
@@ -453,6 +593,9 @@ class _DescripcionEdificacionPageState extends State<DescripcionEdificacionPage>
       padding: const EdgeInsets.all(16.0),
       child: Card(
         elevation: 2,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -578,7 +721,6 @@ class _DescripcionEdificacionPageState extends State<DescripcionEdificacionPage>
   }
 
   Widget _buildSistemaEstructural() {
-    // Definir las opciones para cada sistema estructural
     final sistemasYMateriales = {
       'Muros de carga': [
         'Mampostería Simple',
@@ -615,6 +757,9 @@ class _DescripcionEdificacionPageState extends State<DescripcionEdificacionPage>
       padding: const EdgeInsets.all(16.0),
       child: Card(
         elevation: 2,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: BlocBuilder<DescripcionEdificacionBloc, DescripcionEdificacionState>(
@@ -622,110 +767,134 @@ class _DescripcionEdificacionPageState extends State<DescripcionEdificacionPage>
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    '3.3.1 Sistema estructural',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  Text(
+                    'Sistema estructural',
+                    style: Theme.of(context).textTheme.titleMedium,
                   ),
                   const SizedBox(height: 16),
                   
                   // Sistemas estructurales
                   ...sistemasYMateriales.entries.map((entry) {
+                    bool isSelected = state.sistemaEstructural == entry.key;
                     return Column(
                       children: [
-                        CheckboxListTile(
-                          title: Text(entry.key),
-                          value: state.sistemaEstructural == entry.key,
-                          onChanged: (bool? value) {
-                            if (value == true) {
+                        ElevatedButton(
+                          onPressed: () {
                               context.read<DescripcionEdificacionBloc>().add(
                                 SetSistemaEstructuralYMaterial(entry.key)
                               );
-                            }
                           },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: isSelected
+                                ? Theme.of(context).colorScheme.secondary
+                                : Theme.of(context).colorScheme.surface,
+                            foregroundColor: Theme.of(context).colorScheme.primary,
+                            elevation: 0,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 12,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              side: BorderSide(
+                                color: Theme.of(context).colorScheme.primary,
+                                width: 1,
+                              ),
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  entry.key,
+                                  style: Theme.of(context).textTheme.bodyMedium,
+                                ),
+                              ),
+                              Icon(
+                                isSelected ? Icons.check_circle : Icons.circle_outlined,
+                                color: isSelected
+                                    ? Theme.of(context).colorScheme.primary
+                                    : Theme.of(context).colorScheme.primary.withOpacity(0.5),
+                              ),
+                            ],
+                          ),
                         ),
-                        if (state.sistemaEstructural == entry.key && entry.value.isNotEmpty)
+                        if (isSelected && entry.value.isNotEmpty)
                           Padding(
-                            padding: const EdgeInsets.only(left: 32.0),
+                            padding: const EdgeInsets.only(left: 16.0, top: 8.0),
                             child: Column(
                               children: entry.value.map((material) {
-                                return RadioListTile<String>(
-                                  title: Text(material),
-                                  value: material,
-                                  groupValue: state.material,
-                                  onChanged: (value) {
+                                bool isMaterialSelected = state.material == material;
+                                return Padding(
+                                  padding: const EdgeInsets.only(bottom: 8.0),
+                                  child: ElevatedButton(
+                                    onPressed: () {
                                     context.read<DescripcionEdificacionBloc>().add(
                                       SetSistemaEstructuralYMaterial(
                                         entry.key,
-                                        material: value,
+                                          material: material,
                                       ),
                                     );
                                   },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: isMaterialSelected
+                                          ? Theme.of(context).colorScheme.secondary.withOpacity(0.7)
+                                          : Theme.of(context).colorScheme.surface,
+                                      foregroundColor: Theme.of(context).colorScheme.primary,
+                                      elevation: 0,
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 16,
+                                        vertical: 12,
+                                      ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                        side: BorderSide(
+                                          color: Theme.of(context).colorScheme.primary,
+                                          width: 1,
+                                        ),
+                                      ),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            material,
+                                            style: Theme.of(context).textTheme.bodyMedium,
+                                          ),
+                                        ),
+                                        Icon(
+                                          isMaterialSelected ? Icons.check_circle : Icons.circle_outlined,
+                                          color: isMaterialSelected
+                                              ? Theme.of(context).colorScheme.primary
+                                              : Theme.of(context).colorScheme.primary.withOpacity(0.5),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                 );
                               }).toList(),
                             ),
                           ),
-                        if (entry.key == 'Otro' && state.sistemaEstructural == 'Otro')
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 32.0),
-                            child: TextFormField(
-                              decoration: const InputDecoration(
-                                labelText: '¿Cuál?',
-                                border: OutlineInputBorder(),
-                              ),
-                              initialValue: state.cualOtroSistema,
-                              onChanged: (value) {
-                                context.read<DescripcionEdificacionBloc>().add(
-                                  SetSistemaEstructuralYMaterial(
-                                    'Otro',
-                                    cualOtroSistema: value,
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
+                        const SizedBox(height: 8),
                       ],
                     );
                   }),
-                  
-                  const SizedBox(height: 16),
-                  // Observaciones
-                  TextFormField(
-                    decoration: const InputDecoration(
-                      labelText: 'Observaciones',
-                      border: OutlineInputBorder(),
-                    ),
-                    maxLines: 3,
-                    initialValue: state.observaciones,
-                    onChanged: (value) {
-                      context.read<DescripcionEdificacionBloc>().add(
-                        SetObservaciones(value),
-                      );
-                    },
-                  ),
-                  
-                  const SizedBox(height: 16),
-                  // Sistema múltiple
-                  CheckboxListTile(
-                    title: const Text('¿Existe más de un sistema en planta o en altura?'),
-                    value: state.existeMasDeUnSistema ?? false,
-                    onChanged: (bool? value) {
-                      context.read<DescripcionEdificacionBloc>().add(
-                        SetSistemaMultiple(value ?? false),
-                      );
-                    },
-                  ),
-                  if (state.existeMasDeUnSistema == true)
+
+                  if (state.sistemaEstructural == 'Otro')
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       child: TextFormField(
                         decoration: const InputDecoration(
                           labelText: '¿Cuál?',
                           border: OutlineInputBorder(),
                         ),
-                        initialValue: state.cualOtroSistemaMultiple,
+                        initialValue: state.cualOtroSistema,
                         onChanged: (value) {
                           context.read<DescripcionEdificacionBloc>().add(
-                            SetSistemaMultiple(true, cual: value),
+                            SetSistemaEstructuralYMaterial(
+                              'Otro',
+                              cualOtroSistema: value,
+                            ),
                           );
                         },
                       ),
@@ -772,6 +941,9 @@ class _DescripcionEdificacionPageState extends State<DescripcionEdificacionPage>
       padding: const EdgeInsets.all(16.0),
       child: Card(
         elevation: 2,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: BlocBuilder<DescripcionEdificacionBloc, DescripcionEdificacionState>(
@@ -886,6 +1058,9 @@ class _DescripcionEdificacionPageState extends State<DescripcionEdificacionPage>
       padding: const EdgeInsets.all(16.0),
       child: Card(
         elevation: 2,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: BlocBuilder<DescripcionEdificacionBloc, DescripcionEdificacionState>(
@@ -942,7 +1117,10 @@ class _DescripcionEdificacionPageState extends State<DescripcionEdificacionPage>
                     ],
                   )),
 
-                  const Divider(height: 32),
+                  Divider(
+                    height: 32,
+                    color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+                  ),
 
                   const Text(
                     '3.5.2 Revestimiento',
@@ -1030,6 +1208,9 @@ class _DescripcionEdificacionPageState extends State<DescripcionEdificacionPage>
       padding: const EdgeInsets.all(16.0),
       child: Card(
         elevation: 2,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: BlocBuilder<DescripcionEdificacionBloc, DescripcionEdificacionState>(
@@ -1090,7 +1271,10 @@ class _DescripcionEdificacionPageState extends State<DescripcionEdificacionPage>
                     ],
                   )),
 
-                  const Divider(height: 32),
+                  Divider(
+                    height: 32,
+                    color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+                  ),
 
                   // 3.6.2 Fachadas
                   const Text(
@@ -1143,7 +1327,10 @@ class _DescripcionEdificacionPageState extends State<DescripcionEdificacionPage>
                   )),
 
                   if (mostrarEscaleras) ...[
-                    const Divider(height: 32),
+                    Divider(
+                      height: 32,
+                      color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+                    ),
 
                     // 3.6.3 Escaleras
                     const Text(
@@ -1207,164 +1394,406 @@ class _DescripcionEdificacionPageState extends State<DescripcionEdificacionPage>
   Widget _buildDatosAdicionales() {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
-      child: Card(
-        elevation: 2,
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: BlocBuilder<DescripcionEdificacionBloc, DescripcionEdificacionState>(
-            builder: (context, state) {
-              return Column(
+      child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // 3.7 Nivel de diseño
-                  const Text(
-                    '3.7 Nivel de diseño',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          Text(
+            'Nivel de diseño',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              color: Theme.of(context).colorScheme.primary,
+              fontWeight: FontWeight.bold,
+            ),
                   ),
                   const SizedBox(height: 16),
-                  Row(
+          BlocBuilder<DescripcionEdificacionBloc, DescripcionEdificacionState>(
+            builder: (context, state) {
+              return Row(
                     children: [
                       Expanded(
-                        child: RadioListTile<String>(
-                          title: const Text('Ingenieril'),
-                          value: 'Ingenieril',
-                          groupValue: state.nivelDiseno,
-                          onChanged: (value) {
+                    child: ElevatedButton(
+                      onPressed: () {
                             context.read<DescripcionEdificacionBloc>().add(
-                              SetNivelDiseno(value!),
-                            );
-                          },
+                          SetNivelDiseno('Ingenieril'),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: state.nivelDiseno == 'Ingenieril'
+                            ? const Color(0xFF1B3A5C)  // Dark blue
+                            : Colors.white,
+                        foregroundColor: state.nivelDiseno == 'Ingenieril'
+                            ? Colors.white
+                            : const Color(0xFF1B3A5C),  // Dark blue
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          side: BorderSide(
+                            color: state.nivelDiseno == 'Ingenieril'
+                                ? const Color(0xFF1B3A5C)  // Dark blue
+                                : const Color(0xFFFFD700),  // Yellow
+                            width: 1,
+                          ),
                         ),
                       ),
-                      Expanded(
-                        child: RadioListTile<String>(
-                          title: const Text('No ingenieril'),
-                          value: 'No ingenieril',
-                          groupValue: state.nivelDiseno,
-                          onChanged: (value) {
-                            context.read<DescripcionEdificacionBloc>().add(
-                              SetNivelDiseno(value!),
-                            );
-                          },
+                      child: Text(
+                        'Ingenieril',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: state.nivelDiseno == 'Ingenieril' ? Colors.white : const Color(0xFF1B3A5C),
                         ),
                       ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
                       Expanded(
-                        child: RadioListTile<String>(
-                          title: const Text('Precario'),
-                          value: 'Precario',
-                          groupValue: state.nivelDiseno,
-                          onChanged: (value) {
+                    child: ElevatedButton(
+                      onPressed: () {
                             context.read<DescripcionEdificacionBloc>().add(
-                              SetNivelDiseno(value!),
-                            );
-                          },
+                          SetNivelDiseno('No ingenieril'),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: state.nivelDiseno == 'No ingenieril'
+                            ? const Color(0xFF1B3A5C)  // Dark blue
+                            : Colors.white,
+                        foregroundColor: state.nivelDiseno == 'No ingenieril'
+                            ? Colors.white
+                            : const Color(0xFF1B3A5C),  // Dark blue
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          side: BorderSide(
+                            color: state.nivelDiseno == 'No ingenieril'
+                                ? const Color(0xFF1B3A5C)  // Dark blue
+                                : const Color(0xFFFFD700),  // Yellow
+                            width: 1,
+                          ),
+                        ),
+                      ),
+                      child: Text(
+                        'No ingenieril',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: state.nivelDiseno == 'No ingenieril' ? Colors.white : const Color(0xFF1B3A5C),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                      Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                            context.read<DescripcionEdificacionBloc>().add(
+                          SetNivelDiseno('Precario'),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: state.nivelDiseno == 'Precario'
+                            ? const Color(0xFF1B3A5C)  // Dark blue
+                            : Colors.white,
+                        foregroundColor: state.nivelDiseno == 'Precario'
+                            ? Colors.white
+                            : const Color(0xFF1B3A5C),  // Dark blue
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          side: BorderSide(
+                            color: state.nivelDiseno == 'Precario'
+                                ? const Color(0xFF1B3A5C)  // Dark blue
+                                : const Color(0xFFFFD700),  // Yellow
+                            width: 1,
+                          ),
+                        ),
+                      ),
+                      child: Text(
+                        'Precario',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: state.nivelDiseno == 'Precario' ? Colors.white : const Color(0xFF1B3A5C),
+                        ),
+                      ),
                         ),
                       ),
                     ],
+              );
+            },
                   ),
 
-                  const Divider(height: 32),
+          const SizedBox(height: 24),
 
                   // 3.8 Calidad del diseño
-                  const Text(
-                    '3.8 Calidad del diseño y la construcción de la estructura original',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          Text(
+            'Calidad del diseño y la construcción',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              color: Theme.of(context).colorScheme.primary,
+              fontWeight: FontWeight.bold,
+            ),
                   ),
                   const SizedBox(height: 16),
-                  Row(
+          BlocBuilder<DescripcionEdificacionBloc, DescripcionEdificacionState>(
+            builder: (context, state) {
+              return Row(
                     children: [
                       Expanded(
-                        child: RadioListTile<String>(
-                          title: const Text('Bueno'),
-                          value: 'Bueno',
-                          groupValue: state.calidadDiseno,
-                          onChanged: (value) {
+                    child: ElevatedButton(
+                      onPressed: () {
                             context.read<DescripcionEdificacionBloc>().add(
-                              SetCalidadDiseno(value!),
-                            );
-                          },
+                          SetCalidadDiseno('Bueno'),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: state.calidadDiseno == 'Bueno'
+                            ? const Color(0xFF1B3A5C)  // Dark blue
+                            : Colors.white,
+                        foregroundColor: state.calidadDiseno == 'Bueno'
+                            ? Colors.white
+                            : const Color(0xFF1B3A5C),  // Dark blue
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          side: BorderSide(
+                            color: state.calidadDiseno == 'Bueno'
+                                ? const Color(0xFF1B3A5C)  // Dark blue
+                                : const Color(0xFFFFD700),  // Yellow
+                            width: 1,
+                          ),
                         ),
                       ),
-                      Expanded(
-                        child: RadioListTile<String>(
-                          title: const Text('Regular'),
-                          value: 'Regular',
-                          groupValue: state.calidadDiseno,
-                          onChanged: (value) {
-                            context.read<DescripcionEdificacionBloc>().add(
-                              SetCalidadDiseno(value!),
-                            );
-                          },
+                      child: Text(
+                        'Bueno',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: state.calidadDiseno == 'Bueno' ? Colors.white : const Color(0xFF1B3A5C),
                         ),
                       ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
                       Expanded(
-                        child: RadioListTile<String>(
-                          title: const Text('Malo'),
-                          value: 'Malo',
-                          groupValue: state.calidadDiseno,
-                          onChanged: (value) {
+                    child: ElevatedButton(
+                      onPressed: () {
                             context.read<DescripcionEdificacionBloc>().add(
-                              SetCalidadDiseno(value!),
-                            );
-                          },
+                          SetCalidadDiseno('Regular'),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: state.calidadDiseno == 'Regular'
+                            ? const Color(0xFF1B3A5C)  // Dark blue
+                            : Colors.white,
+                        foregroundColor: state.calidadDiseno == 'Regular'
+                            ? Colors.white
+                            : const Color(0xFF1B3A5C),  // Dark blue
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          side: BorderSide(
+                            color: state.calidadDiseno == 'Regular'
+                                ? const Color(0xFF1B3A5C)  // Dark blue
+                                : const Color(0xFFFFD700),  // Yellow
+                            width: 1,
+                          ),
+                        ),
+                      ),
+                      child: Text(
+                        'Regular',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: state.calidadDiseno == 'Regular' ? Colors.white : const Color(0xFF1B3A5C),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                      Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                            context.read<DescripcionEdificacionBloc>().add(
+                          SetCalidadDiseno('Malo'),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: state.calidadDiseno == 'Malo'
+                            ? const Color(0xFF1B3A5C)  // Dark blue
+                            : Colors.white,
+                        foregroundColor: state.calidadDiseno == 'Malo'
+                            ? Colors.white
+                            : const Color(0xFF1B3A5C),  // Dark blue
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          side: BorderSide(
+                            color: state.calidadDiseno == 'Malo'
+                                ? const Color(0xFF1B3A5C)  // Dark blue
+                                : const Color(0xFFFFD700),  // Yellow
+                            width: 1,
+                          ),
+                        ),
+                      ),
+                      child: Text(
+                        'Malo',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: state.calidadDiseno == 'Malo' ? Colors.white : const Color(0xFF1B3A5C),
+                        ),
+                      ),
                         ),
                       ),
                     ],
+              );
+            },
                   ),
 
-                  const Divider(height: 32),
+          const SizedBox(height: 24),
 
                   // 3.9 Estado de la edificación
-                  const Text(
-                    '3.9 Estado de la edificación (Conservación)',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          Text(
+            'Estado de la edificación',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              color: Theme.of(context).colorScheme.primary,
+              fontWeight: FontWeight.bold,
+            ),
                   ),
                   const SizedBox(height: 16),
-                  Row(
+          BlocBuilder<DescripcionEdificacionBloc, DescripcionEdificacionState>(
+            builder: (context, state) {
+              return Row(
                     children: [
                       Expanded(
-                        child: RadioListTile<String>(
-                          title: const Text('Bueno'),
-                          value: 'Bueno',
-                          groupValue: state.estadoEdificacion,
-                          onChanged: (value) {
+                    child: ElevatedButton(
+                      onPressed: () {
                             context.read<DescripcionEdificacionBloc>().add(
-                              SetEstadoEdificacion(value!),
-                            );
-                          },
+                          SetEstadoEdificacion('Bueno'),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: state.estadoEdificacion == 'Bueno'
+                            ? const Color(0xFF1B3A5C)  // Dark blue
+                            : Colors.white,
+                        foregroundColor: state.estadoEdificacion == 'Bueno'
+                            ? Colors.white
+                            : const Color(0xFF1B3A5C),  // Dark blue
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          side: BorderSide(
+                            color: state.estadoEdificacion == 'Bueno'
+                                ? const Color(0xFF1B3A5C)  // Dark blue
+                                : const Color(0xFFFFD700),  // Yellow
+                            width: 1,
+                          ),
                         ),
                       ),
+                      child: Text(
+                        'Bueno',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: state.estadoEdificacion == 'Bueno' ? Colors.white : const Color(0xFF1B3A5C),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
                       Expanded(
-                        child: RadioListTile<String>(
-                          title: const Text('Regular'),
-                          value: 'Regular',
-                          groupValue: state.estadoEdificacion,
-                          onChanged: (value) {
+                    child: ElevatedButton(
+                      onPressed: () {
                             context.read<DescripcionEdificacionBloc>().add(
-                              SetEstadoEdificacion(value!),
-                            );
-                          },
+                          SetEstadoEdificacion('Regular'),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: state.estadoEdificacion == 'Regular'
+                            ? const Color(0xFF1B3A5C)  // Dark blue
+                            : Colors.white,
+                        foregroundColor: state.estadoEdificacion == 'Regular'
+                            ? Colors.white
+                            : const Color(0xFF1B3A5C),  // Dark blue
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          side: BorderSide(
+                            color: state.estadoEdificacion == 'Regular'
+                                ? const Color(0xFF1B3A5C)  // Dark blue
+                                : const Color(0xFFFFD700),  // Yellow
+                            width: 1,
+                          ),
                         ),
                       ),
+                      child: Text(
+                        'Regular',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: state.estadoEdificacion == 'Regular' ? Colors.white : const Color(0xFF1B3A5C),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
                       Expanded(
-                        child: RadioListTile<String>(
-                          title: const Text('Malo'),
-                          value: 'Malo',
-                          groupValue: state.estadoEdificacion,
-                          onChanged: (value) {
+                    child: ElevatedButton(
+                      onPressed: () {
                             context.read<DescripcionEdificacionBloc>().add(
-                              SetEstadoEdificacion(value!),
-                            );
-                          },
+                          SetEstadoEdificacion('Malo'),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: state.estadoEdificacion == 'Malo'
+                            ? const Color(0xFF1B3A5C)  // Dark blue
+                            : Colors.white,
+                        foregroundColor: state.estadoEdificacion == 'Malo'
+                            ? Colors.white
+                            : const Color(0xFF1B3A5C),  // Dark blue
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          side: BorderSide(
+                            color: state.estadoEdificacion == 'Malo'
+                                ? const Color(0xFF1B3A5C)  // Dark blue
+                                : const Color(0xFFFFD700),  // Yellow
+                            width: 1,
+                          ),
                         ),
                       ),
-                    ],
+                      child: Text(
+                        'Malo',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: state.estadoEdificacion == 'Malo' ? Colors.white : const Color(0xFF1B3A5C),
+                        ),
+                      ),
+                    ),
                   ),
                 ],
               );
             },
           ),
-        ),
+        ],
       ),
     );
   }

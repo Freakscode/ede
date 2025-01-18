@@ -34,26 +34,6 @@ class SetCBML extends EdificacionEvent {
   SetCBML(this.cbml);
 }
 
-class SetMatriculaInmobiliaria extends EdificacionEvent {
-  final String matricula;
-  SetMatriculaInmobiliaria(this.matricula);
-}
-
-class SetNumeroPisos extends EdificacionEvent {
-  final String numeroPisos;
-  SetNumeroPisos(this.numeroPisos);
-}
-
-class SetSubterraneos extends EdificacionEvent {
-  final String subterraneos;
-  SetSubterraneos(this.subterraneos);
-}
-
-class SetYearConstruccion extends EdificacionEvent {
-  final int year;
-  SetYearConstruccion(this.year);
-}
-
 // Eventos para Persona de Contacto
 class SetNombreContacto extends EdificacionEvent {
   final String nombre;

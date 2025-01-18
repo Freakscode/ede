@@ -13,7 +13,7 @@ class EvaluacionBloc extends Bloc<EvaluacionEvent, EvaluacionState> {
   }
 
   Future<void> _onStarted(EvaluacionStarted event, Emitter<EvaluacionState> emit) async {
-    final signature = await repository.obtenerFirmaEvaluador();
+    final signature = repository.obtenerFirmaEvaluador();
     if (signature != null) {
       emit(state.copyWith(firmaPath: signature));
     }

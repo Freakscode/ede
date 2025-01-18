@@ -50,3 +50,7 @@ lib/config/secrets.dart
 
 # Archivos de configuración
 lib/config/secrets.dart
+
+# Archivos con API keys
+android/app/src/main/res/values/strings.xml
+ios/Runner/Info.plist

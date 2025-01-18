@@ -9,7 +9,6 @@ import 'package:go_router/go_router.dart';
 import '../../../widgets/navigation_fab_menu.dart';
 import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import '../../../widgets/map_widget.dart';
 import '../../../widgets/direccion_preview.dart';
 import 'dart:async';
 import '../../../../data/models/colombia_data.dart';
@@ -46,10 +45,6 @@ class _EdificacionPageState extends State<EdificacionPage>
 
   // Controllers para Identificación Catastral
   final _cbmlController = TextEditingController();
-  final _matriculaController = TextEditingController();
-  final _pisosController = TextEditingController();
-  final _subterraneosController = TextEditingController();
-  final _yearController = TextEditingController();
 
   // Controllers para Persona de Contacto
   final _nombreContactoController = TextEditingController();
@@ -68,10 +63,6 @@ class _EdificacionPageState extends State<EdificacionPage>
   Timer? _barrioDebouncer;
   Timer? _codigoBarrioDebouncer;
   Timer? _cbmlDebouncer;
-  Timer? _matriculaDebouncer;
-  Timer? _pisosDebouncer;
-  Timer? _subterraneosDebouncer;
-  Timer? _yearDebouncer;
   Timer? _nombreContactoDebouncer;
   Timer? _telefonoDebouncer;
   Timer? _emailDebouncer;
@@ -137,17 +128,18 @@ class _EdificacionPageState extends State<EdificacionPage>
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Identificación de la Edificación'),
-          backgroundColor: Theme.of(context).colorScheme.primary,
           elevation: 2,
           bottom: TabBar(
             controller: _tabController,
             isScrollable: true,
             labelColor: Theme.of(context).colorScheme.secondary,
-            unselectedLabelColor: Colors.white,
+            unselectedLabelColor: Theme.of(context).colorScheme.surface,
             indicatorColor: Theme.of(context).colorScheme.secondary,
             indicatorWeight: 3,
-            labelStyle: const TextStyle(fontWeight: FontWeight.bold),
-            unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.normal),
+            labelStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
+            unselectedLabelStyle: Theme.of(context).textTheme.bodyLarge,
             indicator: UnderlineTabIndicator(
               borderSide: BorderSide(
                 width: 3,
@@ -419,10 +411,19 @@ class _EdificacionPageState extends State<EdificacionPage>
                   });
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor:
-                      _tipoIdentificacion == TipoIdentificacion.medellin
-                          ? Theme.of(context).primaryColor
-                          : Colors.grey,
+                  backgroundColor: _tipoIdentificacion == TipoIdentificacion.medellin
+                      ? Theme.of(context).colorScheme.secondary
+                      : Theme.of(context).colorScheme.surface,
+                  foregroundColor: Theme.of(context).colorScheme.primary,
+                  side: BorderSide(
+                    color: Theme.of(context).colorScheme.primary,
+                    width: 1,
+                  ),
+                  elevation: 0,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
                 child: const Text('Medellín'),
               ),
@@ -437,10 +438,19 @@ class _EdificacionPageState extends State<EdificacionPage>
                   });
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor:
-                      _tipoIdentificacion == TipoIdentificacion.areaMetropolitana
-                          ? Theme.of(context).primaryColor
-                          : Colors.grey,
+                  backgroundColor: _tipoIdentificacion == TipoIdentificacion.areaMetropolitana
+                      ? Theme.of(context).colorScheme.secondary
+                      : Theme.of(context).colorScheme.surface,
+                  foregroundColor: Theme.of(context).colorScheme.primary,
+                  side: BorderSide(
+                    color: Theme.of(context).colorScheme.primary,
+                    width: 1,
+                  ),
+                  elevation: 0,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
                 child: const Text('Área Metropolitana'),
               ),
@@ -452,7 +462,7 @@ class _EdificacionPageState extends State<EdificacionPage>
           controller: _cbmlController,
           decoration: InputDecoration(
             labelText: _tipoIdentificacion == TipoIdentificacion.medellin
-                ? 'CBML'
+                ? 'Código Catastral'
                 : 'Código Catastral',
             border: const OutlineInputBorder(),
           ),
@@ -466,111 +476,6 @@ class _EdificacionPageState extends State<EdificacionPage>
           validator: (value) {
             if (value?.isEmpty ?? true) {
               return 'Este campo es requerido';
-            }
-            return null;
-          },
-        ),
-        const SizedBox(height: 16),
-        TextFormField(
-          controller: _matriculaController,
-          decoration: const InputDecoration(
-            labelText: 'Matrícula Inmobiliaria',
-            border: OutlineInputBorder(),
-          ),
-          onChanged: (value) {
-            _debounce(_matriculaDebouncer, () {
-              if (mounted) {
-                context.read<EdificacionBloc>().add(SetMatriculaInmobiliaria(value));
-              }
-            });
-          },
-          validator: (value) {
-            if (value?.isEmpty ?? true) {
-              return 'Este campo es requerido';
-            }
-            return null;
-          },
-        ),
-        const SizedBox(height: 16),
-        Row(
-          children: [
-            Expanded(
-              child: TextFormField(
-                controller: _pisosController,
-                decoration: const InputDecoration(
-                  labelText: 'Número de Pisos',
-                  border: OutlineInputBorder(),
-                ),
-                keyboardType: TextInputType.number,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                onChanged: (value) {
-                  _debounce(_pisosDebouncer, () {
-                    if (mounted) {
-                      context.read<EdificacionBloc>().add(SetNumeroPisos(value));
-                    }
-                  });
-                },
-                validator: (value) {
-                  if (value?.isEmpty ?? true) {
-                    return 'Este campo es requerido';
-                  }
-                  return null;
-                },
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: TextFormField(
-                controller: _subterraneosController,
-                decoration: const InputDecoration(
-                  labelText: 'Número de Subterráneos',
-                  border: OutlineInputBorder(),
-                ),
-                keyboardType: TextInputType.number,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                onChanged: (value) {
-                  _debounce(_subterraneosDebouncer, () {
-                    if (mounted) {
-                      context.read<EdificacionBloc>().add(SetSubterraneos(value));
-                    }
-                  });
-                },
-                validator: (value) {
-                  if (value?.isEmpty ?? true) {
-                    return 'Este campo es requerido';
-                  }
-                  return null;
-                },
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 16),
-        TextFormField(
-          controller: _yearController,
-          decoration: const InputDecoration(
-            labelText: 'Año de Construcción',
-            border: OutlineInputBorder(),
-          ),
-          keyboardType: TextInputType.number,
-          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-          onChanged: (value) {
-            _debounce(_yearDebouncer, () {
-              if (mounted && value.isNotEmpty) {
-                context.read<EdificacionBloc>().add(SetYearConstruccion(int.parse(value)));
-              }
-            });
-          },
-          validator: (value) {
-            if (value?.isEmpty ?? true) {
-              return 'Este campo es requerido';
-            }
-            final year = int.tryParse(value!);
-            if (year == null) {
-              return 'Ingrese un año válido';
-            }
-            if (year < 1800 || year > DateTime.now().year) {
-              return 'Ingrese un año válido entre 1800 y ${DateTime.now().year}';
             }
             return null;
           },
@@ -635,20 +540,123 @@ class _EdificacionPageState extends State<EdificacionPage>
           },
         ),
         const SizedBox(height: 16),
-        TextFormField(
-          controller: _ocupacionController,
-          decoration: const InputDecoration(
-            labelText: 'Ocupación',
-            border: OutlineInputBorder(),
-            hintText: 'Propietario, Administrador, etc.',
+        Card(
+          elevation: 2,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
           ),
-          onChanged: (value) {
-            _debounce(_ocupacionDebouncer, () {
-              if (mounted) {
-                context.read<EdificacionBloc>().add(SetOcupacion(value));
-              }
-            });
-          },
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Tipo de Ocupante',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const SizedBox(height: 16),
+                BlocBuilder<EdificacionBloc, EdificacionState>(
+                  builder: (context, state) {
+                    return Column(
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  context.read<EdificacionBloc>().add(
+                                    SetOcupacion('Propietario'),
+                                  );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: state.ocupacion == 'Propietario'
+                                      ? Theme.of(context).colorScheme.secondary
+                                      : Theme.of(context).colorScheme.surface,
+                                  foregroundColor: Theme.of(context).colorScheme.primary,
+                                  side: BorderSide(
+                                    color: Theme.of(context).colorScheme.primary,
+                                    width: 1,
+                                  ),
+                                  elevation: 0,
+                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                ),
+                                child: const Text('Propietario'),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  context.read<EdificacionBloc>().add(
+                                    SetOcupacion('Inquilino'),
+                                  );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: state.ocupacion == 'Inquilino'
+                                      ? Theme.of(context).colorScheme.secondary
+                                      : Theme.of(context).colorScheme.surface,
+                                  foregroundColor: Theme.of(context).colorScheme.primary,
+                                  side: BorderSide(
+                                    color: Theme.of(context).colorScheme.primary,
+                                    width: 1,
+                                  ),
+                                  elevation: 0,
+                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                ),
+                                child: const Text('Inquilino'),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  context.read<EdificacionBloc>().add(
+                                    SetOcupacion('Otro'),
+                                  );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: state.ocupacion == 'Otro'
+                                      ? Theme.of(context).colorScheme.secondary
+                                      : Theme.of(context).colorScheme.surface,
+                                  foregroundColor: Theme.of(context).colorScheme.primary,
+                                  side: BorderSide(
+                                    color: Theme.of(context).colorScheme.primary,
+                                    width: 1,
+                                  ),
+                                  elevation: 0,
+                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                ),
+                                child: const Text('Otro'),
+                              ),
+                            ),
+                          ],
+                        ),
+                        if (state.ocupacion == 'Otro') ...[
+                          const SizedBox(height: 16),
+                          TextFormField(
+                            controller: _ocupacionController,
+                            decoration: const InputDecoration(
+                              labelText: 'Especifique',
+                              border: OutlineInputBorder(),
+                            ),
+                            onChanged: (value) {
+                              _debounce(_ocupacionDebouncer, () {
+                                if (mounted) {
+                                  context.read<EdificacionBloc>().add(
+                                    SetOcupacion('Otro: $value'),
+                                  );
+                                }
+                              });
+                            },
+                          ),
+                        ],
+                      ],
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
         ),
       ],
     );
@@ -662,12 +670,14 @@ class _EdificacionPageState extends State<EdificacionPage>
         children: [
           if (_tabController.index > 0)
             ElevatedButton(
+              style: Theme.of(context).elevatedButtonTheme.style,
               onPressed: () {
                 _tabController.animateTo(_tabController.index - 1);
               },
               child: const Text('Anterior'),
             ),
           ElevatedButton(
+            style: Theme.of(context).elevatedButtonTheme.style,
             onPressed: () {
               if (_formKey.currentState?.validate() ?? false) {
                 if (_tabController.index < 3) {
@@ -722,10 +732,6 @@ class _EdificacionPageState extends State<EdificacionPage>
     _barrioDebouncer?.cancel();
     _codigoBarrioDebouncer?.cancel();
     _cbmlDebouncer?.cancel();
-    _matriculaDebouncer?.cancel();
-    _pisosDebouncer?.cancel();
-    _subterraneosDebouncer?.cancel();
-    _yearDebouncer?.cancel();
     _nombreContactoDebouncer?.cancel();
     _telefonoDebouncer?.cancel();
     _emailDebouncer?.cancel();
@@ -737,10 +743,6 @@ class _EdificacionPageState extends State<EdificacionPage>
     _barrioController.dispose();
     _codigoBarrioController.dispose();
     _cbmlController.dispose();
-    _matriculaController.dispose();
-    _pisosController.dispose();
-    _subterraneosController.dispose();
-    _yearController.dispose();
     _nombreContactoController.dispose();
     _telefonoController.dispose();
     _emailController.dispose();
@@ -798,6 +800,9 @@ class _EdificacionPageState extends State<EdificacionPage>
         // Vía Principal
         Card(
           elevation: 2,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
@@ -805,9 +810,7 @@ class _EdificacionPageState extends State<EdificacionPage>
               children: [
                 Text(
                   'Vía Principal',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
                 const SizedBox(height: 16),
                 Row(
@@ -819,6 +822,10 @@ class _EdificacionPageState extends State<EdificacionPage>
                         decoration: const InputDecoration(
                           labelText: 'Tipo de Vía',
                           border: OutlineInputBorder(),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                        ),
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          fontSize: 12,
                         ),
                         items: ['CL', 'CR', 'CQ', 'TV', 'DG']
                             .map((e) => DropdownMenuItem(
@@ -829,6 +836,9 @@ class _EdificacionPageState extends State<EdificacionPage>
                                     e == 'CQ' ? 'Circular' :
                                     e == 'TV' ? 'Transversal' : 'Diagonal',
                                     overflow: TextOverflow.ellipsis,
+                                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                      fontSize: 12,
+                                    ),
                                   ),
                                 ))
                             .toList(),
@@ -885,25 +895,46 @@ class _EdificacionPageState extends State<EdificacionPage>
                         decoration: const InputDecoration(
                           labelText: 'Orientación',
                           border: OutlineInputBorder(),
-                          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                        ),
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          fontSize: 12,
                         ),
                         value: context.watch<EdificacionBloc>().state.orientacionVia?.isEmpty ?? true 
                             ? null 
                             : context.watch<EdificacionBloc>().state.orientacionVia,
                         items: [
-                          const DropdownMenuItem(
+                          DropdownMenuItem(
                             value: '', 
-                            child: Text('Sin orientación', overflow: TextOverflow.ellipsis),
+                            child: Text(
+                              'Sin orientación',
+                              overflow: TextOverflow.ellipsis,
+                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                fontSize: 12,
+                              ),
+                            ),
                           ),
                           if (context.watch<EdificacionBloc>().state.tipoVia == 'CL')
-                            const DropdownMenuItem(
-                              value: 'SUR', 
-                              child: Text('SUR', overflow: TextOverflow.ellipsis),
+                            DropdownMenuItem(
+                              value: 'SUR',
+                              child: Text(
+                                'SUR',
+                                overflow: TextOverflow.ellipsis,
+                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                  fontSize: 12,
+                                ),
+                              ),
                             )
                           else if (context.watch<EdificacionBloc>().state.tipoVia == 'CR')
-                            const DropdownMenuItem(
-                              value: 'ESTE', 
-                              child: Text('ESTE', overflow: TextOverflow.ellipsis),
+                            DropdownMenuItem(
+                              value: 'ESTE',
+                              child: Text(
+                                'ESTE',
+                                overflow: TextOverflow.ellipsis,
+                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                  fontSize: 12,
+                                ),
+                              ),
                             ),
                         ],
                         onChanged: (value) {
@@ -924,6 +955,9 @@ class _EdificacionPageState extends State<EdificacionPage>
         // Cruce
         Card(
           elevation: 2,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
@@ -931,9 +965,7 @@ class _EdificacionPageState extends State<EdificacionPage>
               children: [
                 Text(
                   'Cruce',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
@@ -978,16 +1010,47 @@ class _EdificacionPageState extends State<EdificacionPage>
                         decoration: const InputDecoration(
                           labelText: 'Orientación',
                           border: OutlineInputBorder(),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                        ),
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          fontSize: 12,
                         ),
                         value: context.watch<EdificacionBloc>().state.orientacionCruce?.isEmpty ?? true 
                             ? null 
                             : context.watch<EdificacionBloc>().state.orientacionCruce,
                         items: [
-                          const DropdownMenuItem(value: '', child: Text('Sin orientación')),
+                          DropdownMenuItem(
+                            value: '',
+                            child: Text(
+                              'Sin orientación',
+                              overflow: TextOverflow.ellipsis,
+                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                fontSize: 12,
+                              ),
+                            ),
+                          ),
                           if (context.watch<EdificacionBloc>().state.tipoVia == 'CL')
-                            const DropdownMenuItem(value: 'SUR', child: Text('SUR'))
+                            DropdownMenuItem(
+                              value: 'SUR',
+                              child: Text(
+                                'SUR',
+                                overflow: TextOverflow.ellipsis,
+                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                  fontSize: 12,
+                                ),
+                              ),
+                            )
                           else if (context.watch<EdificacionBloc>().state.tipoVia == 'CR')
-                            const DropdownMenuItem(value: 'ESTE', child: Text('ESTE')),
+                            DropdownMenuItem(
+                              value: 'ESTE',
+                              child: Text(
+                                'ESTE',
+                                overflow: TextOverflow.ellipsis,
+                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ),
                         ],
                         onChanged: (value) {
                           context.read<EdificacionBloc>().add(
@@ -1007,6 +1070,9 @@ class _EdificacionPageState extends State<EdificacionPage>
         // Número y Complemento
         Card(
           elevation: 2,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
@@ -1014,9 +1080,7 @@ class _EdificacionPageState extends State<EdificacionPage>
               children: [
                 Text(
                   'Número y Complemento',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
                 const SizedBox(height: 16),
                 Row(
@@ -1063,56 +1127,7 @@ class _EdificacionPageState extends State<EdificacionPage>
   Widget _buildCaracteristicasEdificacion(BuildContext context) {
     return Column(
       children: [
-        TextFormField(
-          controller: _pisosController,
-          decoration: const InputDecoration(
-            labelText: 'Número de Pisos',
-            border: OutlineInputBorder(),
-          ),
-          keyboardType: TextInputType.number,
-          onChanged: (value) {
-            _debounce(_pisosDebouncer, () {
-              if (mounted) {
-                context.read<EdificacionBloc>().add(SetNumeroPisos(value));
-              }
-            });
-          },
-        ),
-        const SizedBox(height: 16),
-        TextFormField(
-          controller: _subterraneosController,
-          decoration: const InputDecoration(
-            labelText: 'Número de Subterráneos',
-            border: OutlineInputBorder(),
-          ),
-          keyboardType: TextInputType.number,
-          onChanged: (value) {
-            _debounce(_subterraneosDebouncer, () {
-              if (mounted) {
-                context.read<EdificacionBloc>().add(SetSubterraneos(value));
-              }
-            });
-          },
-        ),
-        const SizedBox(height: 16),
-        TextFormField(
-          controller: _yearController,
-          decoration: const InputDecoration(
-            labelText: 'Año de Construcción',
-            border: OutlineInputBorder(),
-          ),
-          keyboardType: TextInputType.number,
-          onChanged: (value) {
-            _debounce(_yearDebouncer, () {
-              if (mounted) {
-                final year = int.tryParse(value);
-                if (year != null) {
-                  context.read<EdificacionBloc>().add(SetYearConstruccion(year));
-                }
-              }
-            });
-          },
-        ),
+        // Eliminar todo el contenido relacionado con pisos, subterráneos y año
       ],
     );
   }

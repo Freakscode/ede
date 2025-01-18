@@ -70,5 +70,23 @@ class DescripcionEdificacionBloc
       developer.log('SetAcceso: Obstruido:${event.obstruido}, Libre:${event.libre}', 
           name: 'DescripcionEdificacionBloc');
     });
+
+    on<SetNivelDiseno>((event, emit) {
+      emit(state.copyWith(nivelDiseno: event.nivel));
+      developer.log('SetNivelDiseno: ${event.nivel}', 
+          name: 'DescripcionEdificacionBloc');
+    });
+
+    on<SetCalidadDiseno>((event, emit) {
+      emit(state.copyWith(calidadDiseno: event.calidad));
+      developer.log('SetCalidadDiseno: ${event.calidad}', 
+          name: 'DescripcionEdificacionBloc');
+    });
+
+    on<SetEstadoEdificacion>((event, emit) {
+      emit(state.copyWith(estadoEdificacion: event.estado));
+      developer.log('SetEstadoEdificacion: ${event.estado}', 
+          name: 'DescripcionEdificacionBloc');
+    });
   }
 } 
