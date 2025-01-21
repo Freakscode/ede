@@ -1,6 +1,6 @@
 class HabitabilidadState {
-  final String? criterioHabitabilidad;
-  final String? clasificacion;
+  final String? criterioHabitabilidad;  // Habitable, Acceso restringido, No Habitable
+  final String? clasificacion;          // H, R1, R2, I1, I2, I3
 
   HabitabilidadState({
     this.criterioHabitabilidad,

@@ -1,30 +1,52 @@
+import 'dart:developer';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import './riesgos_externos_event.dart';
 import './riesgos_externos_state.dart';
 
 class RiesgosExternosBloc extends Bloc<RiesgosExternosEvent, RiesgosExternosState> {
   RiesgosExternosBloc() : super(RiesgosExternosState()) {
-    on<SetRiesgoExterno>(_onSetRiesgoExterno);
-    on<SetOtroRiesgo>(_onSetOtroRiesgo);
-  }
+    on<SetRiesgoExterno>((event, emit) {
+      log('SetRiesgoExterno: ${event.riesgoId} - ${event.valor}');
+      final riesgoActual = state.riesgos[event.riesgoId];
+      if (riesgoActual != null) {
+        final riesgosActualizados = Map<String, RiesgoItem>.from(state.riesgos);
+        riesgosActualizados[event.riesgoId] = riesgoActual.copyWith(
+          existeRiesgo: event.valor,
+          // Si se desactiva el riesgo, resetear las otras opciones
+          comprometeAccesos: event.valor ? riesgoActual.comprometeAccesos : false,
+          comprometeEstabilidad: event.valor ? riesgoActual.comprometeEstabilidad : false,
+        );
+        emit(state.copyWith(riesgos: riesgosActualizados));
+      }
+    });
 
-  void _onSetRiesgoExterno(
-    SetRiesgoExterno event,
-    Emitter<RiesgosExternosState> emit,
-  ) {
-    final updatedRiesgos = Map<String, RiesgoItem>.from(state.riesgos);
-    updatedRiesgos[event.riesgoId] = RiesgoItem(
-      existeRiesgo: event.existeRiesgo,
-      comprometeFuncionalidad: event.comprometeFuncionalidad ?? false,
-      comprometeEstabilidad: event.comprometeEstabilidad ?? false,
-    );
-    emit(state.copyWith(riesgos: updatedRiesgos));
-  }
+    on<SetComprometeAccesos>((event, emit) {
+      log('SetComprometeAccesos: ${event.riesgoId} - ${event.valor}');
+      final riesgoActual = state.riesgos[event.riesgoId];
+      if (riesgoActual != null && riesgoActual.existeRiesgo) {
+        final riesgosActualizados = Map<String, RiesgoItem>.from(state.riesgos);
+        riesgosActualizados[event.riesgoId] = riesgoActual.copyWith(
+          comprometeAccesos: event.valor,
+        );
+        emit(state.copyWith(riesgos: riesgosActualizados));
+      }
+    });
 
-  void _onSetOtroRiesgo(
-    SetOtroRiesgo event,
-    Emitter<RiesgosExternosState> emit,
-  ) {
-    emit(state.copyWith(otroRiesgo: event.descripcion));
+    on<SetComprometeEstabilidad>((event, emit) {
+      log('SetComprometeEstabilidad: ${event.riesgoId} - ${event.valor}');
+      final riesgoActual = state.riesgos[event.riesgoId];
+      if (riesgoActual != null && riesgoActual.existeRiesgo) {
+        final riesgosActualizados = Map<String, RiesgoItem>.from(state.riesgos);
+        riesgosActualizados[event.riesgoId] = riesgoActual.copyWith(
+          comprometeEstabilidad: event.valor,
+        );
+        emit(state.copyWith(riesgos: riesgosActualizados));
+      }
+    });
+
+    on<SetOtroRiesgo>((event, emit) {
+      log('SetOtroRiesgo: ${event.valor}');
+      emit(state.copyWith(otroRiesgo: event.valor));
+    });
   }
 } 

@@ -20,10 +20,18 @@ class SetSistemaEstructural extends DescripcionEdificacionEvent {
 
 // Sistemas de Entrepiso
 class SetSistemaEntrepiso extends DescripcionEdificacionEvent {
-  final String material;
-  final List<String>? tipos;
+  final List<String> sistemas;
+  final Map<String, List<String>> tiposEntrepiso;
   final String? otroTipo;
-  SetSistemaEntrepiso(this.material, {this.tipos, this.otroTipo});
+
+  SetSistemaEntrepiso({
+    required this.sistemas,
+    required this.tiposEntrepiso,
+    this.otroTipo,
+  });
+
+  @override
+  List<Object?> get props => [sistemas, tiposEntrepiso, otroTipo];
 }
 
 // Sistemas de Cubierta
@@ -120,9 +128,21 @@ class SetObservaciones extends DescripcionEdificacionEvent {
 }
 
 class SetSistemaMultiple extends DescripcionEdificacionEvent {
-  final bool existe;
-  final String? cual;
-  SetSistemaMultiple(this.existe, {this.cual});
+  final String sistemaMultiple;
+
+  SetSistemaMultiple(this.sistemaMultiple);
+
+  @override
+  List<Object?> get props => [sistemaMultiple];
+}
+
+class SetObservacionesSistema extends DescripcionEdificacionEvent {
+  final String observaciones;
+
+  SetObservacionesSistema(this.observaciones);
+
+  @override
+  List<Object?> get props => [observaciones];
 }
 
 class SetSistemaSoporte extends DescripcionEdificacionEvent {
@@ -168,4 +188,17 @@ class SetCalidadDiseno extends DescripcionEdificacionEvent {
 class SetEstadoEdificacion extends DescripcionEdificacionEvent {
   final String estado;
   SetEstadoEdificacion(this.estado);
+}
+
+class SetSistemasEstructuralesYMateriales extends DescripcionEdificacionEvent {
+  final List<String> sistemas;
+  final Map<String, List<String>> materiales;
+
+  SetSistemasEstructuralesYMateriales({
+    required this.sistemas,
+    required this.materiales,
+  });
+
+  @override
+  List<Object?> get props => [sistemas, materiales];
 } 

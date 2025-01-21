@@ -1,13 +1,13 @@
+import '../riesgosExternos/riesgos_externos_state.dart';
+
 abstract class HabitabilidadEvent {}
 
 class CalcularHabitabilidad extends HabitabilidadEvent {
-  final Map<String, bool> riesgosExternos;
+  final Map<String, RiesgoItem> riesgosExternos;
   final String nivelDano;
-  final bool esAfectacionFuncional;
 
   CalcularHabitabilidad({
     required this.riesgosExternos,
     required this.nivelDano,
-    required this.esAfectacionFuncional,
   });
 } 

@@ -113,9 +113,9 @@ class _DescripcionEdificacionPageState extends State<DescripcionEdificacionPage>
               color: Theme.of(context).colorScheme.secondary,
             ),
           ),
-          overlayColor: MaterialStateProperty.resolveWith<Color?>(
-            (Set<MaterialState> states) {
-              if (states.contains(MaterialState.pressed)) {
+          overlayColor: WidgetStateProperty.resolveWith<Color?>(
+            (Set<WidgetState> states) {
+              if (states.contains(WidgetState.pressed)) {
                 return Theme.of(context).colorScheme.secondary.withOpacity(0.1);
               }
               return null;
@@ -492,17 +492,17 @@ class _DescripcionEdificacionPageState extends State<DescripcionEdificacionPage>
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 24.0),
                     child: Row(
-                    children: [
-                      Expanded(
+                      children: [
+                        Expanded(
                           child: ElevatedButton(
                             onPressed: () {
-                            context.read<DescripcionEdificacionBloc>().add(
-                              SetAcceso(
-                                  obstruido: !(state.accesoObstruido ?? false),
-                                  libre: state.accesoLibre ?? false,
-                              ),
-                            );
-                          },
+                              context.read<DescripcionEdificacionBloc>().add(
+                                SetAcceso(
+                                  obstruido: true,
+                                  libre: false,
+                                ),
+                              );
+                            },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: state.accesoObstruido == true
                                   ? Theme.of(context).colorScheme.secondary
@@ -528,16 +528,16 @@ class _DescripcionEdificacionPageState extends State<DescripcionEdificacionPage>
                           ),
                         ),
                         const SizedBox(width: 16),
-                      Expanded(
+                        Expanded(
                           child: ElevatedButton(
                             onPressed: () {
-                            context.read<DescripcionEdificacionBloc>().add(
-                              SetAcceso(
-                                  obstruido: state.accesoObstruido ?? false,
-                                  libre: !(state.accesoLibre ?? false),
-                              ),
-                            );
-                          },
+                              context.read<DescripcionEdificacionBloc>().add(
+                                SetAcceso(
+                                  obstruido: false,
+                                  libre: true,
+                                ),
+                              );
+                            },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: state.accesoLibre == true
                                   ? Theme.of(context).colorScheme.secondary
@@ -560,9 +560,9 @@ class _DescripcionEdificacionPageState extends State<DescripcionEdificacionPage>
                               'Libre',
                               style: Theme.of(context).textTheme.bodyMedium,
                             ),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
                     ),
                   );
                 },
@@ -616,7 +616,12 @@ class _DescripcionEdificacionPageState extends State<DescripcionEdificacionPage>
                         items: usos.map((uso) {
                           return DropdownMenuItem(
                             value: uso,
-                            child: Text(uso),
+                            child: Text(
+                              uso,
+                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                fontSize: 16,
+                              ),
+                            ),
                           );
                         }).toList(),
                         onChanged: (value) {
@@ -652,60 +657,98 @@ class _DescripcionEdificacionPageState extends State<DescripcionEdificacionPage>
               // Fecha de diseño o construcción
               Text(
                 'Fecha de diseño o construcción',
-                style: Theme.of(context).textTheme.titleMedium,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.primary,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 16),
               BlocBuilder<DescripcionEdificacionBloc, DescripcionEdificacionState>(
                 builder: (context, state) {
                   return Column(
                     children: [
-                      RadioListTile<String>(
+                      ListTile(
                         title: const Text('Antes de 1984'),
-                        value: 'Antes de 1984',
-                        groupValue: state.fechaConstruccion,
-                        onChanged: (value) {
+                        leading: Radio<String>(
+                          value: 'Antes de 1984',
+                          groupValue: state.fechaConstruccion,
+                          onChanged: (value) {
+                            context.read<DescripcionEdificacionBloc>().add(
+                              SetFechaConstruccion(value ?? ''),
+                            );
+                          },
+                        ),
+                        onTap: () {
                           context.read<DescripcionEdificacionBloc>().add(
-                            SetFechaConstruccion(value ?? ''),
+                            SetFechaConstruccion('Antes de 1984'),
                           );
                         },
                       ),
-                      RadioListTile<String>(
+                      ListTile(
                         title: const Text('Entre 1984 y 1997'),
-                        value: 'Entre 1984 y 1997',
-                        groupValue: state.fechaConstruccion,
-                        onChanged: (value) {
+                        leading: Radio<String>(
+                          value: 'Entre 1984 y 1997',
+                          groupValue: state.fechaConstruccion,
+                          onChanged: (value) {
+                            context.read<DescripcionEdificacionBloc>().add(
+                              SetFechaConstruccion(value ?? ''),
+                            );
+                          },
+                        ),
+                        onTap: () {
                           context.read<DescripcionEdificacionBloc>().add(
-                            SetFechaConstruccion(value ?? ''),
+                            SetFechaConstruccion('Entre 1984 y 1997'),
                           );
                         },
                       ),
-                      RadioListTile<String>(
+                      ListTile(
                         title: const Text('Entre 1998 y 2010'),
-                        value: 'Entre 1998 y 2010',
-                        groupValue: state.fechaConstruccion,
-                        onChanged: (value) {
+                        leading: Radio<String>(
+                          value: 'Entre 1998 y 2010',
+                          groupValue: state.fechaConstruccion,
+                          onChanged: (value) {
+                            context.read<DescripcionEdificacionBloc>().add(
+                              SetFechaConstruccion(value ?? ''),
+                            );
+                          },
+                        ),
+                        onTap: () {
                           context.read<DescripcionEdificacionBloc>().add(
-                            SetFechaConstruccion(value ?? ''),
+                            SetFechaConstruccion('Entre 1998 y 2010'),
                           );
                         },
                       ),
-                      RadioListTile<String>(
+                      ListTile(
                         title: const Text('Después de 2010'),
-                        value: 'Después de 2010',
-                        groupValue: state.fechaConstruccion,
-                        onChanged: (value) {
+                        leading: Radio<String>(
+                          value: 'Después de 2010',
+                          groupValue: state.fechaConstruccion,
+                          onChanged: (value) {
+                            context.read<DescripcionEdificacionBloc>().add(
+                              SetFechaConstruccion(value ?? ''),
+                            );
+                          },
+                        ),
+                        onTap: () {
                           context.read<DescripcionEdificacionBloc>().add(
-                            SetFechaConstruccion(value ?? ''),
+                            SetFechaConstruccion('Después de 2010'),
                           );
                         },
                       ),
-                      RadioListTile<String>(
+                      ListTile(
                         title: const Text('Desconocida'),
-                        value: 'Desconocida',
-                        groupValue: state.fechaConstruccion,
-                        onChanged: (value) {
+                        leading: Radio<String>(
+                          value: 'Desconocida',
+                          groupValue: state.fechaConstruccion,
+                          onChanged: (value) {
+                            context.read<DescripcionEdificacionBloc>().add(
+                              SetFechaConstruccion(value ?? ''),
+                            );
+                          },
+                        ),
+                        onTap: () {
                           context.read<DescripcionEdificacionBloc>().add(
-                            SetFechaConstruccion(value ?? ''),
+                            SetFechaConstruccion('Desconocida'),
                           );
                         },
                       ),
@@ -767,138 +810,125 @@ class _DescripcionEdificacionPageState extends State<DescripcionEdificacionPage>
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Sistema estructural',
-                    style: Theme.of(context).textTheme.titleMedium,
+                  const Text(
+                    '3.3 Sistema estructural y material',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 16),
                   
+                  const Text(
+                    '3.3.1 Sistema estructural',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  
                   // Sistemas estructurales
                   ...sistemasYMateriales.entries.map((entry) {
-                    bool isSelected = state.sistemaEstructural == entry.key;
+                    bool isSystemSelected = state.sistemasEstructurales?.contains(entry.key) ?? false;
+                    
                     return Column(
                       children: [
-                        ElevatedButton(
-                          onPressed: () {
+                        CheckboxListTile(
+                          title: Text(entry.key),
+                          value: isSystemSelected,
+                          onChanged: (bool? value) {
+                            if (value != null) {
+                              final currentSistemas = List<String>.from(state.sistemasEstructurales ?? []);
+                              final currentMateriales = Map<String, List<String>>.from(state.materialesPorSistema ?? {});
+                              
+                              if (value) {
+                                currentSistemas.add(entry.key);
+                                // Inicializar lista vacía de materiales para este sistema
+                                currentMateriales[entry.key] = [];
+                              } else {
+                                currentSistemas.remove(entry.key);
+                                // Eliminar materiales asociados a este sistema
+                                currentMateriales.remove(entry.key);
+                              }
+                              
                               context.read<DescripcionEdificacionBloc>().add(
-                                SetSistemaEstructuralYMaterial(entry.key)
-                              );
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: isSelected
-                                ? Theme.of(context).colorScheme.secondary
-                                : Theme.of(context).colorScheme.surface,
-                            foregroundColor: Theme.of(context).colorScheme.primary,
-                            elevation: 0,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 12,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                              side: BorderSide(
-                                color: Theme.of(context).colorScheme.primary,
-                                width: 1,
-                              ),
-                            ),
-                          ),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  entry.key,
-                                  style: Theme.of(context).textTheme.bodyMedium,
+                                SetSistemasEstructuralesYMateriales(
+                                  sistemas: currentSistemas,
+                                  materiales: currentMateriales,
                                 ),
-                              ),
-                              Icon(
-                                isSelected ? Icons.check_circle : Icons.circle_outlined,
-                                color: isSelected
-                                    ? Theme.of(context).colorScheme.primary
-                                    : Theme.of(context).colorScheme.primary.withOpacity(0.5),
-                              ),
-                            ],
-                          ),
+                              );
+                            }
+                          },
                         ),
-                        if (isSelected && entry.value.isNotEmpty)
-                          Padding(
-                            padding: const EdgeInsets.only(left: 16.0, top: 8.0),
-                            child: Column(
-                              children: entry.value.map((material) {
-                                bool isMaterialSelected = state.material == material;
-                                return Padding(
-                                  padding: const EdgeInsets.only(bottom: 8.0),
-                                  child: ElevatedButton(
-                                    onPressed: () {
+                        if (isSystemSelected && entry.value.isNotEmpty) ...[
+                          const Padding(
+                            padding: EdgeInsets.only(left: 16.0, top: 8.0),
+                            child: Text(
+                              '3.3.2 Material',
+                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          ...entry.value.map((material) {
+                            bool isMaterialSelected = state.materialesPorSistema?[entry.key]?.contains(material) ?? false;
+                            
+                            return Padding(
+                              padding: const EdgeInsets.only(left: 32.0),
+                              child: CheckboxListTile(
+                                title: Text(material),
+                                value: isMaterialSelected,
+                                onChanged: (bool? value) {
+                                  if (value != null) {
+                                    final currentMateriales = Map<String, List<String>>.from(state.materialesPorSistema ?? {});
+                                    final materialesDelSistema = List<String>.from(currentMateriales[entry.key] ?? []);
+                                    
+                                    if (value) {
+                                      materialesDelSistema.add(material);
+                                    } else {
+                                      materialesDelSistema.remove(material);
+                                    }
+                                    
+                                    currentMateriales[entry.key] = materialesDelSistema;
+                                    
                                     context.read<DescripcionEdificacionBloc>().add(
-                                      SetSistemaEstructuralYMaterial(
-                                        entry.key,
-                                          material: material,
+                                      SetSistemasEstructuralesYMateriales(
+                                        sistemas: state.sistemasEstructurales ?? [],
+                                        materiales: currentMateriales,
                                       ),
                                     );
-                                  },
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: isMaterialSelected
-                                          ? Theme.of(context).colorScheme.secondary.withOpacity(0.7)
-                                          : Theme.of(context).colorScheme.surface,
-                                      foregroundColor: Theme.of(context).colorScheme.primary,
-                                      elevation: 0,
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 16,
-                                        vertical: 12,
-                                      ),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                        side: BorderSide(
-                                          color: Theme.of(context).colorScheme.primary,
-                                          width: 1,
-                                        ),
-                                      ),
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        Expanded(
-                                          child: Text(
-                                            material,
-                                            style: Theme.of(context).textTheme.bodyMedium,
-                                          ),
-                                        ),
-                                        Icon(
-                                          isMaterialSelected ? Icons.check_circle : Icons.circle_outlined,
-                                          color: isMaterialSelected
-                                              ? Theme.of(context).colorScheme.primary
-                                              : Theme.of(context).colorScheme.primary.withOpacity(0.5),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              }).toList(),
-                            ),
-                          ),
-                        const SizedBox(height: 8),
+                                  }
+                                },
+                              ),
+                            );
+                          }),
+                        ],
                       ],
                     );
                   }),
 
-                  if (state.sistemaEstructural == 'Otro')
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      child: TextFormField(
-                        decoration: const InputDecoration(
-                          labelText: '¿Cuál?',
-                          border: OutlineInputBorder(),
-                        ),
-                        initialValue: state.cualOtroSistema,
-                        onChanged: (value) {
-                          context.read<DescripcionEdificacionBloc>().add(
-                            SetSistemaEstructuralYMaterial(
-                              'Otro',
-                              cualOtroSistema: value,
-                            ),
-                          );
-                        },
-                      ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    decoration: const InputDecoration(
+                      labelText: '¿Existe más de un sistema en planta o en altura? ¿Cuál?',
+                      border: OutlineInputBorder(),
                     ),
+                    initialValue: state.sistemaMultiple,
+                    onChanged: (value) {
+                      context.read<DescripcionEdificacionBloc>().add(
+                        SetSistemaMultiple(value),
+                      );
+                    },
+                  ),
+
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    decoration: const InputDecoration(
+                      labelText: 'Observaciones',
+                      border: OutlineInputBorder(),
+                    ),
+                    initialValue: state.observacionesSistema,
+                    maxLines: 3,
+                    onChanged: (value) {
+                      context.read<DescripcionEdificacionBloc>().add(
+                        SetObservacionesSistema(value),
+                      );
+                    },
+                  ),
                 ],
               );
             },
@@ -958,70 +988,93 @@ class _DescripcionEdificacionPageState extends State<DescripcionEdificacionPage>
                   const SizedBox(height: 16),
                   
                   // Materiales principales
-                  ...materialesEntrepiso.keys.map((material) => Column(
-                    children: [
-                      CheckboxListTile(
-                        title: Text(material),
-                        value: state.materialEntrepiso == material,
-                        onChanged: (bool? value) {
-                          if (value == true) {
+                  ...materialesEntrepiso.entries.map((entry) {
+                    bool isSelected = state.sistemasEntrepiso?.contains(entry.key) ?? false;
+                    final tiposSeleccionados = state.tiposEntrepisoPorMaterial?[entry.key] ?? [];
+                    
+                    return Column(
+                      children: [
+                        CheckboxListTile(
+                          title: Text(entry.key),
+                          value: isSelected,
+                          onChanged: (bool? value) {
+                            final currentSistemas = List<String>.from(state.sistemasEntrepiso ?? []);
+                            final currentTipos = Map<String, List<String>>.from(state.tiposEntrepisoPorMaterial ?? {});
+                            
+                            if (value == true) {
+                              currentSistemas.add(entry.key);
+                              currentTipos[entry.key] = [];
+                            } else {
+                              currentSistemas.remove(entry.key);
+                              currentTipos.remove(entry.key);
+                            }
+                            
                             context.read<DescripcionEdificacionBloc>().add(
                               SetSistemaEntrepiso(
-                                material,
-                                tipos: state.materialEntrepiso == material ? state.tiposEntrepiso : [],
+                                sistemas: currentSistemas,
+                                tiposEntrepiso: currentTipos,
                               ),
                             );
-                          }
-                        },
-                      ),
-                      if (state.materialEntrepiso == material && materialesEntrepiso[material]!.isNotEmpty)
-                        Padding(
-                          padding: const EdgeInsets.only(left: 32.0),
-                          child: Column(
-                            children: materialesEntrepiso[material]!.map((tipo) {
-                              return CheckboxListTile(
-                                title: Text(tipo),
-                                value: state.tiposEntrepiso?.contains(tipo) ?? false,
-                                onChanged: (bool? value) {
-                                  final currentTipos = List<String>.from(state.tiposEntrepiso ?? []);
-                                  if (value ?? false) {
-                                    currentTipos.add(tipo);
-                                  } else {
-                                    currentTipos.remove(tipo);
-                                  }
-                                  context.read<DescripcionEdificacionBloc>().add(
-                                    SetSistemaEntrepiso(
-                                      material,
-                                      tipos: currentTipos,
-                                    ),
-                                  );
-                                },
-                              );
-                            }).toList(),
-                          ),
+                          },
                         ),
-                    ],
-                  )),
-
-                  if (state.materialEntrepiso == 'Otro')
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 32.0),
-                      child: TextFormField(
-                        decoration: const InputDecoration(
-                          labelText: '¿Cuál?',
-                          border: OutlineInputBorder(),
-                        ),
-                        initialValue: state.otroEntrepiso,
-                        onChanged: (value) {
-                          context.read<DescripcionEdificacionBloc>().add(
-                            SetSistemaEntrepiso(
-                              'Otro',
-                              otroTipo: value,
+                        if (isSelected && entry.value.isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(left: 32.0),
+                            child: Column(
+                              children: entry.value.map((tipo) {
+                                return CheckboxListTile(
+                                  title: Text(tipo),
+                                  value: tiposSeleccionados.contains(tipo),
+                                  onChanged: (bool? value) {
+                                    final currentSistemas = List<String>.from(state.sistemasEntrepiso ?? []);
+                                    final currentTipos = Map<String, List<String>>.from(state.tiposEntrepisoPorMaterial ?? {});
+                                    final tiposDelSistema = List<String>.from(currentTipos[entry.key] ?? []);
+                                    
+                                    if (value == true) {
+                                      tiposDelSistema.add(tipo);
+                                    } else {
+                                      tiposDelSistema.remove(tipo);
+                                    }
+                                    
+                                    currentTipos[entry.key] = tiposDelSistema;
+                                    
+                                    context.read<DescripcionEdificacionBloc>().add(
+                                      SetSistemaEntrepiso(
+                                        sistemas: currentSistemas,
+                                        tiposEntrepiso: currentTipos,
+                                      ),
+                                    );
+                                  },
+                                );
+                              }).toList(),
                             ),
-                          );
-                        },
-                      ),
-                    ),
+                          ),
+                        if (entry.key == 'Otro' && isSelected)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                            child: TextFormField(
+                              decoration: const InputDecoration(
+                                labelText: '¿Cuál?',
+                                border: OutlineInputBorder(),
+                              ),
+                              initialValue: state.otroEntrepiso,
+                              onChanged: (value) {
+                                final currentSistemas = List<String>.from(state.sistemasEntrepiso ?? []);
+                                final currentTipos = Map<String, List<String>>.from(state.tiposEntrepisoPorMaterial ?? {});
+                                
+                                context.read<DescripcionEdificacionBloc>().add(
+                                  SetSistemaEntrepiso(
+                                    sistemas: currentSistemas,
+                                    tiposEntrepiso: currentTipos,
+                                    otroTipo: value,
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                      ],
+                    );
+                  }).toList(),
                 ],
               );
             },
@@ -1654,12 +1707,12 @@ class _DescripcionEdificacionPageState extends State<DescripcionEdificacionPage>
                           color: state.calidadDiseno == 'Malo' ? Colors.white : const Color(0xFF1B3A5C),
                         ),
                       ),
-                        ),
-                      ),
-                    ],
+                    ),
+                  ),
+                ],
               );
             },
-                  ),
+          ),
 
           const SizedBox(height: 24),
 

@@ -1,5 +1,6 @@
-class DescripcionEdificacionState {
-  // Características Generales
+import 'package:equatable/equatable.dart';
+
+class DescripcionEdificacionState extends Equatable {
   final int? pisosSobreTerreno;
   final int? sotanos;
   final double? frenteDimension;
@@ -13,51 +14,35 @@ class DescripcionEdificacionState {
   final bool? noSeSabe;
   final bool? accesoObstruido;
   final bool? accesoLibre;
-
-  // Usos Predominantes
   final String? usoPredominante;
   final String? otroUso;
   final String? fechaConstruccion;
-
-  // Sistema Estructural y Material
   final String? sistemaEstructural;
   final String? material;
   final String? cualOtroSistema;
-  final String? observaciones;
-  final bool? existeMasDeUnSistema;
-  final String? cualOtroSistemaMultiple;
-
-  // Sistemas de Cubierta
+  final String? materialEntrepiso;
+  final List<String>? sistemasEntrepiso;
+  final Map<String, List<String>>? tiposEntrepisoPorMaterial;
+  final String? otroEntrepiso;
   final List<String>? sistemaSoporte;
-  final List<String>? revestimiento;
   final String? otroSistemaSoporte;
+  final List<String>? revestimiento;
   final String? otroRevestimiento;
-
-  // Elementos No Estructurales
   final List<String>? murosDivisorios;
   final String? otroMuroDivisorio;
   final List<String>? fachadas;
   final String? otraFachada;
   final List<String>? escaleras;
   final String? otraEscalera;
-
-  // Sistemas de Entrepiso
-  final String? materialEntrepiso;
-  final List<String>? tiposEntrepiso;
-  final String? otroEntrepiso;
-
-  // Datos Adicionales
   final String? nivelDiseno;
   final String? calidadDiseno;
   final String? estadoEdificacion;
+  final String? sistemaMultiple;
+  final String? observacionesSistema;
+  final List<String>? sistemasEstructurales;
+  final Map<String, List<String>>? materialesPorSistema;
 
-  final String? numeroPisos;
-  final String? numeroSotanos;
-  final String? areaConstruida;
-  final String? anoConstruccion;
-  final String? usoPrincipal;
-
-  DescripcionEdificacionState({
+  const DescripcionEdificacionState({
     this.pisosSobreTerreno,
     this.sotanos,
     this.frenteDimension,
@@ -77,12 +62,13 @@ class DescripcionEdificacionState {
     this.sistemaEstructural,
     this.material,
     this.cualOtroSistema,
-    this.observaciones,
-    this.existeMasDeUnSistema,
-    this.cualOtroSistemaMultiple,
+    this.materialEntrepiso,
+    this.sistemasEntrepiso,
+    this.tiposEntrepisoPorMaterial,
+    this.otroEntrepiso,
     this.sistemaSoporte,
-    this.revestimiento,
     this.otroSistemaSoporte,
+    this.revestimiento,
     this.otroRevestimiento,
     this.murosDivisorios,
     this.otroMuroDivisorio,
@@ -90,17 +76,13 @@ class DescripcionEdificacionState {
     this.otraFachada,
     this.escaleras,
     this.otraEscalera,
-    this.materialEntrepiso,
-    this.tiposEntrepiso,
-    this.otroEntrepiso,
     this.nivelDiseno,
     this.calidadDiseno,
     this.estadoEdificacion,
-    this.numeroPisos,
-    this.numeroSotanos,
-    this.areaConstruida,
-    this.anoConstruccion,
-    this.usoPrincipal,
+    this.sistemaMultiple,
+    this.observacionesSistema,
+    this.sistemasEstructurales,
+    this.materialesPorSistema,
   });
 
   DescripcionEdificacionState copyWith({
@@ -123,12 +105,13 @@ class DescripcionEdificacionState {
     String? sistemaEstructural,
     String? material,
     String? cualOtroSistema,
-    String? observaciones,
-    bool? existeMasDeUnSistema,
-    String? cualOtroSistemaMultiple,
+    String? materialEntrepiso,
+    List<String>? sistemasEntrepiso,
+    Map<String, List<String>>? tiposEntrepisoPorMaterial,
+    String? otroEntrepiso,
     List<String>? sistemaSoporte,
-    List<String>? revestimiento,
     String? otroSistemaSoporte,
+    List<String>? revestimiento,
     String? otroRevestimiento,
     List<String>? murosDivisorios,
     String? otroMuroDivisorio,
@@ -136,17 +119,13 @@ class DescripcionEdificacionState {
     String? otraFachada,
     List<String>? escaleras,
     String? otraEscalera,
-    String? materialEntrepiso,
-    List<String>? tiposEntrepiso,
-    String? otroEntrepiso,
     String? nivelDiseno,
     String? calidadDiseno,
     String? estadoEdificacion,
-    String? numeroPisos,
-    String? numeroSotanos,
-    String? areaConstruida,
-    String? anoConstruccion,
-    String? usoPrincipal,
+    String? sistemaMultiple,
+    String? observacionesSistema,
+    List<String>? sistemasEstructurales,
+    Map<String, List<String>>? materialesPorSistema,
   }) {
     return DescripcionEdificacionState(
       pisosSobreTerreno: pisosSobreTerreno ?? this.pisosSobreTerreno,
@@ -168,12 +147,13 @@ class DescripcionEdificacionState {
       sistemaEstructural: sistemaEstructural ?? this.sistemaEstructural,
       material: material ?? this.material,
       cualOtroSistema: cualOtroSistema ?? this.cualOtroSistema,
-      observaciones: observaciones ?? this.observaciones,
-      existeMasDeUnSistema: existeMasDeUnSistema ?? this.existeMasDeUnSistema,
-      cualOtroSistemaMultiple: cualOtroSistemaMultiple ?? this.cualOtroSistemaMultiple,
+      materialEntrepiso: materialEntrepiso ?? this.materialEntrepiso,
+      sistemasEntrepiso: sistemasEntrepiso ?? this.sistemasEntrepiso,
+      tiposEntrepisoPorMaterial: tiposEntrepisoPorMaterial ?? this.tiposEntrepisoPorMaterial,
+      otroEntrepiso: otroEntrepiso ?? this.otroEntrepiso,
       sistemaSoporte: sistemaSoporte ?? this.sistemaSoporte,
-      revestimiento: revestimiento ?? this.revestimiento,
       otroSistemaSoporte: otroSistemaSoporte ?? this.otroSistemaSoporte,
+      revestimiento: revestimiento ?? this.revestimiento,
       otroRevestimiento: otroRevestimiento ?? this.otroRevestimiento,
       murosDivisorios: murosDivisorios ?? this.murosDivisorios,
       otroMuroDivisorio: otroMuroDivisorio ?? this.otroMuroDivisorio,
@@ -181,26 +161,57 @@ class DescripcionEdificacionState {
       otraFachada: otraFachada ?? this.otraFachada,
       escaleras: escaleras ?? this.escaleras,
       otraEscalera: otraEscalera ?? this.otraEscalera,
-      materialEntrepiso: materialEntrepiso ?? this.materialEntrepiso,
-      tiposEntrepiso: tiposEntrepiso ?? this.tiposEntrepiso,
-      otroEntrepiso: otroEntrepiso ?? this.otroEntrepiso,
       nivelDiseno: nivelDiseno ?? this.nivelDiseno,
       calidadDiseno: calidadDiseno ?? this.calidadDiseno,
       estadoEdificacion: estadoEdificacion ?? this.estadoEdificacion,
-      numeroPisos: numeroPisos ?? this.numeroPisos,
-      numeroSotanos: numeroSotanos ?? this.numeroSotanos,
-      areaConstruida: areaConstruida ?? this.areaConstruida,
-      anoConstruccion: anoConstruccion ?? this.anoConstruccion,
-      usoPrincipal: usoPrincipal ?? this.usoPrincipal,
+      sistemaMultiple: sistemaMultiple ?? this.sistemaMultiple,
+      observacionesSistema: observacionesSistema ?? this.observacionesSistema,
+      sistemasEstructurales: sistemasEstructurales ?? this.sistemasEstructurales,
+      materialesPorSistema: materialesPorSistema ?? this.materialesPorSistema,
     );
   }
 
-  Map<String, dynamic> toJson() => {
-    'numeroPisos': numeroPisos,
-    'numeroSotanos': numeroSotanos,
-    'areaConstruida': areaConstruida,
-    'anoConstruccion': anoConstruccion,
-    'usoPrincipal': usoPrincipal,
-    'sistemaEstructural': sistemaEstructural,
-  };
+  @override
+  List<Object?> get props => [
+    pisosSobreTerreno,
+    sotanos,
+    frenteDimension,
+    fondoDimension,
+    unidadesResidenciales,
+    unidadesComerciales,
+    unidadesNoHabitadas,
+    numeroOcupantes,
+    muertos,
+    heridos,
+    noSeSabe,
+    accesoObstruido,
+    accesoLibre,
+    usoPredominante,
+    otroUso,
+    fechaConstruccion,
+    sistemaEstructural,
+    material,
+    cualOtroSistema,
+    materialEntrepiso,
+    sistemasEntrepiso,
+    tiposEntrepisoPorMaterial,
+    otroEntrepiso,
+    sistemaSoporte,
+    otroSistemaSoporte,
+    revestimiento,
+    otroRevestimiento,
+    murosDivisorios,
+    otroMuroDivisorio,
+    fachadas,
+    otraFachada,
+    escaleras,
+    otraEscalera,
+    nivelDiseno,
+    calidadDiseno,
+    estadoEdificacion,
+    sistemaMultiple,
+    observacionesSistema,
+    sistemasEstructurales,
+    materialesPorSistema,
+  ];
 } 

@@ -1,25 +1,30 @@
-class NivelDanoState {
+import 'package:equatable/equatable.dart';
+
+class NivelDanoState extends Equatable {
   final String? porcentajeAfectacion;
   final String? severidadDanos;
   final String? nivelDano;
 
-  NivelDanoState({
+  const NivelDanoState({
     this.porcentajeAfectacion,
     this.severidadDanos,
     this.nivelDano,
   });
 
   NivelDanoState copyWith({
-    String? porcentajeAfectacion,
     String? severidadDanos,
     String? nivelDano,
+    String? porcentajeAfectacion,
   }) {
     return NivelDanoState(
-      porcentajeAfectacion: porcentajeAfectacion ?? this.porcentajeAfectacion,
       severidadDanos: severidadDanos ?? this.severidadDanos,
       nivelDano: nivelDano ?? this.nivelDano,
+      porcentajeAfectacion: porcentajeAfectacion ?? this.porcentajeAfectacion,
     );
   }
+
+  @override
+  List<Object?> get props => [severidadDanos, nivelDano, porcentajeAfectacion];
 
   Map<String, dynamic> toJson() => {
     'porcentajeAfectacion': porcentajeAfectacion,

@@ -2,19 +2,23 @@ abstract class RiesgosExternosEvent {}
 
 class SetRiesgoExterno extends RiesgosExternosEvent {
   final String riesgoId;
-  final bool existeRiesgo;
-  final bool? comprometeFuncionalidad;
-  final bool? comprometeEstabilidad;
+  final bool valor;
+  SetRiesgoExterno({required this.riesgoId, required this.valor});
+}
 
-  SetRiesgoExterno({
-    required this.riesgoId,
-    required this.existeRiesgo,
-    this.comprometeFuncionalidad,
-    this.comprometeEstabilidad,
-  });
+class SetComprometeAccesos extends RiesgosExternosEvent {
+  final String riesgoId;
+  final bool valor;
+  SetComprometeAccesos({required this.riesgoId, required this.valor});
+}
+
+class SetComprometeEstabilidad extends RiesgosExternosEvent {
+  final String riesgoId;
+  final bool valor;
+  SetComprometeEstabilidad({required this.riesgoId, required this.valor});
 }
 
 class SetOtroRiesgo extends RiesgosExternosEvent {
-  final String descripcion;
-  SetOtroRiesgo(this.descripcion);
+  final String valor;
+  SetOtroRiesgo({required this.valor});
 } 

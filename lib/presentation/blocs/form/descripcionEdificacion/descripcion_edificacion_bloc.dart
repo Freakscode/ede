@@ -63,10 +63,17 @@ class DescripcionEdificacionBloc
     });
 
     on<SetAcceso>((event, emit) {
-      emit(state.copyWith(
-        accesoObstruido: event.obstruido,
-        accesoLibre: event.libre,
-      ));
+      if (event.obstruido) {
+        emit(state.copyWith(
+          accesoObstruido: true,
+          accesoLibre: false,
+        ));
+      } else if (event.libre) {
+        emit(state.copyWith(
+          accesoObstruido: false,
+          accesoLibre: true,
+        ));
+      }
       developer.log('SetAcceso: Obstruido:${event.obstruido}, Libre:${event.libre}', 
           name: 'DescripcionEdificacionBloc');
     });
@@ -87,6 +94,84 @@ class DescripcionEdificacionBloc
       emit(state.copyWith(estadoEdificacion: event.estado));
       developer.log('SetEstadoEdificacion: ${event.estado}', 
           name: 'DescripcionEdificacionBloc');
+    });
+
+    on<SetSistemaMultiple>((event, emit) {
+      emit(state.copyWith(
+        sistemaMultiple: event.sistemaMultiple,
+      ));
+    });
+
+    on<SetObservacionesSistema>((event, emit) {
+      emit(state.copyWith(
+        observacionesSistema: event.observaciones,
+      ));
+    });
+
+    on<SetSistemasEstructuralesYMateriales>((event, emit) {
+      emit(state.copyWith(
+        sistemasEstructurales: event.sistemas,
+        materialesPorSistema: event.materiales,
+      ));
+      developer.log(
+        'SetSistemasEstructuralesYMateriales: Sistemas: ${event.sistemas}, Materiales: ${event.materiales}',
+        name: 'DescripcionEdificacionBloc'
+      );
+    });
+
+    on<SetFechaConstruccion>((event, emit) {
+      emit(state.copyWith(fechaConstruccion: event.fecha));
+      developer.log('SetFechaConstruccion: ${event.fecha}', 
+          name: 'DescripcionEdificacionBloc');
+    });
+
+    on<SetSistemaEntrepiso>((event, emit) {
+      developer.log('SetSistemaEntrepiso: sistemas=${event.sistemas}, tipos=${event.tiposEntrepiso}, otro=${event.otroTipo}');
+      emit(state.copyWith(
+        sistemasEntrepiso: event.sistemas,
+        tiposEntrepisoPorMaterial: event.tiposEntrepiso,
+        otroEntrepiso: event.otroTipo,
+      ));
+    });
+
+    on<SetSistemaSoporte>((event, emit) {
+      developer.log('SetSistemaSoporte: sistemas=${event.sistemas}, otro=${event.otroSistema}');
+      emit(state.copyWith(
+        sistemaSoporte: event.sistemas,
+        otroSistemaSoporte: event.otroSistema,
+      ));
+    });
+
+    on<SetRevestimiento>((event, emit) {
+      developer.log('SetRevestimiento: revestimientos=${event.revestimientos}, otro=${event.otroRevestimiento}');
+      emit(state.copyWith(
+        revestimiento: event.revestimientos,
+        otroRevestimiento: event.otroRevestimiento,
+      ));
+    });
+
+    on<SetMurosDivisorios>((event, emit) {
+      developer.log('SetMurosDivisorios: muros=${event.muros}, otro=${event.otroMuro}');
+      emit(state.copyWith(
+        murosDivisorios: event.muros,
+        otroMuroDivisorio: event.otroMuro,
+      ));
+    });
+
+    on<SetFachadas>((event, emit) {
+      developer.log('SetFachadas: fachadas=${event.fachadas}, otra=${event.otraFachada}');
+      emit(state.copyWith(
+        fachadas: event.fachadas,
+        otraFachada: event.otraFachada,
+      ));
+    });
+
+    on<SetEscaleras>((event, emit) {
+      developer.log('SetEscaleras: escaleras=${event.escaleras}, otra=${event.otraEscalera}');
+      emit(state.copyWith(
+        escaleras: event.escaleras,
+        otraEscalera: event.otraEscalera,
+      ));
     });
   }
 } 

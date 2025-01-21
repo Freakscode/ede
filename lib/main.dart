@@ -22,6 +22,10 @@ import 'presentation/blocs/form/identificacionEvaluacion/id_evaluacion_bloc.dart
 import 'presentation/pages/eval/eval_wrapper.dart';
 import 'core/providers.dart';
 import 'config/theme/app_theme.dart';
+import 'presentation/blocs/evaluacion/evaluacion_bloc.dart';
+import 'presentation/blocs/form/nivelDano/nivel_dano_bloc.dart';
+import 'presentation/blocs/form/riesgosExternos/riesgos_externos_bloc.dart';
+import 'presentation/blocs/form/evaluacionDanos/evaluacion_danos_bloc.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -75,7 +79,18 @@ class MyApp extends StatelessWidget {
         RepositoryProvider.value(value: authRepository),
       ],
       child: MultiBlocProvider(
-        providers: getGlobalProviders(evaluacionRepository, authRepository),
+        providers: [
+          ...getGlobalProviders(evaluacionRepository, authRepository),
+          BlocProvider<RiesgosExternosBloc>(
+            create: (context) => RiesgosExternosBloc(),
+          ),
+          BlocProvider<EvaluacionDanosBloc>(
+            create: (context) => EvaluacionDanosBloc(),
+          ),
+          BlocProvider<NivelDanoBloc>(
+            create: (context) => NivelDanoBloc(),
+          ),
+        ],
         child: Builder(
           builder: (context) => MaterialApp.router(
             title: 'EDE App',

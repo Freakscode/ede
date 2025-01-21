@@ -74,9 +74,7 @@ class RiesgosExternosPage extends StatelessWidget {
             context.read<RiesgosExternosBloc>().add(
               SetRiesgoExterno(
                 riesgoId: id,
-                existeRiesgo: value ?? false,
-                comprometeFuncionalidad: riesgo?.comprometeFuncionalidad,
-                comprometeEstabilidad: riesgo?.comprometeEstabilidad,
+                valor: value ?? false,
               ),
             );
           },
@@ -94,14 +92,12 @@ class RiesgosExternosPage extends StatelessWidget {
                       child: RadioListTile<bool>(
                         title: const Text('Sí'),
                         value: true,
-                        groupValue: riesgo?.comprometeFuncionalidad,
+                        groupValue: riesgo?.comprometeAccesos,
                         onChanged: (value) {
                           context.read<RiesgosExternosBloc>().add(
-                            SetRiesgoExterno(
+                            SetComprometeAccesos(
                               riesgoId: id,
-                              existeRiesgo: true,
-                              comprometeFuncionalidad: value,
-                              comprometeEstabilidad: riesgo?.comprometeEstabilidad,
+                              valor: value ?? false,
                             ),
                           );
                         },
@@ -111,14 +107,12 @@ class RiesgosExternosPage extends StatelessWidget {
                       child: RadioListTile<bool>(
                         title: const Text('No'),
                         value: false,
-                        groupValue: riesgo?.comprometeFuncionalidad,
+                        groupValue: riesgo?.comprometeAccesos,
                         onChanged: (value) {
                           context.read<RiesgosExternosBloc>().add(
-                            SetRiesgoExterno(
+                            SetComprometeAccesos(
                               riesgoId: id,
-                              existeRiesgo: true,
-                              comprometeFuncionalidad: value,
-                              comprometeEstabilidad: riesgo?.comprometeEstabilidad,
+                              valor: value ?? false,
                             ),
                           );
                         },
@@ -136,11 +130,9 @@ class RiesgosExternosPage extends StatelessWidget {
                         groupValue: riesgo?.comprometeEstabilidad,
                         onChanged: (value) {
                           context.read<RiesgosExternosBloc>().add(
-                            SetRiesgoExterno(
+                            SetComprometeEstabilidad(
                               riesgoId: id,
-                              existeRiesgo: true,
-                              comprometeFuncionalidad: riesgo?.comprometeFuncionalidad,
-                              comprometeEstabilidad: value,
+                              valor: value ?? false,
                             ),
                           );
                         },
@@ -153,11 +145,9 @@ class RiesgosExternosPage extends StatelessWidget {
                         groupValue: riesgo?.comprometeEstabilidad,
                         onChanged: (value) {
                           context.read<RiesgosExternosBloc>().add(
-                            SetRiesgoExterno(
+                            SetComprometeEstabilidad(
                               riesgoId: id,
-                              existeRiesgo: true,
-                              comprometeFuncionalidad: riesgo?.comprometeFuncionalidad,
-                              comprometeEstabilidad: value,
+                              valor: value ?? false,
                             ),
                           );
                         },
@@ -192,7 +182,7 @@ class RiesgosExternosPage extends StatelessWidget {
                 initialValue: state.otroRiesgo,
                 onChanged: (value) {
                   context.read<RiesgosExternosBloc>().add(
-                    SetOtroRiesgo(value),
+                    SetOtroRiesgo(valor: value),
                   );
                 },
               ),
@@ -205,9 +195,7 @@ class RiesgosExternosPage extends StatelessWidget {
                   context.read<RiesgosExternosBloc>().add(
                     SetRiesgoExterno(
                       riesgoId: '4.6',
-                      existeRiesgo: value ?? false,
-                      comprometeFuncionalidad: state.riesgos['4.6']?.comprometeFuncionalidad,
-                      comprometeEstabilidad: state.riesgos['4.6']?.comprometeEstabilidad,
+                      valor: value ?? false,
                     ),
                   );
                 },
@@ -228,14 +216,12 @@ class RiesgosExternosPage extends StatelessWidget {
                       child: RadioListTile<bool>(
                         title: const Text('Sí'),
                         value: true,
-                        groupValue: state.riesgos['4.6']?.comprometeFuncionalidad,
+                        groupValue: state.riesgos['4.6']?.comprometeAccesos,
                         onChanged: (value) {
                           context.read<RiesgosExternosBloc>().add(
-                            SetRiesgoExterno(
+                            SetComprometeAccesos(
                               riesgoId: '4.6',
-                              existeRiesgo: true,
-                              comprometeFuncionalidad: value,
-                              comprometeEstabilidad: state.riesgos['4.6']?.comprometeEstabilidad,
+                              valor: value ?? false,
                             ),
                           );
                         },
@@ -245,14 +231,12 @@ class RiesgosExternosPage extends StatelessWidget {
                       child: RadioListTile<bool>(
                         title: const Text('No'),
                         value: false,
-                        groupValue: state.riesgos['4.6']?.comprometeFuncionalidad,
+                        groupValue: state.riesgos['4.6']?.comprometeAccesos,
                         onChanged: (value) {
                           context.read<RiesgosExternosBloc>().add(
-                            SetRiesgoExterno(
+                            SetComprometeAccesos(
                               riesgoId: '4.6',
-                              existeRiesgo: true,
-                              comprometeFuncionalidad: value,
-                              comprometeEstabilidad: state.riesgos['4.6']?.comprometeEstabilidad,
+                              valor: value ?? false,
                             ),
                           );
                         },
@@ -270,11 +254,9 @@ class RiesgosExternosPage extends StatelessWidget {
                         groupValue: state.riesgos['4.6']?.comprometeEstabilidad,
                         onChanged: (value) {
                           context.read<RiesgosExternosBloc>().add(
-                            SetRiesgoExterno(
+                            SetComprometeEstabilidad(
                               riesgoId: '4.6',
-                              existeRiesgo: true,
-                              comprometeFuncionalidad: state.riesgos['4.6']?.comprometeFuncionalidad,
-                              comprometeEstabilidad: value,
+                              valor: value ?? false,
                             ),
                           );
                         },
@@ -287,11 +269,9 @@ class RiesgosExternosPage extends StatelessWidget {
                         groupValue: state.riesgos['4.6']?.comprometeEstabilidad,
                         onChanged: (value) {
                           context.read<RiesgosExternosBloc>().add(
-                            SetRiesgoExterno(
+                            SetComprometeEstabilidad(
                               riesgoId: '4.6',
-                              existeRiesgo: true,
-                              comprometeFuncionalidad: state.riesgos['4.6']?.comprometeFuncionalidad,
-                              comprometeEstabilidad: value,
+                              valor: value ?? false,
                             ),
                           );
                         },

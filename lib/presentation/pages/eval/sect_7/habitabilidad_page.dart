@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'dart:developer';
 import '../../../../presentation/blocs/form/habitabilidad/habitabilidad_bloc.dart';
 import '../../../../presentation/blocs/form/habitabilidad/habitabilidad_state.dart';
+import '../../../../presentation/blocs/form/habitabilidad/habitabilidad_event.dart';
+import '../../../../presentation/blocs/form/riesgosExternos/riesgos_externos_bloc.dart';
+import '../../../../presentation/blocs/form/riesgosExternos/riesgos_externos_state.dart';
+import '../../../../presentation/blocs/form/nivelDano/nivel_dano_bloc.dart';
+import '../../../../presentation/blocs/form/nivelDano/nivel_dano_state.dart';
 import '../../../../presentation/widgets/navigation_fab_menu.dart';
 
 class HabitabilidadPage extends StatelessWidget {
@@ -11,29 +17,80 @@ class HabitabilidadPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     
-    return Scaffold(
-      backgroundColor: theme.colorScheme.surface,
-      appBar: AppBar(
-        title: const Text('Habitabilidad'),
-        backgroundColor: theme.colorScheme.surface,
-        elevation: 2,
-      ),
-      floatingActionButton: const NavigationFabMenu(
-        currentRoute: '/habitabilidad',
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _buildHabitabilidadCard(theme),
-              const SizedBox(height: 32),
-              _buildClasificacionCard(theme),
-              const SizedBox(height: 32),
-            ],
-          ),
-        ),
+    // Calcular habitabilidad al cargar la página
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _calcularHabitabilidad(context);
+    });
+    
+    return BlocBuilder<RiesgosExternosBloc, RiesgosExternosState>(
+      builder: (context, riesgosState) {
+        return BlocBuilder<NivelDanoBloc, NivelDanoState>(
+          builder: (context, nivelDanoState) {
+            // Recalcular cuando cambien los estados
+            _calcularHabitabilidad(context);
+            
+            return Scaffold(
+              backgroundColor: theme.colorScheme.surface,
+              appBar: AppBar(
+                title: const Text('Habitabilidad'),
+                backgroundColor: theme.colorScheme.surface,
+                elevation: 2,
+              ),
+              floatingActionButton: const NavigationFabMenu(
+                currentRoute: '/habitabilidad',
+              ),
+              body: SafeArea(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _buildHabitabilidadCard(theme),
+                      const SizedBox(height: 32),
+                      _buildClasificacionCard(theme),
+                      const SizedBox(height: 32),
+                      _buildResumenDatos(theme, riesgosState, nivelDanoState),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _calcularHabitabilidad(BuildContext context) {
+    log('=== Calculando Habitabilidad ===');
+    
+    final riesgosState = context.read<RiesgosExternosBloc>().state;
+    final nivelDanoState = context.read<NivelDanoBloc>().state;
+
+    // Verificar que tengamos los datos necesarios
+    if (riesgosState.riesgos.isEmpty || nivelDanoState.nivelDano == null) {
+      log('Datos insuficientes para calcular habitabilidad');
+      return;
+    }
+
+    // Mapear solo los riesgos externos de la sección 4
+    final riesgosExternos = Map<String, RiesgoItem>.fromEntries(
+      riesgosState.riesgos.entries
+          .where((e) => RegExp(r'^4\.[1-6]$').hasMatch(e.key))
+          .map((e) => MapEntry(e.key, e.value))
+    );
+
+    // Obtener nivel de daño
+    final nivelDano = nivelDanoState.nivelDano ?? 'Sin daño';
+
+    log('Riesgos externos: $riesgosExternos');
+    log('Nivel de daño: $nivelDano');
+
+    // Disparar evento para calcular habitabilidad
+    context.read<HabitabilidadBloc>().add(
+      CalcularHabitabilidad(
+        riesgosExternos: riesgosExternos,
+        nivelDano: nivelDano,
       ),
     );
   }
@@ -236,5 +293,67 @@ class HabitabilidadPage extends StatelessWidget {
       default:
         return ('?', null);
     }
+  }
+
+  Widget _buildResumenDatos(
+    ThemeData theme,
+    RiesgosExternosState riesgosState,
+    NivelDanoState nivelDanoState,
+  ) {
+    // Filtrar solo los riesgos de la sección 4
+    final riesgosSeccion4 = riesgosState.riesgos.entries
+        .where((e) => RegExp(r'^4\.[1-6]$').hasMatch(e.key))
+        .toList()
+        ..sort((a, b) => a.key.compareTo(b.key));  // Ordenar por número
+
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Resumen de Datos',
+              style: theme.textTheme.titleLarge?.copyWith(
+                color: theme.colorScheme.onSurface,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Sección 4: Riesgos Externos',
+              style: theme.textTheme.titleMedium?.copyWith(
+                color: theme.colorScheme.primary,
+              ),
+            ),
+            const SizedBox(height: 8),
+            ...riesgosSeccion4.map((e) => Padding(
+              padding: const EdgeInsets.only(left: 16.0, bottom: 4.0),
+              child: Text(
+                '${e.key}: ${e.value.existeRiesgo ? "Sí" : "No"}${e.value.comprometeAccesos ? " (Compromete acceso)" : ""}',
+                style: theme.textTheme.bodyMedium,
+              ),
+            )),
+            const SizedBox(height: 16),
+            Text(
+              'Sección 6: Nivel de Daño',
+              style: theme.textTheme.titleMedium?.copyWith(
+                color: theme.colorScheme.primary,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Padding(
+              padding: const EdgeInsets.only(left: 16.0),
+              child: Text(
+                'Nivel de daño: ${nivelDanoState.nivelDano ?? "No establecido"}${nivelDanoState.nivelDano?.startsWith("I2") == true ? " (Caso especial)" : ""}',
+                style: theme.textTheme.bodyMedium,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 } 
