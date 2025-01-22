@@ -3,81 +3,123 @@ import 'dart:developer';
 
 import 'habitabilidad_event.dart';
 import 'habitabilidad_state.dart';
-import '../riesgosExternos/riesgos_externos_state.dart';
+import '../riesgosExternos/riesgos_externos_state.dart' as externos;
+import '../../../../domain/entities/riesgo_item.dart';
 
 class HabitabilidadBloc extends Bloc<HabitabilidadEvent, HabitabilidadState> {
-  HabitabilidadBloc() : super(HabitabilidadState()) {
-    on<CalcularHabitabilidad>((event, emit) {
-      final resultado = _determinarHabitabilidad(
-        event.riesgosExternos,
-        event.nivelDano,
-      );
+  HabitabilidadBloc() : super(HabitabilidadState.initial) {
+    on<CalcularHabitabilidad>(_onCalcularHabitabilidad);
+    on<UpdateHabitabilidad>(_onUpdateHabitabilidad);
+  }
+
+  void _onUpdateHabitabilidad(
+    UpdateHabitabilidad event,
+    Emitter<HabitabilidadState> emit,
+  ) {
+    emit(state.copyWith(
+      estadoHabitabilidad: event.estadoHabitabilidad,
+      clasificacionHabitabilidad: event.clasificacionHabitabilidad,
+      observacionesHabitabilidad: event.observacionesHabitabilidad,
+      criterioHabitabilidad: event.criterioHabitabilidad,
+    ));
+  }
+
+  void _onCalcularHabitabilidad(
+    CalcularHabitabilidad event,
+    Emitter<HabitabilidadState> emit,
+  ) {
+    log('=== Calculando Habitabilidad ===');
+    log('Riesgos externos: ${event.riesgosExternos}');
+    log('Nivel de daño: ${event.nivelDano}');
+
+    // Verificar si es un caso especial (I2)
+    if (_esCasoEspecial(event.nivelDano)) {
       emit(state.copyWith(
-        criterioHabitabilidad: resultado.criterio,
-        clasificacion: resultado.clasificacion,
+        criterioHabitabilidad: 'No Habitable',
+        clasificacion: 'I2 - Afectación Funcional',
       ));
+      return;
+    }
+
+    // Verificar condiciones para Habitable (H)
+    if (_cumpleCondicionesHabitable(event.riesgosExternos, event.nivelDano)) {
+      emit(state.copyWith(
+        criterioHabitabilidad: 'Habitable',
+        clasificacion: 'H - Segura',
+      ));
+      return;
+    }
+
+    // Verificar condiciones para R1
+    if (_cumpleCondicionesR1(event.riesgosExternos, event.nivelDano)) {
+      emit(state.copyWith(
+        criterioHabitabilidad: 'Acceso restringido',
+        clasificacion: 'R1 - Áreas inseguras',
+      ));
+      return;
+    }
+
+    // Verificar condiciones para R2
+    if (_cumpleCondicionesR2(event.riesgosExternos)) {
+      emit(state.copyWith(
+        criterioHabitabilidad: 'Acceso restringido',
+        clasificacion: 'R2 - Entrada limitada',
+      ));
+      return;
+    }
+
+    // Verificar condiciones para I1
+    if (_cumpleCondicionesI1(event.riesgosExternos)) {
+      emit(state.copyWith(
+        criterioHabitabilidad: 'No Habitable',
+        clasificacion: 'I1 - Riesgo por factores externos',
+      ));
+      return;
+    }
+
+    // Verificar condiciones para I3
+    if (event.nivelDano == 'Alto') {
+      emit(state.copyWith(
+        criterioHabitabilidad: 'No Habitable',
+        clasificacion: 'I3 - Daño severo en la edificación',
+      ));
+      return;
+    }
+  }
+
+  bool _esCasoEspecial(String nivelDano) {
+    return nivelDano == 'Caso Especial';
+  }
+
+  bool _cumpleCondicionesHabitable(Map<String, RiesgoItem> riesgos, String nivelDano) {
+    bool todosNoABC = riesgos.entries.every((entry) {
+      final riesgo = entry.value;
+      return !riesgo.existeRiesgo && !riesgo.comprometeAccesos;
+    });
+
+    return todosNoABC && (nivelDano == 'Sin daño' || nivelDano == 'Bajo');
+  }
+
+  bool _cumpleCondicionesR1(Map<String, RiesgoItem> riesgos, String nivelDano) {
+    bool todosNoABC = riesgos.entries.every((entry) {
+      final riesgo = entry.value;
+      return !riesgo.existeRiesgo && !riesgo.comprometeAccesos;
+    });
+
+    return todosNoABC && nivelDano == 'Medio';
+  }
+
+  bool _cumpleCondicionesR2(Map<String, RiesgoItem> riesgos) {
+    return riesgos.entries.any((entry) {
+      final riesgo = entry.value;
+      return riesgo.existeRiesgo && riesgo.comprometeAccesos && !riesgo.implicaRiesgoVida;
     });
   }
 
-  ({String criterio, String clasificacion}) _determinarHabitabilidad(
-    Map<String, RiesgoItem> riesgos,
-    String nivelDano,
-  ) {
-    log('Calculando habitabilidad:');
-    log('Riesgos externos: $riesgos');
-    log('Nivel de daño: $nivelDano');
-
-    // 1. Verificar casos especiales de la matriz de daño
-    if (nivelDano == 'I2 - Afectación Funcional') {
-      log('Resultado: No Habitable - I2 (Afectación Funcional) - Caso especial de matriz');
-      return (criterio: 'No Habitable', clasificacion: 'I2 - Afectación Funcional');
-    }
-
-    // 2. Verificar si hay nivel de daño Alto (casos I2 e I3)
-    if (nivelDano == 'Alto') {
-      if (riesgos.values.any((r) => r.comprometeAccesos)) {
-        log('Resultado: No Habitable - I2 (Afectación Funcional)');
-        return (criterio: 'No Habitable', clasificacion: 'I2 - Afectación Funcional');
-      } else {
-        log('Resultado: No Habitable - I3 (Daño severo en la edificación)');
-        return (criterio: 'No Habitable', clasificacion: 'I3 - Daño severo en la edificación');
-      }
-    }
-
-    // 3. Verificar si todos los riesgos están en "No"
-    bool todosRiesgosNo = riesgos.values.every((r) => 
-      !r.existeRiesgo && !r.comprometeAccesos && !r.comprometeEstabilidad);
-
-    if (todosRiesgosNo) {
-      if (nivelDano == 'Sin daño' || nivelDano == 'Bajo') {
-        log('Resultado: Habitable - H (Segura)');
-        return (criterio: 'Habitable', clasificacion: 'H - Segura');
-      }
-      if (nivelDano == 'Medio') {
-        log('Resultado: Acceso restringido - R1 (Áreas inseguras)');
-        return (criterio: 'Acceso restringido', clasificacion: 'R1 - Áreas inseguras');
-      }
-    }
-
-    // 4. Verificar casos de riesgos específicos
-    bool hayRiesgoAyB = riesgos.values.any((r) => 
-      r.existeRiesgo && r.comprometeAccesos && !r.comprometeEstabilidad);
-
-    if (hayRiesgoAyB && ['Sin daño', 'Bajo', 'Medio'].contains(nivelDano)) {
-      log('Resultado: Acceso restringido - R2 (Entrada limitada)');
-      return (criterio: 'Acceso restringido', clasificacion: 'R2 - Entrada limitada');
-    }
-
-    bool hayRiesgoAyC = riesgos.values.any((r) => 
-      r.existeRiesgo && !r.comprometeAccesos && r.comprometeEstabilidad);
-
-    if (hayRiesgoAyC && ['Sin daño', 'Bajo', 'Medio'].contains(nivelDano)) {
-      log('Resultado: No Habitable - I1 (Riesgo por factores externos)');
-      return (criterio: 'No Habitable', clasificacion: 'I1 - Riesgo por factores externos');
-    }
-
-    // Por defecto, si no cumple ninguna condición específica
-    log('Resultado: No Habitable - I1 (Riesgo por factores externos)');
-    return (criterio: 'No Habitable', clasificacion: 'I1 - Riesgo por factores externos');
+  bool _cumpleCondicionesI1(Map<String, RiesgoItem> riesgos) {
+    return riesgos.entries.any((entry) {
+      final riesgo = entry.value;
+      return riesgo.existeRiesgo && riesgo.implicaRiesgoVida;
+    });
   }
 } 

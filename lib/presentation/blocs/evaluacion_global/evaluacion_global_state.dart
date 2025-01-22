@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class EvaluacionState {
+class EvaluacionGlobalState {
   // Identificación de la Evaluación
   final DateTime? fechaInspeccion;
   final TimeOfDay? horaInspeccion;
@@ -13,17 +13,29 @@ class EvaluacionState {
   final String? firmaPath;
 
   // Identificación de la Edificación
-  final String? calle;
-  final String? numero;
-  final String? colonia;
-  final String? codigoPostal;
-  final String? referencias;
+  final String? nombreEdificacion;
+  final String? direccion;
   final String? comuna;
   final String? barrio;
-  final String? codigoCatastral;
+  final String? codigoBarrio;
+  final String? cbml;
   final String? nombreContacto;
   final String? telefonoContacto;
   final String? emailContacto;
+  final String? ocupacion;
+  final double? latitud;
+  final double? longitud;
+  final String? tipoVia;
+  final String? numeroVia;
+  final String? apendiceVia;
+  final String? orientacionVia;
+  final String? numeroCruce;
+  final String? apendiceCruce;
+  final String? orientacionCruce;
+  final String? numero;
+  final String? complemento;
+  final String? departamento;
+  final String? municipio;
 
   // Descripción de la Edificación
   final String? uso;
@@ -36,9 +48,9 @@ class EvaluacionState {
   final String? caracteristicasAdicionales;
 
   // Riesgos Externos
-  final String? colapsoEstructuras;
-  final String? caidaObjetos;
-  final String? otrosRiesgos;
+  final bool? colapsoEstructuras;
+  final bool? caidaObjetos;
+  final bool? otrosRiesgos;
   final bool? riesgoColapso;
   final bool? riesgoCaida;
   final bool? riesgoServicios;
@@ -46,10 +58,10 @@ class EvaluacionState {
   final bool? riesgoAccesos;
 
   // Evaluación de Daños
-  final String? danosEstructurales;
-  final String? danosNoEstructurales;
-  final String? danosGeotecnicos;
-  final String? condicionesPreexistentes;
+  final Map<String, dynamic>? danosEstructurales;
+  final Map<String, dynamic>? danosNoEstructurales;
+  final Map<String, dynamic>? danosGeotecnicos;
+  final Map<String, dynamic>? condicionesPreexistentes;
   final String? alcanceEvaluacion;
 
   // Nivel de Daño
@@ -65,14 +77,14 @@ class EvaluacionState {
   final String? criterioHabitabilidad;
 
   // Acciones Recomendadas
-  final String? evaluacionesAdicionales;
-  final String? medidasSeguridad;
-  final String? entidadesRecomendadas;
+  final Map<String, dynamic>? evaluacionesAdicionales;
+  final Map<String, dynamic>? medidasSeguridad;
+  final Map<String, bool> entidadesRecomendadas;
   final String? observacionesAcciones;
   final List<String>? medidasSeguridadSeleccionadas;
   final List<String>? evaluacionesAdicionalesSeleccionadas;
 
-  EvaluacionState({
+  const EvaluacionGlobalState({
     // Identificación de la Evaluación
     this.fechaInspeccion,
     this.horaInspeccion,
@@ -84,17 +96,29 @@ class EvaluacionState {
     this.dependenciaEntidad,
     this.firmaPath,
     // Identificación de la Edificación
-    this.calle,
-    this.numero,
-    this.colonia,
-    this.codigoPostal,
-    this.referencias,
+    this.nombreEdificacion,
+    this.direccion,
     this.comuna,
     this.barrio,
-    this.codigoCatastral,
+    this.codigoBarrio,
+    this.cbml,
     this.nombreContacto,
     this.telefonoContacto,
     this.emailContacto,
+    this.ocupacion,
+    this.latitud,
+    this.longitud,
+    this.tipoVia,
+    this.numeroVia,
+    this.apendiceVia,
+    this.orientacionVia,
+    this.numeroCruce,
+    this.apendiceCruce,
+    this.orientacionCruce,
+    this.numero,
+    this.complemento,
+    this.departamento,
+    this.municipio,
     // Descripción de la Edificación
     this.uso,
     this.niveles,
@@ -132,13 +156,13 @@ class EvaluacionState {
     // Acciones Recomendadas
     this.evaluacionesAdicionales,
     this.medidasSeguridad,
-    this.entidadesRecomendadas,
+    this.entidadesRecomendadas = const {},
     this.observacionesAcciones,
     this.medidasSeguridadSeleccionadas,
     this.evaluacionesAdicionalesSeleccionadas,
   });
 
-  EvaluacionState copyWith({
+  EvaluacionGlobalState copyWith({
     // Identificación de la Evaluación
     DateTime? fechaInspeccion,
     TimeOfDay? horaInspeccion,
@@ -150,17 +174,29 @@ class EvaluacionState {
     String? dependenciaEntidad,
     String? firmaPath,
     // Identificación de la Edificación
-    String? calle,
-    String? numero,
-    String? colonia,
-    String? codigoPostal,
-    String? referencias,
+    String? nombreEdificacion,
+    String? direccion,
     String? comuna,
     String? barrio,
-    String? codigoCatastral,
+    String? codigoBarrio,
+    String? cbml,
     String? nombreContacto,
     String? telefonoContacto,
     String? emailContacto,
+    String? ocupacion,
+    double? latitud,
+    double? longitud,
+    String? tipoVia,
+    String? numeroVia,
+    String? apendiceVia,
+    String? orientacionVia,
+    String? numeroCruce,
+    String? apendiceCruce,
+    String? orientacionCruce,
+    String? numero,
+    String? complemento,
+    String? departamento,
+    String? municipio,
     // Descripción de la Edificación
     String? uso,
     int? niveles,
@@ -171,19 +207,19 @@ class EvaluacionState {
     String? elementosNoEstructurales,
     String? caracteristicasAdicionales,
     // Riesgos Externos
-    String? colapsoEstructuras,
-    String? caidaObjetos,
-    String? otrosRiesgos,
+    bool? colapsoEstructuras,
+    bool? caidaObjetos,
+    bool? otrosRiesgos,
     bool? riesgoColapso,
     bool? riesgoCaida,
     bool? riesgoServicios,
     bool? riesgoTerreno,
     bool? riesgoAccesos,
     // Evaluación de Daños
-    String? danosEstructurales,
-    String? danosNoEstructurales,
-    String? danosGeotecnicos,
-    String? condicionesPreexistentes,
+    Map<String, dynamic>? danosEstructurales,
+    Map<String, dynamic>? danosNoEstructurales,
+    Map<String, dynamic>? danosGeotecnicos,
+    Map<String, dynamic>? condicionesPreexistentes,
     String? alcanceEvaluacion,
     // Nivel de Daño
     String? nivelDanoEstructural,
@@ -196,14 +232,14 @@ class EvaluacionState {
     String? observacionesHabitabilidad,
     String? criterioHabitabilidad,
     // Acciones Recomendadas
-    String? evaluacionesAdicionales,
-    String? medidasSeguridad,
-    String? entidadesRecomendadas,
+    Map<String, dynamic>? evaluacionesAdicionales,
+    Map<String, dynamic>? medidasSeguridad,
+    Map<String, bool>? entidadesRecomendadas,
     String? observacionesAcciones,
     List<String>? medidasSeguridadSeleccionadas,
     List<String>? evaluacionesAdicionalesSeleccionadas,
   }) {
-    return EvaluacionState(
+    return EvaluacionGlobalState(
       // Identificación de la Evaluación
       fechaInspeccion: fechaInspeccion ?? this.fechaInspeccion,
       horaInspeccion: horaInspeccion ?? this.horaInspeccion,
@@ -215,17 +251,29 @@ class EvaluacionState {
       dependenciaEntidad: dependenciaEntidad ?? this.dependenciaEntidad,
       firmaPath: firmaPath ?? this.firmaPath,
       // Identificación de la Edificación
-      calle: calle ?? this.calle,
-      numero: numero ?? this.numero,
-      colonia: colonia ?? this.colonia,
-      codigoPostal: codigoPostal ?? this.codigoPostal,
-      referencias: referencias ?? this.referencias,
+      nombreEdificacion: nombreEdificacion ?? this.nombreEdificacion,
+      direccion: direccion ?? this.direccion,
       comuna: comuna ?? this.comuna,
       barrio: barrio ?? this.barrio,
-      codigoCatastral: codigoCatastral ?? this.codigoCatastral,
+      codigoBarrio: codigoBarrio ?? this.codigoBarrio,
+      cbml: cbml ?? this.cbml,
       nombreContacto: nombreContacto ?? this.nombreContacto,
       telefonoContacto: telefonoContacto ?? this.telefonoContacto,
       emailContacto: emailContacto ?? this.emailContacto,
+      ocupacion: ocupacion ?? this.ocupacion,
+      latitud: latitud ?? this.latitud,
+      longitud: longitud ?? this.longitud,
+      tipoVia: tipoVia ?? this.tipoVia,
+      numeroVia: numeroVia ?? this.numeroVia,
+      apendiceVia: apendiceVia ?? this.apendiceVia,
+      orientacionVia: orientacionVia ?? this.orientacionVia,
+      numeroCruce: numeroCruce ?? this.numeroCruce,
+      apendiceCruce: apendiceCruce ?? this.apendiceCruce,
+      orientacionCruce: orientacionCruce ?? this.orientacionCruce,
+      numero: numero ?? this.numero,
+      complemento: complemento ?? this.complemento,
+      departamento: departamento ?? this.departamento,
+      municipio: municipio ?? this.municipio,
       // Descripción de la Edificación
       uso: uso ?? this.uso,
       niveles: niveles ?? this.niveles,

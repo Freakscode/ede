@@ -6,27 +6,42 @@ import 'acciones_state.dart';
 
 class AccionesBloc extends Bloc<AccionesEvent, AccionesState> {
   AccionesBloc() : super(AccionesState()) {
+    on<UpdateAcciones>((event, emit) {
+      emit(state.copyWith(
+        evaluacionesAdicionales: event.evaluacionesAdicionales?.isNotEmpty == true 
+            ? {event.evaluacionesAdicionales!: true} 
+            : {},
+        medidasSeguridad: event.medidasSeguridad?.isNotEmpty == true 
+            ? {event.medidasSeguridad!: true} 
+            : {},
+        entidadesRecomendadas: event.entidadesRecomendadas ?? {},
+        observacionesAcciones: event.observacionesAcciones,
+        medidasSeguridadSeleccionadas: event.medidasSeguridadSeleccionadas ?? [],
+        evaluacionesAdicionalesSeleccionadas: event.evaluacionesAdicionalesSeleccionadas ?? [],
+      ));
+      developer.log('UpdateAcciones: ${event.evaluacionesAdicionales}', name: 'AccionesBloc');
+    });
+
     on<SetEvaluacionAdicional>((event, emit) {
-      final updatedEvaluacion = Map<String, String>.from(state.evaluacionAdicional);
-      updatedEvaluacion[event.tipo] = event.descripcion;
-      emit(state.copyWith(evaluacionAdicional: updatedEvaluacion));
+      final evaluacionesAdicionales = Map<String, dynamic>.from(state.evaluacionesAdicionales);
+      evaluacionesAdicionales[event.tipo] = event.descripcion;
+      emit(state.copyWith(evaluacionesAdicionales: evaluacionesAdicionales));
       developer.log('SetEvaluacionAdicional: ${event.tipo} - ${event.descripcion}',
           name: 'AccionesBloc');
     });
 
     on<SetRecomendacion>((event, emit) {
-      final updatedRecomendaciones = Map<String, bool>.from(state.recomendaciones);
-      updatedRecomendaciones[event.recomendacion] = event.valor;
-      emit(state.copyWith(recomendaciones: updatedRecomendaciones));
+      final medidasSeguridad = Map<String, dynamic>.from(state.medidasSeguridad);
+      medidasSeguridad[event.recomendacion] = event.valor;
+      emit(state.copyWith(medidasSeguridad: medidasSeguridad));
       developer.log('SetRecomendacion: ${event.recomendacion} - ${event.valor}',
           name: 'AccionesBloc');
     });
 
     on<SetEntidadRecomendada>((event, emit) {
-      final updatedEntidades = Map<String, bool>.from(state.entidadesRecomendadas);
-      updatedEntidades[event.entidad] = event.valor;
+      final entidadesRecomendadas = Map<String, bool>.from(state.entidadesRecomendadas);
+      entidadesRecomendadas[event.entidad] = event.valor;
       
-      // Si se está desactivando la opción "Otra", limpiamos el campo de texto
       String? newOtraEntidad = state.otraEntidad;
       if (event.entidad == 'Otra' && !event.valor) {
         newOtraEntidad = null;
@@ -35,7 +50,7 @@ class AccionesBloc extends Bloc<AccionesEvent, AccionesState> {
       }
       
       emit(state.copyWith(
-        entidadesRecomendadas: updatedEntidades,
+        entidadesRecomendadas: entidadesRecomendadas,
         otraEntidad: newOtraEntidad,
       ));
       developer.log(

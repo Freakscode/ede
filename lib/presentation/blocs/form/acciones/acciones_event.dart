@@ -36,4 +36,22 @@ class SetRecomendacionesEspecificas extends AccionesEvent {
   final String recomendaciones;
   
   SetRecomendacionesEspecificas(this.recomendaciones);
+}
+
+class UpdateAcciones extends AccionesEvent {
+  final String? evaluacionesAdicionales;
+  final String? medidasSeguridad;
+  final Map<String, bool>? entidadesRecomendadas;
+  final String? observacionesAcciones;
+  final List<String>? medidasSeguridadSeleccionadas;
+  final List<String>? evaluacionesAdicionalesSeleccionadas;
+
+  UpdateAcciones({
+    this.evaluacionesAdicionales,
+    this.medidasSeguridad,
+    this.entidadesRecomendadas,
+    this.observacionesAcciones,
+    this.medidasSeguridadSeleccionadas,
+    this.evaluacionesAdicionalesSeleccionadas,
+  });
 } 

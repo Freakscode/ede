@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'dart:developer';
+import '../../../../domain/entities/riesgo_item.dart';
 import '../../../../presentation/blocs/form/habitabilidad/habitabilidad_bloc.dart';
 import '../../../../presentation/blocs/form/habitabilidad/habitabilidad_state.dart';
 import '../../../../presentation/blocs/form/habitabilidad/habitabilidad_event.dart';
 import '../../../../presentation/blocs/form/riesgosExternos/riesgos_externos_bloc.dart';
-import '../../../../presentation/blocs/form/riesgosExternos/riesgos_externos_state.dart';
+import '../../../../presentation/blocs/form/riesgosExternos/riesgos_externos_state.dart' as externos;
 import '../../../../presentation/blocs/form/nivelDano/nivel_dano_bloc.dart';
 import '../../../../presentation/blocs/form/nivelDano/nivel_dano_state.dart';
 import '../../../../presentation/widgets/navigation_fab_menu.dart';
@@ -17,17 +18,14 @@ class HabitabilidadPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     
-    // Calcular habitabilidad al cargar la página
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _calcularHabitabilidad(context);
-    });
-    
-    return BlocBuilder<RiesgosExternosBloc, RiesgosExternosState>(
+    return BlocBuilder<RiesgosExternosBloc, externos.RiesgosExternosState>(
       builder: (context, riesgosState) {
         return BlocBuilder<NivelDanoBloc, NivelDanoState>(
           builder: (context, nivelDanoState) {
-            // Recalcular cuando cambien los estados
-            _calcularHabitabilidad(context);
+            // Solo calcular si hay cambios en los estados
+            if (riesgosState.riesgos.isNotEmpty && nivelDanoState.nivelDano != null) {
+              _calcularHabitabilidad(context, riesgosState, nivelDanoState);
+            }
             
             return Scaffold(
               backgroundColor: theme.colorScheme.surface,
@@ -61,23 +59,22 @@ class HabitabilidadPage extends StatelessWidget {
     );
   }
 
-  void _calcularHabitabilidad(BuildContext context) {
+  void _calcularHabitabilidad(
+    BuildContext context,
+    externos.RiesgosExternosState riesgosState,
+    NivelDanoState nivelDanoState,
+  ) {
     log('=== Calculando Habitabilidad ===');
-    
-    final riesgosState = context.read<RiesgosExternosBloc>().state;
-    final nivelDanoState = context.read<NivelDanoBloc>().state;
-
-    // Verificar que tengamos los datos necesarios
-    if (riesgosState.riesgos.isEmpty || nivelDanoState.nivelDano == null) {
-      log('Datos insuficientes para calcular habitabilidad');
-      return;
-    }
 
     // Mapear solo los riesgos externos de la sección 4
     final riesgosExternos = Map<String, RiesgoItem>.fromEntries(
       riesgosState.riesgos.entries
           .where((e) => RegExp(r'^4\.[1-6]$').hasMatch(e.key))
-          .map((e) => MapEntry(e.key, e.value))
+          .map((e) => MapEntry(e.key, RiesgoItem(
+                existeRiesgo: e.value.existeRiesgo,
+                comprometeAccesos: e.value.comprometeAccesos,
+                implicaRiesgoVida: e.value.comprometeEstabilidad,
+              )))
     );
 
     // Obtener nivel de daño
@@ -297,7 +294,7 @@ class HabitabilidadPage extends StatelessWidget {
 
   Widget _buildResumenDatos(
     ThemeData theme,
-    RiesgosExternosState riesgosState,
+    externos.RiesgosExternosState riesgosState,
     NivelDanoState nivelDanoState,
   ) {
     // Filtrar solo los riesgos de la sección 4

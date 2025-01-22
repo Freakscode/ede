@@ -1,65 +1,82 @@
 import 'dart:developer';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/foundation.dart';
+import 'dart:developer' as developer;
 
 import 'nivel_dano_event.dart';
 import 'nivel_dano_state.dart';
 
 class NivelDanoBloc extends Bloc<NivelDanoEvent, NivelDanoState> {
-  NivelDanoBloc() : super(NivelDanoState()) {
-    on<SetPorcentajeAfectacion>((event, emit) {
-      log('SetPorcentajeAfectacion: ${event.porcentaje}');
-      
-      // Si no hay severidad calculada, solo actualizar el porcentaje
-      if (state.severidadDanos == null) {
-        emit(state.copyWith(porcentajeAfectacion: event.porcentaje));
-        return;
+  NivelDanoBloc() : super(NivelDanoState.initial) {
+    on<UpdateNivelDano>(_onUpdateNivelDano);
+    on<UpdateNivelDanoEstructural>(_onUpdateNivelDanoEstructural);
+    on<UpdateNivelDanoNoEstructural>(_onUpdateNivelDanoNoEstructural);
+    on<UpdateNivelDanoGeotecnico>(_onUpdateNivelDanoGeotecnico);
+    on<UpdateSeveridadGlobal>(_onUpdateSeveridadGlobal);
+    on<CalcularSeveridadDanos>(_onCalcularSeveridadDanos);
+    on<SetPorcentajeAfectacion>(_onSetPorcentajeAfectacion);
+    on<CalcularNivelDano>(_onCalcularNivelDano);
+  }
+
+  void _onUpdateNivelDano(UpdateNivelDano event, Emitter<NivelDanoState> emit) {
+    emit(state.copyWith(nivelDano: event.nivelDano));
+  }
+
+  void _onUpdateNivelDanoEstructural(UpdateNivelDanoEstructural event, Emitter<NivelDanoState> emit) {
+    final newState = state.copyWith(nivelDanoEstructural: event.nivelDanoEstructural);
+    emit(newState);
+    _updateSeveridadGlobal(emit);
+  }
+
+  void _onUpdateNivelDanoNoEstructural(UpdateNivelDanoNoEstructural event, Emitter<NivelDanoState> emit) {
+    final newState = state.copyWith(nivelDanoNoEstructural: event.nivelDanoNoEstructural);
+    emit(newState);
+    _updateSeveridadGlobal(emit);
+  }
+
+  void _onUpdateNivelDanoGeotecnico(UpdateNivelDanoGeotecnico event, Emitter<NivelDanoState> emit) {
+    final newState = state.copyWith(nivelDanoGeotecnico: event.nivelDanoGeotecnico);
+    emit(newState);
+    _updateSeveridadGlobal(emit);
+  }
+
+  void _onUpdateSeveridadGlobal(UpdateSeveridadGlobal event, Emitter<NivelDanoState> emit) {
+    emit(state.copyWith(severidadGlobal: event.severidadGlobal));
+  }
+
+  void _updateSeveridadGlobal(Emitter<NivelDanoState> emit) {
+    final niveles = [
+      state.nivelDanoEstructural,
+      state.nivelDanoNoEstructural,
+      state.nivelDanoGeotecnico,
+    ].where((nivel) => nivel != null).toList();
+
+    if (niveles.isEmpty) {
+      emit(state.copyWith(severidadGlobal: null));
+      return;
+    }
+
+    final severidades = {
+      'NINGUNO': 0,
+      'LEVE': 1,
+      'MODERADO': 2,
+      'FUERTE': 3,
+      'SEVERO': 4,
+    };
+
+    int maxSeveridad = 0;
+    for (final nivel in niveles) {
+      final currentSeveridad = severidades[nivel] ?? 0;
+      if (currentSeveridad > maxSeveridad) {
+        maxSeveridad = currentSeveridad;
       }
+    }
 
-      // Si hay severidad, recalcular el nivel de daño
-      final nivelDano = _calcularNivelDano(
-        state.severidadDanos!,
-        event.porcentaje,
-      );
+    final severidadGlobal = severidades.entries
+        .firstWhere((entry) => entry.value == maxSeveridad)
+        .key;
 
-      emit(state.copyWith(
-        porcentajeAfectacion: event.porcentaje,
-        nivelDano: nivelDano,
-      ));
-    });
-
-    on<CalcularSeveridadDanos>((event, emit) {
-      log('CalcularSeveridadDanos - Inicio');
-      log('Condiciones existentes: ${event.condicionesExistentes}');
-      log('Niveles de elementos: ${event.nivelesElementos}');
-
-      // Validar que tenemos todos los datos necesarios
-      if (event.condicionesExistentes.isEmpty || event.nivelesElementos.isEmpty) {
-        log('Error: Datos incompletos para el cálculo');
-        return;
-      }
-
-      final severidad = _calcularSeveridad(
-        event.condicionesExistentes,
-        event.nivelesElementos,
-      );
-
-      log('Severidad calculada: $severidad');
-
-      String? nivelDano;
-      if (state.porcentajeAfectacion != null) {
-        nivelDano = _calcularNivelDano(
-          severidad,
-          state.porcentajeAfectacion!,
-        );
-        log('Nivel de daño calculado: $nivelDano');
-      }
-
-      emit(state.copyWith(
-        severidadDanos: severidad,
-        nivelDano: nivelDano,
-      ));
-    });
+    emit(state.copyWith(severidadGlobal: severidadGlobal));
   }
 
   String _calcularSeveridad(
@@ -150,77 +167,96 @@ class NivelDanoBloc extends Bloc<NivelDanoEvent, NivelDanoState> {
     return 'Sin Daño';
   }
 
-  String _calcularNivelDano(String severidad, String porcentaje) {
-    log('=== Calculando nivel de daño ===');
-    log('Severidad: $severidad');
-    log('Porcentaje: $porcentaje');
-    
-    // Convertir porcentaje a rango numérico para comparación
-    int porcentajeMin = 0;
-    int porcentajeMax = 0;
-    
+  String _calcularNivelDanoMatriz(String severidad, String porcentaje) {
+    // Normalizar el porcentaje para comparación
+    String porcentajeNormalizado = porcentaje;
     switch (porcentaje) {
       case 'Ninguno':
-        porcentajeMin = 0;
-        porcentajeMax = 0;
+        porcentajeNormalizado = '< 10%';
         break;
       case '< 10%':
-        porcentajeMin = 0;
-        porcentajeMax = 10;
+        porcentajeNormalizado = '< 10%';
         break;
       case '10-40%':
-        porcentajeMin = 10;
-        porcentajeMax = 40;
+        porcentajeNormalizado = '10-40%';
         break;
       case '40-70%':
-        porcentajeMin = 40;
-        porcentajeMax = 70;
+        porcentajeNormalizado = '40-70%';
         break;
       case '>70%':
-        porcentajeMin = 70;
-        porcentajeMax = 100;
+        porcentajeNormalizado = '>70%';
         break;
-      default:
-        log('Porcentaje no reconocido - Retornando Sin Daño');
-        return 'Sin Daño';
     }
 
-    log('Porcentaje convertido - Min: $porcentajeMin, Max: $porcentajeMax');
-
-    String resultado = 'Sin Daño';
+    // Casos especiales (X en la matriz)
+    if ((severidad == 'Medio' && porcentajeNormalizado == '>70%') ||
+        (severidad == 'Medio Alto' && porcentajeNormalizado == '40-70%')) {
+      return 'Caso Especial';
+    }
 
     // Matriz de nivel de daño según la imagen
     if (severidad == 'Alto') {
-      resultado = 'Alto';
+      return 'Alto';
     } else if (severidad == 'Medio Alto') {
-      if (porcentajeMax > 70 || porcentajeMin >= 40) {
-        resultado = 'Alto';
-      } else if (porcentajeMin >= 10) {
-        resultado = 'Medio Alto';
+      if (porcentajeNormalizado == '>70%' || porcentajeNormalizado == '40-70%') {
+        return 'Alto';
+      } else if (porcentajeNormalizado == '10-40%') {
+        return 'Medio Alto';
       } else {
-        resultado = 'Medio';
+        return 'Medio';
       }
     } else if (severidad == 'Medio') {
-      if (porcentajeMax > 70) {
-        resultado = 'Alto';
-      } else if (porcentajeMin >= 40) {
-        resultado = 'Medio Alto';
-      } else if (porcentajeMin >= 10) {
-        resultado = 'Medio';
+      if (porcentajeNormalizado == '>70%') {
+        return 'Alto';
+      } else if (porcentajeNormalizado == '40-70%') {
+        return 'Medio Alto';
+      } else if (porcentajeNormalizado == '10-40%') {
+        return 'Medio';
       } else {
-        resultado = 'Bajo';
+        return 'Bajo';
       }
     } else if (severidad == 'Bajo') {
-      if (porcentajeMax > 70) {
-        resultado = 'Medio Alto';
-      } else if (porcentajeMin >= 40) {
-        resultado = 'Medio';
+      if (porcentajeNormalizado == '>70%') {
+        return 'Medio Alto';
+      } else if (porcentajeNormalizado == '40-70%') {
+        return 'Medio';
       } else {
-        resultado = 'Bajo';
+        return 'Bajo';
       }
     }
 
-    log('Nivel de daño calculado: $resultado');
-    return resultado;
+    return 'Sin Daño';
+  }
+
+  void _onCalcularNivelDano(CalcularNivelDano event, Emitter<NivelDanoState> emit) {
+    if (state.severidadDanos == null || state.porcentajeAfectacion == null) {
+      developer.log('No se puede calcular el nivel de daño: falta severidad o porcentaje', name: 'NivelDanoBloc');
+      return;
+    }
+
+    final nivelDano = _calcularNivelDanoMatriz(state.severidadDanos!, state.porcentajeAfectacion!);
+    emit(state.copyWith(nivelDano: nivelDano));
+    developer.log('Nivel de daño calculado: $nivelDano', name: 'NivelDanoBloc');
+  }
+
+  void _onCalcularSeveridadDanos(CalcularSeveridadDanos event, Emitter<NivelDanoState> emit) {
+    final severidad = _calcularSeveridad(event.condicionesExistentes, event.nivelesElementos);
+    emit(state.copyWith(severidadDanos: severidad));
+    developer.log('Severidad calculada: $severidad', name: 'NivelDanoBloc');
+    
+    // Recalcular el nivel de daño cuando cambie la severidad
+    if (state.porcentajeAfectacion != null) {
+      add(CalcularNivelDano());
+    }
+  }
+
+  void _onSetPorcentajeAfectacion(SetPorcentajeAfectacion event, Emitter<NivelDanoState> emit) {
+    emit(state.copyWith(porcentajeAfectacion: event.porcentaje));
+    developer.log('Porcentaje de afectación actualizado: ${event.porcentaje}', name: 'NivelDanoBloc');
+    
+    // Recalcular el nivel de daño cuando cambie el porcentaje
+    if (state.severidadDanos != null) {
+      add(CalcularNivelDano());
+    }
   }
 } 

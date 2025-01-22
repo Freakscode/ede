@@ -1,4 +1,6 @@
-abstract class EvaluacionDanosEvent {}
+abstract class EvaluacionDanosEvent {
+  const EvaluacionDanosEvent();
+}
 
 class SetCondicionExistente extends EvaluacionDanosEvent {
   final String condicionId;
@@ -19,4 +21,19 @@ class SetAlcanceEvaluacion extends EvaluacionDanosEvent {
   final String? alcanceInterior;
   
   SetAlcanceEvaluacion({this.alcanceExterior, this.alcanceInterior});
+}
+
+class UpdateDanosEstructurales extends EvaluacionDanosEvent {
+  final Map<String, dynamic>? danosEstructurales;
+  const UpdateDanosEstructurales(this.danosEstructurales);
+}
+
+class UpdateDanosNoEstructurales extends EvaluacionDanosEvent {
+  final Map<String, dynamic>? danosNoEstructurales;
+  const UpdateDanosNoEstructurales(this.danosNoEstructurales);
+}
+
+class UpdateDanosGeotecnicos extends EvaluacionDanosEvent {
+  final Map<String, dynamic>? danosGeotecnicos;
+  const UpdateDanosGeotecnicos(this.danosGeotecnicos);
 } 

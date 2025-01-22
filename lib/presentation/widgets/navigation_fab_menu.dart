@@ -14,6 +14,7 @@ class NavigationFabMenu extends StatelessWidget {
     final theme = Theme.of(context);
     
     return FloatingActionButton(
+      heroTag: 'navigation_menu',
       onPressed: () {
         showModalBottomSheet(
           context: context,

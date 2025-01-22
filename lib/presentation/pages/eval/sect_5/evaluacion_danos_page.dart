@@ -254,30 +254,34 @@ class EvaluacionDanosPage extends StatelessWidget {
 
     Color getTextColor() {
       if (!isSelected) return theme.colorScheme.primary.withOpacity(0.7);
-      return Colors.white;
+      return isSelected ? Colors.white : theme.colorScheme.primary;
     }
 
-    return InkWell(
-      onTap: () {
-        context.read<EvaluacionDanosBloc>().add(
-          SetCondicionExistente(key, value),
-        );
-      },
-      borderRadius: BorderRadius.circular(20),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        decoration: BoxDecoration(
-          color: getColor(),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: getBorderColor(),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () {
+          context.read<EvaluacionDanosBloc>().add(
+            SetCondicionExistente(key, value),
+          );
+        },
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            color: getColor(),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: getBorderColor(),
+              width: isSelected ? 2 : 1,
+            ),
           ),
-        ),
-        child: Text(
-          label,
-          style: theme.textTheme.bodyMedium?.copyWith(
-            color: getTextColor(),
-            fontWeight: isSelected ? FontWeight.bold : null,
+          child: Text(
+            label,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: getTextColor(),
+              fontWeight: isSelected ? FontWeight.bold : null,
+            ),
           ),
         ),
       ),
@@ -397,38 +401,42 @@ class EvaluacionDanosPage extends StatelessWidget {
                             runSpacing: 12,
                             children: niveles.map((nivelOption) {
                               final isSelected = nivel == nivelOption;
-                              return InkWell(
-                                onTap: () {
-                                  context.read<EvaluacionDanosBloc>().add(
-                                    SetNivelElemento(entry.key, nivelOption),
-                                  );
-                                },
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                    vertical: 8,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: isSelected
-                                        ? (nivelOption == 'Sin daño' 
-                                            ? theme.colorScheme.surface 
-                                            : _getNivelColor(nivelOption, theme).withOpacity(0.1))
-                                        : theme.colorScheme.surface,
-                                    borderRadius: BorderRadius.circular(20),
-                                    border: Border.all(
-                                      color: isSelected
-                                          ? _getNivelColor(nivelOption, theme)
-                                          : theme.colorScheme.primary.withOpacity(0.2),
-                                      width: isSelected ? 2 : 1,
+                              return Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                  onTap: () {
+                                    context.read<EvaluacionDanosBloc>().add(
+                                      SetNivelElemento(entry.key, nivelOption),
+                                    );
+                                  },
+                                  borderRadius: BorderRadius.circular(20),
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                      vertical: 8,
                                     ),
-                                  ),
-                                  child: Text(
-                                    nivelOption,
-                                    style: theme.textTheme.bodyMedium?.copyWith(
+                                    decoration: BoxDecoration(
                                       color: isSelected
-                                          ? _getNivelColor(nivelOption, theme)
-                                          : theme.colorScheme.primary.withOpacity(0.7),
-                                      fontWeight: isSelected ? FontWeight.bold : null,
+                                          ? (nivelOption == 'Sin daño' 
+                                              ? theme.colorScheme.surface 
+                                              : _getNivelColor(nivelOption, theme).withOpacity(0.1))
+                                          : theme.colorScheme.surface,
+                                      borderRadius: BorderRadius.circular(20),
+                                      border: Border.all(
+                                        color: isSelected
+                                            ? _getNivelColor(nivelOption, theme)
+                                            : theme.colorScheme.primary.withOpacity(0.2),
+                                        width: isSelected ? 2 : 1,
+                                      ),
+                                    ),
+                                    child: Text(
+                                      nivelOption,
+                                      style: theme.textTheme.bodyMedium?.copyWith(
+                                        color: isSelected
+                                            ? _getNivelColor(nivelOption, theme)
+                                            : theme.colorScheme.primary.withOpacity(0.7),
+                                        fontWeight: isSelected ? FontWeight.bold : null,
+                                      ),
                                     ),
                                   ),
                                 ),

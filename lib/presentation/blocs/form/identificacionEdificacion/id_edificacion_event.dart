@@ -47,7 +47,8 @@ class SetTelefonoContacto extends EdificacionEvent {
 
 class SetEmailContacto extends EdificacionEvent {
   final String email;
-  SetEmailContacto(this.email);
+  final BuildContext context;
+  SetEmailContacto(this.email, this.context);
 }
 
 class SetOcupacion extends EdificacionEvent {
@@ -62,8 +63,13 @@ class LoadTemporaryData extends EdificacionEvent {
 class SetCoordenadas extends EdificacionEvent {
   final double latitud;
   final double longitud;
+  final BuildContext context;
   
-  SetCoordenadas({required this.latitud, required this.longitud});
+  SetCoordenadas({
+    required this.latitud, 
+    required this.longitud,
+    required this.context
+  });
 }
 
 class SetNumeroVia extends EdificacionEvent {
@@ -123,5 +129,54 @@ class SetDepartamento extends EdificacionEvent {
 
 class SetMunicipio extends EdificacionEvent {
   final String municipio;
-  SetMunicipio(this.municipio);
+  final BuildContext context;
+  SetMunicipio(this.municipio, this.context);
+}
+
+class SetLatitud extends EdificacionEvent {
+  final String latitud;
+
+  SetLatitud(this.latitud);
+
+  @override
+  List<Object> get props => [latitud];
+}
+
+class SetLongitud extends EdificacionEvent {
+  final String longitud;
+
+  SetLongitud(this.longitud);
+
+  @override
+  List<Object> get props => [longitud];
+}
+
+abstract class IdEdificacionEvent {}
+
+class UpdateIdEdificacion extends IdEdificacionEvent {
+  final String? calle;
+  final String? numero;
+  final String? colonia;
+  final String? codigoPostal;
+  final String? referencias;
+  final String? comuna;
+  final String? barrio;
+  final String? codigoCatastral;
+  final String? nombreContacto;
+  final String? telefonoContacto;
+  final String? emailContacto;
+
+  UpdateIdEdificacion({
+    this.calle,
+    this.numero,
+    this.colonia,
+    this.codigoPostal,
+    this.referencias,
+    this.comuna,
+    this.barrio,
+    this.codigoCatastral,
+    this.nombreContacto,
+    this.telefonoContacto,
+    this.emailContacto,
+  });
 } 

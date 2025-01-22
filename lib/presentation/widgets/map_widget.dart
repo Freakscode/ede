@@ -97,6 +97,7 @@ class MapWidgetState extends State<MapWidget> {
     context.read<EdificacionBloc>().add(SetCoordenadas(
       latitud: position.latitude,
       longitud: position.longitude,
+      context: context,
     ));
   }
 

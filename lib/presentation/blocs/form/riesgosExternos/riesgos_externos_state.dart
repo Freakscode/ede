@@ -1,11 +1,14 @@
-class RiesgosExternosState {
+import 'package:equatable/equatable.dart';
+
+/// Represents the state of external risks assessment
+class RiesgosExternosState extends Equatable {
   final Map<String, RiesgoItem> riesgos;
   final String? otroRiesgo;
 
-  RiesgosExternosState({
+  const RiesgosExternosState({
     Map<String, RiesgoItem>? riesgos,
     this.otroRiesgo,
-  }) : riesgos = riesgos ?? {
+  }) : riesgos = riesgos ?? const {
     '4.1': RiesgoItem(),
     '4.2': RiesgoItem(),
     '4.3': RiesgoItem(),
@@ -13,6 +16,15 @@ class RiesgosExternosState {
     '4.5': RiesgoItem(),
     '4.6': RiesgoItem(),
   };
+
+  factory RiesgosExternosState.fromJson(Map<String, dynamic> json) {
+    return RiesgosExternosState(
+      riesgos: (json['riesgos'] as Map<String, dynamic>?)?.map(
+        (key, value) => MapEntry(key, RiesgoItem.fromJson(value as Map<String, dynamic>)),
+      ) ?? {},
+      otroRiesgo: json['otroRiesgo'] as String?,
+    );
+  }
 
   RiesgosExternosState copyWith({
     Map<String, RiesgoItem>? riesgos,
@@ -25,25 +37,36 @@ class RiesgosExternosState {
   }
 
   Map<String, dynamic> toJson() => {
-    'riesgos': riesgos.map((key, value) => MapEntry(key, {
-      'existeRiesgo': value.existeRiesgo,
-      'comprometeAccesos': value.comprometeAccesos,
-      'comprometeEstabilidad': value.comprometeEstabilidad,
-    })),
+    'riesgos': riesgos.map((key, value) => MapEntry(key, value.toJson())),
     'otroRiesgo': otroRiesgo,
   };
+
+  @override
+  List<Object?> get props => [riesgos, otroRiesgo];
+
+  // Add initial state constant
+  static final RiesgosExternosState initial = RiesgosExternosState();
 }
 
-class RiesgoItem {
-  final bool existeRiesgo;            // Columna a)
-  final bool comprometeAccesos;       // Columna b)
-  final bool comprometeEstabilidad;   // Columna c)
+/// Represents an individual risk item with its assessment details
+class RiesgoItem extends Equatable {
+  final bool existeRiesgo;
+  final bool comprometeAccesos;
+  final bool comprometeEstabilidad;
 
-  RiesgoItem({
+  const RiesgoItem({
     this.existeRiesgo = false,
     this.comprometeAccesos = false,
     this.comprometeEstabilidad = false,
   });
+
+  factory RiesgoItem.fromJson(Map<String, dynamic> json) {
+    return RiesgoItem(
+      existeRiesgo: json['existeRiesgo'] as bool? ?? false,
+      comprometeAccesos: json['comprometeAccesos'] as bool? ?? false,
+      comprometeEstabilidad: json['comprometeEstabilidad'] as bool? ?? false,
+    );
+  }
 
   RiesgoItem copyWith({
     bool? existeRiesgo,
@@ -56,4 +79,17 @@ class RiesgoItem {
       comprometeEstabilidad: comprometeEstabilidad ?? this.comprometeEstabilidad,
     );
   }
-} 
+
+  @override
+  List<Object> get props => [
+        existeRiesgo,
+        comprometeAccesos,
+        comprometeEstabilidad,
+      ];
+
+  Map<String, dynamic> toJson() => {
+    'existeRiesgo': existeRiesgo,
+    'comprometeAccesos': comprometeAccesos,
+    'comprometeEstabilidad': comprometeEstabilidad,
+  };
+}

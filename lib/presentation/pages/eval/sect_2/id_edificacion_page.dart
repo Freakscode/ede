@@ -37,36 +37,55 @@ class _EdificacionPageState extends State<EdificacionPage>
   final _formKey = GlobalKey<FormState>();
 
   // Controllers para Datos Generales
-  final _nombreEdificacionController = TextEditingController();
-  final _direccionController = TextEditingController();
-  final _comunaController = TextEditingController();
-  final _barrioController = TextEditingController();
-  final _codigoBarrioController = TextEditingController();
-
-  // Controllers para Identificación Catastral
-  final _cbmlController = TextEditingController();
-
-  // Controllers para Persona de Contacto
-  final _nombreContactoController = TextEditingController();
-  final _telefonoController = TextEditingController();
-  final _emailController = TextEditingController();
-  final _ocupacionController = TextEditingController();
+  late TextEditingController _nombreEdificacionController;
+  late TextEditingController _direccionController;
+  late TextEditingController _codigoBarrioController;
+  late TextEditingController _cbmlController;
+  late TextEditingController _ocupacionController;
+  late TextEditingController _latitudController;
+  late TextEditingController _longitudController;
+  late TextEditingController _tipoViaController;
+  late TextEditingController _numeroViaController;
+  late TextEditingController _apendiceViaController;
+  late TextEditingController _orientacionViaController;
+  late TextEditingController _numeroCruceController;
+  late TextEditingController _apendiceCruceController;
+  late TextEditingController _orientacionCruceController;
+  late TextEditingController _numeroController;
+  late TextEditingController _complementoController;
+  late TextEditingController _departamentoController;
+  late TextEditingController _municipioController;
+  late TextEditingController _comunaController;
+  late TextEditingController _nombreContactoController;
+  late TextEditingController _telefonoContactoController;
+  late TextEditingController _emailContactoController;
 
   TipoIdentificacion _tipoIdentificacion = TipoIdentificacion.medellin;
   LatLng? _selectedPosition;
   GoogleMapController? _mapController;
 
-  // Timers para debounce
+  // Debouncers para los campos de texto
   Timer? _nombreEdificacionDebouncer;
   Timer? _direccionDebouncer;
-  Timer? _comunaDebouncer;
-  Timer? _barrioDebouncer;
   Timer? _codigoBarrioDebouncer;
   Timer? _cbmlDebouncer;
-  Timer? _nombreContactoDebouncer;
-  Timer? _telefonoDebouncer;
-  Timer? _emailDebouncer;
   Timer? _ocupacionDebouncer;
+  Timer? _latitudDebouncer;
+  Timer? _longitudDebouncer;
+  Timer? _tipoViaDebouncer;
+  Timer? _numeroViaDebouncer;
+  Timer? _apendiceViaDebouncer;
+  Timer? _orientacionViaDebouncer;
+  Timer? _numeroCruceDebouncer;
+  Timer? _apendiceCruceDebouncer;
+  Timer? _orientacionCruceDebouncer;
+  Timer? _numeroDebouncer;
+  Timer? _complementoDebouncer;
+  Timer? _departamentoDebouncer;
+  Timer? _municipioDebouncer;
+  Timer? _nombreContactoDebouncer;
+  Timer? _telefonoContactoDebouncer;
+  Timer? _emailContactoDebouncer;
 
   String? _selectedDepartamento;
   String? _selectedMunicipio;
@@ -76,54 +95,192 @@ class _EdificacionPageState extends State<EdificacionPage>
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
     
+    _nombreEdificacionController = TextEditingController();
+    _direccionController = TextEditingController();
+    _codigoBarrioController = TextEditingController();
+    _cbmlController = TextEditingController();
+    _ocupacionController = TextEditingController();
+    _latitudController = TextEditingController();
+    _longitudController = TextEditingController();
+    _tipoViaController = TextEditingController();
+    _numeroViaController = TextEditingController();
+    _apendiceViaController = TextEditingController();
+    _orientacionViaController = TextEditingController();
+    _numeroCruceController = TextEditingController();
+    _apendiceCruceController = TextEditingController();
+    _orientacionCruceController = TextEditingController();
+    _numeroController = TextEditingController();
+    _complementoController = TextEditingController();
+    _departamentoController = TextEditingController();
+    _municipioController = TextEditingController();
+    _comunaController = TextEditingController();
+    _nombreContactoController = TextEditingController();
+    _telefonoContactoController = TextEditingController();
+    _emailContactoController = TextEditingController();
+
+    // Agregar listeners para actualizar el estado cuando cambien los valores
+    _nombreEdificacionController.addListener(() {
+      context.read<EdificacionBloc>().add(
+        SetNombreEdificacion(_nombreEdificacionController.text),
+      );
+    });
+
+    _tipoViaController.addListener(() {
+      context.read<EdificacionBloc>().add(
+        SetTipoVia(_tipoViaController.text),
+      );
+    });
+
+    _numeroViaController.addListener(() {
+      context.read<EdificacionBloc>().add(
+        SetNumeroVia(_numeroViaController.text),
+      );
+    });
+
+    _apendiceViaController.addListener(() {
+      context.read<EdificacionBloc>().add(
+        SetApendiceVia(_apendiceViaController.text),
+      );
+    });
+
+    _orientacionViaController.addListener(() {
+      context.read<EdificacionBloc>().add(
+        SetOrientacionVia(_orientacionViaController.text, context),
+      );
+    });
+
+    _numeroCruceController.addListener(() {
+      context.read<EdificacionBloc>().add(
+        SetNumeroCruce(_numeroCruceController.text),
+      );
+    });
+
+    _apendiceCruceController.addListener(() {
+      context.read<EdificacionBloc>().add(
+        SetApendiceCruce(_apendiceCruceController.text),
+      );
+    });
+
+    _orientacionCruceController.addListener(() {
+      context.read<EdificacionBloc>().add(
+        SetOrientacionCruce(_orientacionCruceController.text, context),
+      );
+    });
+
+    _numeroController.addListener(() {
+      context.read<EdificacionBloc>().add(
+        SetNumero(_numeroController.text),
+      );
+    });
+
+    _complementoController.addListener(() {
+      context.read<EdificacionBloc>().add(
+        SetComplemento(_complementoController.text),
+      );
+    });
+
+    _departamentoController.addListener(() {
+      context.read<EdificacionBloc>().add(
+        SetDepartamento(_departamentoController.text),
+      );
+    });
+
+    _municipioController.addListener(() {
+      context.read<EdificacionBloc>().add(
+        SetMunicipio(_municipioController.text, context),
+      );
+    });
+
     // Cargar datos del estado inmediatamente
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final state = context.read<EdificacionBloc>().state;
       
       setState(() {
-        // Si no hay valores en el estado, usar Antioquia y Medellín como default
         _selectedDepartamento = state.departamento ?? 'Antioquia';
-        _selectedMunicipio = state.municipio ?? 'Medellín';
+        if (_selectedDepartamento != null) {
+          final departamento = departamentosColombia.firstWhere(
+            (d) => d.nombre == _selectedDepartamento,
+            orElse: () => departamentosColombia.first,
+          );
+          _selectedMunicipio = state.municipio ?? departamento.municipios.first;
+        }
       });
 
       // Cargar el resto de los datos
-      _loadDataFromState(state);
+      _loadDataFromState();
 
       // Si los valores por defecto fueron usados, actualizar el bloc
       if (state.departamento == null || state.municipio == null) {
         context.read<EdificacionBloc>()
           ..add(SetDepartamento(_selectedDepartamento!))
-          ..add(SetMunicipio(_selectedMunicipio!));
+          ..add(SetMunicipio(_selectedMunicipio!, context));
       }
     });
   }
 
-  void _loadDataFromState(EdificacionState state) {
-    // Cargar nombre de edificación
-    if (state.nombreEdificacion?.isNotEmpty ?? false) {
+  void _loadDataFromState() {
+    final state = context.read<EdificacionBloc>().state;
+    if (state.nombreEdificacion != null && state.nombreEdificacion!.isNotEmpty) {
       _nombreEdificacionController.text = state.nombreEdificacion!;
     }
-
-    // Cargar comuna solo si existe y corresponde a Medellín
-    if (state.comuna?.isNotEmpty ?? false) {
-      _comunaController.text = state.comuna!;
-    }
-
-    // Cargar el resto de los campos...
-    if (state.direccion?.isNotEmpty ?? false) {
+    if (state.direccion != null && state.direccion!.isNotEmpty) {
       _direccionController.text = state.direccion!;
     }
-    if (state.barrio?.isNotEmpty ?? false) {
-      _barrioController.text = state.barrio!;
+    if (state.tipoVia != null && state.tipoVia!.isNotEmpty) {
+      _tipoViaController.text = state.tipoVia!;
     }
-    // ... resto del código de carga de datos ...
+    if (state.numeroVia != null && state.numeroVia!.isNotEmpty) {
+      _numeroViaController.text = state.numeroVia!;
+    }
+    if (state.apendiceVia != null && state.apendiceVia!.isNotEmpty) {
+      _apendiceViaController.text = state.apendiceVia!;
+    }
+    if (state.orientacionVia != null && state.orientacionVia!.isNotEmpty) {
+      _orientacionViaController.text = state.orientacionVia!;
+    }
+    if (state.numeroCruce != null && state.numeroCruce!.isNotEmpty) {
+      _numeroCruceController.text = state.numeroCruce!;
+    }
+    if (state.apendiceCruce != null && state.apendiceCruce!.isNotEmpty) {
+      _apendiceCruceController.text = state.apendiceCruce!;
+    }
+    if (state.orientacionCruce != null && state.orientacionCruce!.isNotEmpty) {
+      _orientacionCruceController.text = state.orientacionCruce!;
+    }
+    if (state.numero != null && state.numero!.isNotEmpty) {
+      _numeroController.text = state.numero!;
+    }
+    if (state.complemento != null && state.complemento!.isNotEmpty) {
+      _complementoController.text = state.complemento!;
+    }
+    if (state.departamento != null && state.departamento!.isNotEmpty) {
+      _departamentoController.text = state.departamento!;
+    }
+    if (state.municipio != null && state.municipio!.isNotEmpty) {
+      _municipioController.text = state.municipio!;
+    }
+    if (state.comuna != null && state.comuna!.isNotEmpty) {
+      _comunaController.text = state.comuna!;
+    }
+    if (state.nombreContacto != null && state.nombreContacto!.isNotEmpty) {
+      _nombreContactoController.text = state.nombreContacto!;
+    }
+    if (state.telefonoContacto != null && state.telefonoContacto!.isNotEmpty) {
+      _telefonoContactoController.text = state.telefonoContacto!;
+    }
+    if (state.emailContacto != null && state.emailContacto!.isNotEmpty) {
+      _emailContactoController.text = state.emailContacto!;
+    }
+    if (state.ocupacion != null && state.ocupacion!.isNotEmpty) {
+      _ocupacionController.text = state.ocupacion!;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return BlocListener<EdificacionBloc, EdificacionState>(
       listener: (context, state) {
-        _loadDataFromState(state);
+        _loadDataFromState();
       },
       child: Scaffold(
         appBar: AppBar(
@@ -213,7 +370,7 @@ class _EdificacionPageState extends State<EdificacionPage>
                     ),
                     SingleChildScrollView(
                       padding: const EdgeInsets.all(16.0),
-                      child: _buildPersonaContacto(context),
+                      child: _buildContacto(),
                     ),
                   ],
                 ),
@@ -228,6 +385,7 @@ class _EdificacionPageState extends State<EdificacionPage>
 
   Widget _buildDatosGenerales(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _buildTextField(
           controller: _nombreEdificacionController,
@@ -269,15 +427,16 @@ class _EdificacionPageState extends State<EdificacionPage>
                   if (value != null) {
                     setState(() {
                       _selectedDepartamento = value;
-                      // Resetear municipio cuando cambia el departamento
-                      _selectedMunicipio = departamentosColombia
-                          .firstWhere((d) => d.nombre == value)
-                          .municipios
-                          .first;
+                      final departamento = departamentosColombia.firstWhere(
+                        (d) => d.nombre == value,
+                      );
+                      _selectedMunicipio = departamento.municipios.first;
+                      _comunaController.clear(); // Limpiar comuna al cambiar departamento
                     });
                     // Actualizar el bloc
-                    context.read<EdificacionBloc>().add(SetDepartamento(value));
-                    context.read<EdificacionBloc>().add(SetMunicipio(_selectedMunicipio!));
+                    context.read<EdificacionBloc>()
+                      ..add(SetDepartamento(value))
+                      ..add(SetMunicipio(_selectedMunicipio!, context));
                   }
                 },
                 validator: (value) {
@@ -318,9 +477,10 @@ class _EdificacionPageState extends State<EdificacionPage>
                   if (value != null) {
                     setState(() {
                       _selectedMunicipio = value;
+                      _comunaController.clear(); // Limpiar comuna al cambiar municipio
                     });
                     // Actualizar el bloc
-                    context.read<EdificacionBloc>().add(SetMunicipio(value));
+                    context.read<EdificacionBloc>().add(SetMunicipio(value, context));
                   }
                 },
                 validator: (value) {
@@ -334,17 +494,17 @@ class _EdificacionPageState extends State<EdificacionPage>
           ],
         ),
         const SizedBox(height: 16),
-        _selectedDepartamento == 'Antioquia' && _selectedMunicipio == 'Medellín'
-          ? DropdownButtonFormField<String>(
-              isExpanded: true,
-              menuMaxHeight: 300,
-              decoration: const InputDecoration(
-                labelText: 'Comuna o Corregimiento',
-                border: OutlineInputBorder(),
-                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-              ),
-              value: _comunaController.text.isEmpty ? null : _comunaController.text,
-              items: departamentosColombia
+        if (_selectedDepartamento == 'Antioquia' && _selectedMunicipio == 'Medellín')
+          DropdownButtonFormField<String>(
+            isExpanded: true,
+            menuMaxHeight: 300,
+            decoration: const InputDecoration(
+              labelText: 'Comuna o Corregimiento',
+              border: OutlineInputBorder(),
+              contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+            ),
+            value: _comunaController.text.isEmpty ? null : _comunaController.text,
+            items: departamentosColombia
                 .firstWhere((d) => d.nombre == 'Antioquia')
                 .comunasCorregimientos?['Medellín']
                 ?.map((String value) {
@@ -357,40 +517,44 @@ class _EdificacionPageState extends State<EdificacionPage>
                     ),
                   );
                 }).toList() ?? [],
-              onChanged: (value) {
-                if (value != null) {
+            onChanged: (value) {
+              if (value != null) {
+                setState(() {
                   _comunaController.text = value;
+                });
+                context.read<EdificacionBloc>().add(SetComuna(value));
+              }
+            },
+            validator: (value) {
+              if (_selectedDepartamento == 'Antioquia' && 
+                  _selectedMunicipio == 'Medellín' && 
+                  (value == null || value.isEmpty)) {
+                return 'Por favor seleccione una comuna o corregimiento';
+              }
+              return null;
+            },
+          )
+        else
+          TextFormField(
+            controller: _comunaController,
+            decoration: const InputDecoration(
+              labelText: 'Comuna o Corregimiento',
+              border: OutlineInputBorder(),
+            ),
+            onChanged: (value) {
+              if (_municipioDebouncer?.isActive ?? false) _municipioDebouncer?.cancel();
+              _municipioDebouncer = Timer(const Duration(milliseconds: 500), () {
+                if (mounted) {
                   context.read<EdificacionBloc>().add(SetComuna(value));
                 }
-              },
-              validator: (value) {
-                if (_selectedDepartamento == 'Antioquia' && 
-                    _selectedMunicipio == 'Medellín' && 
-                    (value == null || value.isEmpty)) {
-                  return 'Por favor seleccione una comuna o corregimiento';
-                }
-                return null;
-              },
-            )
-          : TextFormField(
-              controller: _comunaController,
-              decoration: const InputDecoration(
-                labelText: 'Comuna',
-                border: OutlineInputBorder(),
-              ),
-              onChanged: (value) {
-                _debounce(_comunaDebouncer, () {
-                  if (mounted) {
-                    context.read<EdificacionBloc>().add(SetComuna(value));
-                  }
-                });
-              },
-            ),
+              });
+            },
+          ),
         const SizedBox(height: 16),
         _buildTextField(
-          controller: _barrioController,
+          controller: _codigoBarrioController,
           label: 'Barrio',
-          debouncer: _barrioDebouncer,
+          debouncer: _codigoBarrioDebouncer,
           onChanged: (value) => context.read<EdificacionBloc>().add(SetBarrio(value)),
         ),
       ],
@@ -458,201 +622,381 @@ class _EdificacionPageState extends State<EdificacionPage>
           ],
         ),
         const SizedBox(height: 16),
-        TextFormField(
-          controller: _cbmlController,
-          decoration: InputDecoration(
-            labelText: _tipoIdentificacion == TipoIdentificacion.medellin
-                ? 'Código Catastral'
-                : 'Código Catastral',
-            border: const OutlineInputBorder(),
-          ),
-          onChanged: (value) {
-            _debounce(_cbmlDebouncer, () {
-              if (mounted) {
-                context.read<EdificacionBloc>().add(SetCBML(value));
-              }
-            });
-          },
-          validator: (value) {
-            if (value?.isEmpty ?? true) {
-              return 'Este campo es requerido';
-            }
-            return null;
-          },
-        ),
-      ],
-    );
-  }
-
-  Widget _buildPersonaContacto(BuildContext context) {
-    return Column(
-      children: [
-        TextFormField(
-          controller: _nombreContactoController,
-          decoration: const InputDecoration(
-            labelText: 'Nombre del Contacto',
-            border: OutlineInputBorder(),
-          ),
-          onChanged: (value) {
-            _debounce(_nombreContactoDebouncer, () {
-              if (mounted) {
-                context.read<EdificacionBloc>().add(SetNombreContacto(value));
-              }
-            });
-          },
-          validator: (value) {
-            if (value?.isEmpty ?? true) {
-              return 'Este campo es requerido';
-            }
-            return null;
-          },
-        ),
-        const SizedBox(height: 16),
-        TextFormField(
-          controller: _telefonoController,
-          decoration: const InputDecoration(
-            labelText: 'Teléfono',
-            border: OutlineInputBorder(),
-          ),
-          keyboardType: TextInputType.phone,
-          onChanged: (value) {
-            _debounce(_telefonoDebouncer, () {
-              if (mounted) {
-                context.read<EdificacionBloc>().add(SetTelefonoContacto(value));
-              }
-            });
-          },
-        ),
-        const SizedBox(height: 16),
-        TextFormField(
-          controller: _emailController,
-          decoration: const InputDecoration(
-            labelText: 'Email',
-            border: OutlineInputBorder(),
-          ),
-          keyboardType: TextInputType.emailAddress,
-          onChanged: (value) {
-            _debounce(_emailDebouncer, () {
-              if (mounted) {
-                context.read<EdificacionBloc>().add(SetEmailContacto(value));
-              }
-            });
-          },
-        ),
-        const SizedBox(height: 16),
         Card(
-          elevation: 2,
+          elevation: 4,
+          shadowColor: Theme.of(context).colorScheme.primary.withOpacity(0.2),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(12),
+            side: BorderSide(
+              color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+              width: 1,
+            ),
           ),
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Tipo de Ocupante',
-                  style: Theme.of(context).textTheme.titleMedium,
+                Row(
+                  children: [
+                    Icon(
+                      Icons.domain,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Identificación Catastral',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 16),
-                BlocBuilder<EdificacionBloc, EdificacionState>(
-                  builder: (context, state) {
-                    return Column(
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  context.read<EdificacionBloc>().add(
-                                    SetOcupacion('Propietario'),
-                                  );
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: state.ocupacion == 'Propietario'
-                                      ? Theme.of(context).colorScheme.secondary
-                                      : Theme.of(context).colorScheme.surface,
-                                  foregroundColor: Theme.of(context).colorScheme.primary,
-                                  side: BorderSide(
-                                    color: Theme.of(context).colorScheme.primary,
-                                    width: 1,
-                                  ),
-                                  elevation: 0,
-                                  padding: const EdgeInsets.symmetric(vertical: 12),
-                                ),
-                                child: const Text('Propietario'),
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  context.read<EdificacionBloc>().add(
-                                    SetOcupacion('Inquilino'),
-                                  );
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: state.ocupacion == 'Inquilino'
-                                      ? Theme.of(context).colorScheme.secondary
-                                      : Theme.of(context).colorScheme.surface,
-                                  foregroundColor: Theme.of(context).colorScheme.primary,
-                                  side: BorderSide(
-                                    color: Theme.of(context).colorScheme.primary,
-                                    width: 1,
-                                  ),
-                                  elevation: 0,
-                                  padding: const EdgeInsets.symmetric(vertical: 12),
-                                ),
-                                child: const Text('Inquilino'),
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  context.read<EdificacionBloc>().add(
-                                    SetOcupacion('Otro'),
-                                  );
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: state.ocupacion == 'Otro'
-                                      ? Theme.of(context).colorScheme.secondary
-                                      : Theme.of(context).colorScheme.surface,
-                                  foregroundColor: Theme.of(context).colorScheme.primary,
-                                  side: BorderSide(
-                                    color: Theme.of(context).colorScheme.primary,
-                                    width: 1,
-                                  ),
-                                  elevation: 0,
-                                  padding: const EdgeInsets.symmetric(vertical: 12),
-                                ),
-                                child: const Text('Otro'),
-                              ),
-                            ),
-                          ],
-                        ),
-                        if (state.ocupacion == 'Otro') ...[
-                          const SizedBox(height: 16),
-                          TextFormField(
-                            controller: _ocupacionController,
-                            decoration: const InputDecoration(
-                              labelText: 'Especifique',
-                              border: OutlineInputBorder(),
-                            ),
-                            onChanged: (value) {
-                              _debounce(_ocupacionDebouncer, () {
-                                if (mounted) {
-                                  context.read<EdificacionBloc>().add(
-                                    SetOcupacion('Otro: $value'),
-                                  );
-                                }
-                              });
-                            },
-                          ),
-                        ],
-                      ],
-                    );
+                TextFormField(
+                  controller: _cbmlController,
+                  decoration: InputDecoration(
+                    labelText: _tipoIdentificacion == TipoIdentificacion.medellin
+                        ? 'Código Catastral (11 dígitos)'
+                        : 'Código Catastral (19 dígitos)',
+                    border: const OutlineInputBorder(),
+                    helperText: _tipoIdentificacion == TipoIdentificacion.medellin
+                        ? 'Ingrese los 11 dígitos del código catastral'
+                        : 'Ingrese los 19 dígitos del código catastral',
+                  ),
+                  keyboardType: TextInputType.number,
+                  maxLength: _tipoIdentificacion == TipoIdentificacion.medellin ? 11 : 19,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.digitsOnly,
+                  ],
+                  onChanged: (value) {
+                    _debounce(_cbmlDebouncer, () {
+                      if (mounted) {
+                        context.read<EdificacionBloc>().add(SetCBML(value));
+                      }
+                    });
                   },
+                  validator: (value) {
+                    if (value?.isEmpty ?? true) {
+                      return 'Este campo es requerido';
+                    }
+                    if (_tipoIdentificacion == TipoIdentificacion.medellin && value!.length != 11) {
+                      return 'El código debe tener 11 dígitos';
+                    }
+                    if (_tipoIdentificacion == TipoIdentificacion.areaMetropolitana && value!.length != 19) {
+                      return 'El código debe tener 19 dígitos';
+                    }
+                    return null;
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 24),
+        Card(
+          elevation: 4,
+          shadowColor: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+            side: BorderSide(
+              color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+              width: 1,
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      Icons.location_on,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Coordenadas GPS',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextFormField(
+                        controller: _latitudController,
+                        decoration: const InputDecoration(
+                          labelText: 'Latitud',
+                          border: OutlineInputBorder(),
+                          prefixText: '+',
+                          helperText: 'Formato: XX.XXX',
+                        ),
+                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        inputFormatters: [
+                          FilteringTextInputFormatter.allow(RegExp(r'^\d{0,2}\.?\d{0,3}$')),
+                        ],
+                        onChanged: (value) {
+                          _debounce(_latitudDebouncer, () {
+                            if (mounted) {
+                              context.read<EdificacionBloc>().add(SetLatitud(value));
+                            }
+                          });
+                        },
+                        validator: (value) {
+                          if (value?.isEmpty ?? true) {
+                            return 'Este campo es requerido';
+                          }
+                          final lat = double.tryParse(value!);
+                          if (lat == null || lat < 0 || lat > 90) {
+                            return 'Latitud inválida';
+                          }
+                          return null;
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: TextFormField(
+                        controller: _longitudController,
+                        decoration: const InputDecoration(
+                          labelText: 'Longitud',
+                          border: OutlineInputBorder(),
+                          prefixText: '-',
+                          helperText: 'Formato: XX.XXX',
+                        ),
+                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        inputFormatters: [
+                          FilteringTextInputFormatter.allow(RegExp(r'^\d{0,2}\.?\d{0,3}$')),
+                        ],
+                        onChanged: (value) {
+                          _debounce(_longitudDebouncer, () {
+                            if (mounted) {
+                              context.read<EdificacionBloc>().add(SetLongitud(value));
+                            }
+                          });
+                        },
+                        validator: (value) {
+                          if (value?.isEmpty ?? true) {
+                            return 'Este campo es requerido';
+                          }
+                          final lon = double.tryParse(value!);
+                          if (lon == null || lon < 0 || lon > 90) {
+                            return 'Longitud inválida';
+                          }
+                          return null;
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildContacto() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Card(
+          elevation: 4,
+          shadowColor: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+            side: BorderSide(
+              color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+              width: 1,
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      Icons.person,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Persona de contacto',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                // Nombre
+                _buildTextField(
+                  controller: _nombreContactoController,
+                  label: 'Nombre',
+                  debouncer: _nombreContactoDebouncer,
+                  onChanged: (value) => context.read<EdificacionBloc>().add(SetNombreContacto(value)),
+                  validator: (value) {
+                    if (value?.isEmpty ?? true) {
+                      return 'Este campo es requerido';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+                // Teléfono
+                _buildTextField(
+                  controller: _telefonoContactoController,
+                  label: 'Teléfono',
+                  debouncer: _telefonoContactoDebouncer,
+                  onChanged: (value) => context.read<EdificacionBloc>().add(SetTelefonoContacto(value)),
+                  keyboardType: TextInputType.phone,
+                  validator: (value) {
+                    if (value?.isEmpty ?? true) {
+                      return 'Este campo es requerido';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+                // Email
+                _buildTextField(
+                  controller: _emailContactoController,
+                  label: 'E-mail',
+                  debouncer: _emailContactoDebouncer,
+                  onChanged: (value) => context.read<EdificacionBloc>().add(SetEmailContacto(value, context)),
+                  keyboardType: TextInputType.emailAddress,
+                ),
+                const SizedBox(height: 16),
+                // Tipo de ocupante
+                Text(
+                  'Tipo de ocupante:',
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 16.0,
+                  children: [
+                    ChoiceChip(
+                      label: const Text('Propietario'),
+                      selected: _ocupacionController.text == 'Propietario',
+                      selectedColor: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+                      backgroundColor: Theme.of(context).colorScheme.surface,
+                      labelStyle: TextStyle(
+                        color: _ocupacionController.text == 'Propietario'
+                            ? Theme.of(context).colorScheme.primary
+                            : Theme.of(context).colorScheme.onSurface,
+                        fontWeight: _ocupacionController.text == 'Propietario'
+                            ? FontWeight.bold
+                            : FontWeight.normal,
+                      ),
+                      onSelected: (selected) {
+                        if (selected) {
+                          setState(() {
+                            _ocupacionController.text = 'Propietario';
+                          });
+                          context.read<EdificacionBloc>().add(SetOcupacion('Propietario'));
+                        }
+                      },
+                    ),
+                    ChoiceChip(
+                      label: const Text('Inquilino'),
+                      selected: _ocupacionController.text == 'Inquilino',
+                      selectedColor: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+                      backgroundColor: Theme.of(context).colorScheme.surface,
+                      labelStyle: TextStyle(
+                        color: _ocupacionController.text == 'Inquilino'
+                            ? Theme.of(context).colorScheme.primary
+                            : Theme.of(context).colorScheme.onSurface,
+                        fontWeight: _ocupacionController.text == 'Inquilino'
+                            ? FontWeight.bold
+                            : FontWeight.normal,
+                      ),
+                      onSelected: (selected) {
+                        if (selected) {
+                          setState(() {
+                            _ocupacionController.text = 'Inquilino';
+                          });
+                          context.read<EdificacionBloc>().add(SetOcupacion('Inquilino'));
+                        }
+                      },
+                    ),
+                    ChoiceChip(
+                      label: const Text('Otro'),
+                      selected: _ocupacionController.text != 'Propietario' && 
+                               _ocupacionController.text != 'Inquilino' &&
+                               _ocupacionController.text.isNotEmpty,
+                      selectedColor: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+                      backgroundColor: Theme.of(context).colorScheme.surface,
+                      labelStyle: TextStyle(
+                        color: (_ocupacionController.text != 'Propietario' && 
+                               _ocupacionController.text != 'Inquilino' &&
+                               _ocupacionController.text.isNotEmpty)
+                            ? Theme.of(context).colorScheme.primary
+                            : Theme.of(context).colorScheme.onSurface,
+                        fontWeight: (_ocupacionController.text != 'Propietario' && 
+                                   _ocupacionController.text != 'Inquilino' &&
+                                   _ocupacionController.text.isNotEmpty)
+                            ? FontWeight.bold
+                            : FontWeight.normal,
+                      ),
+                      onSelected: (selected) {
+                        if (selected) {
+                          showDialog(
+                            context: context,
+                            builder: (context) {
+                              final otroController = TextEditingController(
+                                text: _ocupacionController.text != 'Propietario' && 
+                                     _ocupacionController.text != 'Inquilino'
+                                    ? _ocupacionController.text
+                                    : ''
+                              );
+                              return AlertDialog(
+                                title: const Text('Especifique'),
+                                content: TextField(
+                                  controller: otroController,
+                                  decoration: const InputDecoration(
+                                    labelText: 'Tipo de ocupante',
+                                    border: OutlineInputBorder(),
+                                  ),
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(context),
+                                    child: const Text('Cancelar'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      if (otroController.text.isNotEmpty) {
+                                        setState(() {
+                                          _ocupacionController.text = otroController.text;
+                                        });
+                                        context.read<EdificacionBloc>().add(SetOcupacion(otroController.text));
+                                        Navigator.pop(context);
+                                      }
+                                    },
+                                    child: const Text('Aceptar'),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        }
+                      },
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -728,43 +1072,65 @@ class _EdificacionPageState extends State<EdificacionPage>
   void dispose() {
     _nombreEdificacionDebouncer?.cancel();
     _direccionDebouncer?.cancel();
-    _comunaDebouncer?.cancel();
-    _barrioDebouncer?.cancel();
     _codigoBarrioDebouncer?.cancel();
     _cbmlDebouncer?.cancel();
-    _nombreContactoDebouncer?.cancel();
-    _telefonoDebouncer?.cancel();
-    _emailDebouncer?.cancel();
     _ocupacionDebouncer?.cancel();
-    
+    _latitudDebouncer?.cancel();
+    _longitudDebouncer?.cancel();
+    _tipoViaDebouncer?.cancel();
+    _numeroViaDebouncer?.cancel();
+    _apendiceViaDebouncer?.cancel();
+    _orientacionViaDebouncer?.cancel();
+    _numeroCruceDebouncer?.cancel();
+    _apendiceCruceDebouncer?.cancel();
+    _orientacionCruceDebouncer?.cancel();
+    _numeroDebouncer?.cancel();
+    _complementoDebouncer?.cancel();
+    _departamentoDebouncer?.cancel();
+    _municipioDebouncer?.cancel();
+    _nombreContactoDebouncer?.cancel();
+    _telefonoContactoDebouncer?.cancel();
+    _emailContactoDebouncer?.cancel();
+
     _nombreEdificacionController.dispose();
     _direccionController.dispose();
-    _comunaController.dispose();
-    _barrioController.dispose();
     _codigoBarrioController.dispose();
     _cbmlController.dispose();
-    _nombreContactoController.dispose();
-    _telefonoController.dispose();
-    _emailController.dispose();
     _ocupacionController.dispose();
+    _latitudController.dispose();
+    _longitudController.dispose();
+    _tipoViaController.dispose();
+    _numeroViaController.dispose();
+    _apendiceViaController.dispose();
+    _orientacionViaController.dispose();
+    _numeroCruceController.dispose();
+    _apendiceCruceController.dispose();
+    _orientacionCruceController.dispose();
+    _numeroController.dispose();
+    _complementoController.dispose();
+    _departamentoController.dispose();
+    _municipioController.dispose();
+    _comunaController.dispose();
+    _nombreContactoController.dispose();
+    _telefonoContactoController.dispose();
+    _emailContactoController.dispose();
     
     _tabController.dispose();
     super.dispose();
   }
 
   void _debounce(Timer? timer, VoidCallback callback) {
-    if (timer?.isActive ?? false) timer?.cancel();
+    timer?.cancel();
     timer = Timer(const Duration(milliseconds: 500), callback);
   }
 
   Widget _buildTextField({
     required TextEditingController controller,
     required String label,
-    required Function(String) onChanged,
-    Timer? debouncer,
+    required Timer? debouncer,
     String? Function(String?)? validator,
+    void Function(String)? onChanged,
     TextInputType? keyboardType,
-    List<TextInputFormatter>? inputFormatters,
   }) {
     return TextFormField(
       controller: controller,
@@ -772,21 +1138,18 @@ class _EdificacionPageState extends State<EdificacionPage>
         labelText: label,
         border: const OutlineInputBorder(),
       ),
-      keyboardType: keyboardType,
-      inputFormatters: inputFormatters,
-      onChanged: (value) {
-        controller.value = controller.value.copyWith(
-          text: value,
-          selection: TextSelection.collapsed(offset: value.length),
-        );
-        if (debouncer?.isActive ?? false) debouncer?.cancel();
-        debouncer = Timer(const Duration(milliseconds: 500), () {
-          if (mounted) {
-            onChanged(value);
-          }
-        });
-      },
       validator: validator,
+      keyboardType: keyboardType,
+      onChanged: (value) {
+        if (onChanged != null) {
+          if (debouncer?.isActive ?? false) debouncer?.cancel();
+          debouncer = Timer(const Duration(milliseconds: 500), () {
+            if (mounted) {
+              onChanged(value);
+            }
+          });
+        }
+      },
     );
   }
 
@@ -794,327 +1157,343 @@ class _EdificacionPageState extends State<EdificacionPage>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const DireccionPreview(),
+        // Vista previa de la dirección con estilo mejorado
+        Container(
+          width: double.infinity,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                Theme.of(context).colorScheme.primary.withOpacity(0.05),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: DireccionPreview(),
+          ),
+        ),
         const SizedBox(height: 24),
         
         // Vía Principal
         Card(
-          elevation: 2,
+          elevation: 4,
+          shadowColor: Theme.of(context).colorScheme.primary.withOpacity(0.2),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Vía Principal',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  children: [
-                    Expanded(
-                      flex: 3,
-                      child: DropdownButtonFormField<String>(
-                        isExpanded: true,
-                        decoration: const InputDecoration(
-                          labelText: 'Tipo de Vía',
-                          border: OutlineInputBorder(),
-                          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                        ),
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          fontSize: 12,
-                        ),
-                        items: ['CL', 'CR', 'CQ', 'TV', 'DG']
-                            .map((e) => DropdownMenuItem(
-                                  value: e,
-                                  child: Text(
-                                    e == 'CL' ? 'Calle' :
-                                    e == 'CR' ? 'Carrera' :
-                                    e == 'CQ' ? 'Circular' :
-                                    e == 'TV' ? 'Transversal' : 'Diagonal',
-                                    overflow: TextOverflow.ellipsis,
-                                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                ))
-                            .toList(),
-                        onChanged: (value) {
-                          context.read<EdificacionBloc>().add(SetTipoVia(value ?? ''));
-                        },
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      flex: 2,
-                      child: TextFormField(
-                        decoration: const InputDecoration(
-                          labelText: 'Número',
-                          border: OutlineInputBorder(),
-                        ),
-                        keyboardType: TextInputType.number,
-                        inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly,
-                          LengthLimitingTextInputFormatter(3),
-                        ],
-                        onChanged: (value) {
-                          context.read<EdificacionBloc>().add(SetNumeroVia(value));
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  children: [
-                    Expanded(
-                      flex: 2,
-                      child: TextFormField(
-                        decoration: const InputDecoration(
-                          labelText: 'Apéndice',
-                          border: OutlineInputBorder(),
-                          hintText: 'A-H, AA-HH',
-                        ),
-                        inputFormatters: [
-                          UpperCaseTextFormatter(),
-                          LengthLimitingTextInputFormatter(2),
-                        ],
-                        onChanged: (value) {
-                          context.read<EdificacionBloc>().add(SetApendiceVia(value));
-                        },
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      flex: 3,
-                      child: DropdownButtonFormField<String>(
-                        isExpanded: true,
-                        decoration: const InputDecoration(
-                          labelText: 'Orientación',
-                          border: OutlineInputBorder(),
-                          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                        ),
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          fontSize: 12,
-                        ),
-                        value: context.watch<EdificacionBloc>().state.orientacionVia?.isEmpty ?? true 
-                            ? null 
-                            : context.watch<EdificacionBloc>().state.orientacionVia,
-                        items: [
-                          DropdownMenuItem(
-                            value: '', 
-                            child: Text(
-                              'Sin orientación',
-                              overflow: TextOverflow.ellipsis,
-                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                fontSize: 12,
-                              ),
-                            ),
-                          ),
-                          if (context.watch<EdificacionBloc>().state.tipoVia == 'CL')
-                            DropdownMenuItem(
-                              value: 'SUR',
-                              child: Text(
-                                'SUR',
-                                overflow: TextOverflow.ellipsis,
-                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  fontSize: 12,
-                                ),
-                              ),
-                            )
-                          else if (context.watch<EdificacionBloc>().state.tipoVia == 'CR')
-                            DropdownMenuItem(
-                              value: 'ESTE',
-                              child: Text(
-                                'ESTE',
-                                overflow: TextOverflow.ellipsis,
-                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ),
-                        ],
-                        onChanged: (value) {
-                          context.read<EdificacionBloc>().add(
-                            SetOrientacionVia(value ?? '', context),
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+            borderRadius: BorderRadius.circular(12),
+            side: BorderSide(
+              color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+              width: 1,
             ),
           ),
-        ),
-        const SizedBox(height: 16),
-        
-        // Cruce
-        Card(
-          elevation: 2,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Cruce',
-                  style: Theme.of(context).textTheme.titleMedium,
+                Row(
+                  children: [
+                    Icon(
+                      Icons.add_road,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Vía Principal',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 16),
-                TextFormField(
-                  decoration: const InputDecoration(
-                    labelText: 'Número',
-                    border: OutlineInputBorder(),
+                // Tipo de Vía
+                DropdownButtonFormField<String>(
+                  isExpanded: true,
+                  decoration: InputDecoration(
+                    labelText: 'Tipo de Vía',
+                    border: const OutlineInputBorder(),
+                    filled: true,
+                    fillColor: Theme.of(context).colorScheme.surface,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                   ),
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [
-                    FilteringTextInputFormatter.digitsOnly,
-                    LengthLimitingTextInputFormatter(3),
-                  ],
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    fontSize: 14,
+                  ),
+                  items: ['CL', 'CR', 'CQ', 'TV', 'DG']
+                      .map((e) => DropdownMenuItem(
+                            value: e,
+                            child: Text(
+                              e == 'CL' ? 'Calle (CL)' :
+                              e == 'CR' ? 'Carrera (CR)' :
+                              e == 'CQ' ? 'Circular (CQ)' :
+                              e == 'TV' ? 'Transversal (TV)' :
+                              'Diagonal (DG)',
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ))
+                      .toList(),
+                  value: _tipoViaController.text.isEmpty ? null : _tipoViaController.text,
                   onChanged: (value) {
-                    context.read<EdificacionBloc>().add(SetNumeroCruce(value));
+                    if (value != null) {
+                      _tipoViaController.text = value;
+                      context.read<EdificacionBloc>().add(SetTipoVia(value));
+                    }
                   },
                 ),
                 const SizedBox(height: 16),
-                Row(
-                  children: [
-                    Expanded(
-                      flex: 2,
-                      child: TextFormField(
-                        decoration: const InputDecoration(
-                          labelText: 'Apéndice',
-                          border: OutlineInputBorder(),
-                          hintText: 'A-H, AA-HH',
-                        ),
-                        inputFormatters: [
-                          UpperCaseTextFormatter(),
-                          LengthLimitingTextInputFormatter(2),
-                        ],
-                        onChanged: (value) {
-                          context.read<EdificacionBloc>().add(SetApendiceCruce(value));
-                        },
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      flex: 3,
-                      child: DropdownButtonFormField<String>(
-                        isExpanded: true,
-                        decoration: const InputDecoration(
-                          labelText: 'Orientación',
-                          border: OutlineInputBorder(),
-                          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                        ),
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          fontSize: 12,
-                        ),
-                        value: context.watch<EdificacionBloc>().state.orientacionCruce?.isEmpty ?? true 
-                            ? null 
-                            : context.watch<EdificacionBloc>().state.orientacionCruce,
-                        items: [
-                          DropdownMenuItem(
-                            value: '',
+                // Número de Vía
+                TextFormField(
+                  controller: _numeroViaController,
+                  decoration: InputDecoration(
+                    labelText: 'Número de Vía',
+                    border: const OutlineInputBorder(),
+                    filled: true,
+                    fillColor: Theme.of(context).colorScheme.surface,
+                  ),
+                  keyboardType: TextInputType.number,
+                  onChanged: (value) {
+                    if (_numeroViaDebouncer?.isActive ?? false) _numeroViaDebouncer?.cancel();
+                    _numeroViaDebouncer = Timer(const Duration(milliseconds: 500), () {
+                      if (mounted) {
+                        context.read<EdificacionBloc>().add(SetNumeroVia(value));
+                      }
+                    });
+                  },
+                ),
+                const SizedBox(height: 16),
+                // Apéndice de Vía
+                TextFormField(
+                  controller: _apendiceViaController,
+                  decoration: InputDecoration(
+                    labelText: 'Apéndice de Vía',
+                    border: const OutlineInputBorder(),
+                    filled: true,
+                    fillColor: Theme.of(context).colorScheme.surface,
+                    hintText: 'Ej: A, B, BIS',
+                  ),
+                  onChanged: (value) {
+                    if (_apendiceViaDebouncer?.isActive ?? false) _apendiceViaDebouncer?.cancel();
+                    _apendiceViaDebouncer = Timer(const Duration(milliseconds: 500), () {
+                      if (mounted) {
+                        context.read<EdificacionBloc>().add(SetApendiceVia(value));
+                      }
+                    });
+                  },
+                ),
+                const SizedBox(height: 16),
+                // Orientación de Vía
+                DropdownButtonFormField<String>(
+                  isExpanded: true,
+                  decoration: InputDecoration(
+                    labelText: 'Orientación de Vía',
+                    border: const OutlineInputBorder(),
+                    filled: true,
+                    fillColor: Theme.of(context).colorScheme.surface,
+                  ),
+                  items: ['NORTE', 'SUR', 'ESTE', 'OESTE']
+                      .map((e) => DropdownMenuItem(
+                            value: e,
                             child: Text(
-                              'Sin orientación',
+                              e,
                               overflow: TextOverflow.ellipsis,
-                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                fontSize: 12,
-                              ),
                             ),
-                          ),
-                          if (context.watch<EdificacionBloc>().state.tipoVia == 'CL')
-                            DropdownMenuItem(
-                              value: 'SUR',
-                              child: Text(
-                                'SUR',
-                                overflow: TextOverflow.ellipsis,
-                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  fontSize: 12,
-                                ),
-                              ),
-                            )
-                          else if (context.watch<EdificacionBloc>().state.tipoVia == 'CR')
-                            DropdownMenuItem(
-                              value: 'ESTE',
-                              child: Text(
-                                'ESTE',
-                                overflow: TextOverflow.ellipsis,
-                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ),
-                        ],
-                        onChanged: (value) {
-                          context.read<EdificacionBloc>().add(
-                            SetOrientacionCruce(value ?? '', context),
-                          );
-                        },
-                      ),
-                    ),
-                  ],
+                          ))
+                      .toList(),
+                  value: _orientacionViaController.text.isEmpty ? null : _orientacionViaController.text,
+                  onChanged: (value) {
+                    if (value != null) {
+                      _orientacionViaController.text = value;
+                      context.read<EdificacionBloc>().add(SetOrientacionVia(value, context));
+                    }
+                  },
                 ),
               ],
             ),
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 24),
         
-        // Número y Complemento
+        // Cruce
         Card(
-          elevation: 2,
+          elevation: 4,
+          shadowColor: Theme.of(context).colorScheme.primary.withOpacity(0.2),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(12),
+            side: BorderSide(
+              color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+              width: 1,
+            ),
           ),
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Número y Complemento',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                const SizedBox(height: 16),
                 Row(
                   children: [
-                    Expanded(
-                      child: TextFormField(
-                        decoration: const InputDecoration(
-                          labelText: 'Número',
-                          border: OutlineInputBorder(),
-                        ),
-                        keyboardType: TextInputType.number,
-                        inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly,
-                          LengthLimitingTextInputFormatter(3),
-                        ],
-                        onChanged: (value) {
-                          context.read<EdificacionBloc>().add(SetNumero(value));
-                        },
-                      ),
+                    Icon(
+                      Icons.route,
+                      color: Theme.of(context).colorScheme.primary,
                     ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: TextFormField(
-                        decoration: const InputDecoration(
-                          labelText: 'Complemento',
-                          border: OutlineInputBorder(),
-                          hintText: 'Edificio, Manzana, etc.',
-                        ),
-                        onChanged: (value) {
-                          context.read<EdificacionBloc>().add(SetComplemento(value));
-                        },
+                    const SizedBox(width: 8),
+                    Text(
+                      'Cruce',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.primary,
                       ),
                     ),
                   ],
+                ),
+                const SizedBox(height: 16),
+                // Número de Cruce
+                TextFormField(
+                  controller: _numeroCruceController,
+                  decoration: InputDecoration(
+                    labelText: 'Número de Cruce',
+                    border: const OutlineInputBorder(),
+                    filled: true,
+                    fillColor: Theme.of(context).colorScheme.surface,
+                  ),
+                  keyboardType: TextInputType.number,
+                  onChanged: (value) {
+                    if (_numeroCruceDebouncer?.isActive ?? false) _numeroCruceDebouncer?.cancel();
+                    _numeroCruceDebouncer = Timer(const Duration(milliseconds: 500), () {
+                      if (mounted) {
+                        context.read<EdificacionBloc>().add(SetNumeroCruce(value));
+                      }
+                    });
+                  },
+                ),
+                const SizedBox(height: 16),
+                // Apéndice de Cruce
+                TextFormField(
+                  controller: _apendiceCruceController,
+                  decoration: InputDecoration(
+                    labelText: 'Apéndice de Cruce',
+                    border: const OutlineInputBorder(),
+                    filled: true,
+                    fillColor: Theme.of(context).colorScheme.surface,
+                    hintText: 'Ej: A, B, BIS',
+                  ),
+                  onChanged: (value) {
+                    if (_apendiceCruceDebouncer?.isActive ?? false) _apendiceCruceDebouncer?.cancel();
+                    _apendiceCruceDebouncer = Timer(const Duration(milliseconds: 500), () {
+                      if (mounted) {
+                        context.read<EdificacionBloc>().add(SetApendiceCruce(value));
+                      }
+                    });
+                  },
+                ),
+                const SizedBox(height: 16),
+                // Orientación de Cruce
+                DropdownButtonFormField<String>(
+                  isExpanded: true,
+                  decoration: InputDecoration(
+                    labelText: 'Orientación de Cruce',
+                    border: const OutlineInputBorder(),
+                    filled: true,
+                    fillColor: Theme.of(context).colorScheme.surface,
+                  ),
+                  items: ['NORTE', 'SUR', 'ESTE', 'OESTE']
+                      .map((e) => DropdownMenuItem(
+                            value: e,
+                            child: Text(
+                              e,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ))
+                      .toList(),
+                  value: _orientacionCruceController.text.isEmpty ? null : _orientacionCruceController.text,
+                  onChanged: (value) {
+                    if (value != null) {
+                      _orientacionCruceController.text = value;
+                      context.read<EdificacionBloc>().add(SetOrientacionCruce(value, context));
+                    }
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 24),
+        
+        // Número y Complemento
+        Card(
+          elevation: 4,
+          shadowColor: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+            side: BorderSide(
+              color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+              width: 1,
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      Icons.home,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Número y Complemento',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                // Número
+                TextFormField(
+                  controller: _numeroController,
+                  decoration: InputDecoration(
+                    labelText: 'Número',
+                    border: const OutlineInputBorder(),
+                    filled: true,
+                    fillColor: Theme.of(context).colorScheme.surface,
+                  ),
+                  keyboardType: TextInputType.number,
+                  onChanged: (value) {
+                    if (_numeroDebouncer?.isActive ?? false) _numeroDebouncer?.cancel();
+                    _numeroDebouncer = Timer(const Duration(milliseconds: 500), () {
+                      if (mounted) {
+                        context.read<EdificacionBloc>().add(SetNumero(value));
+                      }
+                    });
+                  },
+                ),
+                const SizedBox(height: 16),
+                // Complemento
+                TextFormField(
+                  controller: _complementoController,
+                  decoration: InputDecoration(
+                    labelText: 'Complemento',
+                    border: const OutlineInputBorder(),
+                    filled: true,
+                    fillColor: Theme.of(context).colorScheme.surface,
+                    hintText: 'Ej: Torre 1, Apto 201',
+                  ),
+                  onChanged: (value) {
+                    if (_complementoDebouncer?.isActive ?? false) _complementoDebouncer?.cancel();
+                    _complementoDebouncer = Timer(const Duration(milliseconds: 500), () {
+                      if (mounted) {
+                        context.read<EdificacionBloc>().add(SetComplemento(value));
+                      }
+                    });
+                  },
                 ),
               ],
             ),

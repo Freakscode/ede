@@ -63,24 +63,72 @@ class NivelDanoPage extends StatelessWidget {
     RiesgosExternosState riesgosState,
     EvaluacionDanosState danosState,
   ) {
-    log('=== Iniciando cálculo en NivelDanoPage ===');
+    log('=== Iniciando cálculo de severidad ===');
     
-    // Obtener condiciones existentes directamente del EvaluacionDanosState
+    // Obtener condiciones existentes
     final condicionesExistentes = Map<String, bool>.from(danosState.condicionesExistentes);
-    
-    // Imprimir cada condición para depuración
-    log('Detalle de condiciones existentes:');
-    condicionesExistentes.forEach((key, value) {
-      if (['5.1', '5.2', '5.3', '5.4', '5.5', '5.6'].contains(key)) {
-        log('$key: $value');
-      }
-    });
-
-    // Obtener niveles de elementos
     final nivelesElementos = Map<String, String>.from(danosState.nivelesElementos);
-    log('Niveles de elementos mapeados: $nivelesElementos');
+    
+    // Verificar condiciones para ALTO
+    bool esAlto = false;
+    // Si alguna de las primeras 4 condiciones es SI
+    if (['5.1', '5.2', '5.3', '5.4'].any((id) => condicionesExistentes[id] == true)) {
+      esAlto = true;
+    }
+    // O si el daño estructural (5.7) es severo
+    if (nivelesElementos['5.7'] == 'Severo') {
+      esAlto = true;
+    }
 
-    // Disparar el evento para calcular severidad
+    // Verificar condiciones para MEDIO ALTO
+    bool esMedioAlto = false;
+    if (!esAlto) {
+      // Si 5.5 o 5.6 es SI
+      if (['5.5', '5.6'].any((id) => condicionesExistentes[id] == true)) {
+        esMedioAlto = true;
+      }
+      // O si el daño estructural (5.7) es moderado
+      if (nivelesElementos['5.7'] == 'Moderado') {
+        esMedioAlto = true;
+      }
+    }
+
+    // Verificar condiciones para MEDIO
+    bool esMedio = false;
+    if (!esAlto && !esMedioAlto) {
+      // Si alguno de los elementos no estructurales tiene daño moderado
+      if (['5.8', '5.9', '5.10', '5.11'].any((id) => nivelesElementos[id] == 'Moderado')) {
+        esMedio = true;
+      }
+    }
+
+    // Verificar condiciones para BAJO
+    bool esBajo = false;
+    if (!esAlto && !esMedioAlto && !esMedio) {
+      // Si todas las condiciones son NO y hay daños leves
+      if (['5.1', '5.2', '5.3', '5.4', '5.5', '5.6'].every((id) => condicionesExistentes[id] == false) &&
+          ['5.7', '5.8', '5.9', '5.10', '5.11'].any((id) => nivelesElementos[id] == 'Leve')) {
+        esBajo = true;
+      }
+    }
+
+    // Determinar la severidad final
+    String severidad;
+    if (esAlto) {
+      severidad = 'Alto';
+    } else if (esMedioAlto) {
+      severidad = 'Medio Alto';
+    } else if (esMedio) {
+      severidad = 'Medio';
+    } else if (esBajo) {
+      severidad = 'Bajo';
+    } else {
+      severidad = 'Sin Daño';
+    }
+
+    log('Severidad calculada: $severidad');
+    
+    // Disparar el evento para actualizar la severidad
     context.read<NivelDanoBloc>().add(
       CalcularSeveridadDanos(
         condicionesExistentes: condicionesExistentes,
@@ -332,7 +380,7 @@ class NivelDanoPage extends StatelessWidget {
               width: 1,
             ),
             columnWidths: const {
-              0: FixedColumnWidth(60), // Columna de porcentajes
+              0: FixedColumnWidth(60),
               1: FlexColumnWidth(1),
               2: FlexColumnWidth(1),
               3: FlexColumnWidth(1),
@@ -370,6 +418,18 @@ class NivelDanoPage extends StatelessWidget {
                                   )
                                 : null,
                           ),
+                          child: _esCasoEspecial(severidad, porcentaje)
+                              ? const Center(
+                                  child: Text(
+                                    'X',
+                                    style: TextStyle(
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black54,
+                                    ),
+                                  ),
+                                )
+                              : null,
                         ),
                       ),
                   ],
@@ -407,7 +467,7 @@ class NivelDanoPage extends StatelessWidget {
             _buildLeyendaItem('Medio', const Color(0xFFFDD835), theme),
             _buildLeyendaItem('Medio Alto', const Color(0xFFF57C00), theme),
             _buildLeyendaItem('Alto', const Color(0xFFD32F2F), theme),
-            _buildLeyendaItem('Caso Especial', const Color(0xFFFFCDD2), theme),
+            _buildLeyendaItem('Caso Especial (X)', const Color(0xFFFFCDD2), theme),
           ],
         ),
       ],
@@ -478,13 +538,13 @@ class NivelDanoPage extends StatelessWidget {
     // Colores normales según la severidad
     switch (_calcularNivelDanoMatriz(severidad, porcentaje)) {
       case 'Alto':
-        return const Color(0xFFD32F2F); // Rojo más oscuro
+        return const Color(0xFFD32F2F); // Rojo
       case 'Medio Alto':
-        return const Color(0xFFF57C00); // Naranja más oscuro
+        return const Color(0xFFF57C00); // Naranja
       case 'Medio':
-        return const Color(0xFFFDD835); // Amarillo más vivo
+        return const Color(0xFFFDD835); // Amarillo
       case 'Bajo':
-        return const Color(0xFF43A047); // Verde más vivo
+        return const Color(0xFF43A047); // Verde
       default:
         return Colors.white;
     }
@@ -500,7 +560,7 @@ class NivelDanoPage extends StatelessWidget {
     }
 
     if (severidad == 'Medio') {
-      if (porcentaje == '>70') return 'Alto';
+      if (porcentaje == '>70') return 'Caso Especial';
       if (porcentaje == '40-70') return 'Medio Alto';
       if (porcentaje == '10-40') return 'Medio';
       return 'Bajo';
@@ -552,11 +612,16 @@ class NivelDanoPage extends StatelessWidget {
       case 'Medio':
         return 'Si en 5.8 o 5.9 o 5.10 o 5.11 se selecciona moderado';
       case 'Medio Alto':
-        return 'Si en 5.5 o 5.6 se selecciona SI, Si en 5.7 se selecciona moderado, Si en 5.8 o 5.9 o 5.10 o 5.11 se selecciona severo';
+        return 'Si en 5.5 o 5.6 se selecciona SI, Si en 5.7 se selecciona moderado';
       case 'Alto':
-        return 'Si en 5.1 o 5.2 o 5.3 o 5.4 se selecciona SI o en 5.7 se selecciona severo';
+        return 'Si en 5.1 o 5.2 o 5.3 o 5.4 se selecciona SI o Si en 5.7 se selecciona severo';
       default:
         return 'Complete la evaluación de daños para calcular la severidad';
     }
+  }
+
+  bool _esCasoEspecial(String severidad, String porcentaje) {
+    return (severidad == 'Medio' && porcentaje == '>70') ||
+           (severidad == 'Medio Alto' && porcentaje == '40-70');
   }
 } 

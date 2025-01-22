@@ -84,10 +84,13 @@ class DireccionPreview extends StatelessWidget {
       }
     }
 
-    // Solo número, sin complemento
+    // Número y complemento
     if (numero != null) {
       partes.add('-');
       partes.add(numero);
+      if (complemento != null && complemento.isNotEmpty) {
+        partes.add('(${complemento})');
+      }
     }
 
     return partes.join(' ');

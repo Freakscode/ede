@@ -1,4 +1,6 @@
-class EdificacionState {
+import 'package:equatable/equatable.dart';
+
+class EdificacionState extends Equatable {
   final String? nombreEdificacion;
   final String? direccion;
   final String? comuna;
@@ -14,8 +16,8 @@ class EdificacionState {
   final String? emailContacto;
   final String? ocupacion; // Propietario, Administrador, etc.
 
-  final double? latitud;
-  final double? longitud;
+  final String? latitud;
+  final String? longitud;
 
   // Agregar estos campos al EdificacionState
   final String? tipoVia;
@@ -31,7 +33,7 @@ class EdificacionState {
   final String? departamento;
   final String? municipio;
 
-  EdificacionState({
+  const EdificacionState({
     this.nombreEdificacion,
     this.direccion,
     this.comuna,
@@ -68,8 +70,8 @@ class EdificacionState {
     String? telefonoContacto,
     String? emailContacto,
     String? ocupacion,
-    double? latitud,
-    double? longitud,
+    String? latitud,
+    String? longitud,
     String? tipoVia,
     String? numeroVia,
     String? apendiceVia,
@@ -110,14 +112,55 @@ class EdificacionState {
   }
 
   Map<String, dynamic> toJson() => {
-    'nombreEdificacion': nombreEdificacion,
-    'direccion': direccion,
-    'comuna': comuna,
-    'barrio': barrio,
-    'cbml': cbml,
-    'nombreContacto': nombreContacto,
-    'telefonoContacto': telefonoContacto,
-    'latitud': latitud,
-    'longitud': longitud,
-  };
-} 
+        'nombreEdificacion': nombreEdificacion,
+        'direccion': direccion,
+        'comuna': comuna,
+        'barrio': barrio,
+        'codigoBarrio': codigoBarrio,
+        'cbml': cbml,
+        'nombreContacto': nombreContacto,
+        'telefonoContacto': telefonoContacto,
+        'emailContacto': emailContacto,
+        'ocupacion': ocupacion,
+        'latitud': latitud,
+        'longitud': longitud,
+        'tipoVia': tipoVia,
+        'numeroVia': numeroVia,
+        'apendiceVia': apendiceVia,
+        'orientacionVia': orientacionVia,
+        'numeroCruce': numeroCruce,
+        'apendiceCruce': apendiceCruce,
+        'orientacionCruce': orientacionCruce,
+        'numero': numero,
+        'complemento': complemento,
+        'departamento': departamento,
+        'municipio': municipio,
+      };
+
+  @override
+  List<Object?> get props => [
+        nombreEdificacion,
+        direccion,
+        comuna,
+        barrio,
+        codigoBarrio,
+        cbml,
+        nombreContacto,
+        telefonoContacto,
+        emailContacto,
+        ocupacion,
+        latitud,
+        longitud,
+        tipoVia,
+        numeroVia,
+        apendiceVia,
+        orientacionVia,
+        numeroCruce,
+        apendiceCruce,
+        orientacionCruce,
+        numero,
+        complemento,
+        departamento,
+        municipio,
+      ];
+}
