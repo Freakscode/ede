@@ -12,6 +12,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../../../widgets/direccion_preview.dart';
 import 'dart:async';
 import '../../../../data/models/colombia_data.dart';
+import '../../../widgets/map_location_picker.dart';
 
 enum TipoIdentificacion { medellin, areaMetropolitana }
 
@@ -191,6 +192,23 @@ class _EdificacionPageState extends State<EdificacionPage>
       );
     });
 
+    // Agregar listeners para las coordenadas
+    _latitudController.addListener(() {
+      if (_latitudController.text.isNotEmpty) {
+        context.read<EdificacionBloc>().add(
+          SetLatitud(_latitudController.text),
+        );
+      }
+    });
+
+    _longitudController.addListener(() {
+      if (_longitudController.text.isNotEmpty) {
+        context.read<EdificacionBloc>().add(
+          SetLongitud(_longitudController.text),
+        );
+      }
+    });
+
     // Cargar datos del estado inmediatamente
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final state = context.read<EdificacionBloc>().state;
@@ -273,6 +291,12 @@ class _EdificacionPageState extends State<EdificacionPage>
     }
     if (state.ocupacion != null && state.ocupacion!.isNotEmpty) {
       _ocupacionController.text = state.ocupacion!;
+    }
+    if (state.latitud != null && state.latitud!.isNotEmpty) {
+      _latitudController.text = state.latitud!;
+    }
+    if (state.longitud != null && state.longitud!.isNotEmpty) {
+      _longitudController.text = state.longitud!;
     }
   }
 
@@ -718,83 +742,107 @@ class _EdificacionPageState extends State<EdificacionPage>
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      'Coordenadas GPS',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
+                      'Ubicación en el Mapa',
+                      style: Theme.of(context).textTheme.titleMedium,
                     ),
                   ],
                 ),
-                const SizedBox(height: 16),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextFormField(
-                        controller: _latitudController,
-                        decoration: const InputDecoration(
-                          labelText: 'Latitud',
-                          border: OutlineInputBorder(),
-                          prefixText: '+',
-                          helperText: 'Formato: XX.XXX',
+                const SizedBox(height: 8),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => Scaffold(
+                          appBar: AppBar(
+                            title: const Text('Seleccionar Ubicación'),
+                            leading: IconButton(
+                              icon: const Icon(Icons.arrow_back),
+                              onPressed: () => Navigator.pop(context),
+                            ),
+                          ),
+                          body: SafeArea(
+                            child: MapLocationPicker(
+                              initialLatitude: double.tryParse(_latitudController.text),
+                              initialLongitude: double.tryParse(_longitudController.text),
+                              onLocationSelected: (lat, long) {
+                                // Actualizar los controladores después de la navegación
+                                Navigator.pop(context);
+                                setState(() {
+                                  _latitudController.text = lat.toStringAsFixed(4);
+                                  _longitudController.text = long.toStringAsFixed(4);
+                                });
+                                // Actualizar el bloc después de actualizar los controladores
+                                context.read<EdificacionBloc>()
+                                  ..add(SetLatitud(lat.toString()))
+                                  ..add(SetLongitud(long.toString()));
+                              },
+                            ),
+                          ),
                         ),
-                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                        inputFormatters: [
-                          FilteringTextInputFormatter.allow(RegExp(r'^\d{0,2}\.?\d{0,3}$')),
-                        ],
-                        onChanged: (value) {
-                          _debounce(_latitudDebouncer, () {
-                            if (mounted) {
-                              context.read<EdificacionBloc>().add(SetLatitud(value));
-                            }
+                      ),
+                    );
+                  },
+                  child: AbsorbPointer(
+                    child: SizedBox(
+                      height: 200,
+                      child: MapLocationPicker(
+                        initialLatitude: double.tryParse(_latitudController.text),
+                        initialLongitude: double.tryParse(_longitudController.text),
+                        onLocationSelected: (lat, long) {
+                          // Actualizar los controladores después de la navegación
+                          Navigator.pop(context);
+                          setState(() {
+                            _latitudController.text = lat.toStringAsFixed(4);
+                            _longitudController.text = long.toStringAsFixed(4);
                           });
-                        },
-                        validator: (value) {
-                          if (value?.isEmpty ?? true) {
-                            return 'Este campo es requerido';
-                          }
-                          final lat = double.tryParse(value!);
-                          if (lat == null || lat < 0 || lat > 90) {
-                            return 'Latitud inválida';
-                          }
-                          return null;
+                          // Actualizar el bloc después de actualizar los controladores
+                          context.read<EdificacionBloc>()
+                            ..add(SetLatitud(lat.toString()))
+                            ..add(SetLongitud(long.toString()));
                         },
                       ),
                     ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: TextFormField(
-                        controller: _longitudController,
-                        decoration: const InputDecoration(
-                          labelText: 'Longitud',
-                          border: OutlineInputBorder(),
-                          prefixText: '-',
-                          helperText: 'Formato: XX.XXX',
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Center(
+                  child: TextButton.icon(
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => Scaffold(
+                            appBar: AppBar(
+                              title: const Text('Seleccionar Ubicación'),
+                              leading: IconButton(
+                                icon: const Icon(Icons.arrow_back),
+                                onPressed: () => Navigator.pop(context),
+                              ),
+                            ),
+                            body: SafeArea(
+                              child: MapLocationPicker(
+                                initialLatitude: double.tryParse(_latitudController.text),
+                                initialLongitude: double.tryParse(_longitudController.text),
+                                onLocationSelected: (lat, long) {
+                                  // Actualizar los controladores después de la navegación
+                                  Navigator.pop(context);
+                                  setState(() {
+                                    _latitudController.text = lat.toStringAsFixed(4);
+                                    _longitudController.text = long.toStringAsFixed(4);
+                                  });
+                                  // Actualizar el bloc después de actualizar los controladores
+                                  context.read<EdificacionBloc>()
+                                    ..add(SetLatitud(lat.toString()))
+                                    ..add(SetLongitud(long.toString()));
+                                },
+                              ),
+                            ),
+                          ),
                         ),
-                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                        inputFormatters: [
-                          FilteringTextInputFormatter.allow(RegExp(r'^\d{0,2}\.?\d{0,3}$')),
-                        ],
-                        onChanged: (value) {
-                          _debounce(_longitudDebouncer, () {
-                            if (mounted) {
-                              context.read<EdificacionBloc>().add(SetLongitud(value));
-                            }
-                          });
-                        },
-                        validator: (value) {
-                          if (value?.isEmpty ?? true) {
-                            return 'Este campo es requerido';
-                          }
-                          final lon = double.tryParse(value!);
-                          if (lon == null || lon < 0 || lon > 90) {
-                            return 'Longitud inválida';
-                          }
-                          return null;
-                        },
-                      ),
-                    ),
-                  ],
+                      );
+                    },
+                    icon: const Icon(Icons.open_in_new),
+                    label: const Text('Abrir mapa en pantalla completa'),
+                  ),
                 ),
               ],
             ),
@@ -1504,7 +1552,7 @@ class _EdificacionPageState extends State<EdificacionPage>
   }
 
   Widget _buildCaracteristicasEdificacion(BuildContext context) {
-    return Column(
+    return const Column(
       children: [
         // Eliminar todo el contenido relacionado con pisos, subterráneos y año
       ],

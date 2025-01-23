@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
-import '../form/evaluacion/evaluacion_state.dart';
+import 'package:equatable/equatable.dart';
 import '../form/identificacionEdificacion/id_edificacion_state.dart';
 import '../form/riesgosExternos/riesgos_externos_state.dart';
-import '../form/nivelDano/nivel_dano_state.dart';
 
-abstract class EvaluacionGlobalEvent {
+abstract class EvaluacionGlobalEvent extends Equatable {
   const EvaluacionGlobalEvent();
+
+  @override
+  List<Object?> get props => [];
 }
 
 class UpdateIdentificacionEvaluacion extends EvaluacionGlobalEvent {
@@ -30,6 +32,19 @@ class UpdateIdentificacionEvaluacion extends EvaluacionGlobalEvent {
     this.dependenciaEntidad,
     this.firmaPath,
   });
+
+  @override
+  List<Object?> get props => [
+    fechaInspeccion,
+    horaInspeccion,
+    nombreEvaluador,
+    idGrupo,
+    idEvento,
+    eventoSeleccionado,
+    descripcionOtro,
+    dependenciaEntidad,
+    firmaPath
+  ];
 }
 
 class UpdateIdentificacionEdificacion extends EvaluacionGlobalEvent {
@@ -82,6 +97,33 @@ class UpdateIdentificacionEdificacion extends EvaluacionGlobalEvent {
     this.departamento,
     this.municipio,
   });
+
+  @override
+  List<Object?> get props => [
+    nombreEdificacion,
+    direccion,
+    comuna,
+    barrio,
+    codigoBarrio,
+    cbml,
+    nombreContacto,
+    telefonoContacto,
+    emailContacto,
+    ocupacion,
+    latitud,
+    longitud,
+    tipoVia,
+    numeroVia,
+    apendiceVia,
+    orientacionVia,
+    numeroCruce,
+    apendiceCruce,
+    orientacionCruce,
+    numero,
+    complemento,
+    departamento,
+    municipio
+  ];
 }
 
 class UpdateDescripcionEdificacion extends EvaluacionGlobalEvent {
@@ -104,28 +146,31 @@ class UpdateDescripcionEdificacion extends EvaluacionGlobalEvent {
     this.elementosNoEstructurales,
     this.caracteristicasAdicionales,
   });
+
+  @override
+  List<Object?> get props => [
+    uso,
+    niveles,
+    ocupantes,
+    sistemaConstructivo,
+    tipoEntrepiso,
+    tipoCubierta,
+    elementosNoEstructurales,
+    caracteristicasAdicionales
+  ];
 }
 
 class UpdateRiesgosExternos extends EvaluacionGlobalEvent {
-  final bool? colapsoEstructuras;
-  final bool? caidaObjetos;
-  final bool? otrosRiesgos;
-  final bool? riesgoColapso;
-  final bool? riesgoCaida;
-  final bool? riesgoServicios;
-  final bool? riesgoTerreno;
-  final bool? riesgoAccesos;
+  final Map<String, RiesgoItem> riesgosExternos;
+  final String? otroRiesgoExterno;
 
-  UpdateRiesgosExternos({
-    this.colapsoEstructuras,
-    this.caidaObjetos,
-    this.otrosRiesgos,
-    this.riesgoColapso,
-    this.riesgoCaida,
-    this.riesgoServicios,
-    this.riesgoTerreno,
-    this.riesgoAccesos,
+  const UpdateRiesgosExternos({
+    required this.riesgosExternos,
+    this.otroRiesgoExterno,
   });
+
+  @override
+  List<Object?> get props => [riesgosExternos, otroRiesgoExterno];
 }
 
 class UpdateEvaluacionDanos extends EvaluacionGlobalEvent {
@@ -142,6 +187,15 @@ class UpdateEvaluacionDanos extends EvaluacionGlobalEvent {
     this.condicionesPreexistentes,
     this.alcanceEvaluacion,
   });
+
+  @override
+  List<Object?> get props => [
+    danosEstructurales,
+    danosNoEstructurales,
+    danosGeotecnicos,
+    condicionesPreexistentes,
+    alcanceEvaluacion
+  ];
 }
 
 class UpdateNivelDano extends EvaluacionGlobalEvent {
@@ -149,13 +203,24 @@ class UpdateNivelDano extends EvaluacionGlobalEvent {
   final String? nivelDanoNoEstructural;
   final String? nivelDanoGeotecnico;
   final String? severidadGlobal;
+  final String? porcentajeAfectacion;
 
-  UpdateNivelDano({
+  const UpdateNivelDano({
     this.nivelDanoEstructural,
     this.nivelDanoNoEstructural,
     this.nivelDanoGeotecnico,
     this.severidadGlobal,
+    this.porcentajeAfectacion,
   });
+
+  @override
+  List<Object?> get props => [
+    nivelDanoEstructural,
+    nivelDanoNoEstructural,
+    nivelDanoGeotecnico,
+    severidadGlobal,
+    porcentajeAfectacion,
+  ];
 }
 
 class UpdateHabitabilidad extends EvaluacionGlobalEvent {
@@ -170,6 +235,14 @@ class UpdateHabitabilidad extends EvaluacionGlobalEvent {
     this.observacionesHabitabilidad,
     this.criterioHabitabilidad,
   });
+
+  @override
+  List<Object?> get props => [
+    estadoHabitabilidad,
+    clasificacionHabitabilidad,
+    observacionesHabitabilidad,
+    criterioHabitabilidad
+  ];
 }
 
 class UpdateAcciones extends EvaluacionGlobalEvent {
@@ -188,4 +261,23 @@ class UpdateAcciones extends EvaluacionGlobalEvent {
     this.medidasSeguridadSeleccionadas,
     this.evaluacionesAdicionalesSeleccionadas,
   });
+
+  @override
+  List<Object?> get props => [
+    evaluacionesAdicionales,
+    medidasSeguridad,
+    entidadesRecomendadas,
+    observacionesAcciones,
+    medidasSeguridadSeleccionadas,
+    evaluacionesAdicionalesSeleccionadas
+  ];
+}
+
+class IdEdificacionStateChanged extends EvaluacionGlobalEvent {
+  final EdificacionState state;
+
+  const IdEdificacionStateChanged(this.state);
+
+  @override
+  List<Object?> get props => [state];
 } 

@@ -4,7 +4,7 @@ import './riesgos_externos_event.dart';
 import './riesgos_externos_state.dart';
 
 class RiesgosExternosBloc extends Bloc<RiesgosExternosEvent, RiesgosExternosState> {
-  RiesgosExternosBloc() : super(RiesgosExternosState()) {
+  RiesgosExternosBloc() : super(const RiesgosExternosState()) {
     on<SetRiesgoExterno>((event, emit) {
       log('SetRiesgoExterno: ${event.riesgoId} - ${event.valor}');
       final riesgoActual = state.riesgos[event.riesgoId];

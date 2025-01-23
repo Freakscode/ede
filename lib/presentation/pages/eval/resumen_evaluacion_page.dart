@@ -8,12 +8,11 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:path_provider/path_provider.dart';
 import 'package:csv/csv.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:cross_file/cross_file.dart';
 import 'dart:io';
 import '../../../presentation/blocs/evaluacion_global/evaluacion_global_bloc.dart';
 import '../../../presentation/blocs/evaluacion_global/evaluacion_global_state.dart';
 import '../../../presentation/widgets/navigation_fab_menu.dart';
-import 'package:flutter/rendering.dart';
+import '../../../presentation/blocs/form/riesgosExternos/riesgos_externos_state.dart';
 
 class ResumenEvaluacionPage extends StatelessWidget {
   const ResumenEvaluacionPage({super.key});
@@ -81,7 +80,7 @@ class ResumenEvaluacionPage extends StatelessWidget {
                 const SizedBox(height: 16),
                 _buildRiesgosExternosCard(context, theme, state),
                 const SizedBox(height: 16),
-                _buildEvaluacionDanosCard(context, theme, state),
+                _buildEvaluacionDanosCard(state),
                 const SizedBox(height: 16),
                 _buildNivelDanoCard(theme, state),
                 const SizedBox(height: 16),
@@ -136,7 +135,6 @@ class ResumenEvaluacionPage extends StatelessWidget {
                 'Dirección': state.direccion ?? 'No especificada',
                 'Comuna': state.comuna ?? 'No especificada',
                 'Barrio': state.barrio ?? 'No especificado',
-                'Código de Barrio': state.codigoBarrio ?? 'No especificado',
                 'CBML': state.cbml ?? 'No especificado',
                 'Contacto': state.nombreContacto ?? 'No especificado',
                 'Teléfono': state.telefonoContacto ?? 'No especificado',
@@ -160,23 +158,15 @@ class ResumenEvaluacionPage extends StatelessWidget {
             _buildPDFSection(
               '4. Riesgos Externos',
               {
-                'Colapso de Estructuras': state.colapsoEstructuras == true ? 'Sí' : 'No',
-                'Caída de Objetos': state.caidaObjetos == true ? 'Sí' : 'No',
-                'Otros Riesgos': state.otrosRiesgos == true ? 'Sí' : 'No',
-                'Riesgo de Colapso': (state.riesgoColapso ?? false) ? 'Sí' : 'No',
-                'Riesgo de Caída': (state.riesgoCaida ?? false) ? 'Sí' : 'No',
-                'Riesgo en Servicios': (state.riesgoServicios ?? false) ? 'Sí' : 'No',
-                'Riesgo en Terreno': (state.riesgoTerreno ?? false) ? 'Sí' : 'No',
-                'Riesgo en Accesos': (state.riesgoAccesos ?? false) ? 'Sí' : 'No',
+                'riesgosExternos': state.riesgosExternos,
+                'otroRiesgoExterno': state.otroRiesgoExterno,
               },
             ),
             _buildPDFSection(
               '5. Evaluación de Daños',
               {
-                'Daños Estructurales': _mapToString(state.danosEstructurales),
-                'Daños No Estructurales': _mapToString(state.danosNoEstructurales),
-                'Daños Geotécnicos': _mapToString(state.danosGeotecnicos),
-                'Condiciones Preexistentes': _mapToString(state.condicionesPreexistentes),
+                'Condiciones Existentes': _mapToString(state.danosEstructurales?['condicionesExistentes']),
+                'Niveles de Elementos': _mapToString(state.danosEstructurales?['nivelesElementos']),
                 'Alcance de la Evaluación': state.alcanceEvaluacion ?? 'No especificado',
               },
             ),
@@ -262,7 +252,6 @@ class ResumenEvaluacionPage extends StatelessWidget {
         ['Edificación', 'Dirección', state.direccion ?? 'No especificada'],
         ['Edificación', 'Comuna', state.comuna ?? 'No especificada'],
         ['Edificación', 'Barrio', state.barrio ?? 'No especificado'],
-        ['Edificación', 'Código de Barrio', state.codigoBarrio ?? 'No especificado'],
         ['Edificación', 'CBML', state.cbml ?? 'No especificado'],
         ['Edificación', 'Contacto', state.nombreContacto ?? 'No especificado'],
         ['Edificación', 'Teléfono', state.telefonoContacto ?? 'No especificado'],
@@ -291,19 +280,11 @@ class ResumenEvaluacionPage extends StatelessWidget {
         ['Descripción', 'Elementos No Estructurales', state.elementosNoEstructurales ?? 'No especificados'],
         ['Descripción', 'Características Adicionales', state.caracteristicasAdicionales ?? 'No especificadas'],
         // Riesgos Externos
-        ['Riesgos', 'Colapso de Estructuras', state.colapsoEstructuras == true ? 'Sí' : 'No'],
-        ['Riesgos', 'Caída de Objetos', state.caidaObjetos == true ? 'Sí' : 'No'],
-        ['Riesgos', 'Otros Riesgos', state.otrosRiesgos == true ? 'Sí' : 'No'],
-        ['Riesgos', 'Riesgo de Colapso', (state.riesgoColapso ?? false) ? 'Sí' : 'No'],
-        ['Riesgos', 'Riesgo de Caída', (state.riesgoCaida ?? false) ? 'Sí' : 'No'],
-        ['Riesgos', 'Riesgo en Servicios', (state.riesgoServicios ?? false) ? 'Sí' : 'No'],
-        ['Riesgos', 'Riesgo en Terreno', (state.riesgoTerreno ?? false) ? 'Sí' : 'No'],
-        ['Riesgos', 'Riesgo en Accesos', (state.riesgoAccesos ?? false) ? 'Sí' : 'No'],
+        ['Riesgos', 'riesgosExternos', _mapToString(state.riesgosExternos)],
+        ['Riesgos', 'otroRiesgoExterno', state.otroRiesgoExterno?.toString() ?? 'No especificado'],
         // Evaluación de Daños
-        ['Daños', 'Daños Estructurales', _mapToString(state.danosEstructurales)],
-        ['Daños', 'Daños No Estructurales', _mapToString(state.danosNoEstructurales)],
-        ['Daños', 'Daños Geotécnicos', _mapToString(state.danosGeotecnicos)],
-        ['Daños', 'Condiciones Preexistentes', _mapToString(state.condicionesPreexistentes)],
+        ['Daños', 'Condiciones Existentes', _mapToString(state.danosEstructurales?['condicionesExistentes'])],
+        ['Daños', 'Niveles de Elementos', _mapToString(state.danosEstructurales?['nivelesElementos'])],
         ['Daños', 'Alcance de la Evaluación', state.alcanceEvaluacion ?? 'No especificado'],
         // Nivel de Daño
         ['Nivel de Daño', 'Estructural', state.nivelDanoEstructural ?? 'No especificado'],
@@ -355,36 +336,77 @@ class ResumenEvaluacionPage extends StatelessWidget {
     }
   }
 
-  pw.Widget _buildPDFSection(String title, Map<String, dynamic>? data) {
-    final safeData = data ?? {};
+  pw.Widget _buildPDFSection(String title, Map<String, dynamic> data) {
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
-        pw.Text(title, style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold)),
-        pw.SizedBox(height: 5),
-        ...safeData.keys.map((key) => pw.Text(
-          '$key: ${safeData[key]?.toString() ?? 'No especificado'}',
-          style: const pw.TextStyle(fontSize: 12),
-        )),
+        pw.Header(
+          level: 1,
+          child: pw.Text(title),
+        ),
         pw.SizedBox(height: 10),
+        ...data.entries.map((entry) {
+          if (title == '4. Riesgos Externos') {
+            if (entry.key == 'riesgosExternos') {
+              final riesgos = entry.value as Map<String, RiesgoItem>;
+              return pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: riesgos.entries.map((riesgo) {
+                  if (!riesgo.value.existeRiesgo) return pw.Container();
+                  return pw.Column(
+                    crossAxisAlignment: pw.CrossAxisAlignment.start,
+                    children: [
+                      pw.Text('${riesgo.key}: ${_getRiesgoDescripcion(riesgo.key)}'),
+                      if (riesgo.value.comprometeAccesos)
+                        pw.Padding(
+                          padding: const pw.EdgeInsets.only(left: 20),
+                          child: pw.Text('- Compromete accesos/ocupantes'),
+                        ),
+                      if (riesgo.value.comprometeEstabilidad)
+                        pw.Padding(
+                          padding: const pw.EdgeInsets.only(left: 20),
+                          child: pw.Text('- Compromete estabilidad'),
+                        ),
+                      pw.SizedBox(height: 5),
+                    ],
+                  );
+                }).toList(),
+              );
+            }
+            if (entry.key == 'otroRiesgoExterno' && entry.value != null) {
+              return pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: [
+                  pw.Text('Otro riesgo: ${entry.value}'),
+                  pw.SizedBox(height: 5),
+                ],
+              );
+            }
+            return pw.Container();
+          }
+          return pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              pw.Text('${entry.key}: ${entry.value}'),
+              pw.SizedBox(height: 5),
+            ],
+          );
+        }).toList(),
+        pw.SizedBox(height: 20),
       ],
     );
   }
 
-  pw.Widget _buildPDFBoolSection(String title, Map<String, bool>? data) {
-    final safeData = data ?? {};
-    return pw.Column(
-      crossAxisAlignment: pw.CrossAxisAlignment.start,
-      children: [
-        pw.Text(title, style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold)),
-        pw.SizedBox(height: 5),
-        ...safeData.keys.map((key) => pw.Text(
-          '$key: ${(safeData[key] ?? false) ? 'Sí' : 'No'}',
-          style: const pw.TextStyle(fontSize: 12),
-        )),
-        pw.SizedBox(height: 10),
-      ],
-    );
+  String _getRiesgoDescripcion(String codigo) {
+    final riesgosDescripcion = {
+      '4.1': 'Caída de objetos de edificios adyacentes',
+      '4.2': 'Colapso o probable colapso de edificios adyacentes',
+      '4.3': 'Falla en sistemas de distribución de servicios públicos',
+      '4.4': 'Inestabilidad del terreno, movimientos en masa',
+      '4.5': 'Accesos y salidas',
+      '4.6': 'Otro riesgo',
+    };
+    return riesgosDescripcion[codigo] ?? 'Riesgo no especificado';
   }
 
   Widget _buildInfoRow(String label, String value, ThemeData theme, {IconData? icon}) {
@@ -498,9 +520,8 @@ class ResumenEvaluacionPage extends StatelessWidget {
         _buildInfoRow('Hora', state.horaInspeccion?.format(context) ?? 'No especificada', theme, icon: Icons.access_time),
         _buildInfoRow('Evaluador', state.nombreEvaluador ?? 'No especificado', theme, icon: Icons.person),
         _buildInfoRow('ID Grupo', state.idGrupo ?? 'No especificado', theme, icon: Icons.group),
-        _buildInfoRow('ID Evento', state.idEvento ?? 'No especificado', theme, icon: Icons.event),
+        _buildInfoRow('ID Evento', state.idEvento ?? 'No especificado', theme, icon: Icons.tag),
         _buildInfoRow('Evento', state.eventoSeleccionado ?? 'No especificado', theme, icon: Icons.category),
-        _buildInfoRow('Descripción', state.descripcionOtro ?? 'No especificada', theme, icon: Icons.description),
         _buildInfoRow('Dependencia', state.dependenciaEntidad ?? 'No especificada', theme, icon: Icons.business),
       ],
     );
@@ -514,27 +535,104 @@ class ResumenEvaluacionPage extends StatelessWidget {
       [
         _buildInfoRow('Nombre', state.nombreEdificacion ?? 'No especificado', theme, icon: Icons.business),
         _buildInfoRow('Dirección', state.direccion ?? 'No especificada', theme, icon: Icons.location_on),
-        _buildInfoRow('Comuna', state.comuna ?? 'No especificada', theme, icon: Icons.location_city),
-        _buildInfoRow('Barrio', state.barrio ?? 'No especificado', theme, icon: Icons.home),
-        _buildInfoRow('Código de Barrio', state.codigoBarrio ?? 'No especificado', theme, icon: Icons.qr_code),
-        _buildInfoRow('CBML', state.cbml ?? 'No especificado', theme, icon: Icons.qr_code),
-        _buildInfoRow('Contacto', state.nombreContacto ?? 'No especificado', theme, icon: Icons.person),
-        _buildInfoRow('Teléfono', state.telefonoContacto ?? 'No especificado', theme, icon: Icons.phone),
-        _buildInfoRow('Email', state.emailContacto ?? 'No especificado', theme, icon: Icons.email),
-        _buildInfoRow('Ocupación', state.ocupacion ?? 'No especificado', theme, icon: Icons.work),
-        if (state.latitud != null && state.longitud != null)
-          _buildInfoRow('Ubicación', '${state.latitud}, ${state.longitud}', theme, icon: Icons.pin_drop),
-        _buildInfoRow('Tipo de Vía', state.tipoVia ?? 'No especificado', theme, icon: Icons.add_road),
-        _buildInfoRow('Número de Vía', state.numeroVia ?? 'No especificado', theme, icon: Icons.signpost),
-        _buildInfoRow('Apéndice de Vía', state.apendiceVia ?? 'No especificado', theme, icon: Icons.more),
-        _buildInfoRow('Orientación de Vía', state.orientacionVia ?? 'No especificado', theme, icon: Icons.compass_calibration),
-        _buildInfoRow('Número de Cruce', state.numeroCruce ?? 'No especificado', theme, icon: Icons.call_split),
-        _buildInfoRow('Apéndice de Cruce', state.apendiceCruce ?? 'No especificado', theme, icon: Icons.more),
-        _buildInfoRow('Orientación de Cruce', state.orientacionCruce ?? 'No especificado', theme, icon: Icons.compass_calibration),
-        _buildInfoRow('Número', state.numero ?? 'No especificado', theme, icon: Icons.tag),
-        _buildInfoRow('Complemento', state.complemento ?? 'No especificado', theme, icon: Icons.add),
-        _buildInfoRow('Departamento', state.departamento ?? 'No especificado', theme, icon: Icons.location_city),
-        _buildInfoRow('Municipio', state.municipio ?? 'No especificado', theme, icon: Icons.location_city),
+        
+        // Componentes de la dirección
+        const SizedBox(height: 16),
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surface,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: theme.colorScheme.primary.withOpacity(0.2),
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Componentes de la dirección:',
+                style: theme.textTheme.titleSmall?.copyWith(
+                  color: theme.colorScheme.primary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              _buildInfoRow('Tipo de Vía', state.tipoVia ?? 'No especificado', theme, icon: Icons.add_road),
+              _buildInfoRow('Número de Vía', state.numeroVia ?? 'No especificado', theme, icon: Icons.signpost),
+              _buildInfoRow('Apéndice de Vía', state.apendiceVia ?? 'No especificado', theme, icon: Icons.more),
+              _buildInfoRow('Orientación de Vía', state.orientacionVia ?? 'No especificado', theme, icon: Icons.compass_calibration),
+              _buildInfoRow('Número de Cruce', state.numeroCruce ?? 'No especificado', theme, icon: Icons.call_split),
+              _buildInfoRow('Apéndice de Cruce', state.apendiceCruce ?? 'No especificado', theme, icon: Icons.more),
+              _buildInfoRow('Orientación de Cruce', state.orientacionCruce ?? 'No especificado', theme, icon: Icons.compass_calibration),
+              _buildInfoRow('Número', state.numero ?? 'No especificado', theme, icon: Icons.tag),
+              _buildInfoRow('Complemento', state.complemento ?? 'No especificado', theme, icon: Icons.add),
+            ],
+          ),
+        ),
+        
+        // Ubicación
+        const SizedBox(height: 16),
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surface,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: theme.colorScheme.primary.withOpacity(0.2),
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Ubicación:',
+                style: theme.textTheme.titleSmall?.copyWith(
+                  color: theme.colorScheme.primary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              _buildInfoRow('Departamento', state.departamento ?? 'No especificado', theme, icon: Icons.location_city),
+              _buildInfoRow('Municipio', state.municipio ?? 'No especificado', theme, icon: Icons.location_city),
+              _buildInfoRow('Comuna', state.comuna ?? 'No especificada', theme, icon: Icons.location_city),
+              _buildInfoRow('Barrio', state.barrio ?? 'No especificado', theme, icon: Icons.home),
+              _buildInfoRow('CBML', state.cbml ?? 'No especificado', theme, icon: Icons.qr_code),
+              if (state.latitud != null && state.longitud != null)
+                _buildInfoRow('Coordenadas', '${state.latitud}, ${state.longitud}', theme, icon: Icons.pin_drop),
+            ],
+          ),
+        ),
+        
+        // Información de contacto
+        const SizedBox(height: 16),
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surface,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: theme.colorScheme.primary.withOpacity(0.2),
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Información de contacto:',
+                style: theme.textTheme.titleSmall?.copyWith(
+                  color: theme.colorScheme.primary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              _buildInfoRow('Contacto', state.nombreContacto ?? 'No especificado', theme, icon: Icons.person),
+              _buildInfoRow('Teléfono', state.telefonoContacto ?? 'No especificado', theme, icon: Icons.phone),
+              _buildInfoRow('Email', state.emailContacto ?? 'No especificado', theme, icon: Icons.email),
+              _buildInfoRow('Ocupación', state.ocupacion ?? 'No especificado', theme, icon: Icons.work),
+            ],
+          ),
+        ),
       ],
     );
   }
@@ -546,52 +644,96 @@ class ResumenEvaluacionPage extends StatelessWidget {
       Icons.apartment,
       [
         _buildInfoRow('Uso', state.uso ?? 'No especificado', theme, icon: Icons.category),
-        _buildInfoRow('Niveles', state.niveles?.toString() ?? 'No especificado', theme, icon: Icons.layers),
-        _buildInfoRow('Ocupantes', state.ocupantes?.toString() ?? 'No especificado', theme, icon: Icons.people),
+        _buildInfoRow('Niveles', '${state.niveles?.toString() ?? "No especificado"} nivel(es)', theme, icon: Icons.layers),
+        _buildInfoRow('Ocupantes', '${state.ocupantes?.toString() ?? "No especificado"} persona(s)', theme, icon: Icons.people),
         _buildInfoRow('Sistema Constructivo', state.sistemaConstructivo ?? 'No especificado', theme, icon: Icons.construction),
         _buildInfoRow('Tipo de Entrepiso', state.tipoEntrepiso ?? 'No especificado', theme, icon: Icons.view_agenda),
         _buildInfoRow('Tipo de Cubierta', state.tipoCubierta ?? 'No especificado', theme, icon: Icons.roofing),
-        _buildInfoRow('Elementos No Estructurales', state.elementosNoEstructurales ?? 'No especificados', theme, icon: Icons.view_module),
-        _buildInfoRow('Características Adicionales', state.caracteristicasAdicionales ?? 'No especificadas', theme, icon: Icons.add_box),
+        _buildInfoRow('Elementos No Estructurales', state.elementosNoEstructurales ?? 'No especificados', theme, icon: Icons.grid_view),
+        _buildInfoRow('Características Adicionales', state.caracteristicasAdicionales ?? 'No especificadas', theme, icon: Icons.info_outline),
       ],
     );
   }
 
   Widget _buildRiesgosExternosCard(BuildContext context, ThemeData theme, EvaluacionGlobalState state) {
     return Card(
-      margin: const EdgeInsets.all(8.0),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Riesgos Externos',
-              style: theme.textTheme.titleLarge,
+              '4. Riesgos Externos',
+              style: theme.textTheme.titleLarge?.copyWith(
+                color: theme.colorScheme.primary,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-            const SizedBox(height: 16.0),
-            _buildInfoRow(
-              'Colapso de Estructuras',
-              state.colapsoEstructuras == true ? 'Sí' : 'No',
-              theme,
-            ),
-            _buildInfoRow(
-              'Caída de Objetos',
-              state.caidaObjetos == true ? 'Sí' : 'No',
-              theme,
-            ),
-            _buildInfoRow(
-              'Otros Riesgos',
-              state.otrosRiesgos == true ? 'Sí' : 'No',
-              theme,
-            ),
+            const SizedBox(height: 16),
+            ...state.riesgosExternos.entries.map((entry) {
+              final riesgo = entry.value;
+              if (!riesgo.existeRiesgo) return const SizedBox.shrink();
+              
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '${entry.key} ${_getRiesgoDescripcion(entry.key)}',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    if (entry.key == '4.6' && state.otroRiesgoExterno != null)
+                      Padding(
+                        padding: const EdgeInsets.only(left: 16.0),
+                        child: Text('Descripción: ${state.otroRiesgoExterno}'),
+                      ),
+                    if (riesgo.comprometeAccesos)
+                      Padding(
+                        padding: const EdgeInsets.only(left: 16.0),
+                        child: Row(
+                          children: [
+                            Icon(Icons.warning, color: theme.colorScheme.error, size: 16),
+                            const SizedBox(width: 8),
+                            Text('Compromete accesos/ocupantes',
+                              style: TextStyle(color: theme.colorScheme.error),
+                            ),
+                          ],
+                        ),
+                      ),
+                    if (riesgo.comprometeEstabilidad)
+                      Padding(
+                        padding: const EdgeInsets.only(left: 16.0),
+                        child: Row(
+                          children: [
+                            Icon(Icons.dangerous, color: theme.colorScheme.error, size: 16),
+                            const SizedBox(width: 8),
+                            Text('Compromete estabilidad',
+                              style: TextStyle(color: theme.colorScheme.error),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
+              );
+            }).toList(),
+            if (state.riesgosExternos.values.every((r) => !r.existeRiesgo))
+              const Text('No se identificaron riesgos externos'),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildEvaluacionDanosCard(BuildContext context, ThemeData theme, EvaluacionGlobalState state) {
+  Widget _buildEvaluacionDanosCard(EvaluacionGlobalState state) {
+    if (state.danosEstructurales == null) return const SizedBox.shrink();
+
+    final condicionesExistentes = state.danosEstructurales?['condicionesExistentes'] as Map<String, bool>? ?? {};
+    final nivelesElementos = state.danosEstructurales?['nivelesElementos'] as Map<String, String>? ?? {};
+
     return Card(
       margin: const EdgeInsets.all(8.0),
       child: Padding(
@@ -599,47 +741,339 @@ class ResumenEvaluacionPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Evaluación de Daños',
-              style: theme.textTheme.titleLarge,
+            const Text(
+              '5. Evaluación de Daños',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 16.0),
-            _buildInfoRow(
-              'Daños Estructurales',
-              _mapToString(state.danosEstructurales),
-              theme,
+            const SizedBox(height: 16),
+            
+            // Condiciones Existentes (5.1-5.6)
+            const Text(
+              'Condiciones Existentes:',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
             ),
-            _buildInfoRow(
-              'Daños No Estructurales',
-              _mapToString(state.danosNoEstructurales),
-              theme,
+            const SizedBox(height: 8),
+            ...condicionesExistentes.entries.map((entry) {
+              final condicionId = entry.key;
+              final existe = entry.value;
+              String descripcion = '';
+              switch (condicionId) {
+                case '5.1': descripcion = 'Colapso total'; break;
+                case '5.2': descripcion = 'Colapso parcial'; break;
+                case '5.3': descripcion = 'Asentamiento severo en elementos estructurales'; break;
+                case '5.4': descripcion = 'Inclinación o desviación importante de la edificación o de un piso'; break;
+                case '5.5': descripcion = 'Problemas de inestabilidad en el suelo de cimentación'; break;
+                case '5.6': descripcion = 'Riesgo de caídas de elementos de la edificación'; break;
+              }
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4.0),
+                child: Row(
+                  children: [
+                    Icon(
+                      existe ? Icons.check_circle : Icons.cancel,
+                      color: existe ? Colors.red : Colors.green,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text('$condicionId. $descripcion'),
+                    ),
+                  ],
+                ),
+              );
+            }).toList(),
+            
+            const SizedBox(height: 16),
+            
+            // Niveles de Elementos (5.7-5.11)
+            const Text(
+              'Nivel de Daño en Elementos:',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
             ),
-            _buildInfoRow(
-              'Daños Geotécnicos',
-              _mapToString(state.danosGeotecnicos),
-              theme,
-            ),
-            _buildInfoRow(
-              'Condiciones Preexistentes',
-              _mapToString(state.condicionesPreexistentes),
-              theme,
-            ),
+            const SizedBox(height: 8),
+            ...nivelesElementos.entries.map((entry) {
+              final elementoId = entry.key;
+              final nivel = entry.value;
+              String descripcion = '';
+              switch (elementoId) {
+                case '5.7': descripcion = 'Daño en muros de carga, columnas, y otros elementos estructurales primordiales'; break;
+                case '5.8': descripcion = 'Daño en sistemas de contención, muros de contención'; break;
+                case '5.9': descripcion = 'Daño en muros divisorios, muros de fachada, antepechos, barandas'; break;
+                case '5.10': descripcion = 'Cubierta (recubrimiento y estructura de soporte)'; break;
+                case '5.11': descripcion = 'Cielo rasos, luminarias, instalaciones y otros elementos no estructurales diferentes de muros'; break;
+              }
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4.0),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 16,
+                      height: 16,
+                      decoration: BoxDecoration(
+                        color: _getNivelColor(nivel),
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text('$elementoId. $descripcion - $nivel'),
+                    ),
+                  ],
+                ),
+              );
+            }).toList(),
+            
+            if (state.alcanceEvaluacion != null) ...[
+              const SizedBox(height: 16),
+              const Text(
+                'Alcance de la Evaluación:',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+              ),
+              const SizedBox(height: 8),
+              Text(state.alcanceEvaluacion!),
+            ],
           ],
         ),
       ),
     );
   }
 
+  Color _getNivelColor(String nivel) {
+    switch (nivel) {
+      case 'Sin daño': return Colors.green;
+      case 'Leve': return Colors.yellow;
+      case 'Moderado': return Colors.orange;
+      case 'Severo': return Colors.red;
+      default: return Colors.grey;
+    }
+  }
+
   Widget _buildNivelDanoCard(ThemeData theme, EvaluacionGlobalState state) {
+    Color getSeveridadColor(String? severidad) {
+      if (severidad == null) return Colors.grey;
+      switch (severidad.toLowerCase()) {
+        case 'bajo':
+          return const Color(0xFF43A047); // Verde
+        case 'medio':
+          return const Color(0xFFFDD835); // Amarillo
+        case 'medio alto':
+          return const Color(0xFFF57C00); // Naranja
+        case 'alto':
+          return const Color(0xFFD32F2F); // Rojo
+        default:
+          return Colors.grey;
+      }
+    }
+
+    IconData getSeveridadIcon(String? severidad) {
+      if (severidad == null) return Icons.help;
+      switch (severidad.toLowerCase()) {
+        case 'bajo':
+          return Icons.check_circle;
+        case 'medio':
+          return Icons.warning;
+        case 'medio alto':
+          return Icons.warning_amber;
+        case 'alto':
+          return Icons.error;
+        default:
+          return Icons.help;
+      }
+    }
+
+    String getSeveridadDescription(String? severidad) {
+      if (severidad == null) return 'Complete la evaluación de daños para calcular la severidad';
+      switch (severidad.toLowerCase()) {
+        case 'bajo':
+          return 'Si en 5.1, 5.2, 5.3, 5.4, 5.5 y 5.6 se selecciona NO, y Si en 5.7 o 5.8 o 5.9 o 5.10 o 5.11 se selecciona Leve';
+        case 'medio':
+          return 'Si en 5.8 o 5.9 o 5.10 o 5.11 se selecciona moderado';
+        case 'medio alto':
+          return 'Si en 5.5 o 5.6 se selecciona SI, Si en 5.7 se selecciona moderado';
+        case 'alto':
+          return 'Si en 5.1 o 5.2 o 5.3 o 5.4 se selecciona SI o Si en 5.7 se selecciona severo';
+        default:
+          return 'Complete la evaluación de daños para calcular la severidad';
+      }
+    }
+
     return _buildSectionCard(
       theme,
       '6. Nivel de Daño',
       Icons.assessment,
       [
-        _buildInfoRow('Nivel de Daño Estructural', state.nivelDanoEstructural ?? 'No especificado', theme, icon: Icons.warning),
-        _buildInfoRow('Nivel de Daño No Estructural', state.nivelDanoNoEstructural ?? 'No especificado', theme, icon: Icons.warning),
-        _buildInfoRow('Nivel de Daño Geotécnico', state.nivelDanoGeotecnico ?? 'No especificado', theme, icon: Icons.warning),
-        _buildInfoRow('Severidad Global', state.severidadGlobal ?? 'No especificada', theme, icon: Icons.warning),
+        // Porcentaje de Afectación
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surface,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: theme.colorScheme.primary.withOpacity(0.2),
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '6.1 Porcentaje de Afectación',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Icon(
+                    Icons.percent,
+                    color: theme.colorScheme.primary,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    state.porcentajeAfectacion ?? 'No especificado',
+                    style: theme.textTheme.bodyLarge,
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+
+        // Severidad de Daños
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: getSeveridadColor(state.severidadGlobal).withOpacity(0.1),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: getSeveridadColor(state.severidadGlobal),
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '6.2 Severidad de Daños',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Icon(
+                    getSeveridadIcon(state.severidadGlobal),
+                    color: getSeveridadColor(state.severidadGlobal),
+                    size: 32,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          state.severidadGlobal?.toUpperCase() ?? 'NO ESPECIFICADA',
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            color: getSeveridadColor(state.severidadGlobal),
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          getSeveridadDescription(state.severidadGlobal),
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurface.withOpacity(0.7),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+
+        // Matriz de Nivel de Daño
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surface,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: theme.colorScheme.primary.withOpacity(0.2),
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '6.3 Nivel de Daño en la Edificación',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Porcentaje de Afectación:',
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          state.porcentajeAfectacion ?? 'No especificado',
+                          style: theme.textTheme.bodyLarge,
+                        ),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Severidad:',
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            Container(
+                              width: 12,
+                              height: 12,
+                              decoration: BoxDecoration(
+                                color: getSeveridadColor(state.severidadGlobal),
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              state.severidadGlobal?.toUpperCase() ?? 'NO ESPECIFICADA',
+                              style: theme.textTheme.bodyLarge?.copyWith(
+                                color: getSeveridadColor(state.severidadGlobal),
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
       ],
     );
   }

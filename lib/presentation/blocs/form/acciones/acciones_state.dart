@@ -113,5 +113,5 @@ class AccionesState extends Equatable {
       otraEntidad.hashCode ^
       recomendacionesEspecificas.hashCode;
 
-  static final AccionesState initial = AccionesState();
+  static final AccionesState initial = const AccionesState();
 }

@@ -81,12 +81,17 @@ class MapWidgetState extends State<MapWidget> {
   }
 
   void _onMapTap(LatLng position) {
+    // Redondear a 4 decimales
+    final latitudRedondeada = double.parse(position.latitude.toStringAsFixed(4));
+    final longitudRedondeada = double.parse(position.longitude.toStringAsFixed(4));
+    final posicionRedondeada = LatLng(latitudRedondeada, longitudRedondeada);
+
     setState(() {
-      _selectedPosition = position;
+      _selectedPosition = posicionRedondeada;
       _markers = {
         Marker(
           markerId: const MarkerId('selected_location'),
-          position: position,
+          position: posicionRedondeada,
           infoWindow: const InfoWindow(
             title: 'Ubicación seleccionada',
           ),
@@ -95,10 +100,28 @@ class MapWidgetState extends State<MapWidget> {
     });
 
     context.read<EdificacionBloc>().add(SetCoordenadas(
-      latitud: position.latitude,
-      longitud: position.longitude,
+      latitud: latitudRedondeada,
+      longitud: longitudRedondeada,
       context: context,
     ));
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // Inicializar el mapa con la posición del bloc si existe
+    if (widget.initialPosition != null) {
+      _selectedPosition = widget.initialPosition;
+      _markers = {
+        Marker(
+          markerId: const MarkerId('selected_location'),
+          position: widget.initialPosition!,
+          infoWindow: const InfoWindow(
+            title: 'Ubicación seleccionada',
+          ),
+        ),
+      };
+    }
   }
 
   @override

@@ -3,7 +3,6 @@ import 'dart:developer';
 
 import 'habitabilidad_event.dart';
 import 'habitabilidad_state.dart';
-import '../riesgosExternos/riesgos_externos_state.dart' as externos;
 import '../../../../domain/entities/riesgo_item.dart';
 
 class HabitabilidadBloc extends Bloc<HabitabilidadEvent, HabitabilidadState> {

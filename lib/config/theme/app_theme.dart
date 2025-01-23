@@ -9,7 +9,7 @@ class AppTheme {
     // Colores principales
     primaryColor: primaryColor,
     primaryColorDark: primaryColor,
-    primaryColorLight: Color(0xFF003366),
+    primaryColorLight: const Color(0xFF003366),
     colorScheme: const ColorScheme.light(
       primary: primaryColor,
       secondary: secondaryColor,

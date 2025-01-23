@@ -5,7 +5,7 @@ import 'dart:developer' as developer;
 
 class DescripcionEdificacionBloc
     extends Bloc<DescripcionEdificacionEvent, DescripcionEdificacionState> {
-  DescripcionEdificacionBloc() : super(DescripcionEdificacionState()) {
+  DescripcionEdificacionBloc() : super(const DescripcionEdificacionState()) {
     on<SetPisosSobreTerreno>((event, emit) {
       emit(state.copyWith(pisosSobreTerreno: event.pisos));
       developer.log('SetPisosSobreTerreno: ${event.pisos}', 
@@ -172,6 +172,17 @@ class DescripcionEdificacionBloc
         escaleras: event.escaleras,
         otraEscalera: event.otraEscalera,
       ));
+    });
+
+    on<SetUsoPredominante>((event, emit) {
+      emit(state.copyWith(
+        usoPredominante: event.uso,
+        otroUso: event.otroUso,
+      ));
+      developer.log(
+        'SetUsoPredominante: uso=${event.uso}, otroUso=${event.otroUso}',
+        name: 'DescripcionEdificacionBloc'
+      );
     });
   }
 } 

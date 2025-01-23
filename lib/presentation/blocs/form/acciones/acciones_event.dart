@@ -39,8 +39,8 @@ class SetRecomendacionesEspecificas extends AccionesEvent {
 }
 
 class UpdateAcciones extends AccionesEvent {
-  final String? evaluacionesAdicionales;
-  final String? medidasSeguridad;
+  final Map<String, dynamic>? evaluacionesAdicionales;
+  final Map<String, dynamic>? medidasSeguridad;
   final Map<String, bool>? entidadesRecomendadas;
   final String? observacionesAcciones;
   final List<String>? medidasSeguridadSeleccionadas;

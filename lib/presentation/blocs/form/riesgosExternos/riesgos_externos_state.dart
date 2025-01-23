@@ -45,7 +45,7 @@ class RiesgosExternosState extends Equatable {
   List<Object?> get props => [riesgos, otroRiesgo];
 
   // Add initial state constant
-  static final RiesgosExternosState initial = RiesgosExternosState();
+  static final RiesgosExternosState initial = const RiesgosExternosState();
 }
 
 /// Represents an individual risk item with its assessment details

@@ -5,37 +5,31 @@ import 'acciones_event.dart';
 import 'acciones_state.dart';
 
 class AccionesBloc extends Bloc<AccionesEvent, AccionesState> {
-  AccionesBloc() : super(AccionesState()) {
+  AccionesBloc() : super(AccionesState.initial) {
     on<UpdateAcciones>((event, emit) {
       emit(state.copyWith(
-        evaluacionesAdicionales: event.evaluacionesAdicionales?.isNotEmpty == true 
-            ? {event.evaluacionesAdicionales!: true} 
-            : {},
-        medidasSeguridad: event.medidasSeguridad?.isNotEmpty == true 
-            ? {event.medidasSeguridad!: true} 
-            : {},
-        entidadesRecomendadas: event.entidadesRecomendadas ?? {},
+        evaluacionesAdicionales: event.evaluacionesAdicionales,
+        medidasSeguridad: event.medidasSeguridad,
+        entidadesRecomendadas: event.entidadesRecomendadas,
         observacionesAcciones: event.observacionesAcciones,
-        medidasSeguridadSeleccionadas: event.medidasSeguridadSeleccionadas ?? [],
-        evaluacionesAdicionalesSeleccionadas: event.evaluacionesAdicionalesSeleccionadas ?? [],
+        medidasSeguridadSeleccionadas: event.medidasSeguridadSeleccionadas,
+        evaluacionesAdicionalesSeleccionadas: event.evaluacionesAdicionalesSeleccionadas,
       ));
-      developer.log('UpdateAcciones: ${event.evaluacionesAdicionales}', name: 'AccionesBloc');
+      developer.log('UpdateAcciones', name: 'AccionesBloc');
     });
 
     on<SetEvaluacionAdicional>((event, emit) {
-      final evaluacionesAdicionales = Map<String, dynamic>.from(state.evaluacionesAdicionales);
-      evaluacionesAdicionales[event.tipo] = event.descripcion;
-      emit(state.copyWith(evaluacionesAdicionales: evaluacionesAdicionales));
-      developer.log('SetEvaluacionAdicional: ${event.tipo} - ${event.descripcion}',
-          name: 'AccionesBloc');
+      final evaluacionAdicional = Map<String, String>.from(state.evaluacionAdicional);
+      evaluacionAdicional[event.tipo] = event.descripcion;
+      emit(state.copyWith(evaluacionAdicional: evaluacionAdicional));
+      developer.log('SetEvaluacionAdicional: ${event.tipo} - ${event.descripcion}', name: 'AccionesBloc');
     });
 
     on<SetRecomendacion>((event, emit) {
-      final medidasSeguridad = Map<String, dynamic>.from(state.medidasSeguridad);
-      medidasSeguridad[event.recomendacion] = event.valor;
-      emit(state.copyWith(medidasSeguridad: medidasSeguridad));
-      developer.log('SetRecomendacion: ${event.recomendacion} - ${event.valor}',
-          name: 'AccionesBloc');
+      final recomendaciones = Map<String, bool>.from(state.recomendaciones);
+      recomendaciones[event.recomendacion] = event.valor;
+      emit(state.copyWith(recomendaciones: recomendaciones));
+      developer.log('SetRecomendacion: ${event.recomendacion} - ${event.valor}', name: 'AccionesBloc');
     });
 
     on<SetEntidadRecomendada>((event, emit) {
@@ -53,15 +47,12 @@ class AccionesBloc extends Bloc<AccionesEvent, AccionesState> {
         entidadesRecomendadas: entidadesRecomendadas,
         otraEntidad: newOtraEntidad,
       ));
-      developer.log(
-          'SetEntidadRecomendada: ${event.entidad} - ${event.valor}${event.otraEntidad != null ? ' - ${event.otraEntidad}' : ''}',
-          name: 'AccionesBloc');
+      developer.log('SetEntidadRecomendada: ${event.entidad} - ${event.valor}${event.otraEntidad != null ? ' - ${event.otraEntidad}' : ''}', name: 'AccionesBloc');
     });
 
     on<SetRecomendacionesEspecificas>((event, emit) {
       emit(state.copyWith(recomendacionesEspecificas: event.recomendaciones));
-      developer.log('SetRecomendacionesEspecificas: ${event.recomendaciones}',
-          name: 'AccionesBloc');
+      developer.log('SetRecomendacionesEspecificas: ${event.recomendaciones}', name: 'AccionesBloc');
     });
   }
 } 

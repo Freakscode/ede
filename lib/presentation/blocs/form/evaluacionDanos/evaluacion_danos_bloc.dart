@@ -4,7 +4,7 @@ import 'evaluacion_danos_event.dart';
 import 'evaluacion_danos_state.dart';
 
 class EvaluacionDanosBloc extends Bloc<EvaluacionDanosEvent, EvaluacionDanosState> {
-  EvaluacionDanosBloc() : super(EvaluacionDanosState()) {
+  EvaluacionDanosBloc() : super(const EvaluacionDanosState()) {
     on<SetCondicionExistente>((event, emit) {
       final updatedCondiciones = Map<String, bool>.from(state.condicionesExistentes);
       

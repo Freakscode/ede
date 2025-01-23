@@ -5,7 +5,7 @@ import 'dart:developer' as developer;
 import 'package:flutter/material.dart';
 
 class EdificacionBloc extends Bloc<EdificacionEvent, EdificacionState> {
-  EdificacionBloc() : super(EdificacionState()) {
+  EdificacionBloc() : super(const EdificacionState()) {
     on<SetNombreEdificacion>(_onSetNombreEdificacion);
     on<SetDireccion>(_onSetDireccion);
     on<SetComuna>(_onSetComuna);
@@ -93,9 +93,35 @@ class EdificacionBloc extends Bloc<EdificacionEvent, EdificacionState> {
   }
 
   void _onLoadTemporaryData(LoadTemporaryData event, Emitter<EdificacionState> emit) {
-    if (state != EdificacionState()) {
+    if (state != const EdificacionState()) {
       emit(state);
       developer.log('LoadTemporaryData: Loaded', name: 'EdificacionBloc');
+    }
+  }
+
+  void _onSetLatitud(SetLatitud event, Emitter<EdificacionState> emit) {
+    // Validar y redondear la latitud
+    try {
+      final latitud = double.parse(event.latitud);
+      if (latitud >= -90 && latitud <= 90) {
+        emit(state.copyWith(latitud: latitud.toStringAsFixed(4)));
+        developer.log('SetLatitud: ${latitud.toStringAsFixed(4)}', name: 'EdificacionBloc');
+      }
+    } catch (e) {
+      developer.log('Error al procesar latitud: $e', name: 'EdificacionBloc');
+    }
+  }
+
+  void _onSetLongitud(SetLongitud event, Emitter<EdificacionState> emit) {
+    // Validar y redondear la longitud
+    try {
+      final longitud = double.parse(event.longitud);
+      if (longitud >= -180 && longitud <= 180) {
+        emit(state.copyWith(longitud: longitud.toStringAsFixed(4)));
+        developer.log('SetLongitud: ${longitud.toStringAsFixed(4)}', name: 'EdificacionBloc');
+      }
+    } catch (e) {
+      developer.log('Error al procesar longitud: $e', name: 'EdificacionBloc');
     }
   }
 
@@ -109,12 +135,18 @@ class EdificacionBloc extends Bloc<EdificacionEvent, EdificacionState> {
       );
       return;
     }
+    
+    // Redondear a 4 decimales
+    final latitudRedondeada = event.latitud.toStringAsFixed(4);
+    final longitudRedondeada = event.longitud.toStringAsFixed(4);
+    
     emit(state.copyWith(
-      latitud: event.latitud.toString(),
-      longitud: event.longitud.toString(),
+      latitud: latitudRedondeada,
+      longitud: longitudRedondeada,
     ));
+    
     developer.log(
-      'SetCoordenadas: ${event.latitud}, ${event.longitud}',
+      'SetCoordenadas: $latitudRedondeada, $longitudRedondeada',
       name: 'EdificacionBloc'
     );
   }
@@ -283,13 +315,5 @@ class EdificacionBloc extends Bloc<EdificacionEvent, EdificacionState> {
     emit(newState);
     _actualizarDireccionCompleta(newState, emit);
     developer.log('SetComplemento: ${event.complemento}', name: 'EdificacionBloc');
-  }
-
-  void _onSetLatitud(SetLatitud event, Emitter<EdificacionState> emit) {
-    emit(state.copyWith(latitud: event.latitud));
-  }
-
-  void _onSetLongitud(SetLongitud event, Emitter<EdificacionState> emit) {
-    emit(state.copyWith(longitud: event.longitud));
   }
 } 

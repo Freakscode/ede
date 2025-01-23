@@ -27,7 +27,7 @@ class UpdateHabitabilidad extends HabitabilidadEvent {
   final String? observacionesHabitabilidad;
   final String? criterioHabitabilidad;
 
-  UpdateHabitabilidad({
+  const UpdateHabitabilidad({
     this.estadoHabitabilidad,
     this.clasificacionHabitabilidad,
     this.observacionesHabitabilidad,

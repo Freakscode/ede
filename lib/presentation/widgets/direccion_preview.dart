@@ -89,7 +89,7 @@ class DireccionPreview extends StatelessWidget {
       partes.add('-');
       partes.add(numero);
       if (complemento != null && complemento.isNotEmpty) {
-        partes.add('(${complemento})');
+        partes.add('($complemento)');
       }
     }
 

@@ -296,17 +296,17 @@ class AccionesPage extends StatelessWidget {
       {
         'tipo': 'Estructural',
         'descripcion': 'Evaluación detallada de la estructura',
-        'seleccionado': state.evaluacionAdicional['Estructural']?.isNotEmpty ?? false,
+        'seleccionado': state.evaluacionesAdicionales['Estructural'] == true,
       },
       {
         'tipo': 'Geotécnica',
         'descripcion': 'Evaluación del suelo y cimentación',
-        'seleccionado': state.evaluacionAdicional['Geotécnica']?.isNotEmpty ?? false,
+        'seleccionado': state.evaluacionesAdicionales['Geotécnica'] == true,
       },
       {
         'tipo': 'Otra',
         'descripcion': 'Otro tipo de evaluación necesaria',
-        'seleccionado': state.evaluacionAdicional['Otra']?.isNotEmpty ?? false,
+        'seleccionado': state.evaluacionesAdicionales['Otra'] == true,
       },
     ];
 
@@ -316,12 +316,17 @@ class AccionesPage extends StatelessWidget {
       evaluacion['descripcion'] as String,
       evaluacion['seleccionado'] as bool,
       theme,
-      (value) => context.read<AccionesBloc>().add(
-        SetEvaluacionAdicional(
-          tipo: evaluacion['tipo'] as String,
-          descripcion: value ? 'Requerida' : '',
-        ),
-      ),
+      (value) {
+        final evaluacionesAdicionales = Map<String, dynamic>.from(state.evaluacionesAdicionales);
+        if (value) {
+          evaluacionesAdicionales[evaluacion['tipo'] as String] = true;
+        } else {
+          evaluacionesAdicionales.remove(evaluacion['tipo'] as String);
+        }
+        context.read<AccionesBloc>().add(
+          UpdateAcciones(evaluacionesAdicionales: evaluacionesAdicionales),
+        );
+      },
     )).toList();
   }
 
@@ -402,14 +407,19 @@ class AccionesPage extends StatelessWidget {
       context,
       medida['titulo'] as String,
       medida['descripcion'] as String,
-      state.recomendaciones[medida['key']] ?? false,
+      state.medidasSeguridad[medida['key']] == true,
       theme,
-      (value) => context.read<AccionesBloc>().add(
-        SetRecomendacion(
-          recomendacion: medida['key'] as String,
-          valor: value,
-        ),
-      ),
+      (value) {
+        final medidasSeguridad = Map<String, dynamic>.from(state.medidasSeguridad);
+        if (value) {
+          medidasSeguridad[medida['key'] as String] = true;
+        } else {
+          medidasSeguridad.remove(medida['key'] as String);
+        }
+        context.read<AccionesBloc>().add(
+          UpdateAcciones(medidasSeguridad: medidasSeguridad),
+        );
+      },
     )).toList();
   }
 

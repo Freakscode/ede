@@ -96,7 +96,7 @@ class EvaluacionRepository {
       throw Exception('No hay conexión a internet');
     }
 
-    final retry = RetryOptions(maxAttempts: 3);
+    final retry = const RetryOptions(maxAttempts: 3);
     return retry.retry(
       () => _intentarSincronizacion(evaluacion),
       retryIf: (e) => e is DioException && e.type == DioExceptionType.connectionTimeout,

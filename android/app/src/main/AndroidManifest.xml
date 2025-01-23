@@ -12,13 +12,14 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 
     <application
-        android:label="ede_final_app"
+        android:label="EDE"
+        android:name=".Application"
         android:icon="@mipmap/ic_launcher">
         
         <!-- API Key de Google Maps -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="@string/MAPS_API_KEY"/>
+            android:value="AIzaSyBWukdvFMDVz-CjVmOQ6Q8xVoQH8U6H6Ng"/>
 
         <activity
             android:name=".MainActivity"

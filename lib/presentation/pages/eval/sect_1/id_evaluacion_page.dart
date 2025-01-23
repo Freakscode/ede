@@ -28,6 +28,7 @@ class _EvaluacionWizardPageState extends State<EvaluacionWizardPage> with Single
   final _nombreController = TextEditingController();
   final _idGrupoController = TextEditingController();
   final _dependenciaController = TextEditingController();
+  final _idEventoController = TextEditingController();
   final _pageController = PageController();
   late DateTime _fechaInspeccion;
   late TimeOfDay _horaInspeccion;
@@ -79,6 +80,7 @@ class _EvaluacionWizardPageState extends State<EvaluacionWizardPage> with Single
     _nombreController.dispose();
     _idGrupoController.dispose();
     _dependenciaController.dispose();
+    _idEventoController.dispose();
     _otroEventoController.dispose();
     _tabController.dispose();
     super.dispose();
@@ -240,54 +242,70 @@ class _EvaluacionWizardPageState extends State<EvaluacionWizardPage> with Single
                       },
                       validator: (value) => _validateField(value, 'dependencia'),
                     ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Firma Digital',
-                      style: theme.textTheme.titleMedium,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Formatos admitidos: JPG, PNG y PDF',
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.primary.withOpacity(0.6),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _idEventoController,
+                      decoration: const InputDecoration(
+                        labelText: 'ID Evento *',
+                        hintText: 'Ingrese el ID del evento',
+                        prefixIcon: Icon(Icons.tag),
+                        border: OutlineInputBorder(),
                       ),
+                      onChanged: (value) {
+                        context.read<EvaluacionBloc>().add(
+                          SetEvaluacionData(idEvento: value),
+                        );
+                      },
+                      validator: (value) => _validateField(value, 'ID evento'),
                     ),
                     const SizedBox(height: 16),
-                    Center(
-                      child: _firmaPath != null
-                          ? Column(
-                              children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(8),
-                                  child: Image.file(
-                                    File(_firmaPath!),
-                                    height: 120,
-                                    width: double.infinity,
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                TextButton.icon(
-                                  onPressed: _pickFirma,
-                                  icon: const Icon(Icons.edit),
-                                  label: const Text('Cambiar firma'),
-                                ),
-                              ],
-                            )
-                          : OutlinedButton.icon(
-                              onPressed: _pickFirma,
-                              icon: const Icon(Icons.upload_file),
-                              label: const Text('Subir Firma'),
+                    Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Firma Digital',
+                              style: theme.textTheme.titleMedium,
                             ),
+                            const SizedBox(height: 8),
+                            Text(
+                              'Formatos admitidos: JPG, PNG y PDF',
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: theme.colorScheme.primary.withOpacity(0.6),
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            Center(
+                              child: _firmaPath != null
+                                  ? Column(
+                                      children: [
+                                        ClipRRect(
+                                          borderRadius: BorderRadius.circular(8),
+                                          child: Image.file(
+                                            File(_firmaPath!),
+                                            height: 120,
+                                            width: double.infinity,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 8),
+                                        TextButton.icon(
+                                          onPressed: _pickFirma,
+                                          icon: const Icon(Icons.edit),
+                                          label: const Text('Cambiar firma'),
+                                        ),
+                                      ],
+                                    )
+                                  : OutlinedButton.icon(
+                                      onPressed: _pickFirma,
+                                      icon: const Icon(Icons.upload_file),
+                                      label: const Text('Subir Firma'),
+                                    ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ],
                 ),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:equatable/equatable.dart';
+import '../../blocs/form/riesgosExternos/riesgos_externos_state.dart';
 
-class EvaluacionGlobalState {
+class EvaluacionGlobalState extends Equatable {
   // Identificación de la Evaluación
   final DateTime? fechaInspeccion;
   final TimeOfDay? horaInspeccion;
@@ -17,7 +19,6 @@ class EvaluacionGlobalState {
   final String? direccion;
   final String? comuna;
   final String? barrio;
-  final String? codigoBarrio;
   final String? cbml;
   final String? nombreContacto;
   final String? telefonoContacto;
@@ -48,14 +49,8 @@ class EvaluacionGlobalState {
   final String? caracteristicasAdicionales;
 
   // Riesgos Externos
-  final bool? colapsoEstructuras;
-  final bool? caidaObjetos;
-  final bool? otrosRiesgos;
-  final bool? riesgoColapso;
-  final bool? riesgoCaida;
-  final bool? riesgoServicios;
-  final bool? riesgoTerreno;
-  final bool? riesgoAccesos;
+  final Map<String, RiesgoItem> riesgosExternos;
+  final String? otroRiesgoExterno;
 
   // Evaluación de Daños
   final Map<String, dynamic>? danosEstructurales;
@@ -69,6 +64,7 @@ class EvaluacionGlobalState {
   final String? nivelDanoNoEstructural;
   final String? nivelDanoGeotecnico;
   final String? severidadGlobal;
+  final String? porcentajeAfectacion;
 
   // Habitabilidad
   final String? estadoHabitabilidad;
@@ -100,7 +96,6 @@ class EvaluacionGlobalState {
     this.direccion,
     this.comuna,
     this.barrio,
-    this.codigoBarrio,
     this.cbml,
     this.nombreContacto,
     this.telefonoContacto,
@@ -129,25 +124,27 @@ class EvaluacionGlobalState {
     this.elementosNoEstructurales,
     this.caracteristicasAdicionales,
     // Riesgos Externos
-    this.colapsoEstructuras,
-    this.caidaObjetos,
-    this.otrosRiesgos,
-    this.riesgoColapso,
-    this.riesgoCaida,
-    this.riesgoServicios,
-    this.riesgoTerreno,
-    this.riesgoAccesos,
+    this.riesgosExternos = const {
+      '4.1': RiesgoItem(),
+      '4.2': RiesgoItem(),
+      '4.3': RiesgoItem(),
+      '4.4': RiesgoItem(),
+      '4.5': RiesgoItem(),
+      '4.6': RiesgoItem(),
+    },
+    this.otroRiesgoExterno,
     // Evaluación de Daños
-    this.danosEstructurales,
-    this.danosNoEstructurales,
-    this.danosGeotecnicos,
-    this.condicionesPreexistentes,
+    this.danosEstructurales = const {},
+    this.danosNoEstructurales = const {},
+    this.danosGeotecnicos = const {},
+    this.condicionesPreexistentes = const {},
     this.alcanceEvaluacion,
     // Nivel de Daño
     this.nivelDanoEstructural,
     this.nivelDanoNoEstructural,
     this.nivelDanoGeotecnico,
     this.severidadGlobal,
+    this.porcentajeAfectacion,
     // Habitabilidad
     this.estadoHabitabilidad,
     this.clasificacionHabitabilidad,
@@ -161,6 +158,71 @@ class EvaluacionGlobalState {
     this.medidasSeguridadSeleccionadas,
     this.evaluacionesAdicionalesSeleccionadas,
   });
+
+  @override
+  List<Object?> get props => [
+    fechaInspeccion,
+    horaInspeccion,
+    nombreEvaluador,
+    idGrupo,
+    idEvento,
+    eventoSeleccionado,
+    descripcionOtro,
+    dependenciaEntidad,
+    firmaPath,
+    nombreEdificacion,
+    direccion,
+    comuna,
+    barrio,
+    cbml,
+    nombreContacto,
+    telefonoContacto,
+    emailContacto,
+    ocupacion,
+    latitud,
+    longitud,
+    tipoVia,
+    numeroVia,
+    apendiceVia,
+    orientacionVia,
+    numeroCruce,
+    apendiceCruce,
+    orientacionCruce,
+    numero,
+    complemento,
+    departamento,
+    municipio,
+    uso,
+    niveles,
+    ocupantes,
+    sistemaConstructivo,
+    tipoEntrepiso,
+    tipoCubierta,
+    elementosNoEstructurales,
+    caracteristicasAdicionales,
+    riesgosExternos,
+    otroRiesgoExterno,
+    danosEstructurales,
+    danosNoEstructurales,
+    danosGeotecnicos,
+    condicionesPreexistentes,
+    alcanceEvaluacion,
+    nivelDanoEstructural,
+    nivelDanoNoEstructural,
+    nivelDanoGeotecnico,
+    severidadGlobal,
+    porcentajeAfectacion,
+    estadoHabitabilidad,
+    clasificacionHabitabilidad,
+    observacionesHabitabilidad,
+    criterioHabitabilidad,
+    evaluacionesAdicionales,
+    medidasSeguridad,
+    entidadesRecomendadas,
+    observacionesAcciones,
+    medidasSeguridadSeleccionadas,
+    evaluacionesAdicionalesSeleccionadas,
+  ];
 
   EvaluacionGlobalState copyWith({
     // Identificación de la Evaluación
@@ -178,7 +240,6 @@ class EvaluacionGlobalState {
     String? direccion,
     String? comuna,
     String? barrio,
-    String? codigoBarrio,
     String? cbml,
     String? nombreContacto,
     String? telefonoContacto,
@@ -207,14 +268,8 @@ class EvaluacionGlobalState {
     String? elementosNoEstructurales,
     String? caracteristicasAdicionales,
     // Riesgos Externos
-    bool? colapsoEstructuras,
-    bool? caidaObjetos,
-    bool? otrosRiesgos,
-    bool? riesgoColapso,
-    bool? riesgoCaida,
-    bool? riesgoServicios,
-    bool? riesgoTerreno,
-    bool? riesgoAccesos,
+    Map<String, RiesgoItem>? riesgosExternos,
+    String? otroRiesgoExterno,
     // Evaluación de Daños
     Map<String, dynamic>? danosEstructurales,
     Map<String, dynamic>? danosNoEstructurales,
@@ -226,6 +281,7 @@ class EvaluacionGlobalState {
     String? nivelDanoNoEstructural,
     String? nivelDanoGeotecnico,
     String? severidadGlobal,
+    String? porcentajeAfectacion,
     // Habitabilidad
     String? estadoHabitabilidad,
     String? clasificacionHabitabilidad,
@@ -255,7 +311,6 @@ class EvaluacionGlobalState {
       direccion: direccion ?? this.direccion,
       comuna: comuna ?? this.comuna,
       barrio: barrio ?? this.barrio,
-      codigoBarrio: codigoBarrio ?? this.codigoBarrio,
       cbml: cbml ?? this.cbml,
       nombreContacto: nombreContacto ?? this.nombreContacto,
       telefonoContacto: telefonoContacto ?? this.telefonoContacto,
@@ -284,14 +339,8 @@ class EvaluacionGlobalState {
       elementosNoEstructurales: elementosNoEstructurales ?? this.elementosNoEstructurales,
       caracteristicasAdicionales: caracteristicasAdicionales ?? this.caracteristicasAdicionales,
       // Riesgos Externos
-      colapsoEstructuras: colapsoEstructuras ?? this.colapsoEstructuras,
-      caidaObjetos: caidaObjetos ?? this.caidaObjetos,
-      otrosRiesgos: otrosRiesgos ?? this.otrosRiesgos,
-      riesgoColapso: riesgoColapso ?? this.riesgoColapso,
-      riesgoCaida: riesgoCaida ?? this.riesgoCaida,
-      riesgoServicios: riesgoServicios ?? this.riesgoServicios,
-      riesgoTerreno: riesgoTerreno ?? this.riesgoTerreno,
-      riesgoAccesos: riesgoAccesos ?? this.riesgoAccesos,
+      riesgosExternos: riesgosExternos ?? this.riesgosExternos,
+      otroRiesgoExterno: otroRiesgoExterno ?? this.otroRiesgoExterno,
       // Evaluación de Daños
       danosEstructurales: danosEstructurales ?? this.danosEstructurales,
       danosNoEstructurales: danosNoEstructurales ?? this.danosNoEstructurales,
@@ -303,6 +352,7 @@ class EvaluacionGlobalState {
       nivelDanoNoEstructural: nivelDanoNoEstructural ?? this.nivelDanoNoEstructural,
       nivelDanoGeotecnico: nivelDanoGeotecnico ?? this.nivelDanoGeotecnico,
       severidadGlobal: severidadGlobal ?? this.severidadGlobal,
+      porcentajeAfectacion: porcentajeAfectacion ?? this.porcentajeAfectacion,
       // Habitabilidad
       estadoHabitabilidad: estadoHabitabilidad ?? this.estadoHabitabilidad,
       clasificacionHabitabilidad: clasificacionHabitabilidad ?? this.clasificacionHabitabilidad,
