@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:ede_final_app/environment.dart';
+import 'package:ede_final_app/env/environment.dart';
 import 'package:http/http.dart' as http;
 import 'dart:developer' as developer;
 

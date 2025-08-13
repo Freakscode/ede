@@ -2,7 +2,7 @@ import 'dart:math';
 import 'package:crypto/crypto.dart';
 import 'dart:convert';
 
-import 'package:ede_final_app/environment.dart';
+import 'package:ede_final_app/env/environment.dart';
 
 class SecurityConfig {
   static String generateSecretKey(){
@@ -13,6 +13,6 @@ class SecurityConfig {
     return sha256.convert(utf8.encode(key)).toString();
   }
 
-  static const String jwtSecretKey = Environment.jwtSecret;
+  static final String jwtSecretKey = Environment.jwtSecret;
 
 }
