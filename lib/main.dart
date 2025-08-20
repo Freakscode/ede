@@ -1,7 +1,9 @@
 // ignore_for_file: unused_import
 
+import 'package:ede_final_app/env/environment.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dio/dio.dart';
@@ -37,6 +39,7 @@ Future<void> main() async {
 
   try {
     developer.log('Starting app initialization...', name: 'App');
+    await dotenv.load(fileName: Environment.fileName);
     
     // Inicializar SharedPreferences
     final prefs = await SharedPreferences.getInstance();
