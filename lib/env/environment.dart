@@ -7,4 +7,5 @@ final class Environment {
   static int get jwtExpirationDays => int.tryParse(dotenv.env['JWT_EXPIRATION_DAYS'] ?? '') ?? 30;
   static String get userBackend => dotenv.env['username'] ?? '';
   static String get passwordBackend => dotenv.env['password'] ?? '';
+  static String get apiUrl => dotenv.env['API_URL'] ?? 'http://localhost:3000/api';
 }
