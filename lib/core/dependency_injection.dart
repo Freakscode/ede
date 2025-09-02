@@ -1,7 +1,7 @@
 import 'package:get_it/get_it.dart';
-import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:http/http.dart' as http;
 
 // Data sources
 import '../data/datasources/local_database.dart';
@@ -9,60 +9,57 @@ import '../data/datasources/remote_api.dart';
 import '../data/datasources/secure_storage_service.dart';
 
 // Repositories
-import '../data/repositories/evaluacion_repository.dart';
-import '../data/repositories/user_repository.dart';
+import '../domain/repositories/repositories.dart';
+import '../data/repositories/evaluacion_repository_impl.dart';
+import '../data/repositories/auth_repository_impl.dart';
+import '../data/repositories/sync_repository_impl.dart';
 
 // Use cases
-import '../domain/usecases/save_evaluacion_usecase.dart';
-import '../domain/usecases/get_evaluaciones_usecase.dart';
-import '../domain/usecases/sync_evaluaciones_usecase.dart';
-import '../domain/usecases/login_usecase.dart';
-
-// BLoCs
-import '../presentation/blocs/evaluacion_global/evaluacion_global_bloc.dart';
+import '../domain/usecases/usecases.dart';
 
 final GetIt sl = GetIt.instance; // sl = Service Locator
 
 Future<void> initializeDependencies() async {
   // External dependencies
   final sharedPreferences = await SharedPreferences.getInstance();
+  final database = await LocalDatabase.initDatabase();
+  
   sl.registerSingleton<SharedPreferences>(sharedPreferences);
-
-  sl.registerSingleton<Dio>(
-    Dio(BaseOptions(
-      connectTimeout: const Duration(seconds: 30),
-      receiveTimeout: const Duration(seconds: 30),
-      headers: {'Content-Type': 'application/json'},
-    )),
-  );
-
-  // Database
-  sl.registerSingletonAsync<Database>(() async {
-    return await LocalDatabase.initDatabase();
-  });
-
-  // Wait for async singletons to be ready
-  await sl.allReady();
+  sl.registerSingleton<Database>(database);
+  sl.registerLazySingleton<http.Client>(() => http.Client());
 
   // Data sources
-  sl.registerLazySingleton<LocalDatabase>(() => LocalDatabase(sl<Database>()));
-  sl.registerLazySingleton<RemoteApi>(() => RemoteApi(sl<Dio>()));
+  sl.registerLazySingleton<LocalDatabase>(
+    () => LocalDatabase(sl<Database>())
+  );
+  
+  sl.registerLazySingleton<RemoteApi>(
+    () => RemoteApi(client: sl<http.Client>())
+  );
+  
   sl.registerLazySingleton<SecureStorageService>(() => SecureStorageService());
 
   // Repositories
-  sl.registerLazySingleton<EvaluacionRepository>(
-    () => EvaluacionRepository(
-      localDatabase: sl<LocalDatabase>(),
+  sl.registerLazySingleton<AuthRepository>(
+    () => AuthRepositoryImpl(
       remoteApi: sl<RemoteApi>(),
-      secureStorage: sl<SecureStorageService>(),
+      sharedPreferences: sl<SharedPreferences>(),
     ),
   );
 
-  sl.registerLazySingleton<UserRepository>(
-    () => UserRepository(
+  sl.registerLazySingleton<EvaluacionRepository>(
+    () => EvaluacionRepositoryImpl(
+      localDatabase: sl<LocalDatabase>(),
       remoteApi: sl<RemoteApi>(),
-      secureStorage: sl<SecureStorageService>(),
-      sharedPreferences: sl<SharedPreferences>(),
+      authRepository: sl<AuthRepository>(),
+    ),
+  );
+
+  sl.registerLazySingleton<SyncRepository>(
+    () => SyncRepositoryImpl(
+      localDatabase: sl<LocalDatabase>(),
+      remoteApi: sl<RemoteApi>(),
+      authRepository: sl<AuthRepository>(),
     ),
   );
 
@@ -76,21 +73,15 @@ Future<void> initializeDependencies() async {
   );
 
   sl.registerLazySingleton<SyncEvaluacionesUseCase>(
-    () => SyncEvaluacionesUseCase(sl<EvaluacionRepository>()),
+    () => SyncEvaluacionesUseCase(sl<SyncRepository>()),
   );
 
   sl.registerLazySingleton<LoginUseCase>(
-    () => LoginUseCase(sl<UserRepository>()),
+    () => LoginUseCase(sl<AuthRepository>()),
   );
 
-  // BLoCs - Factory instances (new instance each time)
-  sl.registerFactory<EvaluacionGlobalBloc>(
-    () => EvaluacionGlobalBloc(
-      saveEvaluacionUseCase: sl<SaveEvaluacionUseCase>(),
-      getEvaluacionesUseCase: sl<GetEvaluacionesUseCase>(),
-      syncEvaluacionesUseCase: sl<SyncEvaluacionesUseCase>(),
-    ),
-  );
+  // Note: EvaluacionGlobalBloc requires many BLoC dependencies
+  // It should be created manually in the UI layer with all required BLoCs
 }
 
 // Helper method to reset dependencies (useful for testing)
