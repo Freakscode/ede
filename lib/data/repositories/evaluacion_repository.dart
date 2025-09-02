@@ -23,7 +23,7 @@ class EvaluacionRepository {
 
   Future<bool> _verificarConexion() async {
     final connectivityResult = await Connectivity().checkConnectivity();
-    return connectivityResult != ConnectivityResult.none;
+    return !connectivityResult.contains(ConnectivityResult.none);
   }
 
   // Guardar evaluación localmente
