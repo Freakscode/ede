@@ -1,4 +1,4 @@
-import '../../../features/evaluacion/data/models/evaluacion_model.dart';
+import '../../../modules/evaluacion/data/models/evaluacion_model.dart';
 
 abstract class LocalDatabase {
   Future<List<EvaluacionModel>> getAllEvaluaciones();

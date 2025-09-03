@@ -1,7 +1,7 @@
 import 'dart:developer';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import './riesgos_externos_event.dart';
-import './riesgos_externos_state.dart';
+import 'riesgos_externos_event.dart';
+import 'riesgos_externos_state.dart';
 
 class RiesgosExternosBloc extends Bloc<RiesgosExternosEvent, RiesgosExternosState> {
   RiesgosExternosBloc() : super(const RiesgosExternosState()) {

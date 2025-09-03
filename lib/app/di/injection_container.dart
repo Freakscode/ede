@@ -8,21 +8,21 @@ import '../../core/network/network_info.dart';
 import '../../shared/infrastructure/dio_client.dart';
 
 // Features - Auth
-import '../../features/auth/data/repositories_impl/auth_repository_implementation.dart';
-import '../../features/auth/domain/repositories/auth_repository.dart';
-import '../../features/auth/presentation/bloc/auth_bloc.dart';
+import '../../modules/auth/data/repositories_impl/auth_repository_implementation.dart';
+import '../../modules/auth/domain/repositories/auth_repository.dart';
+import '../../modules/auth/presentation/bloc/auth_bloc.dart';
 
 // Features - Evaluacion
-import '../../features/evaluacion/data/repositories_impl/evaluacion_repository_impl.dart';
-import '../../features/evaluacion/domain/repositories/evaluacion_repository.dart';
-import '../../features/evaluacion/presentation/bloc/form/evaluacion/evaluacion_bloc.dart';
-import '../../features/evaluacion/presentation/bloc/form/identificacionEdificacion/id_edificacion_bloc.dart';
-import '../../features/evaluacion/presentation/bloc/form/riesgosExternos/riesgos_externos_bloc.dart';
-import '../../features/evaluacion/presentation/bloc/form/nivelDano/nivel_dano_bloc.dart';
-import '../../features/evaluacion/presentation/bloc/form/habitabilidad/habitabilidad_bloc.dart';
-import '../../features/evaluacion/presentation/bloc/form/acciones/acciones_bloc.dart';
-import '../../features/evaluacion/presentation/bloc/form/evaluacionDanos/evaluacion_danos_bloc.dart';
-import '../../features/evaluacion/presentation/bloc/form/descripcionEdificacion/descripcion_edificacion_bloc.dart';
+import '../../modules/evaluacion/data/repositories_impl/evaluacion_repository_impl.dart';
+import '../../modules/evaluacion/domain/repositories/evaluacion_repository.dart';
+import '../../modules/evaluacion/presentation/bloc/form/evaluacion/evaluacion_bloc.dart';
+import '../../modules/evaluacion/presentation/bloc/form/identificacionEdificacion/id_edificacion_bloc.dart';
+import '../../modules/evaluacion/presentation/bloc/form/riesgosExternos/riesgos_externos_bloc.dart';
+import '../../modules/evaluacion/presentation/bloc/form/nivelDano/nivel_dano_bloc.dart';
+import '../../modules/evaluacion/presentation/bloc/form/habitabilidad/habitabilidad_bloc.dart';
+import '../../modules/evaluacion/presentation/bloc/form/acciones/acciones_bloc.dart';
+import '../../modules/evaluacion/presentation/bloc/form/evaluacionDanos/evaluacion_danos_bloc.dart';
+import '../../modules/evaluacion/presentation/bloc/form/descripcionEdificacion/descripcion_edificacion_bloc.dart';
 
 final GetIt sl = GetIt.instance;
 

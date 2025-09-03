@@ -7,24 +7,24 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 // Core
-import '../../features/auth/presentation/bloc/auth_bloc.dart';
-import '../../features/auth/presentation/bloc/auth_event.dart';
-import '../../features/auth/presentation/bloc/auth_state.dart';
+import '../../modules/auth/presentation/bloc/auth_bloc.dart';
+import '../../modules/auth/presentation/bloc/auth_event.dart';
+import '../../modules/auth/presentation/bloc/auth_state.dart';
 
 // Auth pages
-import '../../features/auth/presentation/pages/login_screen.dart';
+import '../../modules/auth/presentation/pages/login_screen.dart';
 
 // Evaluacion pages
-import '../../features/evaluacion/presentation/pages/home_screen.dart';
-import '../../features/evaluacion/presentation/pages/sect_1/id_evaluacion_page.dart';
-import '../../features/evaluacion/presentation/pages/sect_2/id_edificacion_page.dart';
-import '../../features/evaluacion/presentation/pages/sect_3/descripcion_edificacion_page.dart';
-import '../../features/evaluacion/presentation/pages/sect_4/riesgos_externos_page.dart';
-import '../../features/evaluacion/presentation/pages/sect_5/evaluacion_danos_page.dart';
-import '../../features/evaluacion/presentation/pages/sect_6/nivel_dano_page.dart';
-import '../../features/evaluacion/presentation/pages/sect_7/habitabilidad_page.dart';
-import '../../features/evaluacion/presentation/pages/sect_8/acciones_page.dart';
-import '../../features/evaluacion/presentation/pages/resumen_evaluacion_page.dart';
+import '../../modules/evaluacion/presentation/pages/home_screen.dart';
+import '../../modules/evaluacion/presentation/pages/sect_1/id_evaluacion_page.dart';
+import '../../modules/evaluacion/presentation/pages/sect_2/id_edificacion_page.dart';
+import '../../modules/evaluacion/presentation/pages/sect_3/descripcion_edificacion_page.dart';
+import '../../modules/evaluacion/presentation/pages/sect_4/riesgos_externos_page.dart';
+import '../../modules/evaluacion/presentation/pages/sect_5/evaluacion_danos_page.dart';
+import '../../modules/evaluacion/presentation/pages/sect_6/nivel_dano_page.dart';
+import '../../modules/evaluacion/presentation/pages/sect_7/habitabilidad_page.dart';
+import '../../modules/evaluacion/presentation/pages/sect_8/acciones_page.dart';
+import '../../modules/evaluacion/presentation/pages/resumen_evaluacion_page.dart';
 
 // Routes
 import 'routes.dart';
