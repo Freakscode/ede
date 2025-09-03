@@ -1550,14 +1550,6 @@ class _EdificacionPageState extends State<EdificacionPage>
       ],
     );
   }
-
-  Widget _buildCaracteristicasEdificacion(BuildContext context) {
-    return const Column(
-      children: [
-        // Eliminar todo el contenido relacionado con pisos, subterráneos y año
-      ],
-    );
-  }
 }
 
 class UpperCaseTextFormatter extends TextInputFormatter {

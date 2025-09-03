@@ -4,8 +4,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../bloc/identificacionEdificacion/id_edificacion_bloc.dart';
-import '../bloc/identificacionEdificacion/id_edificacion_event.dart';
+import '../bloc/form/identificacionEdificacion/id_edificacion_bloc.dart';
+import '../bloc/form/identificacionEdificacion/id_edificacion_event.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/foundation.dart';
 

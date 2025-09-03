@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'dart:developer';
-import '../../bloc/form/riesgosExternos/riesgos_externos_state.dart';
-import '../../bloc/habitabilidad/habitabilidad_bloc.dart';
-import '../../bloc/habitabilidad/habitabilidad_state.dart';
-import '../../bloc/habitabilidad/habitabilidad_event.dart';
+import '../../../domain/entities/riesgo_item.dart';
+import '../../bloc/form/habitabilidad/habitabilidad_bloc.dart';
+import '../../bloc/form/habitabilidad/habitabilidad_state.dart';
+import '../../bloc/form/habitabilidad/habitabilidad_event.dart';
 import '../../bloc/form/riesgosExternos/riesgos_externos_bloc.dart';
 import '../../bloc/form/riesgosExternos/riesgos_externos_state.dart' as externos;
 import '../../bloc/form/nivelDano/nivel_dano_bloc.dart';
-import '../../bloc/form/nivelDano/nivel_dano_state.dart' as nivelform;
+import '../../bloc/form/nivelDano/nivel_dano_state.dart';
 import '../../widgets/navigation_fab_menu.dart';
 
 class HabitabilidadPage extends StatelessWidget {
@@ -20,7 +20,7 @@ class HabitabilidadPage extends StatelessWidget {
     
     return BlocBuilder<RiesgosExternosBloc, externos.RiesgosExternosState>(
       builder: (context, riesgosState) {
-        return BlocBuilder<NivelDanoBloc, nivelform.NivelDanoState>(
+        return BlocBuilder<NivelDanoBloc, NivelDanoState>(
           builder: (context, nivelDanoState) {
             // Solo calcular si hay cambios en los estados
             if (riesgosState.riesgos.isNotEmpty && nivelDanoState.nivelDano != null) {
@@ -62,7 +62,7 @@ class HabitabilidadPage extends StatelessWidget {
   void _calcularHabitabilidad(
     BuildContext context,
     externos.RiesgosExternosState riesgosState,
-    nivelform.NivelDanoState nivelDanoState,
+    NivelDanoState nivelDanoState,
   ) {
     log('=== Calculando Habitabilidad ===');
 
@@ -295,7 +295,7 @@ class HabitabilidadPage extends StatelessWidget {
   Widget _buildResumenDatos(
     ThemeData theme,
     externos.RiesgosExternosState riesgosState,
-    nivelform.NivelDanoState nivelDanoState,
+    NivelDanoState nivelDanoState,
   ) {
     // Filtrar solo los riesgos de la sección 4
     final riesgosSeccion4 = riesgosState.riesgos.entries

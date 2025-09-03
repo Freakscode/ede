@@ -3,10 +3,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../bloc/descripcionEdificacion/descripcion_edificacion_event.dart';
+import '../../bloc/form/descripcionEdificacion/descripcion_edificacion_event.dart';
 import '../../widgets/navigation_fab_menu.dart';
-import '../../bloc/descripcionEdificacion/descripcion_edificacion_bloc.dart';
-import '../../bloc/descripcionEdificacion/descripcion_edificacion_state.dart';
+import '../../bloc/form/descripcionEdificacion/descripcion_edificacion_bloc.dart';
+import '../../bloc/form/descripcionEdificacion/descripcion_edificacion_state.dart';
 
 class DescripcionEdificacionPage extends StatefulWidget {
   const DescripcionEdificacionPage({super.key});

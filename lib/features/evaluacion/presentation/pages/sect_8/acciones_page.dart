@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../presentation/bloc/acciones/acciones_bloc.dart';
-import '../../../presentation/bloc/acciones/acciones_event.dart';
-import '../../../presentation/bloc/acciones/acciones_state.dart';
+import '../../bloc/form/acciones/acciones_bloc.dart';
+import '../../bloc/form/acciones/acciones_event.dart';
+import '../../bloc/form/acciones/acciones_state.dart';
 import '../../widgets/navigation_fab_menu.dart';
 
 class AccionesPage extends StatelessWidget {

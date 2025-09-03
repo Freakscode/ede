@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../bloc/nivelDano/nivel_dano_bloc.dart';
-import '../../bloc/nivelDano/nivel_dano_state.dart';
-import '../../bloc/nivelDano/nivel_dano_event.dart';
-import '../../bloc/riesgosExternos/riesgos_externos_bloc.dart';
-import '../../bloc/riesgosExternos/riesgos_externos_state.dart';
-import '../../bloc/evaluacionDanos/evaluacion_danos_bloc.dart';
-import '../../bloc/evaluacionDanos/evaluacion_danos_state.dart';
+import '../../bloc/form/nivelDano/nivel_dano_bloc.dart';
+import '../../bloc/form/nivelDano/nivel_dano_state.dart';
+import '../../bloc/form/nivelDano/nivel_dano_event.dart';
+import '../../bloc/form/riesgosExternos/riesgos_externos_bloc.dart';
+import '../../bloc/form/riesgosExternos/riesgos_externos_state.dart';
+import '../../bloc/form/evaluacionDanos/evaluacion_danos_bloc.dart';
+import '../../bloc/form/evaluacionDanos/evaluacion_danos_state.dart';
 import '../../widgets/navigation_fab_menu.dart';
 import 'dart:developer';
 

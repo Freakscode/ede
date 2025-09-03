@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../bloc/identificacionEdificacion/id_edificacion_bloc.dart';
-import '../bloc/identificacionEdificacion/id_edificacion_state.dart';
+import '../bloc/form/identificacionEdificacion/id_edificacion_bloc.dart';
+import '../bloc/form/identificacionEdificacion/id_edificacion_state.dart';
 
 class DireccionPreview extends StatelessWidget {
   const DireccionPreview({super.key});

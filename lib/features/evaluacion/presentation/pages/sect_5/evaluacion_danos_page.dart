@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../bloc/evaluacionDanos/evaluacion_danos_bloc.dart';
-import '../../bloc/evaluacionDanos/evaluacion_danos_event.dart';
-import '../../bloc/evaluacionDanos/evaluacion_danos_state.dart';
+import '../../bloc/form/evaluacionDanos/evaluacion_danos_bloc.dart';
+import '../../bloc/form/evaluacionDanos/evaluacion_danos_event.dart';
+import '../../bloc/form/evaluacionDanos/evaluacion_danos_state.dart';
 import '../../widgets/navigation_fab_menu.dart';
 
 class EvaluacionDanosPage extends StatelessWidget {

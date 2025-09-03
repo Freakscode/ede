@@ -1,3 +1,4 @@
+import 'package:ede_final_app/config/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -70,12 +71,10 @@ class MyApp extends StatelessWidget {
         builder: (context) {
           return MaterialApp.router(
             title: AppConstants.appName,
+            
             routerConfig: getAppRouter(context),
             debugShowCheckedModeBanner: false,
-            theme: ThemeData(
-              primarySwatch: Colors.blue,
-              visualDensity: VisualDensity.adaptivePlatformDensity,
-            ),
+            theme: AppTheme.theme,
           );
         },
       ),
