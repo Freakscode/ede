@@ -1,9 +1,13 @@
+/// Application routes constants
 class AppRoutes {
+  // Prevent instantiation
+  AppRoutes._();
+  
   // Auth routes
   static const String login = '/login';
   static const String home = '/';
   
-  // Evaluacion routes
+  // Evaluacion flow routes
   static const String idEvaluacion = '/id_evaluacion';
   static const String idEdificacion = '/id_edificacion';
   static const String descripcionEdificacion = '/descripcion_edificacion';
@@ -12,16 +16,23 @@ class AppRoutes {
   static const String nivelDano = '/nivel_dano';
   static const String habitabilidad = '/habitabilidad';
   static const String acciones = '/acciones';
-  static const String resumenEvaluacion = '/resumen_evaluacion';
+  static const String resumenEvaluacion = '/resumen';
   
-  // User routes
+  // User management routes
   static const String profile = '/profile';
   static const String settings = '/settings';
 }
 
+/// Route names for navigation
 class RouteNames {
+  // Prevent instantiation
+  RouteNames._();
+  
+  // Auth routes
   static const String login = 'login';
   static const String home = 'home';
+  
+  // Evaluacion flow routes
   static const String idEvaluacion = 'idEvaluacion';
   static const String idEdificacion = 'idEdificacion';
   static const String descripcionEdificacion = 'descripcionEdificacion';
@@ -31,6 +42,8 @@ class RouteNames {
   static const String habitabilidad = 'habitabilidad';
   static const String acciones = 'acciones';
   static const String resumenEvaluacion = 'resumenEvaluacion';
+  
+  // User management routes
   static const String profile = 'profile';
   static const String settings = 'settings';
 }

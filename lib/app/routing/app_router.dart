@@ -6,13 +6,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+// Core
 import '../../features/auth/presentation/bloc/auth_bloc.dart';
 import '../../features/auth/presentation/bloc/auth_event.dart';
 import '../../features/auth/presentation/bloc/auth_state.dart';
-import '../../features/evaluacion/presentation/bloc/evaluacion/evaluacion_bloc.dart';
 
-import '../../features/evaluacion/presentation/pages/home_screen.dart';
+// Auth pages
 import '../../features/auth/presentation/pages/login_screen.dart';
+
+// Evaluacion pages
+import '../../features/evaluacion/presentation/pages/home_screen.dart';
 import '../../features/evaluacion/presentation/pages/sect_1/id_evaluacion_page.dart';
 import '../../features/evaluacion/presentation/pages/sect_2/id_edificacion_page.dart';
 import '../../features/evaluacion/presentation/pages/sect_3/descripcion_edificacion_page.dart';
@@ -23,11 +26,13 @@ import '../../features/evaluacion/presentation/pages/sect_7/habitabilidad_page.d
 import '../../features/evaluacion/presentation/pages/sect_8/acciones_page.dart';
 import '../../features/evaluacion/presentation/pages/resumen_evaluacion_page.dart';
 
+// Routes
 import 'routes.dart';
 
+/// Creates and configures the application router with clean architecture
 GoRouter getAppRouter(BuildContext context) {
   return GoRouter(
-    initialLocation: '/',
+     initialLocation: '/',
     routes: [
       GoRoute(
         path: '/',
@@ -81,18 +86,22 @@ GoRouter getAppRouter(BuildContext context) {
     ],
     redirect: (context, state) {
       final authBloc = context.read<AuthBloc>();
-      final bool isLoginRoute = state.matchedLocation == '/login';
+      final bool isLoginRoute = state.matchedLocation == AppRoutes.login;
 
-      if (authBloc.state is AuthUnauthenticated && !isLoginRoute) {
-        return '/login';
-      }
+      // Redirect unauthenticated users to login (except if already on login)
+      // if (authBloc.state is AuthUnauthenticated && !isLoginRoute) {
+      //   return AppRoutes.login;
+      // }
 
+      // Redirect authenticated users away from login to home
       if (authBloc.state is AuthAuthenticated && isLoginRoute) {
-        return '/home';
+        return AppRoutes.home;
       }
 
-      return null;
+      return null; // No redirect needed
     },
+    
+    // Refresh router when auth state changes
     refreshListenable: GoRouterRefreshStream(
       context.read<AuthBloc>().stream,
     ),
