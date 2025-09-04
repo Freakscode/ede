@@ -3,8 +3,8 @@ import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
-import 'app/core/network/network_info.dart';
-import 'app/core/utils/logger.dart';
+import '../core/network/network_info.dart';
+import '../core/utils/logger.dart';
 
 final getIt = GetIt.instance;
 
