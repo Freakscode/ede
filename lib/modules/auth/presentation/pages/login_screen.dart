@@ -50,7 +50,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   children: [
                     const SizedBox(height: 48),
                     Text(
-                      'DAGRD - APP EDE',
+                      'DAGRD - Caja de Herramientas',
                       style: theme.textTheme.titleLarge?.copyWith(
                         color: theme.colorScheme.primary,
                         fontSize: 32,

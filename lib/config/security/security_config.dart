@@ -2,7 +2,7 @@ import 'dart:math';
 import 'package:crypto/crypto.dart';
 import 'dart:convert';
 
-import 'package:ede_final_app/env/environment.dart';
+import 'package:caja_herramientas/env/environment.dart';
 
 class SecurityConfig {
   static String generateSecretKey(){

@@ -1,13 +1,14 @@
-# EDE - Evaluación de Daños en Edificaciones
+# Caja de Herramientas
 
 ## Descripción
-EDE es una aplicación móvil desarrollada en Flutter para la evaluación y registro de daños en edificaciones post-evento (sismos, inundaciones, etc.). Permite a los evaluadores realizar inspecciones estructurales de manera sistemática y eficiente, con capacidad de trabajo offline y sincronización posterior.
+Caja de Herramientas es una aplicación móvil desarrollada en Flutter que proporciona múltiples utilidades y herramientas para diferentes propósitos. Incluye funcionalidades de evaluación de daños en edificaciones, gestión de usuarios, habitabilidad y otras herramientas útiles.
 
 ## Objetivo
-Facilitar y estandarizar el proceso de evaluación de daños en edificaciones después de eventos naturales o antrópicos, proporcionando una herramienta digital que permita:
+Proporcionar una plataforma unificada con diversas herramientas digitales que permitan:
 - Realizar evaluaciones estructurales sistemáticas
+- Gestionar información de usuarios y habitabilidad
 - Mantener registros consistentes y accesibles
-- Trabajar sin conexión en zonas afectadas
+- Trabajar sin conexión cuando sea necesario
 - Sincronizar datos cuando haya conectividad
 - Generar reportes estandarizados
 

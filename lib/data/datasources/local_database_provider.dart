@@ -3,7 +3,7 @@ import 'package:path/path.dart' as p;
 import 'dart:developer' as developer;
 
 class LocalDatabaseProvider {
-  static const _databaseName = 'ede_app.db';
+  static const _databaseName = 'caja_herramientas.db';
   static const _databaseVersion = 1;
 
   static Future<Database> open() async {
