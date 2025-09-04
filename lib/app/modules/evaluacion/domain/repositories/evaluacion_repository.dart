@@ -1,5 +1,5 @@
 import '../entities/evaluacion_entity.dart';
-import '../../../../shared/data/models/evaluacion_model.dart';
+import '../../../../core/models/evaluacion_model.dart';
 
 abstract class EvaluacionRepository {
   Future<List<EvaluacionEntity>> getAllEvaluaciones();

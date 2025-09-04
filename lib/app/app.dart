@@ -1,21 +1,21 @@
-import 'package:caja_herramientas/config/theme/app_theme.dart';
+import 'package:caja_herramientas/app/core/config/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../core/constants/app_constants.dart';
-import '../modules/auth/presentation/bloc/auth_bloc.dart';
-import '../modules/auth/presentation/bloc/auth_event.dart';
-import '../modules/evaluacion/presentation/bloc/form/evaluacion/evaluacion_bloc.dart';
-import '../modules/evaluacion/presentation/bloc/form/identificacionEdificacion/id_edificacion_bloc.dart';
-import '../modules/evaluacion/presentation/bloc/form/riesgosExternos/riesgos_externos_bloc.dart';
-import '../modules/evaluacion/presentation/bloc/form/nivelDano/nivel_dano_bloc.dart';
-import '../modules/evaluacion/presentation/bloc/form/habitabilidad/habitabilidad_bloc.dart';
-import '../modules/evaluacion/presentation/bloc/form/acciones/acciones_bloc.dart';
-import '../modules/evaluacion/presentation/bloc/form/evaluacionDanos/evaluacion_danos_bloc.dart';
-import '../modules/evaluacion/presentation/bloc/form/descripcionEdificacion/descripcion_edificacion_bloc.dart';
-import '../modules/evaluacion/presentation/bloc/evaluacion_global_bloc.dart';
-import 'di/injection_container.dart' as di;
-import 'routing/app_router.dart';
+import 'core/constants/app_constants.dart';
+import 'modules/auth/presentation/bloc/auth_bloc.dart';
+import 'modules/auth/presentation/bloc/auth_event.dart';
+import 'modules/evaluacion/presentation/bloc/form/evaluacion/evaluacion_bloc.dart';
+import 'modules/evaluacion/presentation/bloc/form/identificacionEdificacion/id_edificacion_bloc.dart';
+import 'modules/evaluacion/presentation/bloc/form/riesgosExternos/riesgos_externos_bloc.dart';
+import 'modules/evaluacion/presentation/bloc/form/nivelDano/nivel_dano_bloc.dart';
+import 'modules/evaluacion/presentation/bloc/form/habitabilidad/habitabilidad_bloc.dart';
+import 'modules/evaluacion/presentation/bloc/form/acciones/acciones_bloc.dart';
+import 'modules/evaluacion/presentation/bloc/form/evaluacionDanos/evaluacion_danos_bloc.dart';
+import 'modules/evaluacion/presentation/bloc/form/descripcionEdificacion/descripcion_edificacion_bloc.dart';
+import 'modules/evaluacion/presentation/bloc/evaluacion_global_bloc.dart';
+import '../injection_container.dart' as di;
+import 'core/routing/app_router.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

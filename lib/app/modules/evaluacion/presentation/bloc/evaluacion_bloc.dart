@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../domain/repositories/evaluacion_repository.dart';
-import '../../../../shared/data/models/evaluacion_model.dart';
+import '../../../../core/models/evaluacion_model.dart';
 
 // Events
 abstract class EvaluacionEvent {}

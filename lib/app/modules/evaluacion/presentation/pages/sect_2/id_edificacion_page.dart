@@ -11,7 +11,7 @@ import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../../widgets/direccion_preview.dart';
 import 'dart:async';
-import '../../../../../data/models/colombia_data.dart';
+import '../../../../../core/data/models/colombia_data.dart';
 import '../../widgets/map_location_picker.dart';
 
 enum TipoIdentificacion { medellin, areaMetropolitana }

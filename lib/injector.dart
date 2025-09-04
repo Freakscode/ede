@@ -3,9 +3,8 @@ import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
-import '../../core/network/network_info.dart';
-import '../../core/utils/logger.dart';
-import '../../shared/infrastructure/dio_client.dart';
+import 'app/core/network/network_info.dart';
+import 'app/core/utils/logger.dart';
 
 final getIt = GetIt.instance;
 
@@ -25,12 +24,7 @@ Future<void> setupDependencyInjection() async {
 
   // Infrastructure
   getIt.registerLazySingleton<Dio>(() => Dio());
-  getIt.registerLazySingleton<DioClient>(
-    () => DioClient(
-      dio: getIt<Dio>(),
-      networkInfo: getIt<NetworkInfo>(),
-    ),
-  );
+  
 
   // Features will be registered here
   await _setupAuthFeature();

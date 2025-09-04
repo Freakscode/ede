@@ -1,6 +1,6 @@
 import '../../domain/entities/evaluacion_entity.dart';
 import '../../domain/repositories/evaluacion_repository.dart';
-import '../../../../shared/data/models/evaluacion_model.dart';
+import '../../../../core/models/evaluacion_model.dart';
 
 class EvaluacionRepositoryImpl implements EvaluacionRepository {
   // Simple temporary implementation

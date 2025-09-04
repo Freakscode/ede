@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'app/app.dart';
-import 'app/di/injection_container.dart' as di;
-import 'core/utils/env.dart';
-import 'core/utils/logger.dart';
+import 'injection_container.dart' as di;
+import 'app/core/utils/env.dart';
+import 'app/core/utils/logger.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
