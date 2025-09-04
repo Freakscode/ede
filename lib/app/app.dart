@@ -15,7 +15,7 @@ import 'modules/evaluacion/presentation/bloc/form/evaluacionDanos/evaluacion_dan
 import 'modules/evaluacion/presentation/bloc/form/descripcionEdificacion/descripcion_edificacion_bloc.dart';
 import 'modules/evaluacion/presentation/bloc/evaluacion_global_bloc.dart';
 import '../injection_container.dart' as di;
-import 'core/routing/app_router.dart';
+import 'config/routing/app_router.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
