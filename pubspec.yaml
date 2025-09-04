@@ -50,3 +50,8 @@ flutter:
   assets:
     - assets/icons/svg/
     - .env
+
+  fonts:
+    - family: CajaHerramientasIcons
+      fonts:
+        - asset: assets/fonts/CajaHerramientasIcons.ttf
