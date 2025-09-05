@@ -21,6 +21,41 @@ class _LoginScreenState extends State<LoginScreen> {
 
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
+      appBar: AppBar(
+        backgroundColor: DAGRDColors.azulDAGRD, // Color azul DAGRD
+        elevation: 0,
+        automaticallyImplyLeading: false,
+        toolbarHeight: 110, // height: 110px
+        centerTitle: true, // Centrar el título
+        title: const Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'DAGRD - APP',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 20, 
+                fontWeight: FontWeight.w700,
+                height: 1.2, 
+              ),
+              textAlign: TextAlign.center, 
+            ),
+            Text(
+              'Caja de Herramientas',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.w400,
+              ),
+            ),
+          ],
+        ),
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            bottom: Radius.circular(24), // ajusta el radio a tu diseño
+          ),
+        ),
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
