@@ -1,5 +1,6 @@
 import 'package:caja_herramientas/app/core/constants/app_assets.dart';
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
+import 'package:caja_herramientas/app/shared/widgets/buttons/custom_elevated_button.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -58,13 +59,14 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
+          // padding: const EdgeInsets.all(24.0),
+          padding: const EdgeInsets.symmetric(horizontal: 35, vertical: 27),
           child: Form(
             key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const SizedBox(height: 48),
+                // const SizedBox(height: 27),
                 Text(
                   'INICIAR SESIÓN',
                   style: theme.textTheme.titleLarge?.copyWith(
@@ -142,7 +144,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 24),
                 TextFormField(
                   controller: _passwordController,
                   decoration: InputDecoration(
@@ -191,8 +193,28 @@ class _LoginScreenState extends State<LoginScreen> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 24),
-                ElevatedButton(
+                const SizedBox(height: 5),
+                Align(
+                  alignment: Alignment.centerRight, // text-align: right
+                  child: TextButton(
+                    onPressed: () {
+                      // TODO: Implementar recuperación de contraseña
+                    },
+                    child: Text(
+                      '¿Olvidaste la contraseña?',
+                      style: TextStyle(
+                        color: DAGRDColors.azulDAGRD, // color: var(--AzulDAGRD, #232B48)
+                        fontFamily: 'Roboto', // font-family: Roboto
+                        fontSize: 13, // font-size: 13px
+                        fontWeight: FontWeight.w500, // font-weight: 500
+                        height: 1.538, // line-height: 20px / 13px = 153.846%
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 5),
+                CustomElevatedButton(
+                  text: 'Ingresar',
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
                       // Simulación de login exitoso
@@ -206,21 +228,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       context.go('/home');
                     }
                   },
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                  ),
-                  child: const Text('INGRESAR'),
                 ),
                 const SizedBox(height: 16),
-                TextButton(
-                  onPressed: () {
-                    // TODO: Implementar recuperación de contraseña
-                  },
-                  child: Text(
-                    '¿Olvidaste la contraseña?',
-                    style: TextStyle(color: theme.colorScheme.primary),
-                  ),
-                ),
+                
               ],
             ),
           ),
