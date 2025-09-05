@@ -1,15 +1,10 @@
+import 'package:caja_herramientas/app/core/constants/app_assets.dart';
+import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/constants/app_constants.dart';
-import '../bloc/auth_bloc.dart';
-import '../bloc/auth_event.dart';
-import '../bloc/auth_state.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({
-    super.key,
-  });
+  const LoginScreen({super.key});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -23,148 +18,117 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
-      body: BlocConsumer<AuthBloc, AuthState>(
-        listener: (context, state) {
-          if (state is AuthAuthenticated) {
-            context.go('/');
-          } else if (state is AuthUnauthenticated) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: const Text('Credenciales inválidas'),
-                backgroundColor: theme.colorScheme.error,
-              ),
-            );
-          }
-        },
-        builder: (context, state) {
-          return SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(24.0),
-              child: Form(
-                key: _formKey,
-                child: Column(
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SizedBox(height: 48),
+                Text(
+                  'INICIAR SESIÓN',
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    color: DAGRDColors.azulDAGRD,// #1E1E1E
+                    fontFamily: 'Roboto',
+                    fontSize: 24,
+                    fontWeight: FontWeight.w600,
+                    height: 1.167, // line-height: 116.667%
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 32),
+                Image.asset(AppAssets.logoDagrd, height: 164, width: 164),
+                const SizedBox(height: 30),
+                Text(
+                  'Inicie sesión para gestión de datos usuario DAGRD',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: DAGRDColors.azulDAGRD,
+                    fontFamily: 'Roboto',
+                    fontSize: 20,
+                    fontWeight: FontWeight.w400,
+                    height: 1.4, // line-height: 140%
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 48),
+                Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const SizedBox(height: 48),
-                    Text(
-                      'DAGRD - Caja de Herramientas',
-                      style: theme.textTheme.titleLarge?.copyWith(
-                        color: theme.colorScheme.primary,
-                        fontSize: 32,
+                   
+                    const SizedBox(height: 24),
+                    TextFormField(
+                      controller: _cedulaController,
+                      decoration: const InputDecoration(
+                        labelText: 'Cédula',
+                        prefixIcon: Icon(Icons.person_outline),
                       ),
-                      textAlign: TextAlign.center,
+                      keyboardType: TextInputType.number,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Por favor ingrese su cédula';
+                        }
+                        if (!RegExp(r'^[0-9]{8,10}$').hasMatch(value)) {
+                          return 'Cédula inválida';
+                        }
+                        return null;
+                      },
                     ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Evaluación de Daños en Edificaciones',
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        color: theme.colorScheme.primary,
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _passwordController,
+                      decoration: const InputDecoration(
+                        labelText: 'Contraseña',
+                        prefixIcon: Icon(Icons.lock_outline),
                       ),
-                      textAlign: TextAlign.center,
+                      obscureText: true,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Por favor ingrese su contraseña';
+                        }
+                        return null;
+                      },
                     ),
-                    const SizedBox(height: 48),
-                    Container(
-                      padding: const EdgeInsets.all(24),
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.surface,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: theme.colorScheme.primary.withOpacity(0.1),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
+                    const SizedBox(height: 24),
+                    ElevatedButton(
+                      onPressed: () {
+                        if (_formKey.currentState!.validate()) {
+                          // Simulación de login exitoso
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Login exitoso'),
+                              backgroundColor: Colors.green,
+                            ),
+                          );
+                          // Navegar a home después del login
+                          context.go('/home');
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Text(
-                            'INICIAR SESIÓN',
-                            style: theme.textTheme.titleMedium,
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 24),
-                          TextFormField(
-                            controller: _cedulaController,
-                            decoration: const InputDecoration(
-                              labelText: 'Cédula',
-                              prefixIcon: Icon(Icons.person_outline),
-                            ),
-                            keyboardType: TextInputType.number,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Por favor ingrese su cédula';
-                              }
-                              if (!RegExp(r'^[0-9]{8,10}$').hasMatch(value)) {
-                                return 'Cédula inválida';
-                              }
-                              return null;
-                            },
-                          ),
-                          const SizedBox(height: 16),
-                          TextFormField(
-                            controller: _passwordController,
-                            decoration: const InputDecoration(
-                              labelText: 'Contraseña',
-                              prefixIcon: Icon(Icons.lock_outline),
-                            ),
-                            obscureText: true,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Por favor ingrese su contraseña';
-                              }
-                              return null;
-                            },
-                          ),
-                          const SizedBox(height: 24),
-                          if (state is AuthLoading)
-                            Center(
-                              child: CircularProgressIndicator(
-                                color: theme.colorScheme.secondary,
-                              ),
-                            )
-                          else
-                            ElevatedButton(
-                              onPressed: () {
-                                if (_formKey.currentState!.validate()) {
-                                  context.read<AuthBloc>().add(
-                                    LoginRequested(
-                                      username: _cedulaController.text,
-                                      password: _passwordController.text,
-                                    ),
-                                  );
-                                }
-                              },
-                              style: ElevatedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(vertical: 16),
-                              ),
-                              child: const Text('INGRESAR'),
-                            ),
-                          const SizedBox(height: 16),
-                          TextButton(
-                            onPressed: () {
-                              // TODO: Implementar recuperación de contraseña
-                            },
-                            child: Text(
-                              '¿Olvidaste la contraseña?',
-                              style: TextStyle(
-                                color: theme.colorScheme.primary,
-                              ),
-                            ),
-                          ),
-                        ],
+                      child: const Text('INGRESAR'),
+                    ),
+                    const SizedBox(height: 16),
+                    TextButton(
+                      onPressed: () {
+                        // TODO: Implementar recuperación de contraseña
+                      },
+                      child: Text(
+                        '¿Olvidaste la contraseña?',
+                        style: TextStyle(color: theme.colorScheme.primary),
                       ),
                     ),
                   ],
                 ),
-              ),
+              ],
             ),
-          );
-        },
+          ),
+        ),
       ),
     );
   }
