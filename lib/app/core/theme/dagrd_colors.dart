@@ -10,6 +10,9 @@ class DAGRDColors {
   /// Color amarillo de acentos y botones
   static const Color amarilloDAGRD = Color(0xFFFBBF24);
   
+  /// Color amarillo alternativo DAGRD
+  static const Color amarDAGRD = Color(0xFFFFCC00);
+  
   /// Color blanco para textos sobre fondos azules
   static const Color blancoDAGRD = Color(0xFFFFFFFF);
   
