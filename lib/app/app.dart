@@ -1,10 +1,8 @@
-import 'package:caja_herramientas/app/core/config/theme/app_theme.dart';
+import 'package:caja_herramientas/app/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'core/constants/app_constants.dart';
-import 'modules/auth/presentation/bloc/auth_bloc.dart';
-import 'modules/auth/presentation/bloc/auth_event.dart';
 import 'modules/evaluacion/presentation/bloc/form/evaluacion/evaluacion_bloc.dart';
 import 'modules/evaluacion/presentation/bloc/form/identificacionEdificacion/id_edificacion_bloc.dart';
 import 'modules/evaluacion/presentation/bloc/form/riesgosExternos/riesgos_externos_bloc.dart';
@@ -25,9 +23,7 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         // Auth BLoC
-        BlocProvider<AuthBloc>(
-          create: (context) => di.sl<AuthBloc>()..add(AppStarted()),
-        ),
+       
         // Evaluacion BLoCs
         BlocProvider<EvaluacionBloc>(
           create: (context) => di.sl<EvaluacionBloc>(),

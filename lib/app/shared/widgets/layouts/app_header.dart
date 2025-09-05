@@ -1,13 +1,14 @@
+import 'package:caja_herramientas/app/core/icons/caja_herramientas_icons.dart';
+import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import 'package:flutter/material.dart';
-import 'package:caja_herramientas/core/icons/caja_herramientas_icons.dart';
 
 /// Enum para los diferentes tipos de AppBar según la imagen
 enum AppBarType {
-  metodologiaAnalisis,    // Header 1: Metodología de Análisis del Riesgo
-  logosCompletos,        // Header 2: Con logos institucionales completos  
-  logosSimples,          // Header 3: Con logos institucionales simples
-  logoSingle,            // Header 4: Con un solo logo institucional
-  cajaHerramientas,      // Header 5: Caja de Herramientas DAGRD
+  metodologiaAnalisis, // Header 1: Metodología de Análisis del Riesgo
+  logosCompletos, // Header 2: Con logos institucionales completos
+  logosSimples, // Header 3: Con logos institucionales simples
+  logoSingle, // Header 4: Con un solo logo institucional
+  cajaHerramientas, // Header 5: Caja de Herramientas DAGRD
 }
 
 /// AppBar personalizado que replica exactamente los diseños de la imagen
@@ -46,23 +47,19 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: const Color(0xFF232B48), // Color azul DAGRD
+      backgroundColor: DAGRDColors.azulDAGRD, // Color azul DAGRD
       elevation: 0,
       automaticallyImplyLeading: false,
       toolbarHeight: preferredSize.height,
-      flexibleSpace: Container(
-        decoration: const BoxDecoration(
-          color: Color(0xFF232B48),
-          borderRadius: BorderRadius.only(
-            bottomLeft: Radius.circular(16),
-            bottomRight: Radius.circular(16),
-          ),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          bottom: Radius.circular(24), // ajusta el radio a tu diseño
         ),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            child: _buildAppBarContent(),
-          ),
+      ),
+      flexibleSpace: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: _buildAppBarContent(),
         ),
       ),
     );
@@ -93,9 +90,9 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
             icon: CajaHerramientasIcons.arrowleft,
             onPressed: onBackPressed,
           ),
-        
+
         const SizedBox(width: 16),
-        
+
         // Título en dos líneas
         Expanded(
           child: Column(
@@ -113,7 +110,7 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
               Text(
                 subtitle ?? 'Análisis del Riesgo',
                 style: const TextStyle(
-                  color: Colors.white,
+                  color: DAGRDColors.amarDAGRD,
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
                 ),
@@ -121,18 +118,18 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
             ],
           ),
         ),
-        
+
         const SizedBox(width: 16),
-        
+
         // Botón de guardar/archivo
         if (showSaveButton)
           _buildYellowCircleButton(
             icon: CajaHerramientasIcons.save,
             onPressed: onSavePressed,
           ),
-        
+
         if (showSaveButton && showInfoButton) const SizedBox(width: 12),
-        
+
         // Botón de información/pregunta
         if (showInfoButton)
           _buildYellowCircleButton(
@@ -153,9 +150,9 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
             icon: CajaHerramientasIcons.arrowleft,
             onPressed: onBackPressed,
           ),
-        
+
         const SizedBox(width: 16),
-        
+
         // Logos institucionales centrales
         Expanded(
           child: Row(
@@ -163,24 +160,24 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
             children: [
               _buildInstitutionalLogo(48), // Logo 1
               const SizedBox(width: 20),
-              _buildInstitutionalLogo(48), // Logo 2  
+              _buildInstitutionalLogo(48), // Logo 2
               const SizedBox(width: 20),
               _buildInstitutionalLogo(48), // Logo 3
             ],
           ),
         ),
-        
+
         const SizedBox(width: 16),
-        
+
         // Botón de información
         if (showInfoButton)
           _buildYellowCircleButton(
             icon: CajaHerramientasIcons.question,
             onPressed: onInfoPressed,
           ),
-        
+
         if (showInfoButton && showLogoutButton) const SizedBox(width: 12),
-        
+
         // Botón de logout
         if (showLogoutButton)
           _buildYellowCircleButton(
@@ -198,14 +195,10 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
         // Botón de retroceso simple
         if (showBackButton)
           IconButton(
-            icon: const Icon(
-              Icons.arrow_back,
-              color: Colors.white,
-              size: 24,
-            ),
+            icon: const Icon(Icons.arrow_back, color: Colors.white, size: 24),
             onPressed: onBackPressed,
           ),
-        
+
         // Logos institucionales centrales
         Expanded(
           child: Row(
@@ -219,7 +212,7 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
             ],
           ),
         ),
-        
+
         // Botón de información simple
         if (showInfoButton)
           IconButton(
@@ -230,7 +223,7 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
             ),
             onPressed: onInfoPressed,
           ),
-        
+
         // Botón de logout simple
         if (showLogoutButton)
           IconButton(
@@ -255,18 +248,14 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
             icon: CajaHerramientasIcons.arrowleft,
             onPressed: onBackPressed,
           ),
-        
+
         const SizedBox(width: 16),
-        
+
         // Logo institucional central
-        Expanded(
-          child: Center(
-            child: _buildInstitutionalLogo(56),
-          ),
-        ),
-        
+        Expanded(child: Center(child: _buildInstitutionalLogo(56))),
+
         const SizedBox(width: 16),
-        
+
         // Botón de información
         if (showInfoButton)
           _buildYellowCircleButton(
@@ -287,9 +276,9 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
             icon: CajaHerramientasIcons.arrowleft,
             onPressed: onBackPressed,
           ),
-        
+
         const SizedBox(width: 16),
-        
+
         // Título con "Herramientas" en amarillo
         Expanded(
           child: Column(
@@ -316,7 +305,8 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
                       ),
                     ),
                     TextSpan(
-                      text: ' ${subtitle?.split(' ').skip(1).join(' ') ?? 'DAGRD'}',
+                      text:
+                          ' ${subtitle?.split(' ').skip(1).join(' ') ?? 'DAGRD'}',
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 16,
@@ -329,22 +319,22 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
             ],
           ),
         ),
-        
+
         const SizedBox(width: 16),
-        
+
         // Botón de información
         if (showInfoButton)
           _buildYellowCircleButton(
-            icon: CajaHerramientasIcons.question,
+            icon: CajaHerramientasIcons.question2,
             onPressed: onInfoPressed,
           ),
-        
+
         if (showInfoButton && showUserButton) const SizedBox(width: 12),
-        
+
         // Botón de usuario
         if (showUserButton)
           _buildYellowCircleButton(
-            icon: CajaHerramientasIcons.usuario,
+            icon: CajaHerramientasIcons.persona,
             onPressed: onUserPressed,
           ),
       ],
@@ -383,10 +373,7 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.15),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: Colors.white.withOpacity(0.3),
-          width: 1,
-        ),
+        border: Border.all(color: Colors.white.withOpacity(0.3), width: 1),
       ),
       child: Center(
         child: Icon(

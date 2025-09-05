@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../auth/presentation/bloc/auth_bloc.dart';
-import '../../../auth/presentation/bloc/auth_event.dart';
-import '../../../auth/presentation/bloc/auth_state.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({
@@ -14,12 +11,9 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final authState = context.watch<AuthBloc>().state;
     String welcomeMessage = 'Bienvenido a App EDE';
 
-    if (authState is AuthAuthenticated) {
-      welcomeMessage = 'Bienvenido, token: ${authState.token}';
-    }
+   
 
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
@@ -95,7 +89,7 @@ class HomeScreen extends StatelessWidget {
               const SizedBox(height: 24),
               OutlinedButton.icon(
                 onPressed: () {
-                  context.read<AuthBloc>().add(LoggedOut());
+                  
                 },
                 icon: const Icon(Icons.logout),
                 label: const Text('CERRAR SESIÓN'),
