@@ -55,75 +55,136 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 48),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                   
-                    const SizedBox(height: 24),
-                    TextFormField(
-                      controller: _cedulaController,
-                      decoration: const InputDecoration(
-                        labelText: 'Cédula',
-                        prefixIcon: Icon(Icons.person_outline),
-                      ),
-                      keyboardType: TextInputType.number,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Por favor ingrese su cédula';
-                        }
-                        if (!RegExp(r'^[0-9]{8,10}$').hasMatch(value)) {
-                          return 'Cédula inválida';
-                        }
-                        return null;
-                      },
+                const SizedBox(height: 34),
+                TextFormField(
+                  controller: _cedulaController,
+                  decoration: InputDecoration(
+                    labelText: 'Número de cédula',
+                    labelStyle: const TextStyle(
+                      color: Color(0xFFCCCCCC), // Texto-inputs #CCC
+                      fontFamily: 'Work Sans',
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      height: 1.429, // line-height: 142.857%
                     ),
-                    const SizedBox(height: 16),
-                    TextFormField(
-                      controller: _passwordController,
-                      decoration: const InputDecoration(
-                        labelText: 'Contraseña',
-                        prefixIcon: Icon(Icons.lock_outline),
-                      ),
-                      obscureText: true,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Por favor ingrese su contraseña';
-                        }
-                        return null;
-                      },
+                    prefixIcon: Icon(
+                      Icons.person_outline,
+                      color: const Color(0xFFC6C6C6), // stroke: Gris2DAGRD #C6C6C6
+                      size: 24, // Tamaño estándar con stroke-width simulado
                     ),
-                    const SizedBox(height: 24),
-                    ElevatedButton(
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          // Simulación de login exitoso
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Login exitoso'),
-                              backgroundColor: Colors.green,
-                            ),
-                          );
-                          // Navegar a home después del login
-                          context.go('/home');
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                      ),
-                      child: const Text('INGRESAR'),
-                    ),
-                    const SizedBox(height: 16),
-                    TextButton(
-                      onPressed: () {
-                        // TODO: Implementar recuperación de contraseña
-                      },
-                      child: Text(
-                        '¿Olvidaste la contraseña?',
-                        style: TextStyle(color: theme.colorScheme.primary),
+                    filled: true,
+                    fillColor: Colors.white, // background: #FFF
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(6), // border-radius: 6px
+                      borderSide: const BorderSide(
+                        color: Color(0xFFD1D5DB), // Color-bordes #D1D5DB
+                        width: 1,
                       ),
                     ),
-                  ],
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(6),
+                      borderSide: const BorderSide(
+                        color: Color(0xFFD1D5DB),
+                        width: 1,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(6),
+                      borderSide: const BorderSide(
+                        color: Color(0xFFD1D5DB),
+                        width: 1,
+                      ),
+                    ),
+                  ),
+                  keyboardType: TextInputType.number,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Por favor ingrese su cédula';
+                    }
+                    if (!RegExp(r'^[0-9]{8,10}$').hasMatch(value)) {
+                      return 'Cédula inválida';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _passwordController,
+                  decoration: InputDecoration(
+                    labelText: 'Contraseña',
+                    labelStyle: const TextStyle(
+                      color: Color(0xFFCCCCCC), // Texto-inputs #CCC
+                      fontFamily: 'Work Sans',
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      height: 1.429, // line-height: 142.857%
+                    ),
+                    prefixIcon: Icon(
+                      Icons.lock_outline,
+                      color: const Color(0xFFC6C6C6), // stroke: Gris2DAGRD #C6C6C6
+                      size: 24,
+                    ),
+                    filled: true,
+                    fillColor: Colors.white, // background: #FFF
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(6), // border-radius: 6px
+                      borderSide: const BorderSide(
+                        color: Color(0xFFD1D5DB), // Color-bordes #D1D5DB
+                        width: 1,
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(6),
+                      borderSide: const BorderSide(
+                        color: Color(0xFFD1D5DB),
+                        width: 1,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(6),
+                      borderSide: const BorderSide(
+                        color: Color(0xFFD1D5DB),
+                        width: 1,
+                      ),
+                    ),
+                  ),
+                  obscureText: true,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Por favor ingrese su contraseña';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 24),
+                ElevatedButton(
+                  onPressed: () {
+                    if (_formKey.currentState!.validate()) {
+                      // Simulación de login exitoso
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Login exitoso'),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+                      // Navegar a home después del login
+                      context.go('/home');
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                  ),
+                  child: const Text('INGRESAR'),
+                ),
+                const SizedBox(height: 16),
+                TextButton(
+                  onPressed: () {
+                    // TODO: Implementar recuperación de contraseña
+                  },
+                  child: Text(
+                    '¿Olvidaste la contraseña?',
+                    style: TextStyle(color: theme.colorScheme.primary),
+                  ),
                 ),
               ],
             ),
