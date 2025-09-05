@@ -9,7 +9,6 @@ import '../core/network/network_info.dart';
 // Features - Auth
 import '../modules/auth/data/repositories_impl/auth_repository_implementation.dart';
 import '../modules/auth/domain/repositories/auth_repository.dart';
-import '../modules/auth/presentation/bloc/auth_bloc.dart';
 
 // Features - Evaluacion
 import '../modules/evaluacion/data/repositories_impl/evaluacion_repository_impl.dart';
@@ -58,7 +57,6 @@ Future<void> initializeDependencies() async {
   // TODO: Register use cases here
 
   // BLoCs
-  sl.registerFactory(() => AuthBloc(authRepository: sl()));
   sl.registerFactory(() => EvaluacionBloc(repository: sl()));
   sl.registerFactory(() => EdificacionBloc());
   sl.registerFactory(() => RiesgosExternosBloc());
