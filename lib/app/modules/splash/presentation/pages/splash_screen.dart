@@ -59,9 +59,9 @@ class _SplashScreenState extends State<SplashScreen>
     // Esperar antes de navegar
     await Future.delayed(const Duration(milliseconds: 2000));
 
-    // Navegar a login
+    // Navegar a home
     if (mounted) {
-      context.go('/login');
+      context.go('/home');
     }
   }
 

@@ -6,19 +6,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-
-// Layout
 import '../shared/widgets/layouts/app_scaffold.dart';
 import '../shared/widgets/layouts/app_header.dart';
 
-// Auth pages
 import '../modules/auth/presentation/pages/login_screen.dart';
 
-// Splash pages
 import '../modules/splash/presentation/pages/splash_screen.dart';
 
-// Evaluacion pages
-import '../modules/evaluacion/presentation/pages/home_screen.dart';
+import '../modules/home/presentation/pages/home_screen.dart' as home;
+
+import '../modules/evaluacion/presentation/pages/home_screen.dart'
+    as evaluacion;
 import '../modules/evaluacion/presentation/pages/sect_1/id_evaluacion_page.dart';
 import '../modules/evaluacion/presentation/pages/sect_2/id_edificacion_page.dart';
 import '../modules/evaluacion/presentation/pages/sect_3/descripcion_edificacion_page.dart';
@@ -38,7 +36,10 @@ GoRouter getAppRouter(BuildContext context) {
     initialLocation: '/splash',
     routes: [
       // Rutas SIN header (splash, login, onboarding, etc.)
-      GoRoute(path: '/splash', builder: (context, state) => const SplashScreen()),
+      GoRoute(
+        path: '/splash',
+        builder: (context, state) => const SplashScreen(),
+      ),
       GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
 
       // Shell con layout global (AppScaffold + AppHeader)
@@ -67,13 +68,13 @@ GoRouter getAppRouter(BuildContext context) {
           );
         },
         routes: [
+          // Home - Pantalla principal
           GoRoute(
-            path: '/',
-            builder: (context, state) => const LoginScreen(),
+            path: '/home',
+            builder: (context, state) => const home.HomeScreen(),
           ),
 
-          // Home
-          // GoRoute(path: '/', builder: (context, state) => const HomeScreen()),
+          GoRoute(path: '/', builder: (context, state) => const LoginScreen()),
 
           // Evaluación - Sección 1: Identificación de Evaluación
           GoRoute(
@@ -132,8 +133,6 @@ GoRouter getAppRouter(BuildContext context) {
       ),
     ],
     redirect: (context, state) {
-      
-
       return null; // No redirect needed
     },
   );
@@ -145,29 +144,29 @@ AppBarType _getHeaderTypeFromPath(String path) {
     // Login con header "Caja de Herramientas"
     case '/':
       return AppBarType.cajaHerramientas;
-    
+
     // Home podría usar logos completos
     case '/home':
       return AppBarType.logosCompletos;
-    
+
     // Rutas de evaluación con "Metodología de Análisis"
     case '/id_evaluacion':
     case '/id_edificacion':
     case '/descripcion_edificacion':
       return AppBarType.metodologiaAnalisis;
-    
+
     // Rutas de riesgos con logos simples
     case '/riesgos_externos':
     case '/evaluacion_danos':
       return AppBarType.logosSimples;
-    
+
     // Rutas finales con un solo logo
     case '/nivel_dano':
     case '/habitabilidad':
     case '/acciones':
     case '/resumen':
       return AppBarType.logoSingle;
-    
+
     // Por defecto usar metodología
     default:
       return AppBarType.metodologiaAnalisis;
@@ -249,7 +248,6 @@ void _handleUserPressed(BuildContext context) {
 }
 
 /// Maneja el botón de logout
-
 
 /// Determina si mostrar el botón de retroceso
 bool _shouldShowBackButton(String path) {
