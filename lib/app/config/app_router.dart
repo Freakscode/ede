@@ -14,6 +14,9 @@ import '../shared/widgets/layouts/app_header.dart';
 // Auth pages
 import '../modules/auth/presentation/pages/login_screen.dart';
 
+// Splash pages
+import '../modules/splash/presentation/pages/splash_screen.dart';
+
 // Evaluacion pages
 import '../modules/evaluacion/presentation/pages/home_screen.dart';
 import '../modules/evaluacion/presentation/pages/sect_1/id_evaluacion_page.dart';
@@ -32,9 +35,10 @@ import 'routes.dart';
 /// Creates and configures the application router with clean architecture
 GoRouter getAppRouter(BuildContext context) {
   return GoRouter(
-    initialLocation: '/login',
+    initialLocation: '/splash',
     routes: [
-      // Rutas SIN header (login, onboarding, etc.)
+      // Rutas SIN header (splash, login, onboarding, etc.)
+      GoRoute(path: '/splash', builder: (context, state) => const SplashScreen()),
       GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
 
       // Shell con layout global (AppScaffold + AppHeader)
