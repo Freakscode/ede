@@ -1,4 +1,3 @@
-import 'package:caja_herramientas/app/core/icons/caja_herramientas_icons.dart';
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import 'package:flutter/material.dart';
 
@@ -87,7 +86,7 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
         // Botón de retroceso amarillo
         if (showBackButton)
           _buildYellowCircleButton(
-            icon: CajaHerramientasIcons.arrowleft,
+            icon: Icons.arrow_back,
             onPressed: onBackPressed,
           ),
 
@@ -124,7 +123,7 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
         // Botón de guardar/archivo
         if (showSaveButton)
           _buildYellowCircleButton(
-            icon: CajaHerramientasIcons.save,
+            icon: Icons.save,
             onPressed: onSavePressed,
           ),
 
@@ -133,7 +132,7 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
         // Botón de información/pregunta
         if (showInfoButton)
           _buildYellowCircleButton(
-            icon: CajaHerramientasIcons.question,
+            icon: Icons.help_outline,
             onPressed: onInfoPressed,
           ),
       ],
@@ -147,7 +146,7 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
         // Botón de retroceso
         if (showBackButton)
           _buildYellowCircleButton(
-            icon: CajaHerramientasIcons.arrowleft,
+            icon: Icons.arrow_back,
             onPressed: onBackPressed,
           ),
 
@@ -172,7 +171,7 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
         // Botón de información
         if (showInfoButton)
           _buildYellowCircleButton(
-            icon: CajaHerramientasIcons.question,
+            icon: Icons.help_outline,
             onPressed: onInfoPressed,
           ),
 
@@ -181,7 +180,7 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
         // Botón de logout
         if (showLogoutButton)
           _buildYellowCircleButton(
-            icon: CajaHerramientasIcons.signout,
+            icon: Icons.logout,
             onPressed: onLogoutPressed,
           ),
       ],
@@ -216,8 +215,8 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
         // Botón de información simple
         if (showInfoButton)
           IconButton(
-            icon: Icon(
-              CajaHerramientasIcons.question,
+            icon: const Icon(
+              Icons.help_outline,
               color: Colors.white,
               size: 20,
             ),
@@ -227,8 +226,8 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
         // Botón de logout simple
         if (showLogoutButton)
           IconButton(
-            icon: Icon(
-              CajaHerramientasIcons.signout,
+            icon: const Icon(
+              Icons.logout,
               color: Colors.white,
               size: 20,
             ),
@@ -245,7 +244,7 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
         // Botón de retroceso amarillo
         if (showBackButton)
           _buildYellowCircleButton(
-            icon: CajaHerramientasIcons.arrowleft,
+            icon: Icons.arrow_back,
             onPressed: onBackPressed,
           ),
 
@@ -259,7 +258,7 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
         // Botón de información
         if (showInfoButton)
           _buildYellowCircleButton(
-            icon: CajaHerramientasIcons.question,
+            icon: Icons.help_outline,
             onPressed: onInfoPressed,
           ),
       ],
@@ -273,7 +272,7 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
         // Botón de retroceso
         if (showBackButton)
           _buildYellowCircleButton(
-            icon: CajaHerramientasIcons.arrowleft,
+            icon: Icons.arrow_back,
             onPressed: onBackPressed,
           ),
 
@@ -325,7 +324,7 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
         // Botón de información
         if (showInfoButton)
           _buildYellowCircleButton(
-            icon: CajaHerramientasIcons.question2,
+            icon: Icons.help,
             onPressed: onInfoPressed,
           ),
 
@@ -334,7 +333,7 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
         // Botón de usuario
         if (showUserButton)
           _buildYellowCircleButton(
-            icon: CajaHerramientasIcons.persona,
+            icon: Icons.person,
             onPressed: onUserPressed,
           ),
       ],
@@ -377,7 +376,7 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
       ),
       child: Center(
         child: Icon(
-          CajaHerramientasIcons.entidad, // Placeholder para logo institucional
+          Icons.abc_outlined, // Placeholder para logo institucional
           color: Colors.white,
           size: size * 0.6,
         ),

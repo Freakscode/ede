@@ -1,7 +1,9 @@
 import 'package:caja_herramientas/app/core/constants/app_assets.dart';
+import 'package:caja_herramientas/app/core/icons/app_icons.dart';
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import 'package:caja_herramientas/app/shared/widgets/buttons/custom_elevated_button.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -107,12 +109,17 @@ class _LoginScreenState extends State<LoginScreen> {
                             fontWeight: FontWeight.w500,
                             height: 1.429, // line-height: 142.857%
                           ),
-                          prefixIcon: Icon(
-                            Icons.person_outline,
-                            color: const Color(
-                              0xFFC6C6C6,
-                            ), // stroke: Gris2DAGRD #C6C6C6
-                            size: 24, // Tamaño estándar con stroke-width simulado
+                          prefixIcon: Padding(
+                            padding: const EdgeInsets.all(12.0),
+                            child: SvgPicture.asset(
+                              AppIcons.persona,
+                              width: 20,
+                              height: 20,
+                              colorFilter: const ColorFilter.mode(
+                                Color(0xFFC6C6C6),
+                                BlendMode.srcIn,
+                              ),
+                            ),
                           ),
                           filled: true,
                           fillColor: Colors.white, // background: #FFF
@@ -163,12 +170,17 @@ class _LoginScreenState extends State<LoginScreen> {
                             fontWeight: FontWeight.w500,
                             height: 1.429, // line-height: 142.857%
                           ),
-                          prefixIcon: Icon(
-                            Icons.lock_outline,
-                            color: const Color(
-                              0xFFC6C6C6,
-                            ), // stroke: Gris2DAGRD #C6C6C6
-                            size: 24,
+                          prefixIcon: Padding(
+                            padding: const EdgeInsets.all(12.0),
+                            child: SvgPicture.asset(
+                              AppIcons.key, // Usando Persona.svg como placeholder
+                              width: 20,
+                              height: 20,
+                              colorFilter: const ColorFilter.mode(
+                                Color(0xFFC6C6C6),
+                                BlendMode.srcIn,
+                              ),
+                            ),
                           ),
                           filled: true,
                           fillColor: Colors.white, // background: #FFF
