@@ -2,7 +2,7 @@ import 'package:caja_herramientas/app/core/constants/app_assets.dart';
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import 'package:caja_herramientas/app/core/icons/app_icons.dart';
 import 'package:caja_herramientas/app/modules/home/presentation/widgets/menu_card.dart';
-import 'package:caja_herramientas/app/shared/widgets/layouts/app_main_bar.dart';
+import 'package:caja_herramientas/app/shared/widgets/layouts/custom_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
