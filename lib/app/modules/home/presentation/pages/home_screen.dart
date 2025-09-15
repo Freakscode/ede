@@ -2,9 +2,9 @@ import 'package:caja_herramientas/app/core/constants/app_assets.dart';
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import 'package:caja_herramientas/app/core/icons/app_icons.dart';
 import 'package:caja_herramientas/app/modules/home/presentation/widgets/menu_card.dart';
+import 'package:caja_herramientas/app/shared/widgets/layouts/app_main_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:go_router/go_router.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -13,104 +13,108 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[50],
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header con saludo
-              _buildWelcomeHeader(),
-              
-              const SizedBox(height: 30),
-              
-              // Grid de opciones principales
-              _buildMainMenuGrid(context),
-              
-              const SizedBox(height: 30),
-              
-              // Sección de acciones rápidas
-              _buildQuickActionsSection(),
-              
-              const SizedBox(height: 20),
-            ],
-          ),
+      appBar: const AppMainBar(
+        showBack: false,
+        showInfo: true,
+        showProfile: true,
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Contenido principal del home
+            _buildWelcomeSection(),
+            
+            const SizedBox(height: 30),
+            
+            // Grid de herramientas principales
+            _buildToolsGrid(context),
+            
+            const SizedBox(height: 30),
+            
+            // Sección de acciones rápidas
+            _buildQuickActions(),
+            
+            const SizedBox(height: 20),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildWelcomeHeader() {
+  Widget _buildWelcomeSection() {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [DAGRDColors.azulDAGRD, DAGRDColors.azulDAGRD.withOpacity(0.8)],
+          colors: [
+            DAGRDColors.azulDAGRD.withOpacity(0.1),
+            DAGRDColors.amarDAGRD.withOpacity(0.1),
+          ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: DAGRDColors.azulDAGRD.withOpacity(0.2),
+        ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '¡Bienvenido!',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 24,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Caja de Herramientas DAGRD',
-                      style: TextStyle(
-                        color: DAGRDColors.amarDAGRD,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                width: 60,
-                height: 60,
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Image.asset(
-                    AppAssets.logoDagrd,
-                    fit: BoxFit.contain,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '¡Bienvenido!',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w700,
+                    color: DAGRDColors.azulDAGRD,
                   ),
                 ),
+                const SizedBox(height: 8),
+                Text(
+                  'Gestiona evaluaciones y emergencias con las herramientas DAGRD',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w400,
+                    color: Colors.grey[700],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            width: 60,
+            height: 60,
+            decoration: BoxDecoration(
+              color: DAGRDColors.azulDAGRD.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Image.asset(
+                AppAssets.logoDagrd,
+                fit: BoxFit.contain,
               ),
-            ],
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildMainMenuGrid(BuildContext context) {
+  Widget _buildToolsGrid(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Herramientas Principales',
           style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
+            fontSize: 22,
+            fontWeight: FontWeight.w700,
             color: DAGRDColors.azulDAGRD,
           ),
         ),
@@ -127,13 +131,23 @@ class HomeScreen extends StatelessWidget {
               title: 'Evaluación\nde Daños',
               iconPath: AppIcons.estructural,
               color: Colors.blue[600]!,
-              onTap: () => context.go('/evaluacion'),
+              onTap: () {
+                // TODO: Navegar a evaluación
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Evaluación de Daños')),
+                );
+              },
             ),
             MenuCard(
               title: 'Habitabilidad',
               iconPath: AppIcons.persona,
               color: Colors.green[600]!,
-              onTap: () => context.go('/habitabilidad'),
+              onTap: () {
+                // TODO: Navegar a habitabilidad
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Habitabilidad')),
+                );
+              },
             ),
             MenuCard(
               title: 'Emergencias',
@@ -145,7 +159,12 @@ class HomeScreen extends StatelessWidget {
               title: 'Usuarios',
               iconPath: AppIcons.persona,
               color: Colors.purple[600]!,
-              onTap: () => context.go('/users'),
+              onTap: () {
+                // TODO: Navegar a usuarios
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Gestión de Usuarios')),
+                );
+              },
             ),
           ],
         ),
@@ -153,15 +172,15 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildQuickActionsSection() {
+  Widget _buildQuickActions() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Acciones Rápidas',
           style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
+            fontSize: 22,
+            fontWeight: FontWeight.w700,
             color: DAGRDColors.azulDAGRD,
           ),
         ),
@@ -173,7 +192,9 @@ class HomeScreen extends StatelessWidget {
                 'Nueva Evaluación',
                 Icons.add_circle_outline,
                 DAGRDColors.amarDAGRD,
-                () {},
+                () {
+                  // TODO: Crear nueva evaluación
+                },
               ),
             ),
             const SizedBox(width: 12),
@@ -182,7 +203,9 @@ class HomeScreen extends StatelessWidget {
                 'Ver Reportes',
                 Icons.assessment_outlined,
                 Colors.blue[600]!,
-                () {},
+                () {
+                  // TODO: Ver reportes
+                },
               ),
             ),
           ],
@@ -220,11 +243,7 @@ class HomeScreen extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             child: Row(
               children: [
-                Icon(
-                  icon,
-                  color: color,
-                  size: 24,
-                ),
+                Icon(icon, color: color, size: 24),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
@@ -253,12 +272,11 @@ class HomeScreen extends StatelessWidget {
         height: MediaQuery.of(context).size.height * 0.6,
         decoration: const BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.vertical(
-            top: Radius.circular(20),
-          ),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
         child: Column(
           children: [
+            // Handle del modal
             Container(
               width: 40,
               height: 4,
@@ -268,6 +286,8 @@ class HomeScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
+            
+            // Título
             Padding(
               padding: const EdgeInsets.all(20),
               child: Text(
@@ -279,6 +299,8 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
             ),
+            
+            // Grid de emergencias
             Expanded(
               child: GridView.count(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -312,7 +334,9 @@ class HomeScreen extends StatelessWidget {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: () {},
+          onTap: () {
+            // TODO: Manejar selección de emergencia
+          },
           borderRadius: BorderRadius.circular(12),
           child: Padding(
             padding: const EdgeInsets.all(16),
@@ -342,4 +366,6 @@ class HomeScreen extends StatelessWidget {
       ),
     );
   }
+
+  
 }
