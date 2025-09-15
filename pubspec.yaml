@@ -49,6 +49,7 @@ flutter:
   
   assets:
     - assets/icons/svg/
+    - assets/icons/caja_herramientas/
     - assets/images/
     - .env
 
