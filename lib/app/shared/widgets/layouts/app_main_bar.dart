@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 
-class AppMainBar extends StatelessWidget implements PreferredSizeWidget {
+class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback? onBack;
   final VoidCallback? onInfo;
   final VoidCallback? onProfile;
@@ -9,7 +9,7 @@ class AppMainBar extends StatelessWidget implements PreferredSizeWidget {
   final bool showInfo;
   final bool showProfile;
 
-  const AppMainBar({
+  const CustomAppBar({
     super.key,
     this.onBack,
     this.onInfo,
