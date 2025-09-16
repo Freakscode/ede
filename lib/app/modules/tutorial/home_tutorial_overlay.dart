@@ -14,7 +14,7 @@ class TutorialPosterOverlayScreen extends StatelessWidget {
   final _labelData = [
     _LabelData(
       textTop: 'Botón\nir atrás',
-      position: Offset(0.4, 0),
+      position: Offset(0.38, 0),
       align: Alignment.centerRight,
     ),
     _LabelData(
@@ -24,32 +24,30 @@ class TutorialPosterOverlayScreen extends StatelessWidget {
     ),
     _LabelData(
       textTop: 'Botón\ninicio\nde sesión\nUsuarios\nDAGRD',
-      position: Offset(1.15, 0.15),
+      position: Offset(1.12, 0.15),
       align: Alignment.centerLeft,
     ),
     _LabelData(
       textTop: 'Menú de acciones principales',
-      position: Offset(0.38, 1.28),
+      position: Offset(0.38, 0.98),
       align: Alignment.bottomCenter,
     ),
   ];
 
   final _lineData = [
-    // from: punto en la imagen (relativo), to: punto del label (relativo)
-    // Line(from: Offset(0.13, 0.13), to: Offset(0.13, 0.08)), // back
-    Line(from: Offset(0.62, 0.14), to: Offset(0.75, 0.14)), // info (más corta)
-    Line(from: Offset(0.49, 0.10), to: Offset(0.49, 0.02)), // profile
 
-    // Menú de acciones principales (línea amarilla con 3 puntos y esquinas)
-    // Ajusta estos valores para que coincidan visualmente con tu póster
+    // Line(from: Offset(0.13, 0.13), to: Offset(0.13, 0.08)), // back
+    Line(from: Offset(0.65, 0.15), to: Offset(0.78, 0.15)), // profile 
+    Line(from: Offset(0.51, 0.10), to: Offset(0.51, 0.02)), // info (más corta)
+
+    
     // Línea horizontal inferior
-    Line(from: Offset(0.1, 1.05), to: Offset(0.62, 1.05)),
+    Line(from: Offset(0.13, 0.9), to: Offset(0.6, 0.9)),
     // Línea vertical izquierda
-    Line(from: Offset(0.1, 1.05), to: Offset(0.1, 0.97)),
-    // // Línea vertical centro
-    Line(from: Offset(0.28, 1.05), to: Offset(0.28, 0.97)),
-    Line(from: Offset(0.45, 1.05), to: Offset(0.45, 0.97)),
-    Line(from: Offset(0.62, 1.05), to: Offset(0.62, 0.97)),
+    Line(from: Offset(0.13, 0.9), to: Offset(0.13, 0.82)),
+    Line(from: Offset(0.28, 0.9), to: Offset(0.28, 0.82)),
+    Line(from: Offset(0.45, 0.9), to: Offset(0.45, 0.82)),
+    Line(from: Offset(0.6, 0.9), to: Offset(0.6, 0.82)),
     // // Línea vertical derecha
   ];
 
