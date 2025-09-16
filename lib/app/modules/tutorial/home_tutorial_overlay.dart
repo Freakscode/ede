@@ -14,17 +14,17 @@ class TutorialPosterOverlayScreen extends StatelessWidget {
   final _labelData = [
     _LabelData(
       textTop: 'Botón\nir atrás',
-      position: Offset(0.4, 0.18),
+      position: Offset(0.4, 0),
       align: Alignment.centerRight,
     ),
     _LabelData(
       textTop: 'Botón información\nde ayuda para cada sección',
-      position: Offset(0.78, 0.18),
+      position: Offset(0.69, 0),
       align: Alignment.bottomCenter,
     ),
     _LabelData(
       textTop: 'Botón\ninicio\nde sesión\nUsuarios\nDAGRD',
-      position: Offset(1.2, 0.35),
+      position: Offset(1.15, 0.15),
       align: Alignment.centerLeft,
     ),
     _LabelData(
@@ -37,8 +37,8 @@ class TutorialPosterOverlayScreen extends StatelessWidget {
   final _lineData = [
     // from: punto en la imagen (relativo), to: punto del label (relativo)
     // Line(from: Offset(0.13, 0.13), to: Offset(0.13, 0.08)), // back
-    Line(from: Offset(0.65, 0.24), to: Offset(0.82, 0.24)), // info (más corta)
-    Line(from: Offset(0.52, 0.17), to: Offset(0.52, 0.08)), // profile
+    Line(from: Offset(0.62, 0.14), to: Offset(0.75, 0.14)), // info (más corta)
+    Line(from: Offset(0.49, 0.10), to: Offset(0.49, 0.02)), // profile
 
     // Menú de acciones principales (línea amarilla con 3 puntos y esquinas)
     // Ajusta estos valores para que coincidan visualmente con tu póster
@@ -58,188 +58,200 @@ class TutorialPosterOverlayScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    final posterWidth = size.width * 0.78;
-    final posterHeight = posterWidth * 1.65;
 
     return Material(
       color: Colors.black.withOpacity(0.68),
-      child: Stack(
-        children: [
-          // Botón cerrar
-          Positioned(
-            right: 16,
-            top: MediaQuery.of(context).padding.top + 8,
-            child: IconButton(
-              onPressed: () => _close(context),
-              icon: const Icon(Icons.close, color: Colors.white, size: 28),
-            ),
-          ),
-
-          // Textos de bienvenida y título arriba del póster
-          Positioned(
-            top: 80,
-            left: 98,
-            right: 0,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Bienvenidos a la aplicación',
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontFamily: 'Work Sans',
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    height: 16 / 14, // 114.286%
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  IconButton(
+                    onPressed: () => _close(context),
+                    icon: const Icon(Icons.close, color: Colors.white, size: 28),
                   ),
-                ),
-                const SizedBox(height: 2),
-                RichText(
-                  textAlign: TextAlign.start,
-                  text: const TextSpan(
+                ],
+              ),
+              // Título centrado
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Bienvenidos a la aplicación',
+                    textAlign: TextAlign.start,
                     style: TextStyle(
+                      color: Colors.white,
+                      fontFamily: 'Work Sans',
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      height: 16 / 14,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  RichText(
+                    textAlign: TextAlign.start,
+                    text: const TextSpan(
+                      style: TextStyle(
+                        fontFamily: 'Metropolis',
+                        fontWeight: FontWeight.w500,
+                        height: 1.0,
+                      ),
+                      children: [
+                        TextSpan(
+                          text: 'Caja de\n',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        TextSpan(
+                          text: 'Herramientas\n',
+                          style: TextStyle(
+                            color: Color(0xFFFFCC00),
+                            fontSize: 20,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        TextSpan(
+                          text: 'DAGRD',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 23,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 20),
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final posterWidth = constraints.maxWidth * 0.78 > 400 ? 400.0 : constraints.maxWidth * 0.9;
+                  final posterHeight = posterWidth * 1.7;
+                  final stackHeight = posterHeight * 1.20; // más alto para labels arriba/abajo
+                  return Container(
+                    width: posterWidth,
+                    height: stackHeight,
+                    color: Colors.red.withOpacity(0.2), // Color temporal para debug
+                    child: Stack(
+                      children: [
+                        // Imagen del póster centrada verticalmente
+                        Positioned(
+                          left: 0,
+                          right: 100,
+                          top: (stackHeight - posterHeight) / 1.25,
+                          child: Container(
+                            // width: posterWidth,
+                            height: posterHeight * 0.78,
+                            decoration: BoxDecoration(
+                              color: Colors.transparent,
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            clipBehavior: Clip.antiAlias,
+                            child: Image.asset(
+                              'assets/images/home_poster.png',
+                              fit: BoxFit.fitHeight,
+                            ),
+                          ),
+                        ),
+                        // Líneas amarillas
+                        Positioned(
+                          left: 0,
+                          right: 0,
+                          top: (stackHeight - posterHeight) / 2,
+                          child: SizedBox(
+                            width: posterWidth,
+                            height: posterHeight,
+                            child: IgnorePointer(
+                              child: CustomPaint(
+                                painter: LinesPainter(
+                                  lines: _lineData
+                                      .map(
+                                        (l) => Line(
+                                          from: Offset(
+                                            l.from.dx * posterWidth,
+                                            l.from.dy * posterHeight,
+                                          ),
+                                          to: Offset(
+                                            l.to.dx * posterWidth,
+                                            l.to.dy * posterHeight,
+                                          ),
+                                        ),
+                                      )
+                                      .toList(),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        // Labels
+                        ..._labelData.map(
+                          (l) => Positioned(
+                            left: l.position.dx * posterWidth - 110,
+                            top: (stackHeight - posterHeight) / 2 + l.position.dy * posterHeight - 34,
+                            child: LabelBubble(
+                              top: l.textTop,
+                              bottom: l.textBottom,
+                              align: l.align,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(height: 24),
+              // Checkbox “No volver a mostrar” (solo visual, deshabilitado)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: Container(
+                      padding: const EdgeInsets.all(2),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(2),
+                        border: Border.all(color: Color(0xFFAAAAAA), width: 1),
+                      ),
+                      child: Checkbox(
+                        value: false,
+                        onChanged: null, // Deshabilitado
+                        activeColor: DAGRDColors.azulDAGRD,
+                        checkColor: Colors.white,
+                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        visualDensity: VisualDensity.compact,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'No volver a mostrar',
+                    style: TextStyle(
+                      color: Colors.white,
                       fontFamily: 'Metropolis',
+                      fontSize: 13,
                       fontWeight: FontWeight.w500,
                       height: 1.0,
                     ),
-                    children: [
-                      TextSpan(
-                        text: 'Caja de\n',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      TextSpan(
-                        text: 'Herramientas\n',
-                        style: TextStyle(
-                          color: Color(0xFFFFCC00),
-                          fontSize: 20,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      TextSpan(
-                        text: 'DAGRD',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 23,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
                   ),
-                ),
-              ],
-            ),
-          ),
-
-          Positioned(
-            left: 54,
-            top: 240,
-            child: Container(
-              height: 450,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(14),
+                ],
               ),
-              clipBehavior: Clip.antiAlias,
-              child: Image.asset(
-                'assets/images/home_poster.png',
-                fit: BoxFit.fitHeight,
-              ),
-            ),
+            ],
           ),
-
-          // Líneas amarillas
-          Center(
-            child: SizedBox(
-              width: posterWidth,
-              height: posterHeight,
-              child: IgnorePointer(
-                child: CustomPaint(
-                  painter: LinesPainter(
-                    lines: _lineData
-                        .map(
-                          (l) => Line(
-                            from: Offset(
-                              l.from.dx * posterWidth,
-                              l.from.dy * posterHeight,
-                            ),
-                            to: Offset(
-                              l.to.dx * posterWidth,
-                              l.to.dy * posterHeight,
-                            ),
-                          ),
-                        )
-                        .toList(),
-                  ),
-                ),
-              ),
-            ),
-          ),
-
-          // Labels
-          ..._labelData.map(
-            (l) => Positioned(
-              left: size.width * 0.11 + l.position.dx * posterWidth - 110,
-              top: size.height * 0.13 + l.position.dy * posterHeight - 34,
-              child: LabelBubble(
-                top: l.textTop,
-                bottom: l.textBottom,
-                align: l.align,
-              ),
-            ),
-          ),
-
-          // Checkbox “No volver a mostrar” (solo visual, deshabilitado)
-          Positioned(
-            bottom: 18 + MediaQuery.of(context).padding.bottom,
-            left: 0,
-            right: 0,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(
-                  width: 16,
-                  height: 16,
-                  child: Container(
-                    padding: const EdgeInsets.all(2),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(2),
-                      border: Border.all(color: Color(0xFFAAAAAA), width: 1),
-                    ),
-                    child: Checkbox(
-                      value: false,
-                      onChanged: null, // Deshabilitado
-                      activeColor: DAGRDColors.azulDAGRD,
-                      checkColor: Colors.white,
-                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      visualDensity: VisualDensity.compact,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                const Text(
-                  'No volver a mostrar',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontFamily: 'Metropolis',
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500,
-                    height: 1.0, // 13px line-height for 13px font-size
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
