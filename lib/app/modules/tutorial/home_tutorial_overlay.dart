@@ -46,8 +46,8 @@ class _TutorialPosterOverlayState extends State<TutorialPosterOverlayScreen> {
       align: Alignment.bottomCenter,
     ),
     _LabelData(
-      textTop: 'Botón inicio de sesión\nUsuarios DAGRD',
-      position: Offset(0.87, 0.13),
+      textTop: 'Botón\n inicio\n de sesión\nUsuarios DAGRD',
+      position: Offset(1.2, 0.13),
       align: Alignment.centerLeft,
     ),
     _LabelData(
@@ -92,9 +92,10 @@ class _TutorialPosterOverlayState extends State<TutorialPosterOverlayScreen> {
           ),
 
           // Póster (imagen del home) centrado
-          Center(
+          Padding(
+            padding: const EdgeInsets.only(top: 180, left: 54),
             child: Container(
-              // width: 250,
+              
               height: 500,
               decoration: BoxDecoration(
                 color: Colors.white,
