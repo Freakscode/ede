@@ -29,12 +29,12 @@ import 'routes.dart';
 /// Creates and configures the application router with clean architecture
 GoRouter getAppRouter(BuildContext context) {
   return GoRouter(
-    initialLocation: '/tutorial_poster',
+    initialLocation: '/home',
     routes: [
       // Tutorial Poster Overlay
       GoRoute(
         path: '/tutorial_poster',
-        builder: (context, state) => const TutorialPosterOverlayScreen(),
+        builder: (context, state) =>  TutorialPosterOverlayScreen(),
       ),
       // Rutas SIN header (splash, login, onboarding, etc.)
       GoRoute(

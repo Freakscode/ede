@@ -8,23 +8,10 @@ import 'widgets/line_model.dart';
 /// ---------------------------
 /// Overlay tipo "póster" + labels
 /// ---------------------------
-class TutorialPosterOverlayScreen extends StatefulWidget {
-  const TutorialPosterOverlayScreen();
+class TutorialPosterOverlayScreen extends StatelessWidget {
+  TutorialPosterOverlayScreen({super.key});
 
-  @override
-  State<TutorialPosterOverlayScreen> createState() =>
-      _TutorialPosterOverlayState();
-}
-
-class _TutorialPosterOverlayState extends State<TutorialPosterOverlayScreen> {
-  // Posiciones relativas (en porcentaje) sobre la imagen para los puntos de anclaje
-  // (ajusta estos valores según la imagen real)
   final _labelData = [
-    // _LabelData(
-    //   textTop: 'Bienvenidos a la aplicación',
-    //   textBottom: 'Caja de Herramientas DAGRD',
-    //   position: Offset(0.5, 0.08), // arriba del header
-    // ),
     _LabelData(
       textTop: 'Botón\nir atrás',
       position: Offset(0.4, 0.18),
@@ -66,9 +53,8 @@ class _TutorialPosterOverlayState extends State<TutorialPosterOverlayScreen> {
     // // Línea vertical derecha
   ];
 
-  bool _dontShowAgain = false;
 
-  void _close() => Navigator.of(context).pop();
+  void _close(BuildContext context) => Navigator.of(context).pop();
 
   @override
   Widget build(BuildContext context) {
@@ -85,7 +71,7 @@ class _TutorialPosterOverlayState extends State<TutorialPosterOverlayScreen> {
             right: 16,
             top: MediaQuery.of(context).padding.top + 8,
             child: IconButton(
-              onPressed: _close,
+              onPressed: () => _close(context),
               icon: const Icon(Icons.close, color: Colors.white, size: 28),
             ),
           ),
@@ -208,7 +194,7 @@ class _TutorialPosterOverlayState extends State<TutorialPosterOverlayScreen> {
             ),
           ),
 
-          // Checkbox “No volver a mostrar”
+          // Checkbox “No volver a mostrar” (solo visual, deshabilitado)
           Positioned(
             bottom: 18 + MediaQuery.of(context).padding.bottom,
             left: 0,
@@ -216,32 +202,28 @@ class _TutorialPosterOverlayState extends State<TutorialPosterOverlayScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                StatefulBuilder(
-                  builder: (ctx, setSt) {
-                    return SizedBox(
-                      width: 16,
-                      height: 16,
-                      child: Container(
-                        padding: const EdgeInsets.all(2),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(2),
-                          border: Border.all(color: Color(0xFFAAAAAA), width: 1),
-                        ),
-                        child: Checkbox(
-                          value: _dontShowAgain,
-                          onChanged: (v) => setSt(() => _dontShowAgain = v ?? false),
-                          activeColor: DAGRDColors.azulDAGRD,
-                          checkColor: Colors.white,
-                          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                          visualDensity: VisualDensity.compact,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(2),
-                          ),
-                        ),
+                SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: Container(
+                    padding: const EdgeInsets.all(2),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(2),
+                      border: Border.all(color: Color(0xFFAAAAAA), width: 1),
+                    ),
+                    child: Checkbox(
+                      value: false,
+                      onChanged: null, // Deshabilitado
+                      activeColor: DAGRDColors.azulDAGRD,
+                      checkColor: Colors.white,
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      visualDensity: VisualDensity.compact,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(2),
                       ),
-                    );
-                  },
+                    ),
+                  ),
                 ),
                 const SizedBox(width: 8),
                 const Text(
@@ -276,10 +258,6 @@ class _LabelData {
   });
 }
 
-class _Line {
-  final Offset from; // punto del póster
-  final Offset to; // punto cercano a la burbuja de texto
-  _Line({required this.from, required this.to});
-}
+
 
 
