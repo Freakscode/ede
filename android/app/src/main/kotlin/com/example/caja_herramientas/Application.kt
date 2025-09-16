@@ -1,4 +1,4 @@
-package com.example.ede_final_app
+package com.example.caja_herramientas
 
 import io.flutter.app.FlutterApplication
 import io.flutter.embedding.engine.FlutterEngine
@@ -10,18 +10,15 @@ class Application : FlutterApplication() {
 
     override fun onCreate() {
         super.onCreate()
-        
         // Instantiate a FlutterEngine
         flutterEngine = FlutterEngine(this)
-        
         // Start executing Dart code
         flutterEngine.dartExecutor.executeDartEntrypoint(
             DartExecutor.DartEntrypoint.createDefault()
         )
-        
         // Cache the FlutterEngine
         FlutterEngineCache
             .getInstance()
             .put("my_engine_id", flutterEngine)
     }
-} 
+}

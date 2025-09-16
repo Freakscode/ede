@@ -13,7 +13,6 @@
 
     <application
         android:label="EDE"
-        android:name=".Application"
         android:icon="@mipmap/ic_launcher">
         
         <!-- API Key de Google Maps -->

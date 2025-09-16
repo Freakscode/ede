@@ -1,4 +1,4 @@
-package com.example.ede_final_app
+package com.example.caja_herramientas
 
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
