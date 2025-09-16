@@ -1,6 +1,5 @@
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import 'package:flutter/material.dart';
-import '../home_tutorial_overlay.dart';
 
 class RoundButton extends StatelessWidget {
   final IconData icon;
