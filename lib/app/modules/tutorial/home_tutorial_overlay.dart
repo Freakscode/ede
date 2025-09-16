@@ -1,20 +1,12 @@
 import 'dart:ui';
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import 'package:flutter/material.dart';
+import 'widgets/label_bubble.dart';
+import 'widgets/lines_painter.dart';
+import 'widgets/line_model.dart';
+import 'widgets/round_button.dart';
+import 'widgets/nav_dot.dart';
 
-/// Colores DAGRD (ajústalos si ya los tienes en tu theme)
-class _Dagrd {
-  static const grisFondo = Color(0xFFF7F7F7);
-}
-
-/// Llama esto desde tu HomeScreen cuando quieras abrir el tutorial.
-/// Ejemplo: WidgetsBinding.instance.addPostFrameCallback((_) => _showPosterTutorial(context));
-Future<void> _showPosterTutorial(BuildContext context) async {
-  final entry = OverlayEntry(
-    builder: (_) => const TutorialPosterOverlayScreen(),
-  );
-  Overlay.of(context).insert(entry);
-}
 
 /// ---------------------------
 /// Overlay tipo "póster" + labels
@@ -60,20 +52,20 @@ class _TutorialPosterOverlayState extends State<TutorialPosterOverlayScreen> {
 
   final _lineData = [
     // from: punto en la imagen (relativo), to: punto del label (relativo)
-    // _Line(from: Offset(0.13, 0.13), to: Offset(0.13, 0.08)), // back
-    _Line(from: Offset(0.65, 0.24), to: Offset(0.82, 0.24)), // info (más corta)
-    _Line(from: Offset(0.52, 0.17), to: Offset(0.52, 0.08)), // profile
+    // Line(from: Offset(0.13, 0.13), to: Offset(0.13, 0.08)), // back
+    Line(from: Offset(0.65, 0.24), to: Offset(0.82, 0.24)), // info (más corta)
+    Line(from: Offset(0.52, 0.17), to: Offset(0.52, 0.08)), // profile
 
     // Menú de acciones principales (línea amarilla con 3 puntos y esquinas)
     // Ajusta estos valores para que coincidan visualmente con tu póster
     // Línea horizontal inferior
-    _Line(from: Offset(0.1, 1.05), to: Offset(0.62, 1.05)),
+    Line(from: Offset(0.1, 1.05), to: Offset(0.62, 1.05)),
     // Línea vertical izquierda
-    _Line(from: Offset(0.1, 1.05), to: Offset(0.1, 0.97)),
+    Line(from: Offset(0.1, 1.05), to: Offset(0.1, 0.97)),
     // // Línea vertical centro
-    _Line(from: Offset(0.28, 1.05), to: Offset(0.28, 0.97)),
-    _Line(from: Offset(0.45, 1.05), to: Offset(0.45, 0.97)),
-    _Line(from: Offset(0.62, 1.05), to: Offset(0.62, 0.97)),
+    Line(from: Offset(0.28, 1.05), to: Offset(0.28, 0.97)),
+    Line(from: Offset(0.45, 1.05), to: Offset(0.45, 0.97)),
+    Line(from: Offset(0.62, 1.05), to: Offset(0.62, 0.97)),
     // // Línea vertical derecha
   ];
 
@@ -185,10 +177,10 @@ class _TutorialPosterOverlayState extends State<TutorialPosterOverlayScreen> {
               height: posterHeight,
               child: IgnorePointer(
                 child: CustomPaint(
-                  painter: _LinesPainter(
+                  painter: LinesPainter(
                     lines: _lineData
                         .map(
-                          (l) => _Line(
+                          (l) => Line(
                             from: Offset(
                               l.from.dx * posterWidth,
                               l.from.dy * posterHeight,
@@ -211,7 +203,7 @@ class _TutorialPosterOverlayState extends State<TutorialPosterOverlayScreen> {
             (l) => Positioned(
               left: size.width * 0.11 + l.position.dx * posterWidth - 110,
               top: size.height * 0.13 + l.position.dy * posterHeight - 34,
-              child: _LabelBubble(
+              child: LabelBubble(
                 top: l.textTop,
                 bottom: l.textBottom,
                 align: l.align,
@@ -309,7 +301,7 @@ class _MiniHomeMock extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  _RoundButton(key: kBack, icon: Icons.arrow_back),
+                  RoundButton(key: kBack, icon: Icons.arrow_back),
                   const SizedBox(width: 14),
                   Expanded(
                     child: Column(
@@ -345,9 +337,9 @@ class _MiniHomeMock extends StatelessWidget {
                       ],
                     ),
                   ),
-                  _RoundButton(key: kInfo, icon: Icons.help_outline),
+                  RoundButton(key: kInfo, icon: Icons.help_outline),
                   const SizedBox(width: 10),
-                  _RoundButton(key: kProfile, icon: Icons.person_outline),
+                  RoundButton(key: kProfile, icon: Icons.person_outline),
                 ],
               ),
             ),
@@ -536,10 +528,10 @@ class _MiniHomeMock extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _NavDot(key: kNav1),
-                _NavDot(key: kNav2),
-                _NavDot(key: kNav3),
-                _NavDot(key: kNav4),
+                NavDot(key: kNav1),
+                NavDot(key: kNav2),
+                NavDot(key: kNav3),
+                NavDot(key: kNav4),
               ],
             ),
           ),
