@@ -136,9 +136,9 @@ class TutorialPosterOverlayScreen extends StatelessWidget {
             ),
           ),
 
-          // Póster (imagen del home) centrado
-          Padding(
-            padding: const EdgeInsets.only(top: 240, left: 54),
+          Positioned(
+            left: 54,
+            top: 240,
             child: Container(
               height: 450,
               decoration: BoxDecoration(
