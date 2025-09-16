@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import 'package:flutter/material.dart';
 
 /// Colores DAGRD (ajústalos si ya los tienes en tu theme)
@@ -11,7 +12,9 @@ class _Dagrd {
 /// Llama esto desde tu HomeScreen cuando quieras abrir el tutorial.
 /// Ejemplo: WidgetsBinding.instance.addPostFrameCallback((_) => _showPosterTutorial(context));
 Future<void> _showPosterTutorial(BuildContext context) async {
-  final entry = OverlayEntry(builder: (_) => const TutorialPosterOverlayScreen());
+  final entry = OverlayEntry(
+    builder: (_) => const TutorialPosterOverlayScreen(),
+  );
   Overlay.of(context).insert(entry);
 }
 
@@ -22,49 +25,49 @@ class TutorialPosterOverlayScreen extends StatefulWidget {
   const TutorialPosterOverlayScreen();
 
   @override
-  State<TutorialPosterOverlayScreen> createState() => _TutorialPosterOverlayState();
+  State<TutorialPosterOverlayScreen> createState() =>
+      _TutorialPosterOverlayState();
 }
 
 class _TutorialPosterOverlayState extends State<TutorialPosterOverlayScreen> {
-
   // Posiciones relativas (en porcentaje) sobre la imagen para los puntos de anclaje
   // (ajusta estos valores según la imagen real)
   final _labelData = [
+    // _LabelData(
+    //   textTop: 'Bienvenidos a la aplicación',
+    //   textBottom: 'Caja de Herramientas DAGRD',
+    //   position: Offset(0.5, 0.08), // arriba del header
+    // ),
+    // _LabelData(
+    //   textTop: 'Botón\nir atrás',
+    //   position: Offset(0.13, 0.13),
+    //   align: Alignment.centerRight,
+    // ),
+    // _LabelData(
+    //   textTop: 'Botón información\nde ayuda para cada sección',
+    //   position: Offset(0.5, 0.13),
+    //   align: Alignment.bottomCenter,
+    // ),
     _LabelData(
-      textTop: 'Bienvenidos a la aplicación',
-      textBottom: 'Caja de Herramientas DAGRD',
-      position: Offset(0.5, 0.08), // arriba del header
-    ),
-    _LabelData(
-      textTop: 'Botón\nir atrás',
-      position: Offset(0.13, 0.13),
-      align: Alignment.centerRight,
-    ),
-    _LabelData(
-      textTop: 'Botón información\nde ayuda para cada sección',
-      position: Offset(0.5, 0.13),
-      align: Alignment.bottomCenter,
-    ),
-    _LabelData(
-      textTop: 'Botón\n inicio\n de sesión\nUsuarios DAGRD',
-      position: Offset(1.2, 0.13),
+      textTop: 'Botón\ninicio\nde sesión\nUsuarios\nDAGRD',
+      position: Offset(1.2, 0.25),
       align: Alignment.centerLeft,
     ),
-    _LabelData(
-      textTop: 'Menú de acciones principales',
-      position: Offset(0.5, 0.93),
-      align: Alignment.bottomCenter,
-    ),
+    // _LabelData(
+    //   textTop: 'Menú de acciones principales',
+    //   position: Offset(0.5, 0.93),
+    //   align: Alignment.bottomCenter,
+    // ),
   ];
 
   final _lineData = [
     // from: punto en la imagen (relativo), to: punto del label (relativo)
-    _Line(from: Offset(0.13, 0.13), to: Offset(0.13, 0.08)), // back
-    _Line(from: Offset(0.5, 0.13), to: Offset(0.5, 0.08)), // info
-    _Line(from: Offset(0.87, 0.13), to: Offset(0.87, 0.08)), // profile
-    _Line(from: Offset(0.13, 0.93), to: Offset(0.5, 0.93)), // nav1
-    _Line(from: Offset(0.5, 0.93), to: Offset(0.5, 0.93)), // nav2
-    _Line(from: Offset(0.87, 0.93), to: Offset(0.5, 0.93)), // nav3
+    // _Line(from: Offset(0.13, 0.13), to: Offset(0.13, 0.08)), // back
+    _Line(from: Offset(0.7, 0.15), to: Offset(0.82, 0.15)), // info (más corta)
+    // _Line(from: Offset(0.87, 0.13), to: Offset(0.87, 0.08)), // profile
+    // _Line(from: Offset(0.13, 0.93), to: Offset(0.5, 0.93)), // nav1
+    // _Line(from: Offset(0.5, 0.93), to: Offset(0.5, 0.93)), // nav2
+    // _Line(from: Offset(0.87, 0.93), to: Offset(0.5, 0.93)), // nav3
   ];
 
   bool _dontShowAgain = false;
@@ -91,11 +94,70 @@ class _TutorialPosterOverlayState extends State<TutorialPosterOverlayScreen> {
             ),
           ),
 
+          // Textos de bienvenida y título arriba del póster
+          Positioned(
+            top: 80,
+            left: 98,
+            right: 0,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Bienvenidos a la aplicación',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontFamily: 'Work Sans',
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    height: 16 / 14, // 114.286%
+                  ),
+                ),
+                const SizedBox(height: 2),
+                RichText(
+                  textAlign: TextAlign.start,
+                  text: const TextSpan(
+                    style: TextStyle(
+                      fontFamily: 'Metropolis',
+                      fontWeight: FontWeight.w500,
+                      height: 1.0,
+                    ),
+                    children: [
+                      TextSpan(
+                        text: 'Caja de\n',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      TextSpan(
+                        text: 'Herramientas\n',
+                        style: TextStyle(
+                          color: Color(0xFFFFCC00),
+                          fontSize: 20,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      TextSpan(
+                        text: 'DAGRD',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 23,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+
           // Póster (imagen del home) centrado
           Padding(
-            padding: const EdgeInsets.only(top: 180, left: 54),
+            padding: const EdgeInsets.only(top: 182, left: 54),
             child: Container(
-              
               height: 500,
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -117,10 +179,20 @@ class _TutorialPosterOverlayState extends State<TutorialPosterOverlayScreen> {
               child: IgnorePointer(
                 child: CustomPaint(
                   painter: _LinesPainter(
-                    lines: _lineData.map((l) => _Line(
-                      from: Offset(l.from.dx * posterWidth, l.from.dy * posterHeight),
-                      to: Offset(l.to.dx * posterWidth, l.to.dy * posterHeight),
-                    )).toList(),
+                    lines: _lineData
+                        .map(
+                          (l) => _Line(
+                            from: Offset(
+                              l.from.dx * posterWidth,
+                              l.from.dy * posterHeight,
+                            ),
+                            to: Offset(
+                              l.to.dx * posterWidth,
+                              l.to.dy * posterHeight,
+                            ),
+                          ),
+                        )
+                        .toList(),
                   ),
                 ),
               ),
@@ -128,15 +200,17 @@ class _TutorialPosterOverlayState extends State<TutorialPosterOverlayScreen> {
           ),
 
           // Labels
-          ..._labelData.map((l) => Positioned(
-                left: size.width * 0.11 + l.position.dx * posterWidth - 110,
-                top: size.height * 0.13 + l.position.dy * posterHeight - 34,
-                child: _LabelBubble(
-                  top: l.textTop,
-                  bottom: l.textBottom,
-                  align: l.align,
-                ),
-              )),
+          ..._labelData.map(
+            (l) => Positioned(
+              left: size.width * 0.11 + l.position.dx * posterWidth - 110,
+              top: size.height * 0.13 + l.position.dy * posterHeight - 34,
+              child: _LabelBubble(
+                top: l.textTop,
+                bottom: l.textBottom,
+                align: l.align,
+              ),
+            ),
+          ),
 
           // Checkbox “No volver a mostrar”
           Positioned(
@@ -145,18 +219,24 @@ class _TutorialPosterOverlayState extends State<TutorialPosterOverlayScreen> {
             right: 20,
             child: Row(
               children: [
-                StatefulBuilder(builder: (ctx, setSt) {
-                  return Checkbox(
-                    value: _dontShowAgain,
-                    onChanged: (v) => setSt(() => _dontShowAgain = v ?? false),
-                    activeColor: _Dagrd.azul,
-                    checkColor: Colors.white,
-                  );
-                }),
+                StatefulBuilder(
+                  builder: (ctx, setSt) {
+                    return Checkbox(
+                      value: _dontShowAgain,
+                      onChanged: (v) =>
+                          setSt(() => _dontShowAgain = v ?? false),
+                      activeColor: _Dagrd.azul,
+                      checkColor: Colors.white,
+                    );
+                  },
+                ),
                 const SizedBox(width: 8),
                 const Text(
                   'No volver a mostrar',
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ],
             ),
@@ -196,7 +276,9 @@ class _MiniHomeMock extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
               decoration: BoxDecoration(
                 color: const Color(0xFF1E2B4A),
-                borderRadius: const BorderRadius.vertical(bottom: Radius.circular(20)),
+                borderRadius: const BorderRadius.vertical(
+                  bottom: Radius.circular(20),
+                ),
               ),
               child: Row(
                 children: [
@@ -206,27 +288,33 @@ class _MiniHomeMock extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: const [
-                        Text('Caja de',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontFamily: 'Work Sans',
-                              fontSize: 12,
-                              fontWeight: FontWeight.w400,
-                            )),
-                        Text('Herramientas',
-                            style: TextStyle(
-                              color: Color(0xFFFFCC00),
-                              fontFamily: 'Work Sans',
-                              fontSize: 14,
-                              fontWeight: FontWeight.w700,
-                            )),
-                        Text('DAGRD',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontFamily: 'Work Sans',
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                            )),
+                        Text(
+                          'Caja de',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontFamily: 'Work Sans',
+                            fontSize: 12,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                        Text(
+                          'Herramientas',
+                          style: TextStyle(
+                            color: Color(0xFFFFCC00),
+                            fontFamily: 'Work Sans',
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        Text(
+                          'DAGRD',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontFamily: 'Work Sans',
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -441,8 +529,12 @@ class _RoundButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 32, height: 32,
-      decoration: const BoxDecoration(color: _Dagrd.amarillo, shape: BoxShape.circle),
+      width: 32,
+      height: 32,
+      decoration: const BoxDecoration(
+        color: _Dagrd.amarillo,
+        shape: BoxShape.circle,
+      ),
       child: Icon(icon, color: _Dagrd.azul, size: 18),
     );
   }
@@ -454,14 +546,15 @@ class _NavDot extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 26, height: 26,
+      width: 26,
+      height: 26,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: Colors.white.withOpacity(0.25),
         border: Border.all(color: Colors.white, width: 1.6),
       ),
     );
-    }
+  }
 }
 
 /// ---------------------------
@@ -482,7 +575,7 @@ class _LabelData {
 
 class _Line {
   final Offset from; // punto del póster
-  final Offset to;   // punto cercano a la burbuja de texto
+  final Offset to; // punto cercano a la burbuja de texto
   _Line({required this.from, required this.to});
 }
 
@@ -504,13 +597,15 @@ class _LinesPainter extends CustomPainter {
         ..moveTo(l.from.dx, l.from.dy)
         ..lineTo(l.to.dx, l.to.dy);
       canvas.drawPath(path, p);
-      canvas.drawCircle(l.from, 3.5, dot);
+      // Quitar el círculo al inicio de la línea
+      // canvas.drawCircle(l.from, 3.5, dot);
       canvas.drawCircle(l.to, 3.5, dot);
     }
   }
 
   @override
-  bool shouldRepaint(covariant _LinesPainter oldDelegate) => oldDelegate.lines != lines;
+  bool shouldRepaint(covariant _LinesPainter oldDelegate) =>
+      oldDelegate.lines != lines;
 }
 
 class _LabelBubble extends StatelessWidget {
@@ -518,13 +613,20 @@ class _LabelBubble extends StatelessWidget {
   final String? bottom;
   final Alignment align;
 
-  const _LabelBubble({super.key, required String top, String? bottom, this.align = Alignment.centerLeft})
-      : top = top,
-        bottom = bottom;
+  const _LabelBubble({
+    super.key,
+    required String top,
+    String? bottom,
+    this.align = Alignment.centerLeft,
+  }) : top = top,
+       bottom = bottom;
 
   @override
   Widget build(BuildContext context) {
-    final isLoginLabel = top.trim().replaceAll('\n', ' ').contains('inicio de sesión Usuarios DAGRD');
+    final isLoginLabel = top
+        .trim()
+        .replaceAll('\n', ' ')
+        .contains('inicio de sesión Usuarios DAGRD');
     return Align(
       alignment: align,
       child: Container(
@@ -533,7 +635,9 @@ class _LabelBubble extends StatelessWidget {
         decoration: BoxDecoration(
           color: const Color(0xFF0C2340),
           borderRadius: BorderRadius.circular(10),
-          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.25), blurRadius: 8)],
+          boxShadow: [
+            BoxShadow(color: Colors.black.withOpacity(0.25), blurRadius: 8),
+          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
