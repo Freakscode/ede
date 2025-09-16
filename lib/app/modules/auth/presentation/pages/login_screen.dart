@@ -65,7 +65,10 @@ class _LoginScreenState extends State<LoginScreen> {
           Expanded(
             child: SingleChildScrollView(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 35, vertical: 27),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 35,
+                  vertical: 27,
+                ),
                 child: Form(
                   key: _formKey,
                   child: Column(
@@ -173,7 +176,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           prefixIcon: Padding(
                             padding: const EdgeInsets.all(12.0),
                             child: SvgPicture.asset(
-                              AppIcons.key, // Usando Persona.svg como placeholder
+                              AppIcons
+                                  .key, // Usando Persona.svg como placeholder
                               width: 20,
                               height: 20,
                               colorFilter: const ColorFilter.mode(
@@ -250,8 +254,9 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             );
                             // Navegar a home después del login
-                            context.go('/home');
+                            context.go('/risk_events');
                           }
+                          context.go('/risk_events');
                         },
                       ),
                       const SizedBox(height: 24),

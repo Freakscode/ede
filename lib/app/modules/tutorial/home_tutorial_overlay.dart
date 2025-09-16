@@ -153,7 +153,7 @@ class TutorialPosterOverlayScreen extends StatelessWidget {
                             ),
                             clipBehavior: Clip.antiAlias,
                             child: Image.asset(
-                              'assets/images/home_poster.png',
+                              'assets/images/home_poster.jpeg',
                               fit: BoxFit.fitHeight,
                             ),
                           ),

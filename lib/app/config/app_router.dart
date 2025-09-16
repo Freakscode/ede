@@ -1,3 +1,4 @@
+import 'package:caja_herramientas/app/modules/risk_events/risk_events_screen.dart';
 import 'package:caja_herramientas/app/modules/tutorial/home_tutorial_overlay.dart';
 
 // ignore_for_file: unused_import
@@ -29,7 +30,7 @@ import 'routes.dart';
 /// Creates and configures the application router with clean architecture
 GoRouter getAppRouter(BuildContext context) {
   return GoRouter(
-    initialLocation: '/home',
+    initialLocation: '/risk_events',
     routes: [
       // Tutorial Poster Overlay
       GoRoute(
@@ -48,6 +49,11 @@ GoRouter getAppRouter(BuildContext context) {
       GoRoute(
         path: '/home',
         builder: (context, state) => const home.HomeScreen(),
+      ),
+
+      GoRoute(
+        path: '/risk_events',
+        builder: (context, state) => const RiskEventsScreen(),
       ),
 
       // Evaluación - Sección 1: Identificación de Evaluación

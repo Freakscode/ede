@@ -3,6 +3,8 @@ import 'package:caja_herramientas/app/shared/widgets/layouts/custom_app_bar.dart
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import 'package:caja_herramientas/app/core/icons/app_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:caja_herramientas/app/modules/tutorial/home_tutorial_overlay.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
@@ -15,11 +17,38 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
+  bool _tutorialShown = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkAndShowTutorial();
+  }
+
+  Future<void> _checkAndShowTutorial() async {
+    final prefs = await SharedPreferences.getInstance();
+    final shown = prefs.getBool('tutorial_home_shown') ?? false;
+    if (!shown && !_tutorialShown) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _showTutorialOverlay();
+      });
+    }
+  }
+
+  void _showTutorialOverlay() async {
+    // final prefs = await SharedPreferences.getInstance();
+    await showDialog(
+      context: context,
+      // barrierDismissible: false,
+      builder: (context) {
+        return TutorialPosterOverlayScreen();
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
       appBar: const CustomAppBar(
         showBack: false,
         showInfo: true,
