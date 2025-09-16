@@ -134,10 +134,9 @@ class TutorialPosterOverlayScreen extends StatelessWidget {
                   final posterWidth = constraints.maxWidth * 0.78 > 400 ? 400.0 : constraints.maxWidth * 0.9;
                   final posterHeight = posterWidth * 1.7;
                   final stackHeight = posterHeight * 1.20; // más alto para labels arriba/abajo
-                  return Container(
+                  return SizedBox(
                     width: posterWidth,
                     height: stackHeight,
-                    color: Colors.red.withOpacity(0.2), // Color temporal para debug
                     child: Stack(
                       children: [
                         // Imagen del póster centrada verticalmente
@@ -201,52 +200,59 @@ class TutorialPosterOverlayScreen extends StatelessWidget {
                             ),
                           ),
                         ),
+                        // Checkbox “No volver a mostrar” centrado abajo del póster
+                        Positioned(
+                          left: 0,
+                          right: 0,
+                          bottom: 50,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SizedBox(
+                                width: 16,
+                                height: 16,
+                                child: Container(
+                                  padding: const EdgeInsets.all(2),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(2),
+                                    border: Border.all(color: Color(0xFFAAAAAA), width: 1),
+                                  ),
+                                  child: Checkbox(
+                                    value: false,
+                                    onChanged: null, // Deshabilitado
+                                    activeColor: DAGRDColors.azulDAGRD,
+                                    checkColor: Colors.white,
+                                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                    visualDensity: VisualDensity.compact,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(2),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              const Text(
+                                'No volver a mostrar',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontFamily: 'Metropolis',
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                  height: 1.0,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ],
                     ),
                   );
                 },
               ),
-              const SizedBox(height: 24),
+              // const SizedBox(height: 15),
               // Checkbox “No volver a mostrar” (solo visual, deshabilitado)
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    width: 16,
-                    height: 16,
-                    child: Container(
-                      padding: const EdgeInsets.all(2),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(2),
-                        border: Border.all(color: Color(0xFFAAAAAA), width: 1),
-                      ),
-                      child: Checkbox(
-                        value: false,
-                        onChanged: null, // Deshabilitado
-                        activeColor: DAGRDColors.azulDAGRD,
-                        checkColor: Colors.white,
-                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                        visualDensity: VisualDensity.compact,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(2),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  const Text(
-                    'No volver a mostrar',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontFamily: 'Metropolis',
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
-                      height: 1.0,
-                    ),
-                  ),
-                ],
-              ),
+             
             ],
           ),
         ),
