@@ -65,9 +65,18 @@ class _TutorialPosterOverlayState extends State<TutorialPosterOverlayScreen> {
     // _Line(from: Offset(0.13, 0.13), to: Offset(0.13, 0.08)), // back
     _Line(from: Offset(0.65, 0.24), to: Offset(0.82, 0.24)), // info (más corta)
     _Line(from: Offset(0.52, 0.17), to: Offset(0.52, 0.08)), // profile
-    // _Line(from: Offset(0.13, 0.93), to: Offset(0.5, 0.93)), // nav1
-    // _Line(from: Offset(0.5, 0.93), to: Offset(0.5, 0.93)), // nav2
-    // _Line(from: Offset(0.87, 0.93), to: Offset(0.5, 0.93)), // nav3
+
+    // Menú de acciones principales (línea amarilla con 3 puntos y esquinas)
+    // Ajusta estos valores para que coincidan visualmente con tu póster
+    // Línea horizontal inferior
+    _Line(from: Offset(0.1, 1.05), to: Offset(0.62, 1.05)),
+    // Línea vertical izquierda
+    _Line(from: Offset(0.1, 1.05), to: Offset(0.1, 0.97)),
+    // // Línea vertical centro
+    _Line(from: Offset(0.28, 1.05), to: Offset(0.28, 0.97)),
+    _Line(from: Offset(0.45, 1.05), to: Offset(0.45, 0.97)),
+    _Line(from: Offset(0.62, 1.05), to: Offset(0.62, 0.97)),
+    // // Línea vertical derecha
   ];
 
   bool _dontShowAgain = false;
