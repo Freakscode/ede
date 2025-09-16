@@ -2,6 +2,7 @@ import 'package:caja_herramientas/app/core/icons/app_icons.dart';
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import 'package:caja_herramientas/app/modules/risk_events/widgets/event_card.dart';
 import 'package:caja_herramientas/app/shared/widgets/layouts/custom_app_bar.dart';
+import 'package:caja_herramientas/app/shared/widgets/layouts/custom_bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
 
 class RiskEventsScreen extends StatelessWidget {
@@ -91,6 +92,32 @@ class RiskEventsScreen extends StatelessWidget {
             ],
           ),
         ),
+      ),
+      bottomNavigationBar: CustomBottomNavBar(
+        currentIndex: 0,
+        onTap: (index) {},
+        items: const [
+          CustomBottomNavBarItem(
+            label: 'Inicio',
+            iconAsset: AppIcons.home,
+          ),
+          CustomBottomNavBarItem(
+            label: 'Material\neducativo',
+            iconAsset: AppIcons.book,
+          ),
+          CustomBottomNavBarItem(
+            label: 'Mis formularios',
+            iconAsset: AppIcons.files,
+          ),
+          CustomBottomNavBarItem(
+            label: 'Configuración',
+            iconAsset: AppIcons.gear,
+          ),
+        ],
+        backgroundColor: DAGRDColors.azulDAGRD,
+        selectedColor: Colors.white,
+        unselectedColor: Colors.white60,
+        selectedIconBgColor: Colors.white,
       ),
     );
   }

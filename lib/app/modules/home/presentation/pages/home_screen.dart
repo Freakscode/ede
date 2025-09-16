@@ -1,4 +1,3 @@
-
 import 'package:caja_herramientas/app/shared/widgets/layouts/custom_app_bar.dart';
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import 'package:caja_herramientas/app/core/icons/app_icons.dart';
@@ -7,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:caja_herramientas/app/modules/tutorial/home_tutorial_overlay.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:caja_herramientas/app/shared/widgets/layouts/custom_bottom_nav_bar.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -233,93 +233,35 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: DAGRDColors.azulDAGRD,
-        selectedItemColor: Colors.white,
-        unselectedItemColor: Colors.white.withOpacity(0.6),
-        selectedFontSize: 12,
-        unselectedFontSize: 12,
-        selectedLabelStyle: const TextStyle(
-          color: Colors.white,
-          fontFamily: 'Work Sans',
-          fontWeight: FontWeight.w500,
-          fontSize: 12,
-          height: 1.17, // 14px / 12px = 1.1667
-          
-        ),
-        unselectedLabelStyle: const TextStyle(
-          color: Colors.white,
-          fontFamily: 'Work Sans',
-          fontWeight: FontWeight.w500,
-          fontSize: 12,
-          height: 1.17,
-        ),
+      bottomNavigationBar: CustomBottomNavBar(
         currentIndex: _selectedIndex,
         onTap: (index) {
           setState(() {
             _selectedIndex = index;
           });
         },
-        items: [
-          BottomNavigationBarItem(
-            icon: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: _selectedIndex == 0
-                  ? const BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                    )
-                  : null,
-              child: SvgPicture.asset(
-                AppIcons.home,
-                width: 24,
-                height: 24,
-                colorFilter: ColorFilter.mode(
-                  _selectedIndex == 0 ? DAGRDColors.azulDAGRD : Colors.white,
-                  BlendMode.srcIn,
-                ),
-              ),
-            ),
+        items: const [
+          CustomBottomNavBarItem(
             label: 'Inicio',
+            iconAsset: AppIcons.home,
           ),
-          BottomNavigationBarItem(
-            icon: SvgPicture.asset(
-              AppIcons.book,
-              width: 24,
-              height: 24,
-              colorFilter: const ColorFilter.mode(
-                Colors.white,
-                BlendMode.srcIn,
-              ),
-            ),
+          CustomBottomNavBarItem(
             label: 'Material\neducativo',
+            iconAsset: AppIcons.book,
           ),
-          BottomNavigationBarItem(
-            icon: SvgPicture.asset(
-              AppIcons.files,
-              width: 24,
-              height: 24,
-              colorFilter: const ColorFilter.mode(
-                Colors.white,
-                BlendMode.srcIn,
-              ),
-            ),
+          CustomBottomNavBarItem(
             label: 'Mis formularios',
+            iconAsset: AppIcons.files,
           ),
-          BottomNavigationBarItem(
-            icon: SvgPicture.asset(
-              AppIcons.gear,
-              width: 24,
-              height: 24,
-              colorFilter: const ColorFilter.mode(
-                Colors.white,
-                BlendMode.srcIn,
-              ),
-            ),
+          CustomBottomNavBarItem(
             label: 'Configuración',
+            iconAsset: AppIcons.gear,
           ),
         ],
+        backgroundColor: DAGRDColors.azulDAGRD,
+        selectedColor: Colors.white,
+        unselectedColor: Colors.white60,
+        selectedIconBgColor: Colors.white,
       ),
     );
   }
