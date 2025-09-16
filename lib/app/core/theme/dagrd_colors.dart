@@ -25,6 +25,9 @@ class DAGRDColors {
   /// Color gris oscuro para textos principales
   static const Color grisOscuro = Color(0xFF2D3748);
 
+  /// Color azul 3D DAGRD para backgrounds destacados
+  static const Color azul3DAGRD = Color(0xFF2D3E91);
+
   /// Gradiente azul DAGRD para headers y elementos destacados
   static const LinearGradient gradienteAzul = LinearGradient(
     begin: Alignment.topCenter,
