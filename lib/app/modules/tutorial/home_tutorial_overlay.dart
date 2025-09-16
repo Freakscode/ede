@@ -38,33 +38,33 @@ class _TutorialPosterOverlayState extends State<TutorialPosterOverlayScreen> {
     //   textBottom: 'Caja de Herramientas DAGRD',
     //   position: Offset(0.5, 0.08), // arriba del header
     // ),
-    // _LabelData(
-    //   textTop: 'Botón\nir atrás',
-    //   position: Offset(0.13, 0.13),
-    //   align: Alignment.centerRight,
-    // ),
-    // _LabelData(
-    //   textTop: 'Botón información\nde ayuda para cada sección',
-    //   position: Offset(0.5, 0.13),
-    //   align: Alignment.bottomCenter,
-    // ),
+    _LabelData(
+      textTop: 'Botón\nir atrás',
+      position: Offset(0.4, 0.18),
+      align: Alignment.centerRight,
+    ),
+    _LabelData(
+      textTop: 'Botón información\nde ayuda para cada sección',
+      position: Offset(0.78, 0.18),
+      align: Alignment.bottomCenter,
+    ),
     _LabelData(
       textTop: 'Botón\ninicio\nde sesión\nUsuarios\nDAGRD',
-      position: Offset(1.2, 0.25),
+      position: Offset(1.2, 0.35),
       align: Alignment.centerLeft,
     ),
-    // _LabelData(
-    //   textTop: 'Menú de acciones principales',
-    //   position: Offset(0.5, 0.93),
-    //   align: Alignment.bottomCenter,
-    // ),
+    _LabelData(
+      textTop: 'Menú de acciones principales',
+      position: Offset(0.38, 1.28),
+      align: Alignment.bottomCenter,
+    ),
   ];
 
   final _lineData = [
     // from: punto en la imagen (relativo), to: punto del label (relativo)
     // _Line(from: Offset(0.13, 0.13), to: Offset(0.13, 0.08)), // back
-    _Line(from: Offset(0.7, 0.15), to: Offset(0.82, 0.15)), // info (más corta)
-    // _Line(from: Offset(0.87, 0.13), to: Offset(0.87, 0.08)), // profile
+    _Line(from: Offset(0.65, 0.24), to: Offset(0.82, 0.24)), // info (más corta)
+    _Line(from: Offset(0.52, 0.17), to: Offset(0.52, 0.08)), // profile
     // _Line(from: Offset(0.13, 0.93), to: Offset(0.5, 0.93)), // nav1
     // _Line(from: Offset(0.5, 0.93), to: Offset(0.5, 0.93)), // nav2
     // _Line(from: Offset(0.87, 0.93), to: Offset(0.5, 0.93)), // nav3
@@ -156,9 +156,9 @@ class _TutorialPosterOverlayState extends State<TutorialPosterOverlayScreen> {
 
           // Póster (imagen del home) centrado
           Padding(
-            padding: const EdgeInsets.only(top: 182, left: 54),
+            padding: const EdgeInsets.only(top: 240, left: 54),
             child: Container(
-              height: 500,
+              height: 450,
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(14),
@@ -623,23 +623,10 @@ class _LabelBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isLoginLabel = top
-        .trim()
-        .replaceAll('\n', ' ')
-        .contains('inicio de sesión Usuarios DAGRD');
+    final isLoginLabel = top.trim().replaceAll('\n', ' ').contains('inicio de sesión Usuarios DAGRD');
     return Align(
       alignment: align,
-      child: Container(
-        width: 220,
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        decoration: BoxDecoration(
-          color: const Color(0xFF0C2340),
-          borderRadius: BorderRadius.circular(10),
-          boxShadow: [
-            BoxShadow(color: Colors.black.withOpacity(0.25), blurRadius: 8),
-          ],
-        ),
-        child: Column(
+      child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
@@ -658,6 +645,7 @@ class _LabelBubble extends StatelessWidget {
                       fontWeight: FontWeight.w700,
                       height: 1.2,
                     ),
+              textAlign: TextAlign.left,
             ),
             if (bottom != null) ...[
               const SizedBox(height: 2),
@@ -673,7 +661,6 @@ class _LabelBubble extends StatelessWidget {
             ],
           ],
         ),
-      ),
     );
   }
 }
