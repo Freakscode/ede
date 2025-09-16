@@ -4,8 +4,6 @@ import 'package:flutter/material.dart';
 
 /// Colores DAGRD (ajústalos si ya los tienes en tu theme)
 class _Dagrd {
-  static const azul = Color(0xFF1E2B4A);
-  static const amarillo = Color(0xFFFFCC00);
   static const grisFondo = Color(0xFFF7F7F7);
 }
 
@@ -224,18 +222,35 @@ class _TutorialPosterOverlayState extends State<TutorialPosterOverlayScreen> {
           // Checkbox “No volver a mostrar”
           Positioned(
             bottom: 18 + MediaQuery.of(context).padding.bottom,
-            left: 20,
-            right: 20,
+            left: 0,
+            right: 0,
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 StatefulBuilder(
                   builder: (ctx, setSt) {
-                    return Checkbox(
-                      value: _dontShowAgain,
-                      onChanged: (v) =>
-                          setSt(() => _dontShowAgain = v ?? false),
-                      activeColor: _Dagrd.azul,
-                      checkColor: Colors.white,
+                    return SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: Container(
+                        padding: const EdgeInsets.all(2),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(2),
+                          border: Border.all(color: Color(0xFFAAAAAA), width: 1),
+                        ),
+                        child: Checkbox(
+                          value: _dontShowAgain,
+                          onChanged: (v) => setSt(() => _dontShowAgain = v ?? false),
+                          activeColor: DAGRDColors.azulDAGRD,
+                          checkColor: Colors.white,
+                          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          visualDensity: VisualDensity.compact,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(2),
+                          ),
+                        ),
+                      ),
                     );
                   },
                 ),
@@ -244,7 +259,10 @@ class _TutorialPosterOverlayState extends State<TutorialPosterOverlayScreen> {
                   'No volver a mostrar',
                   style: TextStyle(
                     color: Colors.white,
-                    fontWeight: FontWeight.w600,
+                    fontFamily: 'Metropolis',
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    height: 1.0, // 13px line-height for 13px font-size
                   ),
                 ),
               ],
@@ -541,10 +559,10 @@ class _RoundButton extends StatelessWidget {
       width: 32,
       height: 32,
       decoration: const BoxDecoration(
-        color: _Dagrd.amarillo,
+        color: DAGRDColors.amarDAGRD,
         shape: BoxShape.circle,
       ),
-      child: Icon(icon, color: _Dagrd.azul, size: 18),
+      child: Icon(icon, color: DAGRDColors.azulDAGRD, size: 18),
     );
   }
 }
@@ -595,11 +613,11 @@ class _LinesPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final p = Paint()
-      ..color = _Dagrd.amarillo
+      ..color = DAGRDColors.amarDAGRD
       ..strokeWidth = 2
       ..style = PaintingStyle.stroke;
 
-    final dot = Paint()..color = _Dagrd.amarillo;
+    final dot = Paint()..color = DAGRDColors.amarDAGRD;
 
     for (final l in lines) {
       final path = Path()
