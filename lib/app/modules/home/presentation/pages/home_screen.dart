@@ -7,6 +7,7 @@ import 'package:caja_herramientas/app/modules/tutorial/home_tutorial_overlay.dar
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:caja_herramientas/app/shared/widgets/layouts/custom_bottom_nav_bar.dart';
+import '../widgets/home_tool_card.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -76,110 +77,24 @@ class _HomeScreenState extends State<HomeScreen> {
             
             const SizedBox(height: 24),
             
-            // Container with specified CSS styling
-            Container(
-              height: 105,
-              padding: const EdgeInsets.all(23),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                color: DAGRDColors.azulDAGRD,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  SvgPicture.asset(
-                    AppIcons.analisisRiesgo,
-                    width: 60,
-                    height: 54.203,
-                  ),
-                  const SizedBox(width: 18),
-                  Expanded(
-                    child: Text(
-                      'Metodología de Análisis del Riesgo',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontFamily: 'Work Sans',
-                        fontSize: 18,
-                        fontWeight: FontWeight.w500,
-                        height: 1.3,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+            HomeToolCard(
+              title: 'Metodología de Análisis del Riesgo',
+              iconAsset: AppIcons.analisisRiesgo,
+              backgroundColor: DAGRDColors.azulDAGRD,
             ),
             const SizedBox(height: 23),
 
-            Container(
-              height: 105,
-              padding: const EdgeInsets.all(23),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                color: DAGRDColors.azulDAGRD,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  SvgPicture.asset(
-                    AppIcons.danoEdificaciones,
-                    width: 60,
-                    height: 54.203,
-                  ),
-                  const SizedBox(width: 18),
-                  Expanded(
-                    child: Text(
-                      'Evaluación del daño en edificaciones EDE',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontFamily: 'Work Sans',
-                        fontSize: 18,
-                        fontWeight: FontWeight.w500,
-                        height: 1.3,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+            HomeToolCard(
+              title: 'Evaluación del daño en edificaciones EDE',
+              iconAsset: AppIcons.danoEdificaciones,
+              backgroundColor: DAGRDColors.azulDAGRD,
+              onTap: () => context.go('/home_evaluacion'),
             ),
             const SizedBox(height: 23),
-            Container(
-              height: 105,
-              padding: const EdgeInsets.all(23),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                color: DAGRDColors.azulDAGRD,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  SvgPicture.asset(
-                    AppIcons.danoEdificaciones,
-                    width: 60,
-                    height: 54.203,
-                  ),
-                  const SizedBox(width: 18),
-                  Expanded(
-                    child: Text(
-                      'Formulario de caracterización de movimientos en masa',
-                      textAlign: TextAlign.center,
-                      maxLines: 3,
-                      overflow: TextOverflow.visible,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontFamily: 'Work Sans',
-                        fontSize: 18,
-                        fontWeight: FontWeight.w500,
-                        height: 1.2,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+            HomeToolCard(
+              title: 'Formulario de caracterización de movimientos en masa',
+              iconAsset: AppIcons.danoEdificaciones,
+              backgroundColor: DAGRDColors.azulDAGRD,
             ),
             
             const SizedBox(height: 48),

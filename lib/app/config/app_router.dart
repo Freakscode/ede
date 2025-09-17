@@ -31,7 +31,7 @@ import 'routes.dart';
 /// Creates and configures the application router with clean architecture
 GoRouter getAppRouter(BuildContext context) {
   return GoRouter(
-    initialLocation: '/forms_history',
+    initialLocation: '/splash',
     routes: [
       // Tutorial Poster Overlay
       GoRoute(
@@ -63,6 +63,11 @@ GoRouter getAppRouter(BuildContext context) {
 
       // EDE - Configuración rutas
       // Evaluación - Sección 1: Identificación de Evaluación
+      
+      GoRoute(
+        path: '/home_evaluacion',
+        builder: (context, state) => const evaluacion.HomeEdeScreen(),
+      ),
       GoRoute(
         path: '/id_evaluacion',
         builder: (context, state) => const EvaluacionWizardPage(),

@@ -1,10 +1,11 @@
+import 'package:caja_herramientas/app/shared/widgets/layouts/custom_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({
+class HomeEdeScreen extends StatelessWidget {
+  const HomeEdeScreen({
     super.key,
   });
 
@@ -17,14 +18,10 @@ class HomeScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
-      appBar: AppBar(
-        title: Text(
-          'DAGRD - APP EDE',
-          style: theme.textTheme.titleLarge?.copyWith(
-            color: theme.colorScheme.onPrimary,
-          ),
-        ),
-        backgroundColor: theme.colorScheme.primary,
+      appBar: const CustomAppBar(
+        showBack: true,
+        showInfo: true,
+        showProfile: true,
       ),
       body: SafeArea(
         child: SingleChildScrollView(
