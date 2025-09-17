@@ -133,9 +133,9 @@ class _FormsHistoryScreenState extends State<FormsHistoryScreen> {
             ),
             const SizedBox(height: 16),
             FormCard(
-              title: 'Risk Analysis - Landslides',
+              title: 'Análisis de Riesgo - Movimientos en masa',
               lastEdit: '19-08-25',
-              tag: 'Landslides',
+              tag: 'Movimientos en masa',
               progress: 0.485,
               threat: 0.32,
               vulnerability: 0.65,
