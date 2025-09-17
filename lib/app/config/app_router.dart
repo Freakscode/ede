@@ -1,5 +1,6 @@
 import 'package:caja_herramientas/app/modules/risk_events/risk_events_screen.dart';
 import 'package:caja_herramientas/app/modules/tutorial/home_tutorial_overlay.dart';
+import 'package:caja_herramientas/app/modules/forms_history/forms_history_screen.dart';
 
 // ignore_for_file: unused_import
 
@@ -30,12 +31,12 @@ import 'routes.dart';
 /// Creates and configures the application router with clean architecture
 GoRouter getAppRouter(BuildContext context) {
   return GoRouter(
-    initialLocation: '/risk_events',
+    initialLocation: '/forms_history',
     routes: [
       // Tutorial Poster Overlay
       GoRoute(
         path: '/tutorial_poster',
-        builder: (context, state) =>  TutorialPosterOverlayScreen(),
+        builder: (context, state) => TutorialPosterOverlayScreen(),
       ),
       // Rutas SIN header (splash, login, onboarding, etc.)
       GoRoute(
@@ -55,7 +56,12 @@ GoRouter getAppRouter(BuildContext context) {
         path: '/risk_events',
         builder: (context, state) => const RiskEventsScreen(),
       ),
+      GoRoute(
+        path: '/forms_history',
+        builder: (context, state) => const FormsHistoryScreen(),
+      ),
 
+      // EDE - Configuración rutas
       // Evaluación - Sección 1: Identificación de Evaluación
       GoRoute(
         path: '/id_evaluacion',
