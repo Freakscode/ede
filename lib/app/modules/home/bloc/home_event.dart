@@ -18,3 +18,11 @@ class HomeNavBarTapped extends HomeEvent {
 class HomeShowRiskEventsSection extends HomeEvent {}
 
 class HomeCheckAndShowTutorial extends HomeEvent {}
+
+class HomeSetShowTutorial extends HomeEvent {
+  final bool value;
+  const HomeSetShowTutorial(this.value);
+
+  @override
+  List<Object?> get props => [value];
+}

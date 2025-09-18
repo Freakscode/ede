@@ -12,15 +12,19 @@ import 'package:caja_herramientas/app/modules/home/bloc/home_event.dart';
 import 'package:caja_herramientas/app/modules/home/bloc/home_state.dart';
 import 'package:caja_herramientas/app/shared/widgets/layouts/custom_bottom_nav_bar.dart';
 
-
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   void _showTutorialOverlay(BuildContext context) async {
+    final showTutorial = context.read<HomeBloc>().state.showTutorial;
+    print('showTutorial (antes de overlay): $showTutorial');
     await showDialog(
       context: context,
-      builder: (context) {
-        return TutorialPosterOverlay();
+      builder: (dialogContext) {
+        return BlocProvider.value(
+          value: context.read<HomeBloc>(),
+          child: TutorialPosterOverlay(),
+        );
       },
     );
   }
@@ -30,9 +34,11 @@ class HomeScreen extends StatelessWidget {
     return BlocProvider(
       create: (_) => HomeBloc()..add(HomeCheckAndShowTutorial()),
       child: BlocConsumer<HomeBloc, HomeState>(
-        listenWhen: (previous, current) => !previous.tutorialShown && current.tutorialShown,
+        listenWhen: (previous, current) =>
+            !previous.tutorialShown && current.tutorialShown,
         listener: (context, state) {
-          if (state.tutorialShown) {
+          if (state.tutorialShown && state.showTutorial) {
+
             WidgetsBinding.instance.addPostFrameCallback((_) {
               _showTutorialOverlay(context);
             });

@@ -4,4 +4,9 @@ class DatabaseConfig {
   static const database = String.fromEnvironment('DB_NAME', defaultValue: 'EDE_DB');
   static const username = String.fromEnvironment('DB_USER', defaultValue: 'postgres');
   static const password = String.fromEnvironment('DB_PASSWORD', defaultValue: 'admin123');
+
+  // Constante para la clave del tutorial
+  static const tutorialHomeKey = 'tutorial_home_shown';
+
+  
 }

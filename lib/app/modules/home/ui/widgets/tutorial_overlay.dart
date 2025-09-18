@@ -1,8 +1,13 @@
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
+import 'package:caja_herramientas/app/modules/home/bloc/home_bloc.dart';
+import 'package:caja_herramientas/app/modules/home/bloc/home_event.dart';
+import 'package:caja_herramientas/app/modules/home/bloc/home_state.dart';
+import 'package:caja_herramientas/app/modules/home/models/label_data.dart';
 import 'package:caja_herramientas/app/modules/home/ui/widgets/label_bubble.dart';
 import 'package:caja_herramientas/app/modules/home/models/line_model.dart';
 import 'package:caja_herramientas/app/modules/home/ui/widgets/lines_painter.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 
 /// ---------------------------
@@ -12,22 +17,22 @@ class TutorialPosterOverlay extends StatelessWidget {
   TutorialPosterOverlay({super.key});
 
   final _labelData = [
-    _LabelData(
+    LabelData(
       textTop: 'Botón\nir atrás',
       position: Offset(0.38, 0),
       align: Alignment.centerRight,
     ),
-    _LabelData(
+    LabelData(
       textTop: 'Botón información\nde ayuda para cada sección',
       position: Offset(0.69, 0),
       align: Alignment.bottomCenter,
     ),
-    _LabelData(
+    LabelData(
       textTop: 'Botón\ninicio\nde sesión\nUsuarios\nDAGRD',
       position: Offset(1.12, 0.15),
       align: Alignment.centerLeft,
     ),
-    _LabelData(
+    LabelData(
       textTop: 'Menú de acciones principales',
       position: Offset(0.38, 0.98),
       align: Alignment.bottomCenter,
@@ -69,7 +74,9 @@ class TutorialPosterOverlay extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   IconButton(
-                    onPressed: () => _close(context),
+                    onPressed: () {
+                      _close(context);
+                    },
                     icon: const Icon(Icons.close, color: Colors.white, size: 28),
                   ),
                 ],
@@ -218,16 +225,24 @@ class TutorialPosterOverlay extends StatelessWidget {
                                     borderRadius: BorderRadius.circular(2),
                                     border: Border.all(color: Color(0xFFAAAAAA), width: 1),
                                   ),
-                                  child: Checkbox(
-                                    value: false,
-                                    onChanged: null, // Deshabilitado
-                                    activeColor: DAGRDColors.azulDAGRD,
-                                    checkColor: Colors.white,
-                                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                    visualDensity: VisualDensity.compact,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(2),
-                                    ),
+                                  child: BlocBuilder<HomeBloc, HomeState>(
+                                    builder: (context, state) {
+                                      return Checkbox(
+                                        value: !state.showTutorial,
+                                        onChanged: (checked) {
+                                          context.read<HomeBloc>().add(
+                                            HomeSetShowTutorial(!(checked ?? false)),
+                                          );
+                                        },
+                                        activeColor: DAGRDColors.azulDAGRD,
+                                        checkColor: Colors.white,
+                                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                        visualDensity: VisualDensity.compact,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(2),
+                                        ),
+                                      );
+                                    },
                                   ),
                                 ),
                               ),
@@ -261,18 +276,7 @@ class TutorialPosterOverlay extends StatelessWidget {
   }
 }
 
-class _LabelData {
-  final String textTop;
-  final String? textBottom;
-  final Offset position; // centro aproximado de la burbuja
-  final Alignment align;
-  _LabelData({
-    required this.textTop,
-    this.textBottom,
-    required this.position,
-    this.align = Alignment.centerLeft,
-  });
-}
+
 
 
 

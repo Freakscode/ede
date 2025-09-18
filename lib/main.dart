@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'app/app.dart';
-import 'app/config/injection_container.dart' as di;
+import 'injection_container.dart' as di;
 import 'app/core/utils/env.dart';
 import 'app/core/utils/logger.dart';
 

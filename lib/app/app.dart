@@ -12,7 +12,7 @@ import 'modules/evaluacion/presentation/bloc/form/acciones/acciones_bloc.dart';
 import 'modules/evaluacion/presentation/bloc/form/evaluacionDanos/evaluacion_danos_bloc.dart';
 import 'modules/evaluacion/presentation/bloc/form/descripcionEdificacion/descripcion_edificacion_bloc.dart';
 import 'modules/evaluacion/presentation/bloc/evaluacion_global_bloc.dart';
-import 'config/injection_container.dart' as di;
+import '../injection_container.dart' as di;
 import 'config/app_router.dart';
 
 class MyApp extends StatelessWidget {
