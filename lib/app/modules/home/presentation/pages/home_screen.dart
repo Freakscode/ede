@@ -6,10 +6,7 @@ import 'package:caja_herramientas/app/core/icons/app_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:caja_herramientas/app/modules/tutorial/home_tutorial_overlay.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:go_router/go_router.dart';
 import 'package:caja_herramientas/app/shared/widgets/layouts/custom_bottom_nav_bar.dart';
-import '../widgets/home_tool_card.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
