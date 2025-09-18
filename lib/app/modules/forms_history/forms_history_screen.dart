@@ -3,6 +3,7 @@ import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import 'package:caja_herramientas/app/shared/widgets/layouts/custom_app_bar.dart';
 import 'package:caja_herramientas/app/shared/widgets/layouts/custom_bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'widgets/form_card.dart';
 
 class FormsHistoryScreen extends StatefulWidget {
@@ -160,23 +161,38 @@ class _FormsHistoryScreenState extends State<FormsHistoryScreen> {
         ],
       ),
       bottomNavigationBar: CustomBottomNavBar(
-        currentIndex: 2,
-        onTap: (index) {},
+        currentIndex: 0,
+        onTap: (int index) {
+          switch (index) {
+            case 0:
+              context.go('/home');
+              break;
+            case 1:
+              // context.go('/educational_material');
+              break;
+            case 2:
+              context.go('/forms_history');
+              break;
+            case 3:
+              // context.go('/settings');
+              break;
+          }
+        },
         items: const [
           CustomBottomNavBarItem(
-            label: 'Home',
+            label: 'Inicio',
             iconAsset: AppIcons.home,
           ),
           CustomBottomNavBarItem(
-            label: 'Educational\nMaterial',
+            label: 'Material\neducativo',
             iconAsset: AppIcons.book,
           ),
           CustomBottomNavBarItem(
-            label: 'My Forms',
+            label: 'Mis formularios',
             iconAsset: AppIcons.files,
           ),
           CustomBottomNavBarItem(
-            label: 'Settings',
+            label: 'Configuración',
             iconAsset: AppIcons.gear,
           ),
         ],

@@ -254,9 +254,9 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             );
                             // Navegar a home después del login
-                            context.go('/risk_events');
                           }
-                          context.go('/risk_events');
+                          context.go('/home');
+
                         },
                       ),
                       const SizedBox(height: 24),

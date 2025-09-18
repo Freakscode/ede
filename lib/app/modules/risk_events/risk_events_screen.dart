@@ -131,7 +131,10 @@ class _RiskEventsScreenState extends State<RiskEventsScreen> {
         currentIndex: _selectedIndex,
         onTap: _onNavBarTap,
         items: const [
-          CustomBottomNavBarItem(label: 'Inicio', iconAsset: AppIcons.home),
+          CustomBottomNavBarItem(
+            label: 'Inicio',
+            iconAsset: AppIcons.home,
+          ),
           CustomBottomNavBarItem(
             label: 'Material\neducativo',
             iconAsset: AppIcons.book,

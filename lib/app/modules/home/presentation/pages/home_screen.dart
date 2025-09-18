@@ -1,5 +1,6 @@
 import 'package:caja_herramientas/app/modules/home/presentation/widgets/home_forms_section.dart';
 import 'package:caja_herramientas/app/modules/home/presentation/widgets/home_main_section.dart';
+import 'package:caja_herramientas/app/modules/home/presentation/widgets/risk_events_section.dart';
 import 'package:caja_herramientas/app/shared/widgets/layouts/custom_app_bar.dart';
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import 'package:caja_herramientas/app/core/icons/app_icons.dart';
@@ -8,8 +9,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:caja_herramientas/app/modules/tutorial/home_tutorial_overlay.dart';
 import 'package:caja_herramientas/app/shared/widgets/layouts/custom_bottom_nav_bar.dart';
 
+
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({Key? key}) : super(key: key);
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -18,6 +20,14 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
   bool _tutorialShown = false;
+  bool mostrarEventosRiesgo = false;
+
+  // Llama este método después de login para mostrar la sección de eventos de riesgo
+  void mostrarSeccionEventosRiesgo() {
+    setState(() {
+      mostrarEventosRiesgo = true;
+    });
+  }
 
   void _onNavBarTap(int index) {
     setState(() {
@@ -55,31 +65,35 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     Widget bodyContent;
-    switch (_selectedIndex) {
-      case 0:
-        bodyContent = HomeMainSection();
-        break;
-      case 1:
-        bodyContent = const Center(
-          child: Text(
-            'Material educativo (contenido aquí)',
-            style: TextStyle(fontSize: 18),
-          ),
-        );
-        break;
-      case 2:
-        bodyContent = const HomeFormsSection();
-        break;
-      case 3:
-        bodyContent = const Center(
-          child: Text(
-            'Configuración (contenido aquí)',
-            style: TextStyle(fontSize: 18),
-          ),
-        );
-        break;
-      default:
-        bodyContent = const SizedBox.shrink();
+    if (mostrarEventosRiesgo) {
+      bodyContent = const RiskEventsSection();
+    } else {
+      switch (_selectedIndex) {
+        case 0:
+          bodyContent = HomeMainSection();
+          break;
+        case 1:
+          bodyContent = const Center(
+            child: Text(
+              'Material educativo (contenido aquí)',
+              style: TextStyle(fontSize: 18),
+            ),
+          );
+          break;
+        case 2:
+          bodyContent = const HomeFormsSection();
+          break;
+        case 3:
+          bodyContent = const Center(
+            child: Text(
+              'Configuración (contenido aquí)',
+              style: TextStyle(fontSize: 18),
+            ),
+          );
+          break;
+        default:
+          bodyContent = const SizedBox.shrink();
+      }
     }
     return Scaffold(
       appBar: const CustomAppBar(

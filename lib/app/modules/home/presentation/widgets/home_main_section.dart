@@ -56,7 +56,10 @@ class HomeMainSection extends StatelessWidget {
           ),
           const SizedBox(height: 48),
           GestureDetector(
-            onTap: () {},
+            onTap: () {
+              context.go('/login');
+
+            },
             child: Container(
               width: double.infinity,
               padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
