@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
-import 'package:caja_herramientas/app/modules/home/presentation/widgets/form_card.dart';
+import 'package:caja_herramientas/app/modules/home/ui/widgets/form_card.dart';
 
 class HomeFormsSection extends StatefulWidget {
   const HomeFormsSection({super.key});

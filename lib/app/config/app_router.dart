@@ -9,7 +9,7 @@ import 'package:go_router/go_router.dart';
 
 import '../modules/auth/presentation/pages/login_screen.dart';
 import '../modules/splash/presentation/pages/splash_screen.dart';
-import '../modules/home/presentation/pages/home_screen.dart' as home;
+import '../modules/home/ui/pages/home_screen.dart' as home;
 
 import '../modules/evaluacion/presentation/pages/home_screen.dart'
     as evaluacion;

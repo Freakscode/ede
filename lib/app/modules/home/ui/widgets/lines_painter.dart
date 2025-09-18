@@ -1,6 +1,6 @@
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import 'package:flutter/material.dart';
-import 'line_model.dart';
+import '../../models/line_model.dart';
 
 class LinesPainter extends CustomPainter {
   final List<Line> lines;

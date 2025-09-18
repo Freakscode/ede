@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import 'package:caja_herramientas/app/core/icons/app_icons.dart';
-import 'package:caja_herramientas/app/modules/home/presentation/widgets/home_tool_card.dart';
+import 'package:caja_herramientas/app/modules/home/ui/widgets/home_tool_card.dart';
 import 'package:go_router/go_router.dart';
 
 class HomeMainSection extends StatelessWidget {

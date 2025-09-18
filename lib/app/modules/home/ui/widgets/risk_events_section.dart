@@ -1,5 +1,5 @@
 import 'package:caja_herramientas/app/core/icons/app_icons.dart';
-import 'package:caja_herramientas/app/modules/home/presentation/widgets/event_card.dart';
+import 'package:caja_herramientas/app/modules/home/ui/widgets/event_card.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
