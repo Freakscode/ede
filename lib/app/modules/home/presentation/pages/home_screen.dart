@@ -20,7 +20,7 @@ class HomeScreen extends StatelessWidget {
     await showDialog(
       context: context,
       builder: (context) {
-        return TutorialPosterOverlayScreen();
+        return TutorialPosterOverlay();
       },
     );
   }

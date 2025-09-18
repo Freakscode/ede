@@ -8,8 +8,8 @@ import 'package:flutter/material.dart';
 /// ---------------------------
 /// Overlay tipo "póster" + labels
 /// ---------------------------
-class TutorialPosterOverlayScreen extends StatelessWidget {
-  TutorialPosterOverlayScreen({super.key});
+class TutorialPosterOverlay extends StatelessWidget {
+  TutorialPosterOverlay({super.key});
 
   final _labelData = [
     _LabelData(
