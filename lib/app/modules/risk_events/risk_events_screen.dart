@@ -4,9 +4,37 @@ import 'package:caja_herramientas/app/modules/risk_events/widgets/event_card.dar
 import 'package:caja_herramientas/app/shared/widgets/layouts/custom_app_bar.dart';
 import 'package:caja_herramientas/app/shared/widgets/layouts/custom_bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
-class RiskEventsScreen extends StatelessWidget {
+class RiskEventsScreen extends StatefulWidget {
   const RiskEventsScreen({super.key});
+
+  @override
+  State<RiskEventsScreen> createState() => _RiskEventsScreenState();
+}
+
+class _RiskEventsScreenState extends State<RiskEventsScreen> {
+  int _selectedIndex = 0;
+
+  void _onNavBarTap(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+    switch (index) {
+      case 0:
+        context.go('/home');
+        break;
+      case 1:
+        context.go('/educational_material');
+        break;
+      case 2:
+        context.go('/forms_history');
+        break;
+      case 3:
+        context.go('/settings');
+        break;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,43 +92,46 @@ class RiskEventsScreen extends StatelessWidget {
                     EventCard(
                       iconAsset: AppIcons.movimientoMasa,
                       title: 'Movimiento en Masa',
+                      onTap: () => context.go('/forms_history'),
                     ),
                     EventCard(
                       iconAsset: AppIcons.movimientoMasa,
                       title: 'Avenidas torrenciales',
+                      onTap: () => context.go('/forms_history'),
                     ),
                     EventCard(
                       iconAsset: AppIcons.inundacionCH,
                       title: 'Inundación',
+                      onTap: () => context.go('/forms_history'),
                     ),
                     EventCard(
                       iconAsset: AppIcons.estructuralCH,
                       title: 'Estructural',
+                      onTap: () => context.go('/forms_history'),
                     ),
                     EventCard(
                       iconAsset: AppIcons.inundacionCH,
                       title: 'Inundación',
+                      onTap: () => context.go('/forms_history'),
                     ),
                     EventCard(
                       iconAsset: AppIcons.estructuralCH,
                       title: 'Estructural',
+                      onTap: () => context.go('/forms_history'),
                     ),
                   ],
                 ),
               ),
-              SizedBox(height: 100)
+              SizedBox(height: 100),
             ],
           ),
         ),
       ),
       bottomNavigationBar: CustomBottomNavBar(
-        currentIndex: 0,
-        onTap: (index) {},
+        currentIndex: _selectedIndex,
+        onTap: _onNavBarTap,
         items: const [
-          CustomBottomNavBarItem(
-            label: 'Inicio',
-            iconAsset: AppIcons.home,
-          ),
+          CustomBottomNavBarItem(label: 'Inicio', iconAsset: AppIcons.home),
           CustomBottomNavBarItem(
             label: 'Material\neducativo',
             iconAsset: AppIcons.book,
@@ -122,4 +153,3 @@ class RiskEventsScreen extends StatelessWidget {
     );
   }
 }
-

@@ -1,3 +1,5 @@
+import 'package:caja_herramientas/app/modules/home/presentation/widgets/home_forms_section.dart';
+import 'package:caja_herramientas/app/modules/home/presentation/widgets/home_main_section.dart';
 import 'package:caja_herramientas/app/shared/widgets/layouts/custom_app_bar.dart';
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import 'package:caja_herramientas/app/core/icons/app_icons.dart';
@@ -19,6 +21,12 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
   bool _tutorialShown = false;
+
+  void _onNavBarTap(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
 
   @override
   void initState() {
@@ -49,112 +57,43 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    Widget bodyContent;
+    switch (_selectedIndex) {
+      case 0:
+        bodyContent = HomeMainSection();
+        break;
+      case 1:
+        bodyContent = const Center(
+          child: Text(
+            'Material educativo (contenido aquí)',
+            style: TextStyle(fontSize: 18),
+          ),
+        );
+        break;
+      case 2:
+        bodyContent = const HomeFormsSection();
+        break;
+      case 3:
+        bodyContent = const Center(
+          child: Text(
+            'Configuración (contenido aquí)',
+            style: TextStyle(fontSize: 18),
+          ),
+        );
+        break;
+      default:
+        bodyContent = const SizedBox.shrink();
+    }
     return Scaffold(
       appBar: const CustomAppBar(
         showBack: false,
         showInfo: true,
         showProfile: true,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(height: 28),
-            Center(
-              child: const Text(
-                'Seleccione una herramienta',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: DAGRDColors.azulDAGRD,
-                  fontFamily: 'Work Sans',
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                  height: 1.4, // 28px / 20px = 1.4 (line-height: 140%)
-                ),
-              ),
-            ),
-            
-            const SizedBox(height: 24),
-            
-            HomeToolCard(
-              title: 'Metodología de Análisis del Riesgo',
-              iconAsset: AppIcons.analisisRiesgo,
-              backgroundColor: DAGRDColors.azulDAGRD,
-            ),
-            const SizedBox(height: 23),
-
-            HomeToolCard(
-              title: 'Evaluación del daño en edificaciones EDE',
-              iconAsset: AppIcons.danoEdificaciones,
-              backgroundColor: DAGRDColors.azulDAGRD,
-              onTap: () => context.go('/home_evaluacion'),
-            ),
-            const SizedBox(height: 23),
-            HomeToolCard(
-              title: 'Formulario de caracterización de movimientos en masa',
-              iconAsset: AppIcons.danoEdificaciones,
-              backgroundColor: DAGRDColors.azulDAGRD,
-            ),
-            
-            const SizedBox(height: 48),
-            
-            // Botón: Ir a portal SIRMED
-              GestureDetector(
-                onTap: () {
-                  // TODO: Implement navigation to SIRMED portal
-                  // Example: launch URL or navigate
-                  context.go('/login');
-
-                },
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: DAGRDColors.amarDAGRD, width: 1),
-                    color: Colors.white,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SvgPicture.asset(
-                        AppIcons.globe,
-                        width: 24,
-                        height: 24,
-                        colorFilter: const ColorFilter.mode(
-                          Color(0xFF1E1E1E),
-                          BlendMode.srcIn,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Text(
-                        'Ir a portal SIRMED',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Color(0xFF1E1E1E),
-                          fontFamily: 'Work Sans',
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          height: 1.71, // 24px / 14px = 1.71 (line-height: 171.429%)
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            
-            const SizedBox(height: 20),
-          ],
-        ),
-      ),
+      body: bodyContent,
       bottomNavigationBar: CustomBottomNavBar(
         currentIndex: _selectedIndex,
-        onTap: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
+        onTap: _onNavBarTap,
         items: const [
           CustomBottomNavBarItem(
             label: 'Inicio',

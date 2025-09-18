@@ -33,12 +33,10 @@ GoRouter getAppRouter(BuildContext context) {
   return GoRouter(
     initialLocation: '/splash',
     routes: [
-      // Tutorial Poster Overlay
       GoRoute(
         path: '/tutorial_poster',
         builder: (context, state) => TutorialPosterOverlayScreen(),
       ),
-      // Rutas SIN header (splash, login, onboarding, etc.)
       GoRoute(
         path: '/splash',
         builder: (context, state) => const SplashScreen(),
@@ -65,7 +63,7 @@ GoRouter getAppRouter(BuildContext context) {
       // Evaluación - Sección 1: Identificación de Evaluación
       
       GoRoute(
-        path: '/home_evaluacion',
+        path: '/home_ede',
         builder: (context, state) => const evaluacion.HomeEdeScreen(),
       ),
       GoRoute(

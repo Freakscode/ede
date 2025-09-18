@@ -2,6 +2,7 @@ import 'package:caja_herramientas/app/core/icons/app_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
+import 'package:go_router/go_router.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback? onBack;
@@ -35,7 +36,14 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               padding: const EdgeInsets.only(left: 10),
               child: _circleButton(
                 assetName: AppIcons.arrowLeft,
-                onTap: onBack ?? () => Navigator.of(context).maybePop(),
+                onTap: onBack ?? () {
+                  final router = GoRouter.of(context);
+                  if (router.canPop()) {
+                    router.pop();
+                  } else {
+                    router.go('/home');
+                  }
+                },
               ),
             )
           : null,
