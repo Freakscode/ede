@@ -3,8 +3,10 @@ import 'package:caja_herramientas/app/modules/home/presentation/widgets/event_ca
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-class RiskEventsSection extends StatelessWidget {
-  const RiskEventsSection({super.key});
+class RiskEvents extends StatelessWidget {
+  const RiskEvents({
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -86,7 +88,7 @@ class RiskEventsSection extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(height: 100),
+            SizedBox(height: 100),
           ],
         ),
       ),

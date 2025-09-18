@@ -1,4 +1,3 @@
-import 'package:caja_herramientas/app/modules/risk_events/risk_events_screen.dart';
 import 'package:caja_herramientas/app/modules/tutorial/home_tutorial_overlay.dart';
 
 // ignore_for_file: unused_import
@@ -49,11 +48,6 @@ GoRouter getAppRouter(BuildContext context) {
         builder: (context, state) => const home.HomeScreen(),
       ),
 
-      GoRoute(
-        path: '/risk_events',
-        builder: (context, state) => const RiskEventsScreen(),
-      ),
-      
 
       // EDE - Configuración rutas
       // Evaluación - Sección 1: Identificación de Evaluación
