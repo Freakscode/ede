@@ -32,10 +32,6 @@ GoRouter getAppRouter(BuildContext context) {
     initialLocation: '/splash',
     routes: [
       GoRoute(
-        path: '/tutorial_poster',
-        builder: (context, state) => TutorialPosterOverlayScreen(),
-      ),
-      GoRoute(
         path: '/splash',
         builder: (context, state) => const SplashScreen(),
       ),

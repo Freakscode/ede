@@ -1,8 +1,8 @@
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
+import 'package:caja_herramientas/app/modules/home/presentation/widgets/label_bubble.dart';
+import 'package:caja_herramientas/app/modules/home/presentation/widgets/line_model.dart';
+import 'package:caja_herramientas/app/modules/home/presentation/widgets/lines_painter.dart';
 import 'package:flutter/material.dart';
-import 'widgets/label_bubble.dart';
-import 'widgets/lines_painter.dart';
-import 'widgets/line_model.dart';
 
 
 /// ---------------------------
