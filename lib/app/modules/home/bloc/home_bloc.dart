@@ -31,9 +31,23 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       await TutorialOverlayService.setShowTutorial(event.value);
       emit(state.copyWith(showTutorial: event.value));
     });
-    // Método para guardar la preferencia desde el bloc si es necesario
-    Future<void> setShowTutorial(bool value) async {
-      await TutorialOverlayService.setShowTutorial(value);
-    }
+
+    on<HomeToggleNotifications>((event, emit) {
+      emit(state.copyWith(notificationsEnabled: event.enabled));
+    });
+
+    on<HomeToggleDarkMode>((event, emit) {
+      emit(state.copyWith(darkModeEnabled: event.enabled));
+    });
+
+    on<HomeChangeLanguage>((event, emit) {
+      emit(state.copyWith(selectedLanguage: event.language));
+    });
+
+    on<HomeClearData>((event, emit) async {
+      // Limpiar datos de la aplicación
+      await TutorialOverlayService.clearTutorialBox();
+      emit(state.copyWith(showTutorial: true));
+    });
   }
 }

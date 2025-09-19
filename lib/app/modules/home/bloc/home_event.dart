@@ -26,3 +26,29 @@ class HomeSetShowTutorial extends HomeEvent {
   @override
   List<Object?> get props => [value];
 }
+
+class HomeToggleNotifications extends HomeEvent {
+  final bool enabled;
+  const HomeToggleNotifications(this.enabled);
+
+  @override
+  List<Object?> get props => [enabled];
+}
+
+class HomeToggleDarkMode extends HomeEvent {
+  final bool enabled;
+  const HomeToggleDarkMode(this.enabled);
+
+  @override
+  List<Object?> get props => [enabled];
+}
+
+class HomeChangeLanguage extends HomeEvent {
+  final String language;
+  const HomeChangeLanguage(this.language);
+
+  @override
+  List<Object?> get props => [language];
+}
+
+class HomeClearData extends HomeEvent {}

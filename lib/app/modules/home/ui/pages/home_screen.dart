@@ -1,4 +1,5 @@
 import 'package:caja_herramientas/app/modules/home/ui/pages/home_forms_screen.dart';
+import 'package:caja_herramientas/app/modules/home/ui/pages/settings_screen.dart';
 import 'package:caja_herramientas/app/modules/home/ui/widgets/home_main_section.dart';
 import 'package:caja_herramientas/app/modules/home/ui/pages/risk_events_screen.dart';
 import 'package:caja_herramientas/app/modules/home/ui/widgets/tutorial_overlay.dart';
@@ -65,12 +66,7 @@ class HomeScreen extends StatelessWidget {
                 bodyContent = const HomeFormsScreen();
                 break;
               case 3:
-                bodyContent = const Center(
-                  child: Text(
-                    'Configuración (contenido aquí)',
-                    style: TextStyle(fontSize: 18),
-                  ),
-                );
+                bodyContent = SettingsScreen();
                 break;
               case 4:
                 bodyContent = const RiskEventsScreen();

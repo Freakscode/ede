@@ -31,6 +31,9 @@ class DAGRDColors {
   /// Color azul 3D DAGRD para backgrounds destacados
   static const Color azul3DAGRD = Color(0xFF2D3E91);
 
+  /// Color azul secundario DAGRD
+  static const Color azulSecundario = Color(0xFF2563EB);
+
   /// Gradiente azul DAGRD para headers y elementos destacados
   static const LinearGradient gradienteAzul = LinearGradient(
     begin: Alignment.topCenter,
