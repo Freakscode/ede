@@ -63,11 +63,12 @@ class SettingsScreen extends StatelessWidget {
                     trailing: CustomSvgSwitch(
                       value: state.notificationsEnabled,
                       onChanged: (value) {
-                        context.read<HomeBloc>().add(HomeToggleNotifications(value));
+                        context.read<HomeBloc>().add(
+                          HomeToggleNotifications(value),
+                        );
                       },
                     ),
                   ),
-
 
                   // Modo oscuro
                   _buildSettingsTile(
@@ -83,7 +84,6 @@ class SettingsScreen extends StatelessWidget {
                       },
                     ),
                   ),
-
 
                   // Idioma
                   _buildSettingsTile(
@@ -101,7 +101,10 @@ class SettingsScreen extends StatelessWidget {
                         ),
                         color: const Color(0xFFF9FAFB),
                       ),
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
                       child: DropdownButton<String>(
                         value: state.selectedLanguage,
                         items: const [
@@ -134,7 +137,9 @@ class SettingsScreen extends StatelessWidget {
                         ],
                         onChanged: (value) {
                           if (value != null) {
-                            context.read<HomeBloc>().add(HomeChangeLanguage(value));
+                            context.read<HomeBloc>().add(
+                              HomeChangeLanguage(value),
+                            );
                           }
                         },
                         underline: const SizedBox(),
@@ -162,7 +167,6 @@ class SettingsScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-
 
                   // Limpiar Datos
                   Center(
@@ -207,21 +211,20 @@ class SettingsScreen extends StatelessWidget {
                   // Ayuda
                   _buildSettingsTile(
                     context: context,
-                    icon: AppIcons.toggle,
+                    icon: AppIcons.question,
                     iconColor: DAGRDColors.azulSecundario,
                     title: 'Ayuda',
-                    subtitle: 'Centro de ayuda, contáctanos, política de privacidad',
+                    subtitle:
+                        'Centro de ayuda, contáctanos, política de privacidad',
                     onTap: () {
                       // Implementar navegación a ayuda
                     },
                   ),
 
-                  const SizedBox(height: 16),
-
                   // Acerca de
                   _buildSettingsTile(
                     context: context,
-                    icon: AppIcons.toggle,
+                    icon: AppIcons.info,
                     iconColor: DAGRDColors.azulSecundario,
                     title: 'Acerca de',
                     subtitle: 'Caja de Herramientas DAGRD App v1.0.1',
@@ -252,10 +255,7 @@ class SettingsScreen extends StatelessWidget {
       decoration: showBorder
           ? const BoxDecoration(
               border: Border(
-                bottom: BorderSide(
-                  color: Color(0xFFD1D5DB),
-                  width: 1,
-                ),
+                bottom: BorderSide(color: Color(0xFFD1D5DB), width: 1),
               ),
             )
           : null,
@@ -278,10 +278,7 @@ class SettingsScreen extends StatelessWidget {
                     key: const ValueKey('active'),
                     width: 20,
                     height: 20,
-                    colorFilter: ColorFilter.mode(
-                      iconColor,
-                      BlendMode.srcIn,
-                    ),
+                    colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
                   ),
                 ),
               ),
@@ -327,11 +324,7 @@ class CustomSvgSwitch extends StatelessWidget {
   final bool value;
   final ValueChanged<bool>? onChanged;
 
-  const CustomSvgSwitch({
-    super.key,
-    required this.value,
-    this.onChanged,
-  });
+  const CustomSvgSwitch({super.key, required this.value, this.onChanged});
 
   @override
   Widget build(BuildContext context) {
@@ -345,10 +338,7 @@ class CustomSvgSwitch extends StatelessWidget {
           transitionBuilder: (Widget child, Animation<double> animation) {
             return ScaleTransition(
               scale: animation,
-              child: FadeTransition(
-                opacity: animation,
-                child: child,
-              ),
+              child: FadeTransition(opacity: animation, child: child),
             );
           },
           child: value
