@@ -1,4 +1,5 @@
 import 'package:caja_herramientas/app/core/icons/app_icons.dart';
+import 'package:caja_herramientas/app/modules/home/ui/widgets/form_card_completed.dart';
 import 'package:flutter/material.dart';
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import 'package:caja_herramientas/app/modules/home/ui/widgets/form_card_in_progress.dart';
@@ -177,19 +178,16 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
             vulnerability: 0.65,
           ),
         ] else ...[
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 32),
-            child: Center(
-              child: Text(
-                'No hay formularios finalizados',
-                style: TextStyle(
-                  color: DAGRDColors.grisMedio,
-                  fontFamily: 'Work Sans',
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
+          FormCardCompleted(
+            title: 'Análisis de Riesgo - Estructural',
+            lastEdit: '19-08-25',
+            tag: 'Estructural',
+          ),
+          const SizedBox(height: 16),
+          FormCardCompleted(
+            title: 'Análisis de Riesgo - Inundación',
+            lastEdit: '19-08-25',
+            tag: 'Inundación',
           ),
         ],
         const SizedBox(height: 24),

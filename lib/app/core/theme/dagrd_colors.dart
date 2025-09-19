@@ -16,6 +16,9 @@ class DAGRDColors {
   /// Color blanco para textos sobre fondos azules
   static const Color blancoDAGRD = Color(0xFFFFFFFF);
   
+  /// Color negro para textos principales
+  static const Color negroDAGRD = Color(0xFF1E1E1E);
+  
   /// Color gris claro para fondos
   static const Color grisClaro = Color(0xFFF7FAFC);
   
