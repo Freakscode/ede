@@ -1,4 +1,3 @@
-import 'package:caja_herramientas/app/modules/tutorial/home_tutorial_overlay.dart';
 
 // ignore_for_file: unused_import
 
@@ -29,7 +28,7 @@ import 'routes.dart';
 /// Creates and configures the application router with clean architecture
 GoRouter getAppRouter(BuildContext context) {
   return GoRouter(
-    initialLocation: '/splash',
+    initialLocation: '/home',
     routes: [
       GoRoute(
         path: '/splash',

@@ -58,6 +58,7 @@ class AppIcons {
   static const String user = 'assets/icons/caja_herramientas/Usuario.svg';
   static const String video = 'assets/icons/caja_herramientas/Video.svg';
   static const String wrench = 'assets/icons/caja_herramientas/Wrench.svg';
+  static const String faders = 'assets/icons/caja_herramientas/Faders.svg';
 
   // SVG Icons - Advertencias y alertas
   static const String warning = 'assets/icons/caja_herramientas/Advertencia.svg';

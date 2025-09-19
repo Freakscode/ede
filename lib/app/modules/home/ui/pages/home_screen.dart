@@ -1,6 +1,6 @@
-import 'package:caja_herramientas/app/modules/home/ui/widgets/home_forms_section.dart';
+import 'package:caja_herramientas/app/modules/home/ui/pages/home_forms_screen.dart';
 import 'package:caja_herramientas/app/modules/home/ui/widgets/home_main_section.dart';
-import 'package:caja_herramientas/app/modules/home/ui/widgets/risk_events_section.dart';
+import 'package:caja_herramientas/app/modules/home/ui/pages/risk_events_screen.dart';
 import 'package:caja_herramientas/app/modules/home/ui/widgets/tutorial_overlay.dart';
 import 'package:caja_herramientas/app/shared/widgets/layouts/custom_app_bar.dart';
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
@@ -47,7 +47,7 @@ class HomeScreen extends StatelessWidget {
         builder: (context, state) {
           Widget bodyContent;
           if (state.mostrarEventosRiesgo) {
-            bodyContent = const RiskEventsSection();
+            bodyContent = const RiskEventsScreen();
           } else {
             switch (state.selectedIndex) {
               case 0:
@@ -62,7 +62,7 @@ class HomeScreen extends StatelessWidget {
                 );
                 break;
               case 2:
-                bodyContent = const HomeFormsSection();
+                bodyContent = const HomeFormsScreen();
                 break;
               case 3:
                 bodyContent = const Center(
@@ -73,7 +73,7 @@ class HomeScreen extends StatelessWidget {
                 );
                 break;
               case 4:
-                bodyContent = const RiskEventsSection();
+                bodyContent = const RiskEventsScreen();
                 break;
               default:
                 bodyContent = const SizedBox.shrink();

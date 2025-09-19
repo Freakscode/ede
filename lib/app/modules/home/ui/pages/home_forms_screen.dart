@@ -1,15 +1,17 @@
+import 'package:caja_herramientas/app/core/icons/app_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
-import 'package:caja_herramientas/app/modules/home/ui/widgets/form_card.dart';
+import 'package:caja_herramientas/app/modules/home/ui/widgets/form_card_in_progress.dart';
+import 'package:flutter_svg/svg.dart';
 
-class HomeFormsSection extends StatefulWidget {
-  const HomeFormsSection({super.key});
+class HomeFormsScreen extends StatefulWidget {
+  const HomeFormsScreen({super.key});
 
   @override
-  State<HomeFormsSection> createState() => _HomeFormsSectionState();
+  State<HomeFormsScreen> createState() => _HomeFormsScreenState();
 }
 
-class _HomeFormsSectionState extends State<HomeFormsSection> {
+class _HomeFormsScreenState extends State<HomeFormsScreen> {
   int _tabIndex = 0;
 
   @override
@@ -51,7 +53,9 @@ class _HomeFormsSectionState extends State<HomeFormsSection> {
                           'En proceso',
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            color: _tabIndex == 0 ? DAGRDColors.azulDAGRD : DAGRDColors.grisMedio,
+                            color: _tabIndex == 0
+                                ? DAGRDColors.azulDAGRD
+                                : DAGRDColors.grisMedio,
                             fontFamily: 'Work Sans',
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
@@ -69,7 +73,9 @@ class _HomeFormsSectionState extends State<HomeFormsSection> {
                           'Finalizados',
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            color: _tabIndex == 1 ? DAGRDColors.azulDAGRD : DAGRDColors.grisMedio,
+                            color: _tabIndex == 1
+                                ? DAGRDColors.azulDAGRD
+                                : DAGRDColors.grisMedio,
                             fontFamily: 'Work Sans',
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
@@ -84,8 +90,12 @@ class _HomeFormsSectionState extends State<HomeFormsSection> {
               AnimatedPositioned(
                 duration: const Duration(milliseconds: 200),
                 curve: Curves.ease,
-                left: _tabIndex == 0 ? 0 : MediaQuery.of(context).size.width / 2 - 26,
-                right: _tabIndex == 0 ? MediaQuery.of(context).size.width / 2 - 26 : 0,
+                left: _tabIndex == 0
+                    ? 0
+                    : MediaQuery.of(context).size.width / 2 - 26,
+                right: _tabIndex == 0
+                    ? MediaQuery.of(context).size.width / 2 - 26
+                    : 0,
                 bottom: 0,
                 child: Container(
                   height: 5,
@@ -99,10 +109,45 @@ class _HomeFormsSectionState extends State<HomeFormsSection> {
           ),
         ),
         const SizedBox(height: 16),
+        _tabIndex == 1
+            ? Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Filtros',
+                      style: TextStyle(
+                        color: DAGRDColors.azulDAGRD,
+                        fontFamily: 'Work Sans',
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        height: 26 / 16,
+                        letterSpacing: 0,
+                      ),
+                    ),
+                    IconButton(
+                      icon: SvgPicture.asset(
+                        AppIcons.faders,
+                        width: 29,
+                        height: 27,
+                        colorFilter: const ColorFilter.mode(
+                          DAGRDColors.azulDAGRD,
+                          BlendMode.srcIn,
+                        ),
+                      ),
+                      onPressed: () {},
+                    ),
+                  ],
+                ),
+              )
+            : SizedBox.shrink(),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Text(
-            _tabIndex == 0 ? '2 formularios en proceso' : '0 formularios finalizados',
+            _tabIndex == 0
+                ? '2 formularios en proceso'
+                : '0 formularios finalizados',
             style: const TextStyle(
               color: Colors.black,
               fontFamily: 'Work Sans',
@@ -114,7 +159,7 @@ class _HomeFormsSectionState extends State<HomeFormsSection> {
         ),
         const SizedBox(height: 16),
         if (_tabIndex == 0) ...[
-          FormCard(
+          FormCardInProgress(
             title: 'Análisis de Riesgo - Avenidas torrenciales',
             lastEdit: '19-08-25',
             tag: 'Avenidas torrenciales',
@@ -123,7 +168,7 @@ class _HomeFormsSectionState extends State<HomeFormsSection> {
             vulnerability: 0.20,
           ),
           const SizedBox(height: 16),
-          FormCard(
+          FormCardInProgress(
             title: 'Análisis de Riesgo - Movimientos en masa',
             lastEdit: '19-08-25',
             tag: 'Movimientos en masa',

@@ -3,8 +3,8 @@ import 'package:caja_herramientas/app/modules/home/ui/widgets/event_card.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-class RiskEventsSection extends StatelessWidget {
-  const RiskEventsSection({super.key});
+class RiskEventsScreen extends StatelessWidget {
+  const RiskEventsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
