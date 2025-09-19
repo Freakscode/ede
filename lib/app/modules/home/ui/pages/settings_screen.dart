@@ -152,16 +152,17 @@ class SettingsScreen extends StatelessWidget {
                     subtitle: 'Uso de almacenamiento',
                     trailing: const Text(
                       '18,8MB',
+                      textAlign: TextAlign.right,
                       style: TextStyle(
-                        color: DAGRDColors.azulDAGRD,
+                        color: DAGRDColors.azulSecundario,
                         fontFamily: 'Work Sans',
                         fontSize: 14,
-                        fontWeight: FontWeight.w500,
+                        fontWeight: FontWeight.w400,
+                        height: 16 / 14,
                       ),
                     ),
                   ),
 
-                  const SizedBox(height: 16),
 
                   // Limpiar Datos
                   Center(
@@ -178,10 +179,11 @@ class SettingsScreen extends StatelessWidget {
                       child: const Text(
                         'Limpiar Datos ahora',
                         style: TextStyle(
-                          color: DAGRDColors.azulDAGRD,
+                          color: Color(0xFF2563EB),
                           fontFamily: 'Work Sans',
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
+                          height: 20 / 14,
                         ),
                       ),
                     ),
