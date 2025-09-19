@@ -52,12 +52,11 @@ class SettingsScreen extends StatelessWidget {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  const SizedBox(height: 16),
 
                   // Notificaciones
                   _buildSettingsTile(
                     context: context,
-                    icon: Icons.notifications_outlined,
+                    icon: AppIcons.bell,
                     iconColor: DAGRDColors.azulSecundario,
                     title: 'Notificaciones',
                     subtitle: 'Recibir alertas y notificaciones',
@@ -69,12 +68,11 @@ class SettingsScreen extends StatelessWidget {
                     ),
                   ),
 
-                  const SizedBox(height: 16),
 
                   // Modo oscuro
                   _buildSettingsTile(
                     context: context,
-                    icon: Icons.dark_mode_outlined,
+                    icon: AppIcons.moon,
                     iconColor: DAGRDColors.azulSecundario,
                     title: 'Modo oscuro',
                     subtitle: 'Cambiar color de la aplicación',
@@ -86,37 +84,70 @@ class SettingsScreen extends StatelessWidget {
                     ),
                   ),
 
-                  const SizedBox(height: 16),
 
                   // Idioma
                   _buildSettingsTile(
                     context: context,
-                    icon: Icons.language_outlined,
+                    icon: AppIcons.globe,
                     iconColor: DAGRDColors.azulSecundario,
                     title: 'Idioma',
                     subtitle: 'Seleccionar idioma de la app',
-                    trailing: DropdownButton<String>(
-                      value: state.selectedLanguage,
-                      items: const [
-                        DropdownMenuItem(value: 'Español', child: Text('Español')),
-                        DropdownMenuItem(value: 'English', child: Text('English')),
-                      ],
-                      onChanged: (value) {
-                        if (value != null) {
-                          context.read<HomeBloc>().add(HomeChangeLanguage(value));
-                        }
-                      },
-                      underline: const SizedBox(),
+                    trailing: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(4),
+                        border: Border.all(
+                          color: const Color(0xFFD1D5DB),
+                          width: 1,
+                        ),
+                        color: const Color(0xFFF9FAFB),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      child: DropdownButton<String>(
+                        value: state.selectedLanguage,
+                        items: const [
+                          DropdownMenuItem(
+                            value: 'Español',
+                            child: Text(
+                              'Español',
+                              style: TextStyle(
+                                color: Color(0xFF1F2937),
+                                fontFamily: 'Work Sans',
+                                fontSize: 13,
+                                fontWeight: FontWeight.w400,
+                                height: 1.0,
+                              ),
+                            ),
+                          ),
+                          DropdownMenuItem(
+                            value: 'English',
+                            child: Text(
+                              'English',
+                              style: TextStyle(
+                                color: Color(0xFF1F2937),
+                                fontFamily: 'Work Sans',
+                                fontSize: 13,
+                                fontWeight: FontWeight.w400,
+                                height: 1.0,
+                              ),
+                            ),
+                          ),
+                        ],
+                        onChanged: (value) {
+                          if (value != null) {
+                            context.read<HomeBloc>().add(HomeChangeLanguage(value));
+                          }
+                        },
+                        underline: const SizedBox(),
+                        isDense: true,
+                      ),
                     ),
                   ),
-
-                  const SizedBox(height: 16),
-
                   // Almacenamiento
                   _buildSettingsTile(
                     context: context,
-                    icon: Icons.storage_outlined,
+                    icon: AppIcons.database,
                     iconColor: DAGRDColors.azulSecundario,
+                    showBorder: true,
                     title: 'Almacenamiento',
                     subtitle: 'Uso de almacenamiento',
                     trailing: const Text(
@@ -174,7 +205,7 @@ class SettingsScreen extends StatelessWidget {
                   // Ayuda
                   _buildSettingsTile(
                     context: context,
-                    icon: Icons.help_outline,
+                    icon: AppIcons.toggle,
                     iconColor: DAGRDColors.azulSecundario,
                     title: 'Ayuda',
                     subtitle: 'Centro de ayuda, contáctanos, política de privacidad',
@@ -188,7 +219,7 @@ class SettingsScreen extends StatelessWidget {
                   // Acerca de
                   _buildSettingsTile(
                     context: context,
-                    icon: Icons.info_outline,
+                    icon: AppIcons.toggle,
                     iconColor: DAGRDColors.azulSecundario,
                     title: 'Acerca de',
                     subtitle: 'Caja de Herramientas DAGRD App v1.0.1',
@@ -207,62 +238,83 @@ class SettingsScreen extends StatelessWidget {
 
   Widget _buildSettingsTile({
     required BuildContext context,
-    required IconData icon,
+    required String icon,
     required Color iconColor,
     required String title,
     required String subtitle,
     Widget? trailing,
     VoidCallback? onTap,
+    bool showBorder = false,
   }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        child: Row(
-          children: [
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: iconColor.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
+    return Container(
+      decoration: showBorder
+          ? const BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: Color(0xFFD1D5DB),
+                  width: 1,
+                ),
               ),
-              child: Icon(
-                icon,
-                color: iconColor,
-                size: 20,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      color: DAGRDColors.negroDAGRD,
-                      fontFamily: 'Work Sans',
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
+            )
+          : null,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(8),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          child: Row(
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  color: iconColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: SvgPicture.asset(
+                    icon,
+                    key: const ValueKey('active'),
+                    width: 20,
+                    height: 20,
+                    colorFilter: ColorFilter.mode(
+                      iconColor,
+                      BlendMode.srcIn,
                     ),
                   ),
-                  const SizedBox(height: 2),
-                  Text(
-                    subtitle,
-                    style: const TextStyle(
-                      color: DAGRDColors.grisMedio,
-                      fontFamily: 'Work Sans',
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                ],
+                ),
               ),
-            ),
-            if (trailing != null) trailing,
-          ],
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        color: Color(0xFF000000),
+                        fontFamily: 'Work Sans',
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                        height: 20 / 13,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle,
+                      style: const TextStyle(
+                        color: Color(0xFF000000),
+                        fontFamily: 'Work Sans',
+                        fontSize: 12,
+                        fontWeight: FontWeight.w400,
+                        height: 20 / 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (trailing != null) trailing,
+            ],
+          ),
         ),
       ),
     );
