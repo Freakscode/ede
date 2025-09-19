@@ -285,26 +285,40 @@ class CustomSvgSwitch extends StatelessWidget {
       onTap: () => onChanged?.call(!value),
       child: SizedBox(
         width: 45,
-        height: 25,
-        child: value
-            ? SvgPicture.asset(
-                AppIcons.toggle,
-                width: 45,
-                height: 45,
-                colorFilter: ColorFilter.mode(
-                  DAGRDColors.azulSecundario,
-                  BlendMode.srcIn,
-                ),
-              )
-            : SvgPicture.asset(
-                AppIcons.toggleInactive,
-                width: 45,
-                height: 45,
-                colorFilter: const ColorFilter.mode(
-                  Colors.grey,
-                  BlendMode.srcIn,
-                ),
+        height: 35,
+        child: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 300),
+          transitionBuilder: (Widget child, Animation<double> animation) {
+            return ScaleTransition(
+              scale: animation,
+              child: FadeTransition(
+                opacity: animation,
+                child: child,
               ),
+            );
+          },
+          child: value
+              ? SvgPicture.asset(
+                  AppIcons.toggle,
+                  key: const ValueKey('active'),
+                  width: 45,
+                  height: 45,
+                  colorFilter: ColorFilter.mode(
+                    DAGRDColors.azulSecundario,
+                    BlendMode.srcIn,
+                  ),
+                )
+              : SvgPicture.asset(
+                  AppIcons.toggleInactive,
+                  key: const ValueKey('inactive'),
+                  width: 45,
+                  height: 45,
+                  colorFilter: const ColorFilter.mode(
+                    Colors.grey,
+                    BlendMode.srcIn,
+                  ),
+                ),
+        ),
       ),
     );
   }
