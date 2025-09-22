@@ -1,5 +1,6 @@
 import 'package:caja_herramientas/app/core/icons/app_icons.dart';
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
+import 'package:caja_herramientas/app/modules/home/ui/widgets/category_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -50,8 +51,7 @@ class RiskCategoriesScreen extends StatelessWidget {
               child: Column(
                 children: [
                   // Amenaza Movimiento en masa
-                  _buildCategoryCard(
-                    context: context,
+                  CategoryCard(
                     title: 'Amenaza Movimiento en masa',
                     onTap: () {
                       // Navegar a siguiente pantalla
@@ -60,8 +60,7 @@ class RiskCategoriesScreen extends StatelessWidget {
                   const SizedBox(height: 18),
 
                   // Vulnerabilidad Movimiento en masa
-                  _buildCategoryCard(
-                    context: context,
+                  CategoryCard(
                     title: 'Vulnerabilidad Movimiento en masa',
                     onTap: () {
                       // Navegar a siguiente pantalla
@@ -180,48 +179,6 @@ class RiskCategoriesScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 100),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCategoryCard({
-    required BuildContext context,
-    required String title,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        height: 50,
-        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(
-            color: DAGRDColors.azulDAGRD, // AzulDAGRD
-            width: 1,
-          ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Expanded(
-              flex: 1,
-              child: Text(
-                title,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  color: DAGRDColors.azulDAGRD, // AzulDAGRD
-                  fontFamily: 'Work Sans',
-                  fontSize: 16,
-                  fontStyle: FontStyle.normal,
-                  fontWeight: FontWeight.w600,
-                  height: 20 / 16, // 125% line-height
-                ),
-              ),
-            ),
           ],
         ),
       ),
