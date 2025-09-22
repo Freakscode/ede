@@ -37,6 +37,11 @@ class CustomBottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Validar currentIndex para evitar errores cuando es -1
+    final validCurrentIndex = (currentIndex >= 0 && currentIndex < items.length) 
+        ? currentIndex 
+        : 0; // Fallback to first item, but we'll handle selection visually
+    
     return BottomNavigationBar(
       type: BottomNavigationBarType.fixed,
       backgroundColor: backgroundColor,
@@ -58,11 +63,12 @@ class CustomBottomNavBar extends StatelessWidget {
         fontSize: 12,
         height: 1.17,
       ),
-      currentIndex: currentIndex,
+      currentIndex: validCurrentIndex,
       onTap: onTap,
       items: List.generate(items.length, (index) {
         final item = items[index];
-        final isSelected = index == currentIndex;
+        // Si currentIndex es -1, ningún item debe aparecer seleccionado
+        final isSelected = (currentIndex >= 0) && (index == currentIndex);
         return BottomNavigationBarItem(
           icon: item.customIcon ??
               (item.isSvg

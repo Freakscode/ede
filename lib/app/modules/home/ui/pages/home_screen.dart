@@ -1,4 +1,5 @@
 import 'package:caja_herramientas/app/modules/home/ui/pages/home_forms_screen.dart';
+import 'package:caja_herramientas/app/modules/home/ui/pages/risk_categories_screen.dart';
 import 'package:caja_herramientas/app/modules/home/ui/pages/settings_screen.dart';
 import 'package:caja_herramientas/app/modules/home/ui/widgets/home_main_section.dart';
 import 'package:caja_herramientas/app/modules/home/ui/pages/risk_events_screen.dart';
@@ -47,8 +48,11 @@ class HomeScreen extends StatelessWidget {
         },
         builder: (context, state) {
           Widget bodyContent;
+          // Widget bodyContent = const RiskCategoriesScreen();
           if (state.mostrarEventosRiesgo) {
             bodyContent = const RiskEventsScreen();
+          } else if (state.mostrarCategoriasRiesgo) {
+            bodyContent = const RiskCategoriesScreen();
           } else {
             switch (state.selectedIndex) {
               case 0:
@@ -83,7 +87,9 @@ class HomeScreen extends StatelessWidget {
             ),
             body: bodyContent,
             bottomNavigationBar: CustomBottomNavBar(
-              currentIndex: state.selectedIndex,
+              currentIndex: (state.mostrarEventosRiesgo || state.mostrarCategoriasRiesgo) 
+                  ? -1  // No seleccionar ningún tab
+                  : state.selectedIndex,
               onTap: (index) {
                 context.read<HomeBloc>().add(HomeNavBarTapped(index));
               },
