@@ -9,14 +9,34 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         const HomeState(
           selectedIndex: 0,
           mostrarEventosRiesgo: false,
+          mostrarCategoriasRiesgo: false,
           tutorialShown: false,
         ),
       ) {
     on<HomeNavBarTapped>((event, emit) {
-      emit(state.copyWith(selectedIndex: event.index));
+      emit(state.copyWith(
+        selectedIndex: event.index,
+        mostrarEventosRiesgo: false,
+        mostrarCategoriasRiesgo: false,
+      ));
     });
     on<HomeShowRiskEventsSection>((event, emit) {
-      emit(state.copyWith(mostrarEventosRiesgo: true));
+      emit(state.copyWith(
+        mostrarEventosRiesgo: true,
+        mostrarCategoriasRiesgo: false,
+      ));
+    });
+    on<HomeShowRiskCategoriesScreen>((event, emit) {
+      emit(state.copyWith(
+        mostrarEventosRiesgo: false,
+        mostrarCategoriasRiesgo: true,
+      ));
+    });
+    on<HomeResetRiskSections>((event, emit) {
+      emit(state.copyWith(
+        mostrarEventosRiesgo: false,
+        mostrarCategoriasRiesgo: false,
+      ));
     });
     on<HomeCheckAndShowTutorial>((event, emit) async {
       final showTutorial = await TutorialOverlayService.getShowTutorial();

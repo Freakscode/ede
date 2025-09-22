@@ -3,6 +3,7 @@ import 'package:equatable/equatable.dart';
 class HomeState extends Equatable {
   final int selectedIndex;
   final bool mostrarEventosRiesgo;
+  final bool mostrarCategoriasRiesgo;
   final bool tutorialShown;
   final bool showTutorial;
   final bool notificationsEnabled;
@@ -12,6 +13,7 @@ class HomeState extends Equatable {
   const HomeState({
     required this.selectedIndex,
     required this.mostrarEventosRiesgo,
+    required this.mostrarCategoriasRiesgo,
     required this.tutorialShown,
     this.showTutorial = true,
     this.notificationsEnabled = true,
@@ -22,6 +24,7 @@ class HomeState extends Equatable {
   HomeState copyWith({
     int? selectedIndex,
     bool? mostrarEventosRiesgo,
+    bool? mostrarCategoriasRiesgo,
     bool? tutorialShown,
     bool? showTutorial,
     bool? notificationsEnabled,
@@ -31,6 +34,7 @@ class HomeState extends Equatable {
     return HomeState(
       selectedIndex: selectedIndex ?? this.selectedIndex,
       mostrarEventosRiesgo: mostrarEventosRiesgo ?? this.mostrarEventosRiesgo,
+      mostrarCategoriasRiesgo: mostrarCategoriasRiesgo ?? this.mostrarCategoriasRiesgo,
       tutorialShown: tutorialShown ?? this.tutorialShown,
       showTutorial: showTutorial ?? this.showTutorial,
       notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
@@ -40,5 +44,5 @@ class HomeState extends Equatable {
   }
 
   @override
-  List<Object?> get props => [selectedIndex, mostrarEventosRiesgo, tutorialShown, showTutorial, notificationsEnabled, darkModeEnabled, selectedLanguage];
+  List<Object?> get props => [selectedIndex, mostrarEventosRiesgo, mostrarCategoriasRiesgo, tutorialShown, showTutorial, notificationsEnabled, darkModeEnabled, selectedLanguage];
 }

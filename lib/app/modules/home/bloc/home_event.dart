@@ -17,6 +17,10 @@ class HomeNavBarTapped extends HomeEvent {
 
 class HomeShowRiskEventsSection extends HomeEvent {}
 
+class HomeShowRiskCategoriesScreen extends HomeEvent {}
+
+class HomeResetRiskSections extends HomeEvent {}
+
 class HomeCheckAndShowTutorial extends HomeEvent {}
 
 class HomeSetShowTutorial extends HomeEvent {

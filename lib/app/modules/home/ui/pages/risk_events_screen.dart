@@ -1,7 +1,9 @@
 import 'package:caja_herramientas/app/core/icons/app_icons.dart';
 import 'package:caja_herramientas/app/modules/home/ui/widgets/event_card.dart';
+import 'package:caja_herramientas/app/modules/home/bloc/home_bloc.dart';
+import 'package:caja_herramientas/app/modules/home/bloc/home_event.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class RiskEventsScreen extends StatelessWidget {
   const RiskEventsScreen({super.key});
@@ -56,32 +58,58 @@ class RiskEventsScreen extends StatelessWidget {
                   EventCard(
                     iconAsset: AppIcons.movimientoMasa,
                     title: 'Movimiento en Masa',
-                    onTap: () => context.go('/forms_history'),
+                    onTap: () {
+                      context.read<HomeBloc>().add(
+                        HomeShowRiskCategoriesScreen(),
+                      );
+                    },
                   ),
                   EventCard(
                     iconAsset: AppIcons.movimientoMasa,
                     title: 'Avenidas torrenciales',
-                    onTap: () => context.go('/forms_history'),
+                    onTap: () {
+                      context.read<HomeBloc>().add(
+                        HomeShowRiskCategoriesScreen(),
+                      );
+                    },
                   ),
                   EventCard(
                     iconAsset: AppIcons.inundacionCH,
                     title: 'Inundación',
-                    onTap: () => context.go('/forms_history'),
+                    onTap: () {
+                      // Disparar evento para mostrar RiskCategoriesScreen
+                      context.read<HomeBloc>().add(
+                        HomeShowRiskCategoriesScreen(),
+                      );
+                    },
                   ),
                   EventCard(
                     iconAsset: AppIcons.estructuralCH,
                     title: 'Estructural',
-                    onTap: () => context.go('/forms_history'),
+                    onTap: () {
+                      context.read<HomeBloc>().add(
+                        HomeShowRiskCategoriesScreen(),
+                      );
+                    },
                   ),
                   EventCard(
                     iconAsset: AppIcons.inundacionCH,
                     title: 'Inundación',
-                    onTap: () => context.go('/forms_history'),
+                    onTap: () {
+                      context.read<HomeBloc>().add(
+                        HomeShowRiskCategoriesScreen(),
+                      );
+                    },
                   ),
                   EventCard(
                     iconAsset: AppIcons.estructuralCH,
                     title: 'Estructural',
-                    onTap: () => context.go('/forms_history'),
+                    onTap: () {
+                      // Disparar evento para mostrar RiskCategoriesScreen
+                      context.read<HomeBloc>().add(
+                        HomeShowRiskCategoriesScreen(),
+                      );
+                    },
                   ),
                 ],
               ),
