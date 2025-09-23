@@ -182,7 +182,7 @@ class ExpandableDropdownField extends StatelessWidget {
                 .map(
                   (level) => Expanded(
                     child: Container(
-                      margin: const EdgeInsets.only(right: 8),
+                      margin: const EdgeInsets.only(right: 4),
                       child: _buildLevelButton(level),
                     ),
                   ),
@@ -241,11 +241,13 @@ class ExpandableDropdownField extends StatelessWidget {
   Widget _buildLevelButton(String level) {
     Color backgroundColor;
     if (level.contains('BAJO') && !level.contains('MEDIO')) {
-      backgroundColor = const Color(0xFF10B981); // Verde
+      backgroundColor = const Color(0xFFDCFCE7); // Verde suave
+    } else if (level.contains('MEDIO') && level.contains('ALTO')) {
+      backgroundColor = const Color(0xFFFFEDD5); // Naranja suave para MEDIO ALTO
     } else if (level.contains('MEDIO')) {
-      backgroundColor = DAGRDColors.amarDAGRD; // Amarillo
+      backgroundColor = const Color(0xFFFEF9C3); // Amarillo suave
     } else {
-      backgroundColor = const Color(0xFFEF4444); // Rojo
+      backgroundColor = const Color(0xFFFEE2E2); // Rojo suave
     }
 
     return GestureDetector(
@@ -253,7 +255,9 @@ class ExpandableDropdownField extends StatelessWidget {
         // Acción al seleccionar nivel
       },
       child: Container(
-        height: 40,
+        width: 80,
+        height: 50,
+        padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
           color: backgroundColor,
           borderRadius: BorderRadius.circular(4),
