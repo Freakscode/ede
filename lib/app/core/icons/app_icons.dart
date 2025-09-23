@@ -65,6 +65,10 @@ class AppIcons {
   static const String moon = 'assets/icons/caja_herramientas/Moon.svg';
   static const String database = 'assets/icons/caja_herramientas/Database.svg';
   static const String preview = 'assets/icons/caja_herramientas/Preview.svg';
+  static const String hoja = 'assets/icons/caja_herramientas/Hoja.svg';
+  static const String clipboardText = 'assets/icons/caja_herramientas/ClipboardText.svg';
+  static const String imagen = 'assets/icons/caja_herramientas/Imagen.svg';
+  static const String images = 'assets/icons/caja_herramientas/Images.svg';
 
   // SVG Icons - Advertencias y alertas
   static const String warning = 'assets/icons/caja_herramientas/Advertencia.svg';
