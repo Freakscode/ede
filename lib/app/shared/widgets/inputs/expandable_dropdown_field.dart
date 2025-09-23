@@ -489,7 +489,7 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
       child: Container(
         width: 80,
         height: 50,
-        padding: const EdgeInsets.all(10),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
         decoration: BoxDecoration(
           color: isSelected ? selectedBackgroundColor : backgroundColor,
           borderRadius: BorderRadius.circular(4),
@@ -503,14 +503,14 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
             textAlign: TextAlign.center,
             style: TextStyle(
               color: isSelected 
-                  ? Colors.white 
+                  ? const Color(0xFF000000) // Texto negro para mejor contraste
                   : const Color(0xFF000000),
               fontFamily: 'Work Sans',
               fontSize: 12,
               fontWeight: isSelected 
                   ? FontWeight.w600 
                   : FontWeight.w400,
-              height: 16 / 12, // 133.333% line-height
+              height: 1.4, // Aumentado a 1.4 para mejor visibilidad
             ),
           ),
         ),
