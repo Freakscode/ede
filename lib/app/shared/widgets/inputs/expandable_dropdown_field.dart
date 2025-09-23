@@ -502,9 +502,7 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
             level,
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: isSelected 
-                  ? const Color(0xFF000000) // Texto negro para mejor contraste
-                  : const Color(0xFF000000),
+              color:  const Color(0xFF000000),
               fontFamily: 'Work Sans',
               fontSize: 12,
               fontWeight: isSelected 
