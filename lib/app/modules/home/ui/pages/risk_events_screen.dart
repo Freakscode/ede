@@ -60,7 +60,7 @@ class RiskEventsScreen extends StatelessWidget {
                     title: 'Movimiento en Masa',
                     onTap: () {
                       context.read<HomeBloc>().add(
-                        HomeShowRiskCategoriesScreen(),
+                        SelectRiskEvent('Movimiento en Masa'),
                       );
                     },
                   ),
@@ -69,26 +69,7 @@ class RiskEventsScreen extends StatelessWidget {
                     title: 'Avenidas torrenciales',
                     onTap: () {
                       context.read<HomeBloc>().add(
-                        HomeShowRiskCategoriesScreen(),
-                      );
-                    },
-                  ),
-                  EventCard(
-                    iconAsset: AppIcons.inundacionCH,
-                    title: 'Inundación',
-                    onTap: () {
-                      // Disparar evento para mostrar RiskCategoriesScreen
-                      context.read<HomeBloc>().add(
-                        HomeShowRiskCategoriesScreen(),
-                      );
-                    },
-                  ),
-                  EventCard(
-                    iconAsset: AppIcons.estructuralCH,
-                    title: 'Estructural',
-                    onTap: () {
-                      context.read<HomeBloc>().add(
-                        HomeShowRiskCategoriesScreen(),
+                        SelectRiskEvent('Avenidas torrenciales'),
                       );
                     },
                   ),
@@ -97,7 +78,7 @@ class RiskEventsScreen extends StatelessWidget {
                     title: 'Inundación',
                     onTap: () {
                       context.read<HomeBloc>().add(
-                        HomeShowRiskCategoriesScreen(),
+                        SelectRiskEvent('Inundación'),
                       );
                     },
                   ),
@@ -105,9 +86,17 @@ class RiskEventsScreen extends StatelessWidget {
                     iconAsset: AppIcons.estructuralCH,
                     title: 'Estructural',
                     onTap: () {
-                      // Disparar evento para mostrar RiskCategoriesScreen
                       context.read<HomeBloc>().add(
-                        HomeShowRiskCategoriesScreen(),
+                        SelectRiskEvent('Estructural'),
+                      );
+                    },
+                  ),
+                  EventCard(
+                    iconAsset: AppIcons.inundacionCH,
+                    title: 'Otros',
+                    onTap: () {
+                      context.read<HomeBloc>().add(
+                        SelectRiskEvent('Otros'),
                       );
                     },
                   ),

@@ -1,8 +1,11 @@
 import 'package:caja_herramientas/app/core/icons/app_icons.dart';
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import 'package:caja_herramientas/app/modules/home/ui/widgets/category_card.dart';
+import 'package:caja_herramientas/app/modules/home/bloc/home_bloc.dart';
+import 'package:caja_herramientas/app/modules/home/bloc/home_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 class RiskCategoriesScreen extends StatelessWidget {
@@ -10,7 +13,11 @@ class RiskCategoriesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
+    return BlocBuilder<HomeBloc, HomeState>(
+      builder: (context, state) {
+        final selectedEvent = state.selectedRiskEvent;
+        
+        return SingleChildScrollView(
       child: Padding(
         padding: EdgeInsets.zero,
         child: Column(
@@ -51,9 +58,9 @@ class RiskCategoriesScreen extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
                 children: [
-                  // Amenaza Movimiento en masa
+                  // Amenaza - dinámico basado en selección
                   CategoryCard(
-                    title: 'Amenaza Movimiento en masa',
+                    title: 'Amenaza $selectedEvent',
                     onTap: () {
                       // Navegar a siguiente pantalla
                       context.go('/risk_threat_analysis');
@@ -61,9 +68,9 @@ class RiskCategoriesScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 18),
 
-                  // Vulnerabilidad Movimiento en masa
+                  // Vulnerabilidad - dinámico basado en selección
                   CategoryCard(
-                    title: 'Vulnerabilidad Movimiento en masa',
+                    title: 'Vulnerabilidad $selectedEvent',
                     onTap: () {
                       // Navegar a siguiente pantalla
                       context.go('/risk_threat_analysis');
@@ -162,7 +169,7 @@ class RiskCategoriesScreen extends StatelessWidget {
                                 ),
                               ),
                               Text(
-                                'Movimiento en masa',
+                                selectedEvent,
                                 textAlign: TextAlign.center,
                                 style: const TextStyle(
                                   color: Color(0xFF706F6F), // GrisDAGRD
@@ -186,6 +193,8 @@ class RiskCategoriesScreen extends StatelessWidget {
           ],
         ),
       ),
+    );
+      },
     );
   }
 }

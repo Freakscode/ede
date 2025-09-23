@@ -32,6 +32,13 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         mostrarCategoriasRiesgo: true,
       ));
     });
+    on<SelectRiskEvent>((event, emit) {
+      emit(state.copyWith(
+        selectedRiskEvent: event.eventName,
+        mostrarEventosRiesgo: false,
+        mostrarCategoriasRiesgo: true,
+      ));
+    });
     on<HomeResetRiskSections>((event, emit) {
       emit(state.copyWith(
         mostrarEventosRiesgo: false,

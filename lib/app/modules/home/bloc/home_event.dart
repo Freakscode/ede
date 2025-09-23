@@ -19,6 +19,14 @@ class HomeShowRiskEventsSection extends HomeEvent {}
 
 class HomeShowRiskCategoriesScreen extends HomeEvent {}
 
+class SelectRiskEvent extends HomeEvent {
+  final String eventName;
+  const SelectRiskEvent(this.eventName);
+
+  @override
+  List<Object?> get props => [eventName];
+}
+
 class HomeResetRiskSections extends HomeEvent {}
 
 class HomeCheckAndShowTutorial extends HomeEvent {}
