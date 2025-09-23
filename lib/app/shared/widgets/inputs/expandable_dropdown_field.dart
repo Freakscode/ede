@@ -2,13 +2,14 @@ import 'package:caja_herramientas/app/core/icons/app_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:caja_herramientas/app/shared/models/models.dart';
 
 class ExpandableDropdownField extends StatefulWidget {
   final String hint;
   final String? value;
   final bool isSelected;
   final VoidCallback? onTap;
-  final List<Map<String, dynamic>> categories;
+  final List<DropdownCategory> categories;
   final Color? borderColor;
   final Color? backgroundColor;
   final Color? textColor;
@@ -31,7 +32,7 @@ class ExpandableDropdownField extends StatefulWidget {
 }
 
 class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
-  bool _isDetailsExpanded = false;
+  Map<String, bool> _expandedCategories = {};
 
   @override
   Widget build(BuildContext context) {
@@ -116,8 +117,7 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
                 ...widget.categories.map(
                   (category) => _buildCategorySection(
                     context,
-                    category['title'] as String,
-                    category['levels'] as List<String>,
+                    category,
                   ),
                 ),
               ],
@@ -129,8 +129,7 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
 
   Widget _buildCategorySection(
     BuildContext context,
-    String title,
-    List<String> levels,
+    DropdownCategory category,
   ) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -141,7 +140,7 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
             children: [
               Expanded(
                 child: Text(
-                  title,
+                  category.title,
                   style: const TextStyle(
                     color: Color(0xFF1E1E1E),
                     fontFamily: 'Work Sans',
@@ -186,7 +185,7 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
           ),
           const SizedBox(height: 12),
           Row(
-            children: levels
+            children: category.levels
                 .map(
                   (level) => Expanded(
                     child: Container(
@@ -203,13 +202,13 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
               GestureDetector(
                 onTap: () {
                   setState(() {
-                    _isDetailsExpanded = !_isDetailsExpanded;
+                    _expandedCategories[category.title] = !(_expandedCategories[category.title] ?? false);
                   });
                 },
                 child: Row(
                   children: [
                     SvgPicture.asset(
-                      _isDetailsExpanded
+                      (_expandedCategories[category.title] ?? false)
                           ? AppIcons.arrowUp
                           : AppIcons.arrowDown,
                       width: 20,
@@ -221,7 +220,7 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      _isDetailsExpanded
+                      (_expandedCategories[category.title] ?? false)
                           ? 'Ocultar detalles'
                           : 'Ver todos los niveles',
                       textAlign: TextAlign.center,
@@ -264,17 +263,17 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
             ],
           ),
           // Contenido expandible con detalles
-          if (_isDetailsExpanded) ...[
+          if (_expandedCategories[category.title] ?? false) ...[
             const SizedBox(height: 16),
-            _buildDetailedLevels(title),
+            _buildDetailedLevels(category),
           ],
         ],
       ),
     );
   }
 
-  Widget _buildDetailedLevels(String categoryTitle) {
-    final detailedLevels = _getDetailedLevelsForCategory(categoryTitle);
+  Widget _buildDetailedLevels(DropdownCategory category) {
+    final detailedLevels = category.detailedLevels ?? _getDefaultDetailedLevels();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -284,13 +283,13 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
     );
   }
 
-  Widget _buildDetailedLevelItem(Map<String, dynamic> level) {
+  Widget _buildDetailedLevelItem(RiskLevel level) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(4),
-          border: Border.all(color: level['color'] as Color),
+          border: Border.all(color: level.color),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -299,7 +298,7 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
               padding: const EdgeInsets.all(10),
               width: double.infinity,
               decoration: BoxDecoration(
-                color: level['color'] as Color,
+                color: level.color,
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(4),
                   topRight: Radius.circular(4),
@@ -313,16 +312,16 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
                     fontSize: 12,
                     height: 16 / 12, // 133.333% line-height
                   ),
-                  children: _parseTitle(level['title'] as String),
+                  children: _parseTitle(level.title),
                 ),
               ),
             ),
-            if (level['description'] != null) ...[
+            if (level.description != null) ...[
               const SizedBox(height: 8),
               Padding(
                 padding: const EdgeInsets.all(10),
                 child: Text(
-                  level['description'] as String,
+                  level.description!,
                   style: const TextStyle(
                     color: Color(0xFF1E1E1E),
                     fontFamily: 'Work Sans',
@@ -333,9 +332,9 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
                 ),
               ),
             ],
-            if (level['items'] != null) ...[
+            if (level.items != null) ...[
               const SizedBox(height: 8),
-              ...((level['items'] as List<String>).map(
+              ...(level.items!.map(
                 (item) => Padding(
                   padding: const EdgeInsets.only(left: 16, bottom: 4),
                   child: Row(
@@ -367,7 +366,7 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
                 ),
               )),
             ],
-            if (level['note'] != null) ...[
+            if (level.note != null) ...[
               const SizedBox(height: 8),
               Padding(
                 padding: const EdgeInsets.all(10),
@@ -379,7 +378,7 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
                       fontSize: 12,
                       height: 20 / 12, // 166.667% line-height (20px/12px)
                     ),
-                    children: _parseNote(level['note'] as String),
+                    children: _parseNote(level.note!),
                   ),
                 ),
               ),
@@ -442,45 +441,13 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
     ];
   }
 
-  List<Map<String, dynamic>> _getDetailedLevelsForCategory(String category) {
+  List<RiskLevel> _getDefaultDetailedLevels() {
     // Datos de ejemplo basados en la imagen
     return [
-      {
-        'title':
-            'BAJO (1): Las características del escenario sugieren que la probabilidad de que se presente el evento es mínima',
-        'color': const Color(0xFF22C55E),
-        'items': [
-          'Pendientes bajos modeladas en suelos (< 5°).',
-          'Pendientes bajas, medias o altas, modeladas en roca sana o levemente meteorizada sin fracturas.',
-        ],
-      },
-      {
-        'title': 'MEDIO - BAJO (2): Las características del escenario sugieren que es poco probable de que se presente el evento',
-        'color': const Color(0xFFFDE047),
-        'items': [
-          'Pendientes moderadas modeladas en suelos (5° - 15°).',
-          'Pendientes bajas modeladas en suelos (< 5°), en condiciones saturadas.',
-        ],
-      },
-      {
-        'title': 'MEDIO - ALTO (3): Las características del escenario sugieren la probabilidad moderada de que se presente el evento.',
-        'color': const Color(0xFFFB923C),
-        'items': [
-          'Pendientes altas modeladas en suelos (15° - 30°).',
-          'Pendientes moderadas modeladas en suelos (5° - 15°), en condiciones saturadas.',
-        ],
-      },
-      {
-        'title': 'ALTO (4): Las características del escenario sugieren la probabilidad de que se presente el evento.',
-        'color': const Color(0xFFDC2626),
-        'items': [
-          'Pendientes medias o altas modeladas en roca fracturada.',
-          'Pendientes muy altas modeladas en suelos (> 30°).',
-          'Pendientes altas modeladas en suelos (15° - 30°), en condiciones saturadas.',
-          'Pendientes medias o altas, modeladas en llenos antrópicos.',
-        ],
-        'note': 'NOTA: En caso de tratarse de llenos antrópicos constituidos sin sustento técnico (vertimiento libre de materiales de excavación, escombros y basuras)',
-      },
+      RiskLevel.bajo(),
+      RiskLevel.medioBajo(),
+      RiskLevel.medioAlto(),
+      RiskLevel.alto(),
     ];
   }
 
