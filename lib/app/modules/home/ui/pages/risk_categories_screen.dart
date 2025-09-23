@@ -3,6 +3,7 @@ import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import 'package:caja_herramientas/app/modules/home/ui/widgets/category_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 
 class RiskCategoriesScreen extends StatelessWidget {
   const RiskCategoriesScreen({super.key});
@@ -55,6 +56,7 @@ class RiskCategoriesScreen extends StatelessWidget {
                     title: 'Amenaza Movimiento en masa',
                     onTap: () {
                       // Navegar a siguiente pantalla
+                      context.go('/risk_threat_analysis');
                     },
                   ),
                   const SizedBox(height: 18),
@@ -64,6 +66,8 @@ class RiskCategoriesScreen extends StatelessWidget {
                     title: 'Vulnerabilidad Movimiento en masa',
                     onTap: () {
                       // Navegar a siguiente pantalla
+                      context.go('/risk_threat_analysis');
+
                     },
                   ),
 

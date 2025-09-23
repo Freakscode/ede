@@ -122,3 +122,7 @@ class HomeScreen extends StatelessWidget {
     );
   }
 }
+
+class RiskThreatAnalysisScreen {
+  const RiskThreatAnalysisScreen();
+}
