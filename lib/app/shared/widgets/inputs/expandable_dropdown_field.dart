@@ -267,10 +267,11 @@ class ExpandableDropdownField extends StatelessWidget {
             level,
             textAlign: TextAlign.center,
             style: const TextStyle(
-              color: Color(0xFF1E1E1E),
+              color: Color(0xFF000000),
               fontFamily: 'Work Sans',
-              fontSize: 10,
-              fontWeight: FontWeight.w600,
+              fontSize: 12,
+              fontWeight: FontWeight.w400,
+              height: 16 / 12, // 133.333% line-height
             ),
           ),
         ),
