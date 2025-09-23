@@ -1,5 +1,7 @@
+import 'package:caja_herramientas/app/core/icons/app_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
+import 'package:flutter_svg/svg.dart';
 
 class ExpandableDropdownField extends StatelessWidget {
   final String hint;
@@ -35,21 +37,21 @@ class ExpandableDropdownField extends StatelessWidget {
             height: 50,
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             decoration: BoxDecoration(
-              color: isSelected 
-                ? DAGRDColors.amarDAGRD 
-                : (backgroundColor ?? Colors.white),
+              color: isSelected
+                  ? DAGRDColors.amarDAGRD
+                  : (backgroundColor ?? Colors.white),
               border: Border.all(
-                color: isSelected 
-                  ? DAGRDColors.amarDAGRD 
-                  : (borderColor ?? const Color(0xFFD1D5DB)),
+                color: isSelected
+                    ? DAGRDColors.amarDAGRD
+                    : (borderColor ?? const Color(0xFFD1D5DB)),
                 width: 1,
               ),
-              borderRadius: isSelected 
-                ? const BorderRadius.only(
-                    topLeft: Radius.circular(8),
-                    topRight: Radius.circular(8),
-                  )
-                : BorderRadius.circular(8),
+              borderRadius: isSelected
+                  ? const BorderRadius.only(
+                      topLeft: Radius.circular(8),
+                      topRight: Radius.circular(8),
+                    )
+                  : BorderRadius.circular(8),
             ),
             child: Row(
               children: [
@@ -57,11 +59,11 @@ class ExpandableDropdownField extends StatelessWidget {
                   child: Text(
                     value ?? hint,
                     style: TextStyle(
-                      color: isSelected 
-                        ? const Color(0xFF1E1E1E)
-                        : (value != null 
-                            ? (textColor ?? const Color(0xFF1E1E1E))
-                            : const Color(0xFF1E1E1E)),
+                      color: isSelected
+                          ? const Color(0xFF1E1E1E)
+                          : (value != null
+                                ? (textColor ?? const Color(0xFF1E1E1E))
+                                : const Color(0xFF1E1E1E)),
                       fontFamily: 'Work Sans',
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
@@ -70,10 +72,12 @@ class ExpandableDropdownField extends StatelessWidget {
                   ),
                 ),
                 Icon(
-                  isSelected ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-                  color: isSelected 
-                    ? const Color(0xFF1E1E1E)
-                    : const Color(0xFF666666),
+                  isSelected
+                      ? Icons.keyboard_arrow_up
+                      : Icons.keyboard_arrow_down,
+                  color: isSelected
+                      ? const Color(0xFF1E1E1E)
+                      : const Color(0xFF666666),
                   size: 24,
                 ),
               ],
@@ -101,11 +105,13 @@ class ExpandableDropdownField extends StatelessWidget {
             ),
             child: Column(
               children: [
-                ...categories.map((category) => _buildCategorySection(
-                  context, 
-                  category['title'] as String, 
-                  category['levels'] as List<String>,
-                )),
+                ...categories.map(
+                  (category) => _buildCategorySection(
+                    context,
+                    category['title'] as String,
+                    category['levels'] as List<String>,
+                  ),
+                ),
               ],
             ),
           ),
@@ -113,7 +119,11 @@ class ExpandableDropdownField extends StatelessWidget {
     );
   }
 
-  Widget _buildCategorySection(BuildContext context, String title, List<String> levels) {
+  Widget _buildCategorySection(
+    BuildContext context,
+    String title,
+    List<String> levels,
+  ) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       child: Column(
@@ -127,31 +137,39 @@ class ExpandableDropdownField extends StatelessWidget {
                   style: const TextStyle(
                     color: Color(0xFF1E1E1E),
                     fontFamily: 'Work Sans',
-                    fontSize: 14,
+                    fontSize: 15,
                     fontWeight: FontWeight.w500,
+                    height: 18 / 15, // 120% line-height
                   ),
                 ),
               ),
-              const Icon(
-                Icons.info_outline,
-                size: 16,
-                color: Color(0xFF666666),
+              SvgPicture.asset(
+                AppIcons.info,
+                width: 16,
+                height: 16,
+                colorFilter: const ColorFilter.mode(
+                  Color(0xFF1E1E1E),
+                  BlendMode.srcIn,
+                ),
               ),
               const SizedBox(width: 8),
               Container(
-                width: 20,
-                height: 20,
+                width: 32,
+                height: 32,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF3F4F6),
                   borderRadius: BorderRadius.circular(4),
+                  border: Border.all(color: const Color(0xFFD1D5DB)),
                 ),
                 child: const Center(
                   child: Text(
                     '0',
+                    textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      color: Color(0xFF666666),
+                      color: Color(0xFFD1D5DB),
+                      fontFamily: 'Work Sans',
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                      height: 16 / 20, // 80% line-height
                     ),
                   ),
                 ),
@@ -160,12 +178,16 @@ class ExpandableDropdownField extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           Row(
-            children: levels.map((level) => Expanded(
-              child: Container(
-                margin: const EdgeInsets.only(right: 8),
-                child: _buildLevelButton(level),
-              ),
-            )).toList(),
+            children: levels
+                .map(
+                  (level) => Expanded(
+                    child: Container(
+                      margin: const EdgeInsets.only(right: 8),
+                      child: _buildLevelButton(level),
+                    ),
+                  ),
+                )
+                .toList(),
           ),
           const SizedBox(height: 12),
           Row(
@@ -191,7 +213,10 @@ class ExpandableDropdownField extends StatelessWidget {
                 },
                 style: TextButton.styleFrom(
                   backgroundColor: const Color(0xFFF3F4F6),
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(4),
                   ),
