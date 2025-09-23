@@ -33,6 +33,7 @@ class ExpandableDropdownField extends StatefulWidget {
 
 class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
   Map<String, bool> _expandedCategories = {};
+  Map<String, String?> _selectedLevels = {}; // Para almacenar el nivel seleccionado por categoría
 
   @override
   Widget build(BuildContext context) {
@@ -167,12 +168,14 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
                   borderRadius: BorderRadius.circular(4),
                   border: Border.all(color: const Color(0xFFD1D5DB)),
                 ),
-                child: const Center(
+                child: Center(
                   child: Text(
-                    '0',
+                    _selectedLevels[category.title] != null ? '1' : '0',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: Color(0xFFD1D5DB),
+                      color: _selectedLevels[category.title] != null 
+                          ? const Color(0xFF1E1E1E)
+                          : const Color(0xFFD1D5DB),
                       fontFamily: 'Work Sans',
                       fontSize: 20,
                       fontWeight: FontWeight.w600,
@@ -190,7 +193,7 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
                   (level) => Expanded(
                     child: Container(
                       margin: const EdgeInsets.only(right: 4),
-                      child: _buildLevelButton(level),
+                      child: _buildLevelButton(level, category.title),
                     ),
                   ),
                 )
@@ -451,28 +454,37 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
     ];
   }
 
-  Widget _buildLevelButton(String level, {bool isSelected = false}) {
+  Widget _buildLevelButton(String level, String categoryTitle) {
+    bool isSelected = _selectedLevels[categoryTitle] == level;
+    
     Color backgroundColor;
     Color selectedBackgroundColor;
     
     if (level.contains('BAJO') && !level.contains('MEDIO')) {
-      backgroundColor = const Color(0xFF22C55E).withOpacity(0.3); // Verde claro
-      selectedBackgroundColor = const Color(0xFF22C55E); // Verde oscuro
+      backgroundColor = const Color(0xFFDCFCE7); // Verde claro desactivado
+      selectedBackgroundColor = const Color(0xFF22C55E); // Verde activado
     } else if (level.contains('MEDIO') && level.contains('ALTO')) {
-      backgroundColor = const Color(0xFFFB923C).withOpacity(0.3); // Naranja claro
-      selectedBackgroundColor = const Color(0xFFFB923C); // Naranja oscuro
+      backgroundColor = const Color(0xFFFFEDD5); // Naranja claro desactivado
+      selectedBackgroundColor = const Color(0xFFFB923C); // Naranja activado
     } else if (level.contains('MEDIO')) {
-      backgroundColor = const Color(0xFFFDE047).withOpacity(0.3); // Amarillo claro
-      selectedBackgroundColor = const Color(0xFFFDE047); // Amarillo oscuro
+      backgroundColor = const Color(0xFFFEF9C3); // Amarillo claro desactivado
+      selectedBackgroundColor = const Color(0xFFFDE047); // Amarillo activado
     } else {
-      backgroundColor = const Color(0xFFDC2626).withOpacity(0.3); // Rojo claro
-      selectedBackgroundColor = const Color(0xFFDC2626); // Rojo oscuro
+      backgroundColor = const Color(0xFFFEE2E2); // Rojo claro desactivado
+      selectedBackgroundColor = const Color(0xFFDC2626); // Rojo activado
     }
 
     return GestureDetector(
       onTap: () {
-        // Acción al seleccionar nivel
-        // Aquí se puede agregar la lógica para cambiar el estado de selección
+        setState(() {
+          // Si el nivel ya está seleccionado, deseleccionarlo
+          if (_selectedLevels[categoryTitle] == level) {
+            _selectedLevels[categoryTitle] = null;
+          } else {
+            // Seleccionar el nuevo nivel
+            _selectedLevels[categoryTitle] = level;
+          }
+        });
       },
       child: Container(
         width: 80,
