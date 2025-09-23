@@ -64,6 +64,7 @@ class AppIcons {
   static const String toggleInactive = 'assets/icons/caja_herramientas/ToggleInactivo.svg';
   static const String moon = 'assets/icons/caja_herramientas/Moon.svg';
   static const String database = 'assets/icons/caja_herramientas/Database.svg';
+  static const String preview = 'assets/icons/caja_herramientas/Preview.svg';
 
   // SVG Icons - Advertencias y alertas
   static const String warning = 'assets/icons/caja_herramientas/Advertencia.svg';

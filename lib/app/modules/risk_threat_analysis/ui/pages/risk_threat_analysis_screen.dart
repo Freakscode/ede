@@ -347,7 +347,7 @@ class RiskThreatAnalysisScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 14),
                     // Barra de progreso
                     Column(
                       children: [
@@ -365,9 +365,7 @@ class RiskThreatAnalysisScreen extends StatelessWidget {
                               value: 0.5, // 50% completado
                               backgroundColor: Colors.transparent,
                               valueColor: const AlwaysStoppedAnimation<Color>(
-                                Color(
-                                  0xFFFFCC00,
-                                ), // Color #FC0 para el progreso
+                                Color(0xFFFFCC00),
                               ),
                             ),
                           ),
@@ -375,11 +373,13 @@ class RiskThreatAnalysisScreen extends StatelessWidget {
                         const SizedBox(height: 8),
                         const Text(
                           '0% completado',
+                          textAlign: TextAlign.center,
                           style: TextStyle(
-                            color: Color(0xFF6B7280),
+                            color: DAGRDColors.grisMedio, 
                             fontFamily: 'Work Sans',
-                            fontSize: 14,
+                            fontSize: 12,
                             fontWeight: FontWeight.w400,
+                            height: 16 / 12, // line-height: 133.333%
                           ),
                         ),
                       ],
@@ -466,71 +466,62 @@ class RiskThreatAnalysisScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 32),
-                    // Botones de navegación
+                    const SizedBox(height: 40),
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         // Botón Volver
-                        Expanded(
-                          child: TextButton.icon(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            icon: const Icon(
-                              Icons.arrow_back_ios,
-                              color: Color(0xFF374151),
-                              size: 18,
-                            ),
-                            label: const Text(
-                              'Volver',
-                              style: TextStyle(
-                                color: Color(0xFF374151),
-                                fontFamily: 'Work Sans',
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            style: TextButton.styleFrom(
-                              backgroundColor: Colors.transparent,
-                              padding: const EdgeInsets.symmetric(vertical: 12),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        // Botón Continuar
-                        Expanded(
-                          child: Container(
-                            height: 48,
-                            child: ElevatedButton.icon(
-                              onPressed: () {
-                                // Acción para continuar
-                              },
-                              icon: const Icon(
-                                Icons.arrow_forward_ios,
-                                color: Colors.white,
+                        InkWell(
+                          onTap: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                Icons.arrow_back_ios,
+                                color: DAGRDColors.negroDAGRD,
                                 size: 18,
                               ),
-                              label: const Text(
-                                'Continuar',
+                              const SizedBox(width: 8),
+                              const Text(
+                                'Volver',
                                 style: TextStyle(
-                                  color: Colors.white,
+                                  color: DAGRDColors.negroDAGRD, // #000
                                   fontFamily: 'Work Sans',
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500,
+                                  height: 18 / 16, // line-height: 112.5%
                                 ),
                               ),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF2563EB),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(4),
+                            ],
+                          ),
+                        ),
+                        // Botón Continuar
+                        InkWell(
+                          onTap: () {
+                            // Acción para continuar
+                          },
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Text(
+                                'Continuar',
+                                style: TextStyle(
+                                  color: DAGRDColors.negroDAGRD, // #000
+                                  fontFamily: 'Work Sans',
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  height: 18 / 16, // line-height: 112.5%
                                 ),
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 20,
-                                  vertical: 8,
-                                ),
-                                elevation: 0,
                               ),
-                            ),
+                              const SizedBox(width: 8),
+                              const Icon(
+                                Icons.arrow_forward_ios,
+                                color: DAGRDColors.negroDAGRD,
+                                size: 18,
+                              ),
+                            ],
                           ),
                         ),
                       ],
