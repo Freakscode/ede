@@ -196,14 +196,30 @@ class ExpandableDropdownField extends StatelessWidget {
                 onTap: () {
                   // Acción para "Ver todos los niveles"
                 },
-                child: const Text(
-                  '↓ Ver todos los niveles',
-                  style: TextStyle(
-                    color: Color(0xFF3B82F6),
-                    fontFamily: 'Work Sans',
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                  ),
+                child: Row(
+                  children: [
+                    SvgPicture.asset(
+                      AppIcons.arrowDown,
+                      width: 20,
+                      height: 20,
+                      colorFilter: const ColorFilter.mode(
+                        Color(0xFF2563EB),
+                        BlendMode.srcIn,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    const Text(
+                      'Ver todos los niveles',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Color(0xFF2563EB),
+                        fontFamily: 'Work Sans',
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                        height: 16 / 15, // 106.667% line-height
+                      ),
+                    ),
+                  ],
                 ),
               ),
               const Spacer(),
@@ -212,22 +228,22 @@ class ExpandableDropdownField extends StatelessWidget {
                   // Acción para "No Aplica"
                 },
                 style: TextButton.styleFrom(
-                  backgroundColor: const Color(0xFFF3F4F6),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
+                  backgroundColor: const Color(0xFFF9FAFB),
+                  minimumSize: const Size(0, 30),
+                  padding: const EdgeInsets.all(10),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(4),
                   ),
                 ),
                 child: const Text(
                   'No Aplica',
+                  textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: Color(0xFF666666),
+                    color: Color(0xFF1E1E1E),
                     fontFamily: 'Work Sans',
-                    fontSize: 12,
+                    fontSize: 15,
                     fontWeight: FontWeight.w500,
+                    height: 16 / 15, // 106.667% line-height
                   ),
                 ),
               ),
@@ -243,7 +259,9 @@ class ExpandableDropdownField extends StatelessWidget {
     if (level.contains('BAJO') && !level.contains('MEDIO')) {
       backgroundColor = const Color(0xFFDCFCE7); // Verde suave
     } else if (level.contains('MEDIO') && level.contains('ALTO')) {
-      backgroundColor = const Color(0xFFFFEDD5); // Naranja suave para MEDIO ALTO
+      backgroundColor = const Color(
+        0xFFFFEDD5,
+      ); // Naranja suave para MEDIO ALTO
     } else if (level.contains('MEDIO')) {
       backgroundColor = const Color(0xFFFEF9C3); // Amarillo suave
     } else {
