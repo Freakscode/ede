@@ -35,6 +35,24 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
   Map<String, bool> _expandedCategories = {};
   Map<String, String?> _selectedLevels = {}; // Para almacenar el nivel seleccionado por categoría
 
+  // Método helper para obtener el valor numérico del nivel seleccionado
+  int _getSelectedLevelValue(String categoryTitle) {
+    final selectedLevel = _selectedLevels[categoryTitle];
+    if (selectedLevel == null) return 0;
+    
+    // Mapear los niveles a sus valores numéricos
+    if (selectedLevel.contains('BAJO') && !selectedLevel.contains('MEDIO')) {
+      return 1;
+    } else if (selectedLevel.contains('MEDIO') && selectedLevel.contains('ALTO')) {
+      return 3;
+    } else if (selectedLevel.contains('MEDIO')) {
+      return 2;
+    } else if (selectedLevel.contains('ALTO')) {
+      return 4;
+    }
+    return 0;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -170,7 +188,7 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
                 ),
                 child: Center(
                   child: Text(
-                    _selectedLevels[category.title] != null ? '1' : '0',
+                    _getSelectedLevelValue(category.title).toString(),
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: _selectedLevels[category.title] != null 

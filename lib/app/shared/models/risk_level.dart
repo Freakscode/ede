@@ -6,6 +6,7 @@ class RiskLevel {
   final List<String>? items;
   final String? description;
   final String? note;
+  final int? value; // Valor numérico asociado al nivel
 
   const RiskLevel({
     required this.title,
@@ -13,6 +14,7 @@ class RiskLevel {
     this.items,
     this.description,
     this.note,
+    this.value,
   });
 
   factory RiskLevel.fromMap(Map<String, dynamic> map) {
@@ -24,6 +26,7 @@ class RiskLevel {
           : null,
       description: map['description'] as String?,
       note: map['note'] as String?,
+      value: map['value'] as int?,
     );
   }
 
@@ -34,18 +37,21 @@ class RiskLevel {
       if (items != null) 'items': items,
       if (description != null) 'description': description,
       if (note != null) 'note': note,
+      if (value != null) 'value': value,
     };
   }
 
-  // Factory constructors para los diferentes niveles de riesgo
+    // Factory constructors para los diferentes niveles de riesgo
   factory RiskLevel.bajo({
     String? customDescription,
     List<String>? customItems,
+    int? customValue,
   }) {
     return RiskLevel(
       title: 'BAJO (1): Las características del escenario sugieren que la probabilidad de que se presente el evento es mínima',
       color: const Color(0xFF22C55E),
       description: customDescription,
+      value: customValue ?? 1,
       items: customItems ?? [
         'Pendientes bajos modeladas en suelos (< 5°).',
         'Pendientes bajas, medias o altas, modeladas en roca sana o levemente meteorizada sin fracturas.',
@@ -56,11 +62,13 @@ class RiskLevel {
   factory RiskLevel.medioBajo({
     String? customDescription,
     List<String>? customItems,
+    int? customValue,
   }) {
     return RiskLevel(
       title: 'MEDIO - BAJO (2): Las características del escenario sugieren que es poco probable de que se presente el evento',
       color: const Color(0xFFFDE047),
       description: customDescription,
+      value: customValue ?? 2,
       items: customItems ?? [
         'Pendientes moderadas modeladas en suelos (5° - 15°).',
         'Pendientes bajas modeladas en suelos (< 5°), en condiciones saturadas.',
@@ -71,11 +79,13 @@ class RiskLevel {
   factory RiskLevel.medioAlto({
     String? customDescription,
     List<String>? customItems,
+    int? customValue,
   }) {
     return RiskLevel(
       title: 'MEDIO - ALTO (3): Las características del escenario sugieren la probabilidad moderada de que se presente el evento.',
       color: const Color(0xFFFB923C),
       description: customDescription,
+      value: customValue ?? 3,
       items: customItems ?? [
         'Pendientes altas modeladas en suelos (15° - 30°).',
         'Pendientes moderadas modeladas en suelos (5° - 15°), en condiciones saturadas.',
@@ -87,11 +97,13 @@ class RiskLevel {
     String? customDescription,
     List<String>? customItems,
     String? customNote,
+    int? customValue,
   }) {
     return RiskLevel(
       title: 'ALTO (4): Las características del escenario sugieren la probabilidad de que se presente el evento.',
       color: const Color(0xFFDC2626),
       description: customDescription,
+      value: customValue ?? 4,
       items: customItems ?? [
         'Pendientes medias o altas modeladas en roca fracturada.',
         'Pendientes muy altas modeladas en suelos (> 30°).',
@@ -110,7 +122,8 @@ class RiskLevel {
         other.color == color &&
         _listEquals(other.items, items) &&
         other.description == description &&
-        other.note == note;
+        other.note == note &&
+        other.value == value;
   }
 
   @override
@@ -121,12 +134,13 @@ class RiskLevel {
       items,
       description,
       note,
+      value,
     );
   }
 
   @override
   String toString() {
-    return 'RiskLevel(title: $title, color: $color, items: $items, description: $description, note: $note)';
+    return 'RiskLevel(title: $title, color: $color, items: $items, description: $description, note: $note, value: $value)';
   }
 
   bool _listEquals<T>(List<T>? a, List<T>? b) {

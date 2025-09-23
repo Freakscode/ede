@@ -36,19 +36,6 @@ class DropdownCategory {
     };
   }
 
-  // Factory para categoría de probabilidad de deslizamiento
-  factory DropdownCategory.probabilidadDeslizamiento() {
-    return DropdownCategory(
-      title: 'Probabilidad de deslizamiento',
-      levels: ['BAJO', 'MEDIO', 'MEDIO ALTO', 'ALTO'],
-      detailedLevels: [
-        RiskLevel.bajo(),
-        RiskLevel.medioBajo(),
-        RiskLevel.medioAlto(),
-        RiskLevel.alto(),
-      ],
-    );
-  }
 
   // Factory para categoría de intensidad
   factory DropdownCategory.intensidad() {
@@ -120,6 +107,8 @@ class DropdownCategory {
       additionalData,
     );
   }
+
+ 
 
   @override
   String toString() {
