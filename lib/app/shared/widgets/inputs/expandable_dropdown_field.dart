@@ -451,39 +451,53 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
     ];
   }
 
-  Widget _buildLevelButton(String level) {
+  Widget _buildLevelButton(String level, {bool isSelected = false}) {
     Color backgroundColor;
+    Color selectedBackgroundColor;
+    
     if (level.contains('BAJO') && !level.contains('MEDIO')) {
-      backgroundColor = const Color(0xFF22C55E); // Verde
+      backgroundColor = const Color(0xFF22C55E).withOpacity(0.3); // Verde claro
+      selectedBackgroundColor = const Color(0xFF22C55E); // Verde oscuro
     } else if (level.contains('MEDIO') && level.contains('ALTO')) {
-      backgroundColor = const Color(0xFFFB923C); // Naranja para MEDIO ALTO
+      backgroundColor = const Color(0xFFFB923C).withOpacity(0.3); // Naranja claro
+      selectedBackgroundColor = const Color(0xFFFB923C); // Naranja oscuro
     } else if (level.contains('MEDIO')) {
-      backgroundColor = const Color(0xFFFDE047); // Amarillo
+      backgroundColor = const Color(0xFFFDE047).withOpacity(0.3); // Amarillo claro
+      selectedBackgroundColor = const Color(0xFFFDE047); // Amarillo oscuro
     } else {
-      backgroundColor = const Color(0xFFDC2626); // Rojo
+      backgroundColor = const Color(0xFFDC2626).withOpacity(0.3); // Rojo claro
+      selectedBackgroundColor = const Color(0xFFDC2626); // Rojo oscuro
     }
 
     return GestureDetector(
       onTap: () {
         // Acción al seleccionar nivel
+        // Aquí se puede agregar la lógica para cambiar el estado de selección
       },
       child: Container(
         width: 80,
         height: 50,
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: backgroundColor,
+          color: isSelected ? selectedBackgroundColor : backgroundColor,
           borderRadius: BorderRadius.circular(4),
+          border: isSelected 
+              ? Border.all(color: selectedBackgroundColor, width: 2)
+              : null,
         ),
         child: Center(
           child: Text(
             level,
             textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: Color(0xFF000000),
+            style: TextStyle(
+              color: isSelected 
+                  ? Colors.white 
+                  : const Color(0xFF000000),
               fontFamily: 'Work Sans',
               fontSize: 12,
-              fontWeight: FontWeight.w400,
+              fontWeight: isSelected 
+                  ? FontWeight.w600 
+                  : FontWeight.w400,
               height: 16 / 12, // 133.333% line-height
             ),
           ),
