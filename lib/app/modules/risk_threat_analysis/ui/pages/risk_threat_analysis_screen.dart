@@ -1,6 +1,7 @@
 import 'package:caja_herramientas/app/core/icons/app_icons.dart';
 import 'package:caja_herramientas/app/shared/widgets/buttons/custom_elevated_button.dart';
 import 'package:caja_herramientas/app/shared/widgets/layouts/custom_app_bar.dart';
+import 'package:caja_herramientas/app/shared/widgets/inputs/expandable_dropdown_field.dart';
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -11,6 +12,33 @@ import '../../bloc/risk_threat_analysis_state.dart';
 
 class RiskThreatAnalysisScreen extends StatelessWidget {
   const RiskThreatAnalysisScreen({super.key});
+
+  static const List<Map<String, dynamic>> _categories = [
+    {
+      'title': 'Características Geotécnicas',
+      'levels': ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO']
+    },
+    {
+      'title': 'Intervención Antrópica',
+      'levels': ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO']
+    },
+    {
+      'title': 'Manejo aguas lluvia',
+      'levels': ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO']
+    },
+    {
+      'title': 'Manejo de redes hidro sanitarias',
+      'levels': ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO']
+    },
+    {
+      'title': 'Antecedentes',
+      'levels': ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO']
+    },
+    {
+      'title': 'Evidencias de materialización o reactivación',
+      'levels': ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO']
+    },
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -33,12 +61,12 @@ class RiskThreatAnalysisScreen extends StatelessWidget {
                       'Metodología de Análisis del Riesgo',
                       textAlign: TextAlign.center,
                       style: const TextStyle(
-                        color: Color(0xFF232B48), // AzulDAGRD
+                        color: Color(0xFF232B48),
                         fontFamily: 'Work Sans',
                         fontSize: 20,
                         fontStyle: FontStyle.normal,
                         fontWeight: FontWeight.w600,
-                        height: 28 / 20, // 140% line-height
+                        height: 28 / 20,
                       ),
                     ),
                     const SizedBox(height: 10),
@@ -47,12 +75,12 @@ class RiskThreatAnalysisScreen extends StatelessWidget {
                       title: Text(
                         'Calificación de la Amenaza',
                         style: const TextStyle(
-                          color: Color(0xFF706F6F), // GrisDAGRD
+                          color: Color(0xFF706F6F),
                           fontFamily: 'Work Sans',
                           fontSize: 18,
                           fontStyle: FontStyle.normal,
                           fontWeight: FontWeight.w600,
-                          height: 28 / 18, // 155.556% line-height
+                          height: 28 / 18,
                         ),
                       ),
                       trailing: SvgPicture.asset(
@@ -76,21 +104,21 @@ class RiskThreatAnalysisScreen extends StatelessWidget {
                       borderRadius: 8,
                     ),
                     const SizedBox(height: 24),
-                    // Dropdown de Probabilidad
-                    CustomDropdownField(
+                    ExpandableDropdownField(
                       hint: 'Probabilidad',
                       value: state.selectedProbabilidad,
                       isSelected: state.isProbabilidadDropdownOpen,
+                      categories: _categories,
                       onTap: () {
                         context.read<RiskThreatAnalysisBloc>().add(ToggleProbabilidadDropdown());
                       },
                     ),
                     const SizedBox(height: 16),
-                    // Dropdown de Intensidad
-                    CustomDropdownField(
+                    ExpandableDropdownField(
                       hint: 'Intensidad',
                       value: state.selectedIntensidad,
                       isSelected: state.isIntensidadDropdownOpen,
+                      categories: _categories,
                       onTap: () {
                         context.read<RiskThreatAnalysisBloc>().add(ToggleIntensidadDropdown());
                       },
@@ -100,80 +128,6 @@ class RiskThreatAnalysisScreen extends StatelessWidget {
               },
             ),
           ),
-        ),
-      ),
-    );
-  }
-}
-
-
-
-class CustomDropdownField extends StatelessWidget {
-  final String hint;
-  final String? value;
-  final VoidCallback? onTap;
-  final Color? borderColor;
-  final Color? backgroundColor;
-  final Color? textColor;
-  final bool isSelected;
-
-  const CustomDropdownField({
-    super.key,
-    required this.hint,
-    this.value,
-    this.onTap,
-    this.borderColor,
-    this.backgroundColor,
-    this.textColor,
-    this.isSelected = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: double.infinity,
-        height: 50,
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        decoration: BoxDecoration(
-          color: isSelected 
-            ? DAGRDColors.amarDAGRD 
-            : (backgroundColor ?? Colors.white),
-          border: Border.all(
-            color: isSelected 
-              ? DAGRDColors.amarDAGRD 
-              : (borderColor ?? const Color(0xFFD1D5DB)),
-            width: 1,
-          ),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Text(
-                value ?? hint,
-                style: TextStyle(
-                  color: isSelected 
-                    ? const Color(0xFF1E1E1E)
-                    : (value != null 
-                        ? (textColor ?? const Color(0xFF1E1E1E))
-                        : const Color(0xFF1E1E1E)),
-                  fontFamily: 'Work Sans',
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  height: 24 / 16, // 150% line-height
-                ),
-              ),
-            ),
-            Icon(
-              isSelected ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-              color: isSelected 
-                ? const Color(0xFF1E1E1E)
-                : const Color(0xFF666666),
-              size: 24,
-            ),
-          ],
         ),
       ),
     );
