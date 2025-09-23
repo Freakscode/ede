@@ -9,6 +9,7 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     on<SelectProbabilidad>(_onSelectProbabilidad);
     on<SelectIntensidad>(_onSelectIntensidad);
     on<ResetDropdowns>(_onResetDropdowns);
+    on<ChangeBottomNavIndex>(_onChangeBottomNavIndex);
   }
 
   void _onToggleProbabilidadDropdown(
@@ -56,5 +57,12 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     Emitter<RiskThreatAnalysisState> emit,
   ) {
     emit(const RiskThreatAnalysisState());
+  }
+
+  void _onChangeBottomNavIndex(
+    ChangeBottomNavIndex event,
+    Emitter<RiskThreatAnalysisState> emit,
+  ) {
+    emit(state.copyWith(currentBottomNavIndex: event.index));
   }
 }

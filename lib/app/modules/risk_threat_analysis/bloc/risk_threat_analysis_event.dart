@@ -17,3 +17,10 @@ class SelectIntensidad extends RiskThreatAnalysisEvent {
 }
 
 class ResetDropdowns extends RiskThreatAnalysisEvent {}
+
+// Navigation Events
+class ChangeBottomNavIndex extends RiskThreatAnalysisEvent {
+  final int index;
+  
+  ChangeBottomNavIndex(this.index);
+}

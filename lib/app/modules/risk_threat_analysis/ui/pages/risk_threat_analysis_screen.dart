@@ -6,43 +6,61 @@ import 'package:caja_herramientas/app/shared/widgets/layouts/custom_bottom_nav_b
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../bloc/risk_threat_analysis_bloc.dart';
+import '../../bloc/risk_threat_analysis_event.dart';
+import '../../bloc/risk_threat_analysis_state.dart';
 
 class RiskThreatAnalysisScreen extends StatelessWidget {
   const RiskThreatAnalysisScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final List<Widget> screens = [
+      const CalificacionScreen(),
+      const Center(child: Text('Evidencias Screen')),
+      const Center(child: Text('Resultados Screen')),
+    ];
+
     return BlocProvider(
       create: (context) => RiskThreatAnalysisBloc(),
-      child: Scaffold(
-        appBar: const CustomAppBar(
-          showBack: false,
-          showInfo: true,
-          showProfile: true,
-        ),
-        body: SingleChildScrollView(child: CalificacionScreen()),
-        bottomNavigationBar: CustomBottomNavBar(
-          currentIndex: 0,
-          onTap: (index) {},
-          items: const [
-            CustomBottomNavBarItem(
-              label: 'Calificación',
-              iconAsset: AppIcons.clipboardText,
+      child: BlocBuilder<RiskThreatAnalysisBloc, RiskThreatAnalysisState>(
+        builder: (context, state) {
+          return Scaffold(
+            appBar: const CustomAppBar(
+              showBack: false,
+              showInfo: true,
+              showProfile: true,
             ),
-            CustomBottomNavBarItem(
-              label: 'Evidencias',
-              iconAsset: AppIcons.images,
+            body: SingleChildScrollView(
+              child: screens[state.currentBottomNavIndex],
             ),
-            CustomBottomNavBarItem(
-              label: 'Resultados',
-              iconAsset: AppIcons.hoja,
+            bottomNavigationBar: CustomBottomNavBar(
+              currentIndex: state.currentBottomNavIndex,
+              onTap: (index) {
+                context.read<RiskThreatAnalysisBloc>().add(
+                  ChangeBottomNavIndex(index),
+                );
+              },
+              items: const [
+                CustomBottomNavBarItem(
+                  label: 'Calificación',
+                  iconAsset: AppIcons.clipboardText,
+                ),
+                CustomBottomNavBarItem(
+                  label: 'Evidencias',
+                  iconAsset: AppIcons.images,
+                ),
+                CustomBottomNavBarItem(
+                  label: 'Resultados',
+                  iconAsset: AppIcons.hoja,
+                ),
+              ],
+              backgroundColor: DAGRDColors.azulDAGRD,
+              selectedColor: Colors.white,
+              unselectedColor: Colors.white60,
+              selectedIconBgColor: Colors.white,
             ),
-          ],
-          backgroundColor: DAGRDColors.azulDAGRD,
-          selectedColor: Colors.white,
-          unselectedColor: Colors.white60,
-          selectedIconBgColor: Colors.white,
-        ),
+          );
+        },
       ),
     );
   }
