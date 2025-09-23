@@ -44,7 +44,8 @@ class RiskThreatAnalysisScreen extends StatelessWidget {
             'Pendientes altas modeladas en suelos (15° - 30°), en condiciones saturadas.',
             'Pendientes medias o altas, modeladas en llenos antrópicos.',
           ],
-          customNote: 'NOTA: En caso de tratarse de llenos antrópicos constituidos sin sustento técnico (vertimiento libre de materiales de excavación, escombros y basuras)',
+          customNote:
+              'NOTA: En caso de tratarse de llenos antrópicos constituidos sin sustento técnico (vertimiento libre de materiales de excavación, escombros y basuras)',
         ),
       ],
     ),
@@ -122,16 +123,10 @@ class RiskThreatAnalysisScreen extends StatelessWidget {
           ],
         ),
         RiskLevel.medioBajo(
-          customItems: [
-            'Redes en buen estado.',
-            'Fugas menores controladas.',
-          ],
+          customItems: ['Redes en buen estado.', 'Fugas menores controladas.'],
         ),
         RiskLevel.medioAlto(
-          customItems: [
-            'Redes con deterioro moderado.',
-            'Fugas frecuentes.',
-          ],
+          customItems: ['Redes con deterioro moderado.', 'Fugas frecuentes.'],
         ),
         RiskLevel.alto(
           customItems: [
@@ -178,10 +173,7 @@ class RiskThreatAnalysisScreen extends StatelessWidget {
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
       detailedLevels: [
         RiskLevel.bajo(
-          customItems: [
-            'Sin evidencias visibles.',
-            'Terreno estable.',
-          ],
+          customItems: ['Sin evidencias visibles.', 'Terreno estable.'],
         ),
         RiskLevel.medioBajo(
           customItems: [
@@ -243,7 +235,9 @@ class RiskThreatAnalysisScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 10),
                     ListTile(
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 27),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 27,
+                      ),
                       title: Text(
                         'Calificación de la Amenaza',
                         style: const TextStyle(
@@ -282,7 +276,9 @@ class RiskThreatAnalysisScreen extends StatelessWidget {
                       isSelected: state.isProbabilidadDropdownOpen,
                       categories: _probabilidadCategories,
                       onTap: () {
-                        context.read<RiskThreatAnalysisBloc>().add(ToggleProbabilidadDropdown());
+                        context.read<RiskThreatAnalysisBloc>().add(
+                          ToggleProbabilidadDropdown(),
+                        );
                       },
                     ),
                     const SizedBox(height: 16),
@@ -292,9 +288,254 @@ class RiskThreatAnalysisScreen extends StatelessWidget {
                       isSelected: state.isIntensidadDropdownOpen,
                       categories: _intensidadCategories,
                       onTap: () {
-                        context.read<RiskThreatAnalysisBloc>().add(ToggleIntensidadDropdown());
+                        context.read<RiskThreatAnalysisBloc>().add(
+                          ToggleIntensidadDropdown(),
+                        );
                       },
                     ),
+                    const SizedBox(height: 24),
+                    // Ver Niveles de Amenaza
+                    Container(
+                      width: double.infinity,
+                      height: 44,
+                      padding: const EdgeInsets.fromLTRB(20, 10, 10, 10),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: const Color(0xFF2563EB)),
+                        borderRadius: BorderRadius.circular(6),
+                        color: const Color(0xFFEFF6FF), // background: #EFF6FF
+                      ),
+                      child: InkWell(
+                        onTap: () {
+                          // Acción para ver niveles de amenaza
+                        },
+                        borderRadius: BorderRadius.circular(6),
+                        child: Row(
+                          children: [
+                            SvgPicture.asset(
+                              AppIcons.info,
+                              width: 20,
+                              height: 20,
+                              colorFilter: const ColorFilter.mode(
+                                Color(0xFF2563EB),
+                                BlendMode.srcIn,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            const Expanded(
+                              child: Text(
+                                'Ver Niveles de Amenaza',
+                                style: TextStyle(
+                                  color: Color(0xFF2563EB),
+                                  fontFamily: 'Work Sans',
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  height: 24 / 16, // 150% line-height
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            SvgPicture.asset(
+                              AppIcons.preview,
+                              width: 20,
+                              height: 20,
+                              colorFilter: const ColorFilter.mode(
+                                Color(0xFF2563EB),
+                                BlendMode.srcIn,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    // Barra de progreso
+                    Column(
+                      children: [
+                        Container(
+                          height: 16,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFE5E7EB),
+                            borderRadius: BorderRadius.circular(
+                              99,
+                            ), // Completamente redondeado
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(99),
+                            child: LinearProgressIndicator(
+                              value: 0.5, // 50% completado
+                              backgroundColor: Colors.transparent,
+                              valueColor: const AlwaysStoppedAnimation<Color>(
+                                Color(
+                                  0xFFFFCC00,
+                                ), // Color #FC0 para el progreso
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        const Text(
+                          '0% completado',
+                          style: TextStyle(
+                            color: Color(0xFF6B7280),
+                            fontFamily: 'Work Sans',
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 32),
+                    // Sección Calificación Amenaza
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Calificación Amenaza',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Color(0xFF232B48), // AzulDAGRD
+                            fontFamily: 'Work Sans',
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            height: 16 / 16, // line-height: 100%
+                          ),
+                        ),
+                        Container(
+                          width: 165,
+                          height: 40,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 10,
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFD1D5DB), // Color bordes
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Center(
+                            child: Text(
+                              'SIN CALIFICAR',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Color(0xFF1E1E1E), // Color textos
+                                fontFamily: 'Work Sans',
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                height: 16 / 16, // line-height: 100%
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+                    // Botón Guardar avance
+                    SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          // Acción para guardar avance
+                        },
+                        icon: SvgPicture.asset(
+                          AppIcons.save,
+                          width: 20,
+                          height: 20,
+                          colorFilter: const ColorFilter.mode(
+                            DAGRDColors.blancoDAGRD,
+                            BlendMode.srcIn,
+                          ),
+                        ),
+
+                        label: const Text(
+                          'Guardar avance',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Color(0xFFFFFFFF), // #FFF
+                            fontFamily: 'Work Sans',
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            height: 24 / 14, // line-height: 171.429%
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF2563EB),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          elevation: 0,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+                    // Botones de navegación
+                    Row(
+                      children: [
+                        // Botón Volver
+                        Expanded(
+                          child: TextButton.icon(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            icon: const Icon(
+                              Icons.arrow_back_ios,
+                              color: Color(0xFF374151),
+                              size: 18,
+                            ),
+                            label: const Text(
+                              'Volver',
+                              style: TextStyle(
+                                color: Color(0xFF374151),
+                                fontFamily: 'Work Sans',
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            style: TextButton.styleFrom(
+                              backgroundColor: Colors.transparent,
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        // Botón Continuar
+                        Expanded(
+                          child: Container(
+                            height: 48,
+                            child: ElevatedButton.icon(
+                              onPressed: () {
+                                // Acción para continuar
+                              },
+                              icon: const Icon(
+                                Icons.arrow_forward_ios,
+                                color: Colors.white,
+                                size: 18,
+                              ),
+                              label: const Text(
+                                'Continuar',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontFamily: 'Work Sans',
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF2563EB),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                  vertical: 8,
+                                ),
+                                elevation: 0,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20), // Padding bottom adicional
                   ],
                 );
               },
