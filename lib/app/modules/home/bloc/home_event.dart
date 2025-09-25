@@ -27,6 +27,15 @@ class SelectRiskEvent extends HomeEvent {
   List<Object?> get props => [eventName];
 }
 
+class SelectRiskCategory extends HomeEvent {
+  final String categoryType; // 'Amenaza' o 'Vulnerabilidad'
+  final String eventName; // El evento asociado
+  const SelectRiskCategory(this.categoryType, this.eventName);
+
+  @override
+  List<Object?> get props => [categoryType, eventName];
+}
+
 class HomeResetRiskSections extends HomeEvent {}
 
 class HomeCheckAndShowTutorial extends HomeEvent {}

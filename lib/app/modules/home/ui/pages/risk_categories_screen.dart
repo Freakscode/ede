@@ -3,6 +3,7 @@ import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import 'package:caja_herramientas/app/modules/home/ui/widgets/category_card.dart';
 import 'package:caja_herramientas/app/modules/home/bloc/home_bloc.dart';
 import 'package:caja_herramientas/app/modules/home/bloc/home_state.dart';
+import 'package:caja_herramientas/app/modules/home/bloc/home_event.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -62,6 +63,10 @@ class RiskCategoriesScreen extends StatelessWidget {
                   CategoryCard(
                     title: 'Amenaza $selectedEvent',
                     onTap: () {
+                      // Guardar la categoría seleccionada
+                      context.read<HomeBloc>().add(
+                        SelectRiskCategory('Amenaza', selectedEvent),
+                      );
                       // Navegar a siguiente pantalla
                       context.go('/risk_threat_analysis');
                     },
@@ -72,9 +77,12 @@ class RiskCategoriesScreen extends StatelessWidget {
                   CategoryCard(
                     title: 'Vulnerabilidad $selectedEvent',
                     onTap: () {
+                      // Guardar la categoría seleccionada
+                      context.read<HomeBloc>().add(
+                        SelectRiskCategory('Vulnerabilidad', selectedEvent),
+                      );
                       // Navegar a siguiente pantalla
                       context.go('/risk_threat_analysis');
-
                     },
                   ),
 
@@ -189,6 +197,47 @@ class RiskCategoriesScreen extends StatelessWidget {
                 ],
               ),
             ),
+            // Debug info - mostrar categoría seleccionada
+            if (state.selectedRiskCategory != null)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: DAGRDColors.success.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: DAGRDColors.success,
+                      width: 1,
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Última categoría seleccionada:',
+                        style: const TextStyle(
+                          color: DAGRDColors.azulSecundario,
+                          fontFamily: 'Work Sans',
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        state.selectedRiskCategory!,
+                        style: const TextStyle(
+                          color: DAGRDColors.azulSecundario,
+                          fontFamily: 'Work Sans',
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             const SizedBox(height: 100),
           ],
         ),

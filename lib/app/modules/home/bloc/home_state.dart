@@ -10,6 +10,7 @@ class HomeState extends Equatable {
   final bool darkModeEnabled;
   final String selectedLanguage;
   final String selectedRiskEvent;
+  final String? selectedRiskCategory;
 
   const HomeState({
     required this.selectedIndex,
@@ -21,6 +22,7 @@ class HomeState extends Equatable {
     this.darkModeEnabled = false,
     this.selectedLanguage = 'Español',
     this.selectedRiskEvent = 'Movimiento en Masa',
+    this.selectedRiskCategory,
   });
 
   HomeState copyWith({
@@ -33,6 +35,7 @@ class HomeState extends Equatable {
     bool? darkModeEnabled,
     String? selectedLanguage,
     String? selectedRiskEvent,
+    String? selectedRiskCategory,
   }) {
     return HomeState(
       selectedIndex: selectedIndex ?? this.selectedIndex,
@@ -44,9 +47,10 @@ class HomeState extends Equatable {
       darkModeEnabled: darkModeEnabled ?? this.darkModeEnabled,
       selectedLanguage: selectedLanguage ?? this.selectedLanguage,
       selectedRiskEvent: selectedRiskEvent ?? this.selectedRiskEvent,
+      selectedRiskCategory: selectedRiskCategory ?? this.selectedRiskCategory,
     );
   }
 
   @override
-  List<Object?> get props => [selectedIndex, mostrarEventosRiesgo, mostrarCategoriasRiesgo, tutorialShown, showTutorial, notificationsEnabled, darkModeEnabled, selectedLanguage, selectedRiskEvent];
+  List<Object?> get props => [selectedIndex, mostrarEventosRiesgo, mostrarCategoriasRiesgo, tutorialShown, showTutorial, notificationsEnabled, darkModeEnabled, selectedLanguage, selectedRiskEvent, selectedRiskCategory];
 }

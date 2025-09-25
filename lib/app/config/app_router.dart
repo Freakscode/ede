@@ -3,6 +3,7 @@
 
 import 'dart:async';
 
+import 'package:caja_herramientas/app/modules/risk_threat_analysis/ui/pages/risk_threat_analysis_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -42,6 +43,11 @@ GoRouter getAppRouter(BuildContext context) {
         path: '/home',
         builder: (context, state) => const home.HomeScreen(),
       ),
+      GoRoute(
+        path: '/risk_threat_analysis',
+        builder: (context, state) => const RiskThreatAnalysisScreen(),
+      ),
+
 
 
       // EDE - Configuración rutas
