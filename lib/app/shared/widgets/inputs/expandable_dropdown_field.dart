@@ -99,6 +99,28 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
                     ),
                   ),
                 ),
+                Container(
+                  width: 50,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(100),
+                    color: const Color(0xFF22C55E), // #22C55E
+                  ),
+                  child: Center(
+                    child: Text(
+                      '1,9', // Reemplaza con el contenido que necesites
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        color: Color(0xFFFFFFFF), // #FFF
+                        fontFamily: 'Work Sans',
+                        fontSize: 14,
+                        fontStyle: FontStyle.normal,
+                        fontWeight: FontWeight.w700,
+                        height: 16 / 14, // 114.286% line-height (16px/14px)
+                      ),
+                    ),
+                  ),
+                ),
                 Icon(
                   widget.isSelected
                       ? Icons.keyboard_arrow_up
