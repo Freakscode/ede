@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'risk_threat_analysis_event.dart';
 import 'risk_threat_analysis_state.dart';
@@ -177,5 +178,50 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     }
     
     return (probAverage + intAverage) / 2;
+  }
+
+  // Método para obtener el color de fondo basado en la calificación
+  Color getThreatBackgroundColor() {
+    final rating = calculateThreatRating();
+    
+    switch (rating) {
+      case 'BAJO':
+        return const Color(0xFF22C55E); // Verde
+      case 'MEDIO':
+        return const Color(0xFFFDE047); // Amarillo
+      case 'MEDIO-ALTO':
+        return const Color(0xFFFB923C); // Naranja
+      case 'ALTO':
+        return const Color(0xFFDC2626); // Rojo
+      default:
+        return const Color(0xFFD1D5DB); // Gris
+    }
+  }
+
+  // Método para obtener el color del texto basado en la calificación
+  Color getThreatTextColor() {
+    final rating = calculateThreatRating();
+    
+    switch (rating) {
+      case 'BAJO':
+      case 'MEDIO-ALTO':
+      case 'ALTO':
+        return const Color(0xFFFFFFFF); // Blanco
+      case 'MEDIO':
+      default:
+        return const Color(0xFF1E1E1E); // Negro/Gris oscuro
+    }
+  }
+
+  // Método para obtener el texto formateado de la calificación
+  String getFormattedThreatRating() {
+    final rating = calculateThreatRating();
+    
+    if (rating == 'SIN CALIFICAR') {
+      return rating;
+    }
+    
+    final score = calculateFinalScore().toStringAsFixed(1).replaceAll('.', ',');
+    return '$score $rating';
   }
 }

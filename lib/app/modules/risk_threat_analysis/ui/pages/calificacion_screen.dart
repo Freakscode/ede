@@ -395,31 +395,6 @@ class CalificacionScreen extends StatelessWidget {
               BlocBuilder<RiskThreatAnalysisBloc, RiskThreatAnalysisState>(
                 builder: (context, state) {
                   final bloc = context.read<RiskThreatAnalysisBloc>();
-                  final rating = bloc.calculateThreatRating();
-                  
-                  // Obtener color basado en la calificación
-                  Color backgroundColor;
-                  Color textColor = const Color(0xFF1E1E1E);
-                  
-                  switch (rating) {
-                    case 'BAJO':
-                      backgroundColor = const Color(0xFF22C55E);
-                      textColor = Colors.white;
-                      break;
-                    case 'MEDIO':
-                      backgroundColor = const Color(0xFFFDE047);
-                      break;
-                    case 'MEDIO-ALTO':
-                      backgroundColor = const Color(0xFFFB923C);
-                      textColor = Colors.white;
-                      break;
-                    case 'ALTO':
-                      backgroundColor = const Color(0xFFDC2626);
-                      textColor = Colors.white;
-                      break;
-                    default:
-                      backgroundColor = const Color(0xFFD1D5DB);
-                  }
                   
                   return Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -443,17 +418,15 @@ class CalificacionScreen extends StatelessWidget {
                           vertical: 10,
                         ),
                         decoration: BoxDecoration(
-                          color: backgroundColor,
+                          color: bloc.getThreatBackgroundColor(),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Center(
                           child: Text(
-                            rating == 'SIN CALIFICAR' 
-                                ? rating 
-                                : '${bloc.calculateFinalScore().toStringAsFixed(1).replaceAll('.', ',')} $rating',
+                            bloc.getFormattedThreatRating(),
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                              color: textColor,
+                              color: bloc.getThreatTextColor(),
                               fontFamily: 'Work Sans',
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
