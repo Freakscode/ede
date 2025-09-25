@@ -270,6 +270,11 @@ class CalificacionScreen extends StatelessWidget {
                     ToggleProbabilidadDropdown(),
                   );
                 },
+                onSelectionChanged: (category, level) {
+                  context.read<RiskThreatAnalysisBloc>().add(
+                    UpdateProbabilidadSelection(category, level),
+                  );
+                },
               ),
               const SizedBox(height: 16),
               ExpandableDropdownField(
@@ -280,6 +285,11 @@ class CalificacionScreen extends StatelessWidget {
                 onTap: () {
                   context.read<RiskThreatAnalysisBloc>().add(
                     ToggleIntensidadDropdown(),
+                  );
+                },
+                onSelectionChanged: (category, level) {
+                  context.read<RiskThreatAnalysisBloc>().add(
+                    UpdateIntensidadSelection(category, level),
                   );
                 },
               ),
@@ -338,84 +348,123 @@ class CalificacionScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 14),
-              // Barra de progreso
-              Column(
-                children: [
-                  Container(
-                    height: 16,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFE5E7EB),
-                      borderRadius: BorderRadius.circular(
-                        99,
-                      ), // Completamente redondeado
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(99),
-                      child: LinearProgressIndicator(
-                        value: 0.5, // 50% completado
-                        backgroundColor: Colors.transparent,
-                        valueColor: const AlwaysStoppedAnimation<Color>(
-                          Color(0xFFFFCC00),
+              // Barra de progreso dinámica
+              BlocBuilder<RiskThreatAnalysisBloc, RiskThreatAnalysisState>(
+                builder: (context, state) {
+                  final bloc = context.read<RiskThreatAnalysisBloc>();
+                  final progress = bloc.calculateCompletionPercentage();
+                  final progressText = '${(progress * 100).toInt()}% completado';
+                  
+                  return Column(
+                    children: [
+                      Container(
+                        height: 16,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFE5E7EB),
+                          borderRadius: BorderRadius.circular(99),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(99),
+                          child: LinearProgressIndicator(
+                            value: progress,
+                            backgroundColor: Colors.transparent,
+                            valueColor: const AlwaysStoppedAnimation<Color>(
+                              Color(0xFFFFCC00),
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    '0% completado',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: DAGRDColors.grisMedio, 
-                      fontFamily: 'Work Sans',
-                      fontSize: 12,
-                      fontWeight: FontWeight.w400,
-                      height: 16 / 12, // line-height: 133.333%
-                    ),
-                  ),
-                ],
+                      const SizedBox(height: 8),
+                      Text(
+                        progressText,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: DAGRDColors.grisMedio,
+                          fontFamily: 'Work Sans',
+                          fontSize: 12,
+                          fontWeight: FontWeight.w400,
+                          height: 16 / 12,
+                        ),
+                      ),
+                    ],
+                  );
+                },
               ),
               const SizedBox(height: 32),
-              // Sección Calificación Amenaza
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Calificación Amenaza',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Color(0xFF232B48), // AzulDAGRD
-                      fontFamily: 'Work Sans',
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      height: 16 / 16, // line-height: 100%
-                    ),
-                  ),
-                  Container(
-                    width: 165,
-                    height: 40,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 10,
-                    ),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFD1D5DB), // Color bordes
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: const Center(
-                      child: Text(
-                        'SIN CALIFICAR',
+              // Sección Calificación Amenaza dinámica
+              BlocBuilder<RiskThreatAnalysisBloc, RiskThreatAnalysisState>(
+                builder: (context, state) {
+                  final bloc = context.read<RiskThreatAnalysisBloc>();
+                  final rating = bloc.calculateThreatRating();
+                  
+                  // Obtener color basado en la calificación
+                  Color backgroundColor;
+                  Color textColor = const Color(0xFF1E1E1E);
+                  
+                  switch (rating) {
+                    case 'BAJO':
+                      backgroundColor = const Color(0xFF22C55E);
+                      textColor = Colors.white;
+                      break;
+                    case 'MEDIO':
+                      backgroundColor = const Color(0xFFFDE047);
+                      break;
+                    case 'MEDIO-ALTO':
+                      backgroundColor = const Color(0xFFFB923C);
+                      textColor = Colors.white;
+                      break;
+                    case 'ALTO':
+                      backgroundColor = const Color(0xFFDC2626);
+                      textColor = Colors.white;
+                      break;
+                    default:
+                      backgroundColor = const Color(0xFFD1D5DB);
+                  }
+                  
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Calificación Amenaza',
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          color: Color(0xFF1E1E1E), // Color textos
+                          color: Color(0xFF232B48),
                           fontFamily: 'Work Sans',
                           fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          height: 16 / 16, // line-height: 100%
+                          fontWeight: FontWeight.w500,
+                          height: 16 / 16,
                         ),
                       ),
-                    ),
-                  ),
-                ],
+                      Container(
+                        width: 165,
+                        height: 40,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 10,
+                        ),
+                        decoration: BoxDecoration(
+                          color: backgroundColor,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Center(
+                          child: Text(
+                            rating == 'SIN CALIFICAR' 
+                                ? rating 
+                                : '${bloc.calculateFinalScore().toStringAsFixed(1).replaceAll('.', ',')} $rating',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: textColor,
+                              fontFamily: 'Work Sans',
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              height: 16 / 16,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                },
               ),
               const SizedBox(height: 24),
               // Botón Guardar avance

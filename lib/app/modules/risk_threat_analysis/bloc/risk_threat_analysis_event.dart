@@ -24,3 +24,18 @@ class ChangeBottomNavIndex extends RiskThreatAnalysisEvent {
   
   ChangeBottomNavIndex(this.index);
 }
+
+// Dropdown Selection Events
+class UpdateProbabilidadSelection extends RiskThreatAnalysisEvent {
+  final String category;
+  final String level;
+  
+  UpdateProbabilidadSelection(this.category, this.level);
+}
+
+class UpdateIntensidadSelection extends RiskThreatAnalysisEvent {
+  final String category;
+  final String level;
+  
+  UpdateIntensidadSelection(this.category, this.level);
+}

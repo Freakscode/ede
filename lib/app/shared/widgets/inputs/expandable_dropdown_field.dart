@@ -13,6 +13,7 @@ class ExpandableDropdownField extends StatefulWidget {
   final Color? borderColor;
   final Color? backgroundColor;
   final Color? textColor;
+  final Function(String category, String level)? onSelectionChanged;
 
   const ExpandableDropdownField({
     super.key,
@@ -24,6 +25,7 @@ class ExpandableDropdownField extends StatefulWidget {
     this.borderColor,
     this.backgroundColor,
     this.textColor,
+    this.onSelectionChanged,
   });
 
   @override
@@ -570,6 +572,11 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
           } else {
             // Seleccionar el nuevo nivel
             _selectedLevels[categoryTitle] = level;
+            
+            // Notificar la selección si hay callback
+            if (widget.onSelectionChanged != null) {
+              widget.onSelectionChanged!(categoryTitle, level);
+            }
           }
         });
       },
