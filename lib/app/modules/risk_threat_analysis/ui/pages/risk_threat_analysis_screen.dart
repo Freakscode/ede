@@ -9,9 +9,16 @@ import '../../bloc/risk_threat_analysis_bloc.dart';
 import '../../bloc/risk_threat_analysis_event.dart';
 import '../../bloc/risk_threat_analysis_state.dart';
 
-class RiskThreatAnalysisScreen extends StatelessWidget {
-  const RiskThreatAnalysisScreen({super.key});
+class RiskThreatAnalysisScreen extends StatefulWidget {
+  final String? selectedEvent;
+  
+  const RiskThreatAnalysisScreen({super.key, this.selectedEvent});
 
+  @override
+  State<RiskThreatAnalysisScreen> createState() => _RiskThreatAnalysisScreenState();
+}
+
+class _RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
   @override
   Widget build(BuildContext context) {
     final List<Widget> screens = [
@@ -21,7 +28,14 @@ class RiskThreatAnalysisScreen extends StatelessWidget {
     ];
 
     return BlocProvider(
-      create: (context) => RiskThreatAnalysisBloc(),
+      create: (context) {
+        final bloc = RiskThreatAnalysisBloc();
+        // Si hay un evento seleccionado, actualizarlo en el bloc
+        if (widget.selectedEvent != null && widget.selectedEvent!.isNotEmpty) {
+          bloc.add(UpdateSelectedRiskEvent(widget.selectedEvent!));
+        }
+        return bloc;
+      },
       child: BlocBuilder<RiskThreatAnalysisBloc, RiskThreatAnalysisState>(
         builder: (context, state) {
           return Scaffold(
@@ -30,9 +44,7 @@ class RiskThreatAnalysisScreen extends StatelessWidget {
               showInfo: true,
               showProfile: true,
             ),
-            body: SingleChildScrollView(
-              child: screens[state.currentBottomNavIndex],
-            ),
+            body: SingleChildScrollView(child: screens[state.currentBottomNavIndex]),
             bottomNavigationBar: CustomBottomNavBar(
               currentIndex: state.currentBottomNavIndex,
               onTap: (index) {

@@ -75,7 +75,7 @@ class CalificacionScreen extends StatelessWidget {
                 hint: 'Probabilidad',
                 value: state.selectedProbabilidad,
                 isSelected: state.isProbabilidadDropdownOpen,
-                categories: context.read<RiskThreatAnalysisBloc>().getCategoriesForEvent('Movimiento en Masa'),
+                categories: context.read<RiskThreatAnalysisBloc>().getCategoriesForSelectedEvent(),
                 onTap: () {
                   context.read<RiskThreatAnalysisBloc>().add(
                     ToggleProbabilidadDropdown(),

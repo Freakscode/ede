@@ -68,7 +68,7 @@ class RiskCategoriesScreen extends StatelessWidget {
                         SelectRiskCategory('Amenaza', selectedEvent),
                       );
                       // Navegar a siguiente pantalla
-                      context.go('/risk_threat_analysis');
+                      context.go('/risk_threat_analysis', extra: selectedEvent);
                     },
                   ),
                   const SizedBox(height: 18),

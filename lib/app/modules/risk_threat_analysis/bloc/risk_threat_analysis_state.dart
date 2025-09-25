@@ -6,6 +6,7 @@ class RiskThreatAnalysisState {
   final int currentBottomNavIndex;
   final Map<String, String> probabilidadSelections;
   final Map<String, String> intensidadSelections;
+  final String selectedRiskEvent;
 
   const RiskThreatAnalysisState({
     this.isProbabilidadDropdownOpen = false,
@@ -15,6 +16,7 @@ class RiskThreatAnalysisState {
     this.currentBottomNavIndex = 0,
     this.probabilidadSelections = const {},
     this.intensidadSelections = const {},
+    this.selectedRiskEvent = 'Movimiento en Masa', // Default
   });
 
   RiskThreatAnalysisState copyWith({
@@ -25,6 +27,7 @@ class RiskThreatAnalysisState {
     int? currentBottomNavIndex,
     Map<String, String>? probabilidadSelections,
     Map<String, String>? intensidadSelections,
+    String? selectedRiskEvent,
   }) {
     return RiskThreatAnalysisState(
       isProbabilidadDropdownOpen: isProbabilidadDropdownOpen ?? this.isProbabilidadDropdownOpen,
@@ -34,6 +37,7 @@ class RiskThreatAnalysisState {
       currentBottomNavIndex: currentBottomNavIndex ?? this.currentBottomNavIndex,
       probabilidadSelections: probabilidadSelections ?? this.probabilidadSelections,
       intensidadSelections: intensidadSelections ?? this.intensidadSelections,
+      selectedRiskEvent: selectedRiskEvent ?? this.selectedRiskEvent,
     );
   }
 }

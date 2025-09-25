@@ -45,7 +45,10 @@ GoRouter getAppRouter(BuildContext context) {
       ),
       GoRoute(
         path: '/risk_threat_analysis',
-        builder: (context, state) => const RiskThreatAnalysisScreen(),
+        builder: (context, state) {
+          final selectedEvent = state.extra as String?;
+          return RiskThreatAnalysisScreen(selectedEvent: selectedEvent);
+        },
       ),
 
 

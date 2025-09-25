@@ -39,3 +39,10 @@ class UpdateIntensidadSelection extends RiskThreatAnalysisEvent {
   
   UpdateIntensidadSelection(this.category, this.level);
 }
+
+// Event to update selected risk event
+class UpdateSelectedRiskEvent extends RiskThreatAnalysisEvent {
+  final String riskEvent;
+  
+  UpdateSelectedRiskEvent(this.riskEvent);
+}
