@@ -155,8 +155,13 @@ class RiskEventFactory {
               description: 'Factores que influyen en la probabilidad de ocurrencia',
               weight: 0.5,
               categories: [
-                _createCaracteristicasHidrologicas(),
-                _createPrecipitacion(),
+                _createInundacionCategorizacionMapas(),
+                _createInundacionFrecuencia(),
+                _createInundacionProfundidadCauce(),
+                _createInundacionCambiosSeccionHidraulica(),
+                _createInundacionCaracteristicasCauce(),
+                _createInundacionCambiosAlineamiento(),
+                _createInundacionResiduosSolidos(),
               ],
             ),
             RiskSubClassification(
@@ -165,9 +170,52 @@ class RiskEventFactory {
               description: 'Factores que determinan la magnitud e impacto del evento',
               weight: 0.5,
               categories: [
-                _createProfundidadAgua(),
-                _createVelocidadFlujo(),
-                _createDuracionInundacion(),
+                _createInundacionPotencialDanoEdificaciones(),
+                _createInundacionCapacidadPerdidaVidas(),
+                _createInundacionAlteracionLineasVitales(),
+              ],
+            ),
+          ],
+        ),
+        // VULNERABILIDAD
+        RiskClassification(
+          id: 'vulnerabilidad',
+          name: 'Vulnerabilidad',
+          description: 'Factores de vulnerabilidad de la población y elementos expuestos a inundación',
+          subClassifications: [
+            // FRAGILIDAD FÍSICA
+            RiskSubClassification(
+              id: 'fragilidad_fisica',
+              name: 'Fragilidad Física',
+              description: 'Vulnerabilidad de infraestructura y edificaciones ante inundación',
+              weight: 0.33,
+              categories: [
+                _createInundacionCalidadMaterialesProcesos(),
+                _createInundacionEstadoConservacion(),
+                _createInundacionTipologiaEstructural(),
+              ],
+            ),
+            // FRAGILIDAD EN PERSONAS
+            RiskSubClassification(
+              id: 'fragilidad_personas',
+              name: 'Fragilidad en Personas',
+              description: 'Vulnerabilidad de la población y capacidad de respuesta ante inundación',
+              weight: 0.33,
+              categories: [
+                _createInundacionNivelOrganizacion(),
+                _createInundacionSuficienciaEconomica(),
+              ],
+            ),
+            // EXPOSICIÓN
+            RiskSubClassification(
+              id: 'exposicion',
+              name: 'Exposición',
+              description: 'Elementos expuestos al riesgo de inundación',
+              weight: 0.34,
+              categories: [
+                _createInundacionEdificacionesExpuestas(),
+                _createInundacionOtrosElementosExpuestos(),
+                _createInundacionEscalaAfectacion(),
               ],
             ),
           ],
@@ -1237,6 +1285,482 @@ class RiskEventFactory {
             'Formación de represamientos y lagos.',
           ],
         ),
+      ],
+    );
+  }
+
+  // ========== CATEGORÍAS PARA INUNDACIÓN (ACTUALIZADAS SEGÚN TABLA OFICIAL) ==========
+
+  /// CATEGORIZACIÓN DE AMENAZA EN MAPAS DE INUNDACIÓN
+  static RiskCategory _createInundacionCategorizacionMapas() {
+    return RiskCategory(
+      id: 'categorizacion_mapas_inundacion',
+      title: 'Categorización de Amenaza en Mapas de Inundación',
+      description: 'Clasificación según mapas oficiales de amenaza por inundación',
+      levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      value: 1,
+      order: 1,
+      detailedLevels: [
+        RiskLevel.bajo(customItems: ['No presenta']),
+        RiskLevel.medioBajo(customItems: ['Bajo']),
+        RiskLevel.medioAlto(customItems: ['Medio']),
+        RiskLevel.alto(customItems: ['Alto']),
+      ],
+    );
+  }
+
+  /// FRECUENCIA
+  static RiskCategory _createInundacionFrecuencia() {
+    return RiskCategory(
+      id: 'frecuencia_inundacion',
+      title: 'Frecuencia',
+      description: 'Frecuencia de ocurrencia del evento de inundación',
+      levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      value: 3,
+      order: 2,
+      detailedLevels: [
+        RiskLevel.bajo(customItems: [
+          'El evento se presenta por lo menos una vez en un periodo superior a diez (10) años'
+        ]),
+        RiskLevel.medioBajo(customItems: [
+          'El evento se presenta por lo menos una vez en un periodo entre cinco (5) y diez (10) años'
+        ]),
+        RiskLevel.medioAlto(customItems: [
+          'El evento se presenta por lo menos una vez en un periodo entre dos (2) y cuatro (4) años'
+        ]),
+        RiskLevel.alto(customItems: [
+          'El evento se presenta por lo menos una vez en un periodo inferior a dos años.'
+        ]),
+      ],
+    );
+  }
+
+  /// PROFUNDIDAD DEL CAUCE
+  static RiskCategory _createInundacionProfundidadCauce() {
+    return RiskCategory(
+      id: 'profundidad_cauce_inundacion',
+      title: 'Profundidad del Cauce',
+      description: 'Características de la profundidad del cauce y probabilidad de desbordamiento',
+      levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      value: 2,
+      order: 3,
+      detailedLevels: [
+        RiskLevel.bajo(customItems: [
+          'El drenaje tiene un canal profundo, encañonado y con márgenes muy altas, así que existen muy pocas probabilidades de desbordamiento'
+        ]),
+        RiskLevel.medioBajo(customItems: [
+          'El drenaje tiene un canal incisado con márgenes altas, pero existe alguna probabilidad de desbordamiento'
+        ]),
+        RiskLevel.medioAlto(customItems: [
+          'El drenaje tiene un canal levemente incisado con márgenes bajas, se ahí que exista alta probabilidad de desbordamiento'
+        ]),
+        RiskLevel.alto(customItems: [
+          'El drenaje presenta un cauce somero, de ahí que exista una alta probabilidad de desbordamiento'
+        ]),
+      ],
+    );
+  }
+
+  /// CAMBIOS EN LA SECCIÓN HIDRÁULICA
+  static RiskCategory _createInundacionCambiosSeccionHidraulica() {
+    return RiskCategory(
+      id: 'cambios_seccion_hidraulica_inundacion',
+      title: 'Cambios en la Sección Hidráulica',
+      description: 'Modificaciones en la sección del canal que afectan el flujo',
+      levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      value: 1,
+      order: 4,
+      detailedLevels: [
+        RiskLevel.bajo(customItems: [
+          'En el tramo evaluado no existen reducciones ni cambios en la sección hidráulica del canal que puedan afectar el curso del agua'
+        ]),
+        RiskLevel.medioBajo(customItems: [
+          'En el tramo evaluado hay cambios en la sección del canal, pero no representan una reducción importante de la capacidad hidráulica'
+        ]),
+        RiskLevel.medioAlto(customItems: [
+          'Existen estructuras hidráulicas cerradas (coberturas) que reducen la sección hidráulica del canal'
+        ]),
+        RiskLevel.alto(customItems: [
+          'Existe una transición de canal natural o artificial a estructuras hidráulicas cerradas (coberturas) menores de 1.5 m de diámetro, que reduce claramente la capacidad hidráulica, además se han registrado antecedentes de desbordamiento en el sitio.'
+        ]),
+      ],
+    );
+  }
+
+  /// CARACTERÍSTICAS DEL CAUCE
+  static RiskCategory _createInundacionCaracteristicasCauce() {
+    return RiskCategory(
+      id: 'caracteristicas_cauce_inundacion',
+      title: 'Características del Cauce',
+      description: 'Condiciones del cauce que afectan el flujo del agua',
+      levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      value: 4,
+      order: 5,
+      detailedLevels: [
+        RiskLevel.bajo(customItems: [
+          '• En el cauce predomina la presencia de suelos finos y las aguas son conducidas por una estructura hidráulica como canal en concreto',
+          '• No se presenta obstrucción',
+          '• Poca densidad de vegetación y presencia de pastos, rastrojo bajo o especies no leñosas.'
+        ]),
+        RiskLevel.medioBajo(customItems: [
+          '• El cauce tiene la presencia de arenas con diámetro menor a los 6cm.',
+          '• El cauce presenta obstrucciones menores (se observa de forma puntual) de troncos de árboles, basuras y escombros.',
+          '• Densidad moderada de matorrales o rastrojo alto.'
+        ]),
+        RiskLevel.medioAlto(customItems: [
+          '• El cauce tiene gravas con diámetros entre 6cm y 25cm',
+          '• El cauce presenta obstrucciones apreciables (se observa en tramos) de troncos de árboles, basuras y escombros.',
+          '• Densidad moderada de rastrojo alto con troncos delgados.'
+        ]),
+        RiskLevel.alto(customItems: [
+          '• El cauce tiene gravas con diámetros mayores a 25cm.',
+          '• El cauce presenta obstrucciones severas (se observa en todo el tramo) de troncos de árboles, basuras y escombros.',
+          '• Alta densidad de árboles, rastrojo alto y matorrales.'
+        ]),
+      ],
+    );
+  }
+
+  /// CAMBIOS EN EL ALINEAMIENTO DEL CAUCE
+  static RiskCategory _createInundacionCambiosAlineamiento() {
+    return RiskCategory(
+      id: 'cambios_alineamiento_cauce_inundacion',
+      title: 'Cambios en el Alineamiento del Cauce',
+      description: 'Modificaciones en la dirección del cauce',
+      levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      value: 2,
+      order: 6,
+      detailedLevels: [
+        RiskLevel.bajo(customItems: [
+          'Cauce recto sin cambios de dirección en el lineamiento horizontal'
+        ]),
+        RiskLevel.medioBajo(customItems: [
+          'Cauce con tramos con más de un cambio de dirección, el cual puede tener un cambio en su lineamiento entre 0-45º'
+        ]),
+        RiskLevel.medioAlto(customItems: [
+          'Cauce con tramos con más de un cambio de dirección, el cual puede tener un cambio en su lineamiento entre 45-90º'
+        ]),
+        RiskLevel.alto(customItems: [
+          'Cauce con tramos con más de un cambio de dirección, el cual su lineamiento supera los 90º'
+        ]),
+      ],
+    );
+  }
+
+  /// RESIDUOS SÓLIDOS EN EL CAUCE
+  static RiskCategory _createInundacionResiduosSolidos() {
+    return RiskCategory(
+      id: 'residuos_solidos_cauce_inundacion',
+      title: 'Residuos Sólidos en el Cauce',
+      description: 'Presencia de residuos sólidos que pueden causar obstrucciones',
+      levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      value: 1,
+      order: 7,
+      detailedLevels: [
+        RiskLevel.bajo(customItems: [
+          'No se observan residuos sólidos en este tramo del cauce'
+        ]),
+        RiskLevel.medioBajo(customItems: [
+          'Se observan algunos residuos sólidos en el cauce, con baja probabilidad de obstrucción.'
+        ]),
+        RiskLevel.medioAlto(customItems: [
+          'Se observan residuos sólidos en el cauce con probabilidad moderada de obstrucción.'
+        ]),
+        RiskLevel.alto(customItems: [
+          'Se observa gran cantidad de residuos sólidos en el cauce de la quebrada, con alta probabilidad de obstrucción.'
+        ]),
+      ],
+    );
+  }
+
+  // ========== CATEGORÍAS DE INTENSIDAD PARA INUNDACIÓN ==========
+
+  /// POTENCIAL DE DAÑO EN EDIFICACIONES
+  static RiskCategory _createInundacionPotencialDanoEdificaciones() {
+    return RiskCategory(
+      id: 'potencial_dano_edificaciones_inundacion',
+      title: 'Potencial de Daño en Edificaciones',
+      description: 'Capacidad del evento para generar daños en edificaciones',
+      levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      value: 2,
+      order: 1,
+      detailedLevels: [
+        RiskLevel.bajo(customItems: [
+          'Las características del fenómeno sugieren un bajo potencial de daño, por lo que las edificaciones no se verían afectadas.'
+        ]),
+        RiskLevel.medioBajo(customItems: [
+          'Las características del fenómeno sugieren la ocurrencia de daños leves en las edificaciones, recuperables fácilmente.'
+        ]),
+        RiskLevel.medioAlto(customItems: [
+          'Las características del fenómeno sugieren la ocurrencia de daños importantes en las edificaciones.'
+        ]),
+        RiskLevel.alto(customItems: [
+          'Las características del fenómeno sugieren un potencial de daño muy alto, por lo que podría ser inminente el colapso o la falla de las edificaciones.'
+        ]),
+      ],
+    );
+  }
+
+  /// CAPACIDAD DE GENERAR PÉRDIDA DE VIDAS HUMANAS
+  static RiskCategory _createInundacionCapacidadPerdidaVidas() {
+    return RiskCategory(
+      id: 'capacidad_perdida_vidas_inundacion',
+      title: 'Capacidad de Generar Pérdida de Vidas Humanas',
+      description: 'Potencial del evento para causar lesiones o muertes',
+      levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      value: 3,
+      order: 2,
+      detailedLevels: [
+        RiskLevel.bajo(customItems: [
+          'No se estiman personas lesionadas ni muertos'
+        ]),
+        RiskLevel.medioBajo(customItems: [
+          'Difícilmente genera personas muertas o lesionadas'
+        ]),
+        RiskLevel.medioAlto(customItems: [
+          'Puede presentar personas lesionadas y posiblemente algún muerto'
+        ]),
+        RiskLevel.alto(customItems: [
+          'Puede presentar numerosos muertos y lesionados.'
+        ]),
+      ],
+    );
+  }
+
+  /// ALTERACIÓN DEL FUNCIONAMIENTO DE LÍNEAS VITALES Y ESPACIO PÚBLICO
+  static RiskCategory _createInundacionAlteracionLineasVitales() {
+    return RiskCategory(
+      id: 'alteracion_lineas_vitales_inundacion',
+      title: 'Alteración del Funcionamiento de Líneas Vitales y Espacio Público',
+      description: 'Impacto en infraestructura crítica y servicios públicos',
+      levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      value: 1,
+      order: 3,
+      detailedLevels: [
+        RiskLevel.bajo(customItems: [
+          'No se altera el funcionamiento u operación de los elementos, de manera que no se compromete la prestación del servicio.'
+        ]),
+        RiskLevel.medioBajo(customItems: [
+          'Se presentan daños leves en los elementos pero no se compromete la prestación del servicio.'
+        ]),
+        RiskLevel.medioAlto(customItems: [
+          'El funcionamiento u operación de los elementos se ve alterado, de manera que se compromete la prestación del servicio pero se puede recuperar en el corto plazo (acciones de reparación).'
+        ]),
+        RiskLevel.alto(customItems: [
+          'Se altera completamente el funcionamiento u operación de los elementos y su recuperación es difícil en el corto plazo (acciones de reconstrucción).'
+        ]),
+      ],
+    );
+  }
+
+  // ========== CATEGORÍAS DE VULNERABILIDAD PARA INUNDACIÓN ==========
+
+  /// FRAGILIDAD FÍSICA - CALIDAD DE LOS MATERIALES Y PROCESOS CONSTRUCTIVOS
+  static RiskCategory _createInundacionCalidadMaterialesProcesos() {
+    return RiskCategory(
+      id: 'calidad_materiales_procesos_inundacion',
+      title: 'Calidad de los Materiales y Procesos Constructivos',
+      description: 'Evaluación de la calidad de materiales y técnicas constructivas ante inundación',
+      levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      value: 2,
+      order: 1,
+      detailedLevels: [
+        RiskLevel.bajo(customItems: [
+          'Estructura con materiales de muy buena calidad y adecuada técnica constructiva'
+        ]),
+        RiskLevel.medioBajo(customItems: [
+          'Estructura con materiales de regular calidad, pero adecuada técnica constructiva'
+        ]),
+        RiskLevel.medioAlto(customItems: [
+          'Estructura con materiales de buena calidad, pero con deficiencias constructivas'
+        ]),
+        RiskLevel.alto(customItems: [
+          'Estructura con materiales de mala calidad y con deficiencias constructivas'
+        ]),
+      ],
+    );
+  }
+
+  /// FRAGILIDAD FÍSICA - ESTADO DE CONSERVACIÓN
+  static RiskCategory _createInundacionEstadoConservacion() {
+    return RiskCategory(
+      id: 'estado_conservacion_inundacion',
+      title: 'Estado de Conservación',
+      description: 'Estado de conservación de las edificaciones ante inundación',
+      levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      value: 2,
+      order: 2,
+      detailedLevels: [
+        RiskLevel.bajo(customItems: [
+          'Buen estado de conservación. No hay lesiones considerables o solo observan daños superficiales leves en los acabados.'
+        ]),
+        RiskLevel.medioBajo(customItems: [
+          'Buen estado de conservación. Hay lesiones menores que no comprometen la seguridad de la edificación.'
+        ]),
+        RiskLevel.medioAlto(customItems: [
+          'Estado de deterioro moderado. Hay evidencia de lesiones importantes pero no comprometen la seguridad de la estructura'
+        ]),
+        RiskLevel.alto(customItems: [
+          'Estado precario de conservación. Alta densidad de lesiones que comprometen la seguridad de la estructura y deformaciones graves (unidades de mampostería o concreto con fallas por aplastamiento, inclinaciones del elemento fuera de su plano vertical)'
+        ]),
+      ],
+    );
+  }
+
+  /// FRAGILIDAD FÍSICA - TIPOLOGÍA ESTRUCTURAL
+  static RiskCategory _createInundacionTipologiaEstructural() {
+    return RiskCategory(
+      id: 'tipologia_estructural_inundacion',
+      title: 'Tipología Estructural',
+      description: 'Tipo de sistema estructural y su resistencia ante inundación',
+      levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      value: 3,
+      order: 3,
+      detailedLevels: [
+        RiskLevel.bajo(customItems: [
+          'Edificaciones reforzadas o con reforzamiento especial. Edificaciones en concreto reforzado y acero, diseñadas y construidas con requerimientos de norma o superiores (pórticos, sistemas combinados, duales, muros de concreto reforzado)'
+        ]),
+        RiskLevel.medioBajo(customItems: [
+          'Mampostería confinada o reforzada'
+        ]),
+        RiskLevel.medioAlto(customItems: [
+          'Edificaciones con confinamiento deficiente, estructuras híbridas. Mampostería no reforzada, no confinada, pero con una configuración estructural que brinda cierta resistencia al evento.'
+        ]),
+        RiskLevel.alto(customItems: [
+          'Estructuras ligeras y construcciones simples. Edificaciones no reforzadas, no confinadas, con baja resistencia a cargas laterales y/o impactos generados por los fenómenos.'
+        ]),
+      ],
+    );
+  }
+
+  /// FRAGILIDAD EN PERSONAS - NIVEL DE ORGANIZACIÓN
+  static RiskCategory _createInundacionNivelOrganizacion() {
+    return RiskCategory(
+      id: 'nivel_organizacion_inundacion',
+      title: 'Nivel de Organización',
+      description: 'Capacidad organizacional y preparación de la comunidad ante inundación',
+      levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      value: 1,
+      order: 1,
+      detailedLevels: [
+        RiskLevel.bajo(customItems: [
+          'La comunidad tiene total conocimiento de los riesgos presentes en el territorio y asume su compromiso frente al tema. La población cuenta con sistemas de alerta temprana.'
+        ]),
+        RiskLevel.medioBajo(customItems: [
+          'La comunidad tiene conocimiento de los riesgos presentes y manifiesta un compromiso frente al tema. La población cuenta con planes comunitarios para la gestión del riesgo de desastres.'
+        ]),
+        RiskLevel.medioAlto(customItems: [
+          'La población tiene conocimiento de los riesgos presentes, pero manifiesta poco compromiso frente al tema.'
+        ]),
+        RiskLevel.alto(customItems: [
+          'La población no tiene conocimiento de los riesgos presentes, y no manifiesta compromiso frente al tema.'
+        ]),
+      ],
+    );
+  }
+
+  /// FRAGILIDAD EN PERSONAS - SUFICIENCIA ECONÓMICA
+  static RiskCategory _createInundacionSuficienciaEconomica() {
+    return RiskCategory(
+      id: 'suficiencia_economica_inundacion',
+      title: 'Suficiencia Económica',
+      description: 'Capacidad económica para enfrentar y recuperarse de inundación',
+      levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      value: 1,
+      order: 2,
+      detailedLevels: [
+        RiskLevel.bajo(customItems: [
+          'El actor responsable tiene la capacidad de resolver la problemática con sus propios medios.'
+        ]),
+        RiskLevel.medioBajo(customItems: [
+          'El actor responsable tiene la capacidad de resolver parcialmente la problemática en el corto plazo.'
+        ]),
+        RiskLevel.medioAlto(customItems: [
+          'El actor responsable tiene la capacidad de resolver parcialmente la problemática en el largo plazo.'
+        ]),
+        RiskLevel.alto(customItems: [
+          'El actor responsable no tiene la capacidad de resolver la problemática y requiere de apoyo de terceros.'
+        ]),
+      ],
+    );
+  }
+
+  /// EXPOSICIÓN - EDIFICACIONES EXPUESTAS
+  static RiskCategory _createInundacionEdificacionesExpuestas() {
+    return RiskCategory(
+      id: 'edificaciones_expuestas_inundacion',
+      title: 'Edificaciones Expuestas',
+      description: 'Tipo de edificaciones expuestas a inundación según su importancia',
+      levels: ['BAJO', 'MEDIO', 'MEDIO\nALTO', 'ALTO'],
+      value: 1,
+      order: 1,
+      detailedLevels: [
+        RiskLevel.bajo(customItems: [
+          'Estructuras de ocupación normal según NSR-10'
+        ]),
+        RiskLevel.medioBajo(customItems: [
+          'Estructuras de ocupación especial según NSR-10'
+        ]),
+        RiskLevel.medioAlto(customItems: [
+          'Edificaciones de atención a la comunidad según NSR-10.'
+        ]),
+        RiskLevel.alto(customItems: [
+          'Edificaciones indispensables según la NSR-10.'
+        ]),
+      ],
+    );
+  }
+
+  /// EXPOSICIÓN - OTROS ELEMENTOS EXPUESTOS (Líneas vitales y drenajes)
+  static RiskCategory _createInundacionOtrosElementosExpuestos() {
+    return RiskCategory(
+      id: 'otros_elementos_expuestos_inundacion',
+      title: 'Otros Elementos Expuestos (Líneas vitales y drenajes)',
+      description: 'Infraestructura vital expuesta a inundación',
+      levels: ['BAJO', 'MEDIO', 'MEDIO\nALTO', 'ALTO'],
+      value: 2,
+      order: 2,
+      detailedLevels: [
+        RiskLevel.bajo(customItems: [
+          'Redes eléctricas y de telecomunicaciones.'
+        ]),
+        RiskLevel.medioBajo(customItems: [
+          'Vías y senderos peatonales que no representan únicas rutas de acceso y evacuación.'
+        ]),
+        RiskLevel.medioAlto(customItems: [
+          'Redes locales de servicios públicos'
+        ]),
+        RiskLevel.alto(customItems: [
+          '• Puentes, vías principales o vías que representen una única ruta de acceso y evacuación.',
+          '• Redes primarias de servicios públicos (acueducto, alcantarillado y gas).',
+          '• Drenajes'
+        ]),
+      ],
+    );
+  }
+
+  /// EXPOSICIÓN - ESCALA DE AFECTACIÓN
+  static RiskCategory _createInundacionEscalaAfectacion() {
+    return RiskCategory(
+      id: 'escala_afectacion_inundacion',
+      title: 'Escala de Afectación',
+      description: 'Escala territorial de la afectación por inundación',
+      levels: ['BAJO', 'MEDIO', 'MEDIO\nALTO', 'ALTO'],
+      value: 3,
+      order: 3,
+      detailedLevels: [
+        RiskLevel.bajo(customItems: [
+          'Puntual (1 vivienda)'
+        ]),
+        RiskLevel.medioBajo(customItems: [
+          'Entre 2 y 3 viviendas'
+        ]),
+        RiskLevel.medioAlto(customItems: [
+          'Entre 4 y 5 viviendas'
+        ]),
+        RiskLevel.alto(customItems: [
+          'Zonal (Cuadra, manzana, barrio)'
+        ]),
       ],
     );
   }
