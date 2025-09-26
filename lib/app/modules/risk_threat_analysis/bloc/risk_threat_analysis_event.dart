@@ -53,3 +53,18 @@ class SelectClassification extends RiskThreatAnalysisEvent {
   
   SelectClassification(this.classification);
 }
+
+// Eventos genéricos para dropdowns dinámicos
+class ToggleDynamicDropdown extends RiskThreatAnalysisEvent {
+  final String subClassificationId;
+  
+  ToggleDynamicDropdown(this.subClassificationId);
+}
+
+class UpdateDynamicSelection extends RiskThreatAnalysisEvent {
+  final String subClassificationId;
+  final String category;
+  final String level;
+  
+  UpdateDynamicSelection(this.subClassificationId, this.category, this.level);
+}

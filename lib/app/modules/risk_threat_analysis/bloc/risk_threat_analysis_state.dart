@@ -8,6 +8,10 @@ class RiskThreatAnalysisState {
   final Map<String, String> intensidadSelections;
   final String selectedRiskEvent;
   final String selectedClassification; // Nueva propiedad para Amenaza/Vulnerabilidad
+  
+  // Estado genérico para dropdowns dinámicos
+  final Map<String, bool> dropdownOpenStates;
+  final Map<String, Map<String, String>> dynamicSelections;
 
   const RiskThreatAnalysisState({
     this.isProbabilidadDropdownOpen = false,
@@ -19,6 +23,8 @@ class RiskThreatAnalysisState {
     this.intensidadSelections = const {},
     this.selectedRiskEvent = 'Movimiento en Masa', // Default
     this.selectedClassification = 'amenaza', // Default: amenaza
+    this.dropdownOpenStates = const {},
+    this.dynamicSelections = const {},
   });
 
   RiskThreatAnalysisState copyWith({
@@ -31,6 +37,8 @@ class RiskThreatAnalysisState {
     Map<String, String>? intensidadSelections,
     String? selectedRiskEvent,
     String? selectedClassification,
+    Map<String, bool>? dropdownOpenStates,
+    Map<String, Map<String, String>>? dynamicSelections,
   }) {
     return RiskThreatAnalysisState(
       isProbabilidadDropdownOpen: isProbabilidadDropdownOpen ?? this.isProbabilidadDropdownOpen,
@@ -42,6 +50,8 @@ class RiskThreatAnalysisState {
       intensidadSelections: intensidadSelections ?? this.intensidadSelections,
       selectedRiskEvent: selectedRiskEvent ?? this.selectedRiskEvent,
       selectedClassification: selectedClassification ?? this.selectedClassification,
+      dropdownOpenStates: dropdownOpenStates ?? this.dropdownOpenStates,
+      dynamicSelections: dynamicSelections ?? this.dynamicSelections,
     );
   }
 }

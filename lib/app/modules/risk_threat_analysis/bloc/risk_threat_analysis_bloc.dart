@@ -17,6 +17,8 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     on<UpdateIntensidadSelection>(_onUpdateIntensidadSelection);
     on<UpdateSelectedRiskEvent>(_onUpdateSelectedRiskEvent);
     on<SelectClassification>(_onSelectClassification);
+    on<ToggleDynamicDropdown>(_onToggleDynamicDropdown);
+    on<UpdateDynamicSelection>(_onUpdateDynamicSelection);
   }
 
   void _onToggleProbabilidadDropdown(
@@ -102,6 +104,8 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
       // Reset selections when event changes
       probabilidadSelections: {},
       intensidadSelections: {},
+      dropdownOpenStates: {}, // Reset dynamic dropdown states
+      dynamicSelections: {}, // Reset dynamic selections
     ));
   }
 
@@ -114,6 +118,52 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
       // Reset selections when classification changes
       probabilidadSelections: {},
       intensidadSelections: {},
+      dropdownOpenStates: {}, // Reset dynamic dropdown states
+      dynamicSelections: {}, // Reset dynamic selections
+    ));
+  }
+
+  void _onToggleDynamicDropdown(
+    ToggleDynamicDropdown event,
+    Emitter<RiskThreatAnalysisState> emit,
+  ) {
+    final currentStates = Map<String, bool>.from(state.dropdownOpenStates);
+    final subClassificationId = event.subClassificationId;
+    final isCurrentlyOpen = currentStates[subClassificationId] ?? false;
+    
+    // Close all other dropdowns and toggle this one
+    final newStates = <String, bool>{};
+    for (final key in currentStates.keys) {
+      newStates[key] = key == subClassificationId ? !isCurrentlyOpen : false;
+    }
+    newStates[subClassificationId] = !isCurrentlyOpen;
+
+    emit(state.copyWith(
+      dropdownOpenStates: newStates,
+    ));
+  }
+
+  void _onUpdateDynamicSelection(
+    UpdateDynamicSelection event,
+    Emitter<RiskThreatAnalysisState> emit,
+  ) {
+    final currentSelections = Map<String, Map<String, String>>.from(state.dynamicSelections);
+    final subClassificationId = event.subClassificationId;
+    
+    // Initialize the subclassification map if it doesn't exist
+    if (!currentSelections.containsKey(subClassificationId)) {
+      currentSelections[subClassificationId] = <String, String>{};
+    }
+    
+    // Update the selection for this category
+    currentSelections[subClassificationId]![event.category] = event.level;
+    
+    // NO cerrar el dropdown después de la selección - mantenerlo abierto
+    // para permitir múltiples selecciones en la misma subclasificación
+
+    emit(state.copyWith(
+      dynamicSelections: currentSelections,
+      // No modificar dropdownOpenStates - mantener el estado actual
     ));
   }
 
@@ -415,6 +465,7 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
       case 'intensidad':
         return state.selectedIntensidad;
       default:
+        // Check in dynamic selections
         return null;
     }
   }
@@ -427,12 +478,20 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
       case 'intensidad':
         return state.isIntensidadDropdownOpen;
       default:
-        return false;
+        // Check in dynamic dropdown states
+        return state.dropdownOpenStates[subClassificationId] ?? false;
     }
   }
 
   /// Maneja el tap en un dropdown específico
   void handleDropdownTap(String subClassificationId) {
+    // For vulnerabilidad and other dynamic sub-classifications, use the generic event
+    if (subClassificationId != 'probabilidad' && subClassificationId != 'intensidad') {
+      add(ToggleDynamicDropdown(subClassificationId));
+      return;
+    }
+    
+    // Legacy support for amenaza dropdowns
     switch (subClassificationId) {
       case 'probabilidad':
         add(ToggleProbabilidadDropdown());
@@ -445,6 +504,13 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
 
   /// Maneja la selección de una categoría en un dropdown específico
   void handleSelectionChanged(String subClassificationId, String category, String level) {
+    // For vulnerabilidad and other dynamic sub-classifications, use the generic event
+    if (subClassificationId != 'probabilidad' && subClassificationId != 'intensidad') {
+      add(UpdateDynamicSelection(subClassificationId, category, level));
+      return;
+    }
+    
+    // Legacy support for amenaza dropdowns
     switch (subClassificationId) {
       case 'probabilidad':
         add(UpdateProbabilidadSelection(category, level));
@@ -452,6 +518,18 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
       case 'intensidad':
         add(UpdateIntensidadSelection(category, level));
         break;
+    }
+  }
+
+  /// Obtiene las selecciones para una subclasificación específica (genérico)
+  Map<String, String> getSelectionsForSubClassification(String subClassificationId) {
+    switch (subClassificationId) {
+      case 'probabilidad':
+        return state.probabilidadSelections;
+      case 'intensidad':
+        return state.intensidadSelections;
+      default:
+        return state.dynamicSelections[subClassificationId] ?? {};
     }
   }
 
