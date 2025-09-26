@@ -244,8 +244,11 @@ class RiskEventFactory {
               description: 'Factores que influyen en la probabilidad de ocurrencia',
               weight: 0.5,
               categories: [
-                _createCaracteristicasCuenca(),
-                _createSedimentosDetritos(),
+                _createAvenidaTorrencialCategorizacionMapas(),
+                _createAvenidaTorrencialTipoMaterialCauce(),
+                _createAvenidaTorrencialCambiosSeccionHidraulica(),
+                _createAvenidaTorrencialProfundidadCauce(),
+                _createAvenidaTorrencialEstabilidadTaludes(),
               ],
             ),
             RiskSubClassification(
@@ -254,9 +257,52 @@ class RiskEventFactory {
               description: 'Factores que determinan la magnitud e impacto del evento',
               weight: 0.5,
               categories: [
-                _createCaudalPico(),
-                _createConcentracionSedimentos(),
-                _createPoderDestructivo(),
+                _createAvenidaTorrencialPotencialDanoEdificaciones(),
+                _createAvenidaTorrencialCapacidadPerdidaVidas(),
+                _createAvenidaTorrencialAlteracionLineasVitales(),
+              ],
+            ),
+          ],
+        ),
+        // VULNERABILIDAD
+        RiskClassification(
+          id: 'vulnerabilidad',
+          name: 'Vulnerabilidad',
+          description: 'Factores de vulnerabilidad de la población y elementos expuestos a avenida torrencial',
+          subClassifications: [
+            // FRAGILIDAD FÍSICA
+            RiskSubClassification(
+              id: 'fragilidad_fisica',
+              name: 'Fragilidad Física',
+              description: 'Vulnerabilidad de infraestructura y edificaciones ante avenida torrencial',
+              weight: 0.33,
+              categories: [
+                _createAvenidaTorrencialCalidadMaterialesProcesos(),
+                _createAvenidaTorrencialEstadoConservacion(),
+                _createAvenidaTorrencialTipologiaEstructural(),
+              ],
+            ),
+            // FRAGILIDAD EN PERSONAS
+            RiskSubClassification(
+              id: 'fragilidad_personas',
+              name: 'Fragilidad en Personas',
+              description: 'Vulnerabilidad de la población y capacidad de respuesta ante avenida torrencial',
+              weight: 0.33,
+              categories: [
+                _createAvenidaTorrencialNivelOrganizacion(),
+                _createAvenidaTorrencialSuficienciaEconomica(),
+              ],
+            ),
+            // EXPOSICIÓN
+            RiskSubClassification(
+              id: 'exposicion',
+              name: 'Exposición',
+              description: 'Elementos expuestos al riesgo de avenida torrencial',
+              weight: 0.34,
+              categories: [
+                _createAvenidaTorrencialEdificacionesExpuestas(),
+                _createAvenidaTorrencialOtrosElementosExpuestos(),
+                _createAvenidaTorrencialEscalaAfectacion(),
               ],
             ),
           ],
@@ -2499,6 +2545,436 @@ class RiskEventFactory {
             'Zonal (Cuadra, manzana, barrio).',
           ],
         ),
+      ],
+    );
+  }
+
+  // ========== CATEGORÍAS PARA AVENIDA TORRENCIAL ==========
+
+  // ========== AMENAZA - PROBABILIDAD ==========
+
+  /// PROBABILIDAD - CATEGORIZACIÓN DE AMENAZA EN MAPAS DE TORRENCIALIDAD
+  static RiskCategory _createAvenidaTorrencialCategorizacionMapas() {
+    return RiskCategory(
+      id: 'categorizacion_mapas_torrencialidad',
+      title: 'Categorización de Amenaza en Mapas de Torrencialidad',
+      description: 'Clasificación según mapas oficiales de amenaza por torrencialidad',
+      levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      value: 2,
+      order: 1,
+      detailedLevels: [
+        RiskLevel.bajo(customItems: [
+          'No presenta'
+        ]),
+        RiskLevel.medioBajo(customItems: [
+          'Bajo'
+        ]),
+        RiskLevel.medioAlto(customItems: [
+          'Medio'
+        ]),
+        RiskLevel.alto(customItems: [
+          'Alto'
+        ]),
+      ],
+    );
+  }
+
+  /// PROBABILIDAD - TIPO DE MATERIAL DEL CAUCE
+  static RiskCategory _createAvenidaTorrencialTipoMaterialCauce() {
+    return RiskCategory(
+      id: 'tipo_material_cauce',
+      title: 'Tipo de Material del Cauce',
+      description: 'Características del material presente en el cauce que puede ser arrastrado',
+      levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      value: 3,
+      order: 2,
+      detailedLevels: [
+        RiskLevel.bajo(customItems: [
+          'Ausencia de bloques de roca o gravas'
+        ]),
+        RiskLevel.medioBajo(customItems: [
+          'Presencia de fragmentos de roca de tamaño centimétrico'
+        ]),
+        RiskLevel.medioAlto(customItems: [
+          'Fragmentos de roca decimétricos y al menos un bloque de tamaño métrico'
+        ]),
+        RiskLevel.alto(customItems: [
+          'Gran cantidad de bloques de roca de tamaño métrico'
+        ]),
+      ],
+    );
+  }
+
+  /// PROBABILIDAD - CAMBIOS EN LA SECCIÓN HIDRÁULICA
+  static RiskCategory _createAvenidaTorrencialCambiosSeccionHidraulica() {
+    return RiskCategory(
+      id: 'cambios_seccion_hidraulica',
+      title: 'Cambios en la Sección Hidráulica',
+      description: 'Modificaciones en la capacidad hidráulica del canal',
+      levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      value: 1,
+      order: 3,
+      detailedLevels: [
+        RiskLevel.bajo(customItems: [
+          'En el tramo evaluado no existen reducciones ni cambios en la sección hidráulica del canal que puedan afectar el curso del agua'
+        ]),
+        RiskLevel.medioBajo(customItems: [
+          'En el tramo evaluado hay cambios en la sección del canal, pero no representan una reducción importante de la capacidad hidráulica'
+        ]),
+        RiskLevel.medioAlto(customItems: [
+          'Existen estructuras u obras hidráulicas tipo box culvert, que reducen la sección hidráulica del canal'
+        ]),
+        RiskLevel.alto(customItems: [
+          'Existe una transición de canal natural o artificial a tubería, que reduce claramente la capacidad hidráulica, además se han registrado antecedentes de desbordamiento en el sitio'
+        ]),
+      ],
+    );
+  }
+
+  /// PROBABILIDAD - PROFUNDIDAD DEL CAUCE
+  static RiskCategory _createAvenidaTorrencialProfundidadCauce() {
+    return RiskCategory(
+      id: 'profundidad_cauce_torrencial',
+      title: 'Profundidad del Cauce',
+      description: 'Capacidad de contención del cauce y probabilidad de desbordamiento',
+      levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      value: 2,
+      order: 4,
+      detailedLevels: [
+        RiskLevel.bajo(customItems: [
+          'El drenaje tiene un canal profundo, encañonado y con márgenes muy altas, así que existen muy pocas probabilidades de desbordamiento.'
+        ]),
+        RiskLevel.medioBajo(customItems: [
+          'El drenaje tiene un canal incisado con márgenes altas, pero existe alguna probabilidad de desbordamiento.'
+        ]),
+        RiskLevel.medioAlto(customItems: [
+          'El drenaje tiene un canal levemente incisado con márgenes bajas, se ahí que exista alta probabilidad de desbordamiento.'
+        ]),
+        RiskLevel.alto(customItems: [
+          'El drenaje presenta un cauce somero, de ahí que exista una alta probabilidad de desbordamiento.'
+        ]),
+      ],
+    );
+  }
+
+  /// PROBABILIDAD - ESTABILIDAD DE LOS TALUDES O LADERAS ADYACENTES DEL CAUCE
+  static RiskCategory _createAvenidaTorrencialEstabilidadTaludes() {
+    return RiskCategory(
+      id: 'estabilidad_taludes_cauce',
+      title: 'Estabilidad de los Taludes o Laderas Adyacentes del Cauce',
+      description: 'Condición de estabilidad de las márgenes del cauce',
+      levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      value: 3,
+      order: 5,
+      detailedLevels: [
+        RiskLevel.bajo(customItems: [
+          'Las márgenes de la quebrada en el tramo evaluado son estables y es poco probable que se presente un deslizamiento que obstruya el cauce'
+        ]),
+        RiskLevel.medioBajo(customItems: [
+          'Las márgenes de la quebrada presentan procesos incipientes de erosión lateral de orillas.'
+        ]),
+        RiskLevel.medioAlto(customItems: [
+          'Se presentan desgarres en las márgenes y se pueden desarrollar movimientos en masa superficiales que generen una obstrucción parcial de cauce.'
+        ]),
+        RiskLevel.alto(customItems: [
+          'Hay evidencias de que se puede presentar un movimiento en masa profundo que genere una obstrucción total de cauce.'
+        ]),
+      ],
+    );
+  }
+
+  // ========== AMENAZA - INTENSIDAD ==========
+
+  /// INTENSIDAD - POTENCIAL DE DAÑO EN EDIFICACIONES
+  static RiskCategory _createAvenidaTorrencialPotencialDanoEdificaciones() {
+    return RiskCategory(
+      id: 'potencial_dano_edificaciones_torrencial',
+      title: 'Potencial de Daño en Edificaciones',
+      description: 'Evaluación del potencial de daño a las edificaciones por avenida torrencial',
+      levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      value: 2,
+      order: 1,
+      detailedLevels: [
+        RiskLevel.bajo(customItems: [
+          'Las características del fenómeno sugieren un bajo potencial de daño, por lo que las edificaciones no se verían afectadas.'
+        ]),
+        RiskLevel.medioBajo(customItems: [
+          'Las características del fenómeno sugieren la ocurrencia de daños leves en las edificaciones, recuperables fácilmente.'
+        ]),
+        RiskLevel.medioAlto(customItems: [
+          'Las características del fenómeno sugieren la ocurrencia de daños importantes en las edificaciones.'
+        ]),
+        RiskLevel.alto(customItems: [
+          'Las características del fenómeno sugieren un potencial de daño muy alto, por lo que podría ser inminente el colapso o la falla de las edificaciones.'
+        ]),
+      ],
+    );
+  }
+
+  /// INTENSIDAD - CAPACIDAD DE GENERAR PÉRDIDA DE VIDAS HUMANAS
+  static RiskCategory _createAvenidaTorrencialCapacidadPerdidaVidas() {
+    return RiskCategory(
+      id: 'capacidad_perdida_vidas_torrencial',
+      title: 'Capacidad de Generar Pérdida de Vidas Humanas',
+      description: 'Potencial de generar víctimas mortales o lesionados por avenida torrencial',
+      levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      value: 4,
+      order: 2,
+      detailedLevels: [
+        RiskLevel.bajo(customItems: [
+          'No se estiman personas lesionadas ni muertos'
+        ]),
+        RiskLevel.medioBajo(customItems: [
+          'Difícilmente genera personas muertas o lesionadas'
+        ]),
+        RiskLevel.medioAlto(customItems: [
+          'Puede presentar personas lesionadas y posiblemente algún muerto'
+        ]),
+        RiskLevel.alto(customItems: [
+          'Puede presentar numerosos muertos y lesionados.'
+        ]),
+      ],
+    );
+  }
+
+  /// INTENSIDAD - ALTERACIÓN DEL FUNCIONAMIENTO DE LÍNEAS VITALES Y ESPACIO PÚBLICO
+  static RiskCategory _createAvenidaTorrencialAlteracionLineasVitales() {
+    return RiskCategory(
+      id: 'alteracion_lineas_vitales_torrencial',
+      title: 'Alteración del Funcionamiento de Líneas Vitales y Espacio Público',
+      description: 'Afectación a servicios públicos e infraestructura vital por avenida torrencial',
+      levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      value: 1,
+      order: 3,
+      detailedLevels: [
+        RiskLevel.bajo(customItems: [
+          'No se altera el funcionamiento u operación de los elementos, de manera que no se compromete la prestación del servicio.'
+        ]),
+        RiskLevel.medioBajo(customItems: [
+          'Se presentan daños leves en los elementos pero no se compromete la prestación del servicio.'
+        ]),
+        RiskLevel.medioAlto(customItems: [
+          'El funcionamiento u operación de los elementos se ve alterado, de manera que se compromete la prestación del servicio pero se puede recuperar en el corto plazo (acciones de reparación).'
+        ]),
+        RiskLevel.alto(customItems: [
+          'Se altera completamente el funcionamiento u operación de los elementos y su recuperación es difícil en el corto plazo (acciones de reconstrucción).'
+        ]),
+      ],
+    );
+  }
+
+  // ========== VULNERABILIDAD - FRAGILIDAD FÍSICA ==========
+
+  /// FRAGILIDAD FÍSICA - CALIDAD DE LOS MATERIALES Y PROCESOS CONSTRUCTIVOS
+  static RiskCategory _createAvenidaTorrencialCalidadMaterialesProcesos() {
+    return RiskCategory(
+      id: 'calidad_materiales_procesos_torrencial',
+      title: 'Calidad de los Materiales y Procesos Constructivos',
+      description: 'Evaluación de la calidad de materiales y técnicas constructivas ante avenida torrencial',
+      levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      value: 2,
+      order: 1,
+      detailedLevels: [
+        RiskLevel.bajo(customItems: [
+          'Estructura con materiales de muy buena calidad y adecuada técnica constructiva'
+        ]),
+        RiskLevel.medioBajo(customItems: [
+          'Estructura con materiales de regular calidad, pero adecuada técnica constructiva'
+        ]),
+        RiskLevel.medioAlto(customItems: [
+          'Estructura con materiales de buena calidad, pero con deficiencias constructivas'
+        ]),
+        RiskLevel.alto(customItems: [
+          'Estructura con materiales de mala calidad y con deficiencias constructivas'
+        ]),
+      ],
+    );
+  }
+
+  /// FRAGILIDAD FÍSICA - ESTADO DE CONSERVACIÓN
+  static RiskCategory _createAvenidaTorrencialEstadoConservacion() {
+    return RiskCategory(
+      id: 'estado_conservacion_torrencial',
+      title: 'Estado de Conservación',
+      description: 'Estado de conservación de las edificaciones ante avenida torrencial',
+      levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      value: 1,
+      order: 2,
+      detailedLevels: [
+        RiskLevel.bajo(customItems: [
+          'Buen estado de conservación. No hay lesiones considerables o solo observan daños superficiales leves en los acabados.'
+        ]),
+        RiskLevel.medioBajo(customItems: [
+          'Buen estado de conservación. Hay lesiones menores que no comprometen la seguridad de la edificación.'
+        ]),
+        RiskLevel.medioAlto(customItems: [
+          'Estado de deterioro moderado. Hay evidencia de lesiones importantes pero no comprometen la seguridad de la estructura'
+        ]),
+        RiskLevel.alto(customItems: [
+          'Estado precario de conservación. Alta densidad de lesiones que comprometen la seguridad de la estructura y deformaciones graves (unidades de mamspotería o concreto con fallas por aplastamiento, inclinaciones del elemento fuera de su plano vertical)'
+        ]),
+      ],
+    );
+  }
+
+  /// FRAGILIDAD FÍSICA - TIPOLOGÍA ESTRUCTURAL
+  static RiskCategory _createAvenidaTorrencialTipologiaEstructural() {
+    return RiskCategory(
+      id: 'tipologia_estructural_torrencial',
+      title: 'Tipología Estructural',
+      description: 'Tipo de sistema estructural y su resistencia ante avenida torrencial',
+      levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      value: 2,
+      order: 3,
+      detailedLevels: [
+        RiskLevel.bajo(customItems: [
+          'Edificaciones reforzadas o con reforzamiento especial. Edificaciones en concreto reforzado y acero, diseñadas y construidas con requerimientos de norma o superiores (pórticos, sistemas combinados, duales, muros de concreto reforzado)'
+        ]),
+        RiskLevel.medioBajo(customItems: [
+          'Mampostería confinada o reforzada'
+        ]),
+        RiskLevel.medioAlto(customItems: [
+          'Edificaciones con confinamiento deficiente, estructuras híbridas. Mampostería no reforzada, no confinada, pero con una configuración estructural que brinda cierta resistencia al evento.'
+        ]),
+        RiskLevel.alto(customItems: [
+          'Estructuras ligeras y construcciones simples. Edificaciones no reforzadas, no confinadas, con baja resistencia a cargas laterales y/o impactos generados por los fenómenos.'
+        ]),
+      ],
+    );
+  }
+
+  // ========== VULNERABILIDAD - FRAGILIDAD EN PERSONAS ==========
+
+  /// FRAGILIDAD EN PERSONAS - NIVEL DE ORGANIZACIÓN
+  static RiskCategory _createAvenidaTorrencialNivelOrganizacion() {
+    return RiskCategory(
+      id: 'nivel_organizacion_torrencial',
+      title: 'Nivel de Organización',
+      description: 'Capacidad organizacional y preparación de la comunidad ante avenida torrencial',
+      levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      value: 2,
+      order: 1,
+      detailedLevels: [
+        RiskLevel.bajo(customItems: [
+          'La comunidad tiene total conocimiento de los riesgos presentes en el territorio y asume su compromiso frente al tema. La población cuenta con sistemas de alerta temprana.'
+        ]),
+        RiskLevel.medioBajo(customItems: [
+          'La comunidad tiene conocimiento de los riesgos presentes y manifiesta un compromiso frente al tema. La población cuenta con planes comunitarios para la gestión del riesgo de desastres.'
+        ]),
+        RiskLevel.medioAlto(customItems: [
+          'La población tiene conocimiento de los riesgos presentes, pero manifiesta poco compromiso frente al tema.'
+        ]),
+        RiskLevel.alto(customItems: [
+          'La población no tiene conocimiento de los riesgos presentes, y no manifiesta compromiso frente al tema.'
+        ]),
+      ],
+    );
+  }
+
+  /// FRAGILIDAD EN PERSONAS - SUFICIENCIA ECONÓMICA
+  static RiskCategory _createAvenidaTorrencialSuficienciaEconomica() {
+    return RiskCategory(
+      id: 'suficiencia_economica_torrencial',
+      title: 'Suficiencia Económica',
+      description: 'Capacidad económica para enfrentar y recuperarse de avenida torrencial',
+      levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      value: 1,
+      order: 2,
+      detailedLevels: [
+        RiskLevel.bajo(customItems: [
+          'El actor responsable tiene la capacidad de resolver la problemática con sus propios medios.'
+        ]),
+        RiskLevel.medioBajo(customItems: [
+          'El actor responsable tiene la capacidad de resolver parcialmente la problemática en el corto plazo.'
+        ]),
+        RiskLevel.medioAlto(customItems: [
+          'El actor responsable tiene la capacidad de resolver parcialmente la problemática en el largo plazo.'
+        ]),
+        RiskLevel.alto(customItems: [
+          'El actor responsable no tiene la capacidad de resolver la problemática y requiere de apoyo de terceros.'
+        ]),
+      ],
+    );
+  }
+
+  // ========== VULNERABILIDAD - EXPOSICIÓN ==========
+
+  /// EXPOSICIÓN - EDIFICACIONES EXPUESTAS
+  static RiskCategory _createAvenidaTorrencialEdificacionesExpuestas() {
+    return RiskCategory(
+      id: 'edificaciones_expuestas_torrencial',
+      title: 'Edificaciones Expuestas',
+      description: 'Tipo de edificaciones expuestas a avenida torrencial según su importancia',
+      levels: ['BAJO', 'MEDIO', 'MEDIO\nALTO', 'ALTO'],
+      value: 3,
+      order: 1,
+      detailedLevels: [
+        RiskLevel.bajo(customItems: [
+          'Estructuras de ocupación normal según NSR-10'
+        ]),
+        RiskLevel.medioBajo(customItems: [
+          'Estructuras de ocupación especial según NSR-10'
+        ]),
+        RiskLevel.medioAlto(customItems: [
+          'Edificaciones de atención a la comunidad según NSR-10.'
+        ]),
+        RiskLevel.alto(customItems: [
+          'Edificaciones indispensables según la NSR-10.'
+        ]),
+      ],
+    );
+  }
+
+  /// EXPOSICIÓN - OTROS ELEMENTOS EXPUESTOS (Líneas vitales y drenajes)
+  static RiskCategory _createAvenidaTorrencialOtrosElementosExpuestos() {
+    return RiskCategory(
+      id: 'otros_elementos_expuestos_torrencial',
+      title: 'Otros Elementos Expuestos (Líneas vitales y drenajes)',
+      description: 'Infraestructura vital expuesta a avenida torrencial',
+      levels: ['BAJO', 'MEDIO', 'MEDIO\nALTO', 'ALTO'],
+      value: 1,
+      order: 2,
+      detailedLevels: [
+        RiskLevel.bajo(customItems: [
+          'Redes eléctricas y de telecomunicaciones.'
+        ]),
+        RiskLevel.medioBajo(customItems: [
+          'Vías y senderos peatonales que no representan únicas rutas de acceso y evacuación.'
+        ]),
+        RiskLevel.medioAlto(customItems: [
+          'Redes locales de servicios públicos'
+        ]),
+        RiskLevel.alto(customItems: [
+          '• Puentes, vías principales o vías que representen una única ruta de acceso y evacuación.',
+          '• Redes primarias de servicios públicos (acueducto, alcantarillado y gas).',
+          '• Drenajes'
+        ]),
+      ],
+    );
+  }
+
+  /// EXPOSICIÓN - ESCALA DE AFECTACIÓN
+  static RiskCategory _createAvenidaTorrencialEscalaAfectacion() {
+    return RiskCategory(
+      id: 'escala_afectacion_torrencial',
+      title: 'Escala de Afectación',
+      description: 'Escala territorial de la afectación por avenida torrencial',
+      levels: ['BAJO', 'MEDIO', 'MEDIO\nALTO', 'ALTO'],
+      value: 2,
+      order: 3,
+      detailedLevels: [
+        RiskLevel.bajo(customItems: [
+          'Puntual (1 vivienda)'
+        ]),
+        RiskLevel.medioBajo(customItems: [
+          'Entre 2 y 3 viviendas'
+        ]),
+        RiskLevel.medioAlto(customItems: [
+          'Entre 4 y 5 viviendas'
+        ]),
+        RiskLevel.alto(customItems: [
+          'Zonal (Cuadra, manzana, barrio)'
+        ]),
       ],
     );
   }
