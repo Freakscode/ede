@@ -12,7 +12,53 @@ import '../../bloc/risk_threat_analysis_state.dart';
 class CalificacionScreen extends StatelessWidget {
   const CalificacionScreen({super.key});
 
+  /// Obtiene el valor seleccionado para una subclasificación específica
+  String? _getValueForSubClassification(RiskThreatAnalysisState state, String subClassificationId) {
+    switch (subClassificationId) {
+      case 'probabilidad':
+        return state.selectedProbabilidad;
+      case 'intensidad':
+        return state.selectedIntensidad;
+      default:
+        return null;
+    }
+  }
 
+  /// Verifica si el dropdown está abierto para una subclasificación específica
+  bool _getIsSelectedForSubClassification(RiskThreatAnalysisState state, String subClassificationId) {
+    switch (subClassificationId) {
+      case 'probabilidad':
+        return state.isProbabilidadDropdownOpen;
+      case 'intensidad':
+        return state.isIntensidadDropdownOpen;
+      default:
+        return false;
+    }
+  }
+
+  /// Maneja el tap en un dropdown específico
+  void _handleDropdownTap(BuildContext context, String subClassificationId) {
+    switch (subClassificationId) {
+      case 'probabilidad':
+        context.read<RiskThreatAnalysisBloc>().add(ToggleProbabilidadDropdown());
+        break;
+      case 'intensidad':
+        context.read<RiskThreatAnalysisBloc>().add(ToggleIntensidadDropdown());
+        break;
+    }
+  }
+
+  /// Maneja la selección de una categoría en un dropdown específico
+  void _handleSelectionChanged(BuildContext context, String subClassificationId, String category, String level) {
+    switch (subClassificationId) {
+      case 'probabilidad':
+        context.read<RiskThreatAnalysisBloc>().add(UpdateProbabilidadSelection(category, level));
+        break;
+      case 'intensidad':
+        context.read<RiskThreatAnalysisBloc>().add(UpdateIntensidadSelection(category, level));
+        break;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -71,36 +117,37 @@ class CalificacionScreen extends StatelessWidget {
                 borderRadius: 8,
               ),
               const SizedBox(height: 24),
-              ExpandableDropdownField(
-                hint: 'Probabilidad',
-                value: state.selectedProbabilidad,
-                isSelected: state.isProbabilidadDropdownOpen,
-                categories: context.read<RiskThreatAnalysisBloc>().getCategoriesForSelectedEvent(),
-                onTap: () {
-                  context.read<RiskThreatAnalysisBloc>().add(
-                    ToggleProbabilidadDropdown(),
-                  );
-                },
-                onSelectionChanged: (category, level) {
-                  context.read<RiskThreatAnalysisBloc>().add(
-                    UpdateProbabilidadSelection(category, level),
-                  );
-                },
-              ),
-              const SizedBox(height: 16),
-              ExpandableDropdownField(
-                hint: 'Intensidad',
-                value: state.selectedIntensidad,
-                isSelected: state.isIntensidadDropdownOpen,
-                categories: context.read<RiskThreatAnalysisBloc>().getIntensidadCategories(),
-                onTap: () {
-                  context.read<RiskThreatAnalysisBloc>().add(
-                    ToggleIntensidadDropdown(),
-                  );
-                },
-                onSelectionChanged: (category, level) {
-                  context.read<RiskThreatAnalysisBloc>().add(
-                    UpdateIntensidadSelection(category, level),
+              // Generar dropdowns dinámicamente basados en las RiskSubClassification
+              BlocBuilder<RiskThreatAnalysisBloc, RiskThreatAnalysisState>(
+                builder: (context, state) {
+                  final bloc = context.read<RiskThreatAnalysisBloc>();
+                  final subClassifications = bloc.getAmenazaSubClassifications();
+                  
+                  return Column(
+                    children: subClassifications.asMap().entries.map((entry) {
+                      final index = entry.key;
+                      final subClassification = entry.value;
+                      
+                      return Column(
+                        children: [
+                          ExpandableDropdownField(
+                            hint: subClassification.name,
+                            value: _getValueForSubClassification(state, subClassification.id),
+                            isSelected: _getIsSelectedForSubClassification(state, subClassification.id),
+                            categories: bloc.getCategoriesForSubClassification(subClassification.id),
+                            onTap: () {
+                              _handleDropdownTap(context, subClassification.id);
+                            },
+                            onSelectionChanged: (category, level) {
+                              _handleSelectionChanged(context, subClassification.id, category, level);
+                            },
+                          ),
+                          // Agregar espaciado entre dropdowns, excepto después del último
+                          if (index < subClassifications.length - 1) 
+                            const SizedBox(height: 16),
+                        ],
+                      );
+                    }).toList(),
                   );
                 },
               ),

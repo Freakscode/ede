@@ -316,5 +316,45 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     }
   }
 
+  /// Obtiene todas las subclasificaciones de amenaza para el evento seleccionado
+  List<RiskSubClassification> getAmenazaSubClassifications() {
+    final selectedEvent = state.selectedRiskEvent;
+    final threatClassifications = RiskModelAdapter.getThreatSubClassifications(selectedEvent);
+    
+    print('🔥 RiskThreatAnalysisBloc: Subclasificaciones de amenaza para $selectedEvent: ${threatClassifications.length}');
+    return threatClassifications;
+  }
+
+  /// Obtiene las categorías para una subclasificación específica
+  List<DropdownCategory> getCategoriesForSubClassification(String subClassificationId) {
+    final selectedEvent = state.selectedRiskEvent;
+    final eventModel = RiskModelAdapter.getEventModel(selectedEvent);
+    
+    if (eventModel != null) {
+      final amenazaClassification = eventModel.getClassificationById('amenaza');
+      if (amenazaClassification != null) {
+        final subClassification = amenazaClassification.subClassifications
+            .where((sub) => sub.id == subClassificationId)
+            .firstOrNull;
+        
+        if (subClassification != null) {
+          final categories = RiskModelAdapter.convertToDropdownCategories(subClassification.categories);
+          print('🔥 RiskThreatAnalysisBloc: Categorías para $subClassificationId: ${categories.length}');
+          return categories;
+        }
+      }
+    }
+    
+    // Fallback al sistema antiguo
+    print('🔥 RiskThreatAnalysisBloc: Fallback al sistema antiguo para $subClassificationId');
+    if (subClassificationId == 'probabilidad') {
+      return getCategoriesForSelectedEvent();
+    } else if (subClassificationId == 'intensidad') {
+      return getIntensidadCategories();
+    }
+    
+    return [];
+  }
+
 
 }

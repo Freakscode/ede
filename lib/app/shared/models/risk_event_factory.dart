@@ -1,7 +1,6 @@
 import 'package:caja_herramientas/app/shared/models/risk_event_model.dart';
 import 'package:caja_herramientas/app/shared/models/risk_level.dart';
 
-/// Factory para crear eventos de riesgo con sus clasificaciones completas
 class RiskEventFactory {
   
   /// Crea el evento "Movimiento en Masa" completo
