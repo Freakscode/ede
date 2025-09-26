@@ -217,8 +217,52 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     return 0;
   }
 
-  // Método para calcular la calificación final de amenaza
+  // Método helper para obtener el valor numérico desde el modelo cuando esté disponible
+  int _getCategoryValue(String subClassificationId, String categoryTitle) {
+    try {
+      final categories = getCategoriesForCurrentSubClassification(subClassificationId);
+      final category = categories.where((cat) => cat.title == categoryTitle).firstOrNull;
+      
+      if (category != null && category.detailedLevels != null) {
+        // Si tenemos categorías detalladas con valores específicos, usar esos valores
+        final selectedLevel = getSelectionsForSubClassification(subClassificationId)[categoryTitle];
+        if (selectedLevel != null) {
+          final detailedLevel = category.detailedLevels!
+              .where((level) => level.title.contains(selectedLevel))
+              .firstOrNull;
+          
+          if (detailedLevel != null) {
+            // Extraer el valor del título, ej: "BAJO (1):" -> 1
+            final regex = RegExp(r'\((\d+)\)');
+            final match = regex.firstMatch(detailedLevel.title);
+            if (match != null) {
+              return int.tryParse(match.group(1)!) ?? _getLevelValue(selectedLevel);
+            }
+          }
+        }
+      }
+      
+      // Fallback al método de parseo de texto
+      final selectedLevel = getSelectionsForSubClassification(subClassificationId)[categoryTitle];
+      return selectedLevel != null ? _getLevelValue(selectedLevel) : 0;
+    } catch (e) {
+      // En caso de error, usar el método de fallback
+      final selectedLevel = getSelectionsForSubClassification(subClassificationId)[categoryTitle];
+      return selectedLevel != null ? _getLevelValue(selectedLevel) : 0;
+    }
+  }
+
+  // Método para calcular la calificación final (amenaza o vulnerabilidad)
   String calculateThreatRating() {
+    if (state.selectedClassification == 'amenaza') {
+      return _calculateAmenazaRating();
+    } else {
+      return _calculateVulnerabilidadRating();
+    }
+  }
+
+  // Método específico para calcular calificación de amenaza
+  String _calculateAmenazaRating() {
     final probAverage = calculateProbabilidadAverage();
     final intAverage = calculateIntensidadAverage();
     
@@ -239,15 +283,98 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     }
   }
 
+  // Método específico para calcular calificación de vulnerabilidad
+  String _calculateVulnerabilidadRating() {
+    final subClassifications = getCurrentSubClassifications();
+    
+    if (subClassifications.isEmpty) {
+      return 'SIN CALIFICAR';
+    }
+    
+    // Calcular el promedio de todas las subclasificaciones de vulnerabilidad
+    double totalScore = 0.0;
+    int count = 0;
+    
+    for (final subClassification in subClassifications) {
+      final selections = state.dynamicSelections[subClassification.id] ?? {};
+      
+      if (selections.isNotEmpty) {
+        double subScore = 0.0;
+        int subCount = 0;
+        
+        for (final level in selections.values) {
+          int value = _getLevelValue(level);
+          if (value > 0) {
+            subScore += value;
+            subCount++;
+          }
+        }
+        
+        if (subCount > 0) {
+          totalScore += (subScore / subCount);
+          count++;
+        }
+      }
+    }
+    
+    if (count == 0) {
+      return 'SIN CALIFICAR';
+    }
+    
+    final finalScore = totalScore / count;
+    
+    if (finalScore <= 1.5) {
+      return 'BAJO';
+    } else if (finalScore <= 2.5) {
+      return 'MEDIO';
+    } else if (finalScore <= 3.5) {
+      return 'MEDIO-ALTO';
+    } else {
+      return 'ALTO';
+    }
+  }
+
   // Método para calcular el porcentaje de completado
   double calculateCompletionPercentage() {
-    const totalCategories = 7; // 6 categorías de probabilidad + 1 de intensidad
-    final completedCategories = state.probabilidadSelections.length + state.intensidadSelections.length;
-    return completedCategories / totalCategories;
+    // Obtener las subclasificaciones actuales para calcular el total dinámicamente
+    final subClassifications = getCurrentSubClassifications();
+    
+    if (subClassifications.isEmpty) return 0.0;
+    
+    // Calcular el total de categorías dinámicamente
+    int totalCategories = 0;
+    int completedCategories = 0;
+    
+    for (final subClassification in subClassifications) {
+      final categories = getCategoriesForCurrentSubClassification(subClassification.id);
+      totalCategories += categories.length;
+      
+      // Contar categorías completadas
+      if (subClassification.id == 'probabilidad') {
+        completedCategories += state.probabilidadSelections.length;
+      } else if (subClassification.id == 'intensidad') {
+        completedCategories += state.intensidadSelections.length;
+      } else {
+        // Para subclasificaciones dinámicas (como vulnerabilidad)
+        final selections = state.dynamicSelections[subClassification.id] ?? {};
+        completedCategories += selections.length;
+      }
+    }
+    
+    return totalCategories > 0 ? completedCategories / totalCategories : 0.0;
   }
 
   // Método para obtener el puntaje final numérico
   double calculateFinalScore() {
+    if (state.selectedClassification == 'amenaza') {
+      return _calculateAmenazaFinalScore();
+    } else {
+      return _calculateVulnerabilidadFinalScore();
+    }
+  }
+
+  // Método específico para calcular puntaje final de amenaza
+  double _calculateAmenazaFinalScore() {
     final probAverage = calculateProbabilidadAverage();
     final intAverage = calculateIntensidadAverage();
     
@@ -256,6 +383,43 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     }
     
     return (probAverage + intAverage) / 2;
+  }
+
+  // Método específico para calcular puntaje final de vulnerabilidad
+  double _calculateVulnerabilidadFinalScore() {
+    final subClassifications = getCurrentSubClassifications();
+    
+    if (subClassifications.isEmpty) {
+      return 0.0;
+    }
+    
+    // Calcular el promedio de todas las subclasificaciones de vulnerabilidad
+    double totalScore = 0.0;
+    int count = 0;
+    
+    for (final subClassification in subClassifications) {
+      final selections = state.dynamicSelections[subClassification.id] ?? {};
+      
+      if (selections.isNotEmpty) {
+        double subScore = 0.0;
+        int subCount = 0;
+        
+        for (final level in selections.values) {
+          int value = _getLevelValue(level);
+          if (value > 0) {
+            subScore += value;
+            subCount++;
+          }
+        }
+        
+        if (subCount > 0) {
+          totalScore += (subScore / subCount);
+          count++;
+        }
+      }
+    }
+    
+    return count > 0 ? totalScore / count : 0.0;
   }
 
   // Método para obtener el color de fondo basado en la calificación
