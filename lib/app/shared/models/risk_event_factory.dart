@@ -331,10 +331,8 @@ class RiskEventFactory {
               description: 'Factores que influyen en la probabilidad de falla estructural',
               weight: 0.5,
               categories: [
-                _createEstadoEstructural(),
-                _createCalidadMateriales(),
-                _createAntiguedadEstructura(),
-                _createMantenimientoEstructura(),
+                _createEstructuralEstadoDeterioro(),
+                _createEstructuralIncrementoCargaReduccionResistencia(),
               ],
             ),
             RiskSubClassification(
@@ -343,9 +341,51 @@ class RiskEventFactory {
               description: 'Factores que determinan la magnitud e impacto de la falla',
               weight: 0.5,
               categories: [
-                _createTipoFalla(),
-                _createMagnitudColapso(),
-                _createAreaAfectadaEstructural(),
+                _createEstructuralPotencialDanoEdificaciones(),
+                _createEstructuralCapacidadPerdidaVidas(),
+                _createEstructuralAlteracionLineasVitales(),
+              ],
+            ),
+          ],
+        ),
+        // VULNERABILIDAD
+        RiskClassification(
+          id: 'vulnerabilidad',
+          name: 'Vulnerabilidad',
+          description: 'Factores de vulnerabilidad de la población y elementos expuestos ante eventos estructurales',
+          subClassifications: [
+            // FRAGILIDAD FÍSICA
+            RiskSubClassification(
+              id: 'fragilidad_fisica',
+              name: 'Fragilidad Física',
+              description: 'Vulnerabilidad de infraestructura y edificaciones ante eventos estructurales',
+              weight: 0.33,
+              categories: [
+                _createEstructuralCalidadMaterialesProcesos(),
+                _createEstructuralTipologiaEstructural(),
+              ],
+            ),
+            // FRAGILIDAD EN PERSONAS
+            RiskSubClassification(
+              id: 'fragilidad_personas',
+              name: 'Fragilidad en Personas',
+              description: 'Vulnerabilidad de la población y capacidad de respuesta ante eventos estructurales',
+              weight: 0.33,
+              categories: [
+                _createEstructuralNivelOrganizacion(),
+                _createEstructuralSuficienciaEconomica(),
+              ],
+            ),
+            // EXPOSICIÓN
+            RiskSubClassification(
+              id: 'exposicion',
+              name: 'Exposición',
+              description: 'Elementos expuestos al riesgo de eventos estructurales',
+              weight: 0.34,
+              categories: [
+                _createEstructuralEdificacionesExpuestas(),
+                _createEstructuralOtrosElementosExpuestos(),
+                _createEstructuralEscalaAfectacion(),
               ],
             ),
           ],
@@ -2961,6 +3001,346 @@ class RiskEventFactory {
       description: 'Escala territorial de la afectación por avenida torrencial',
       levels: ['BAJO', 'MEDIO', 'MEDIO\nALTO', 'ALTO'],
       value: 2,
+      order: 3,
+      detailedLevels: [
+        RiskLevel.bajo(customItems: [
+          'Puntual (1 vivienda)'
+        ]),
+        RiskLevel.medioBajo(customItems: [
+          'Entre 2 y 3 viviendas'
+        ]),
+        RiskLevel.medioAlto(customItems: [
+          'Entre 4 y 5 viviendas'
+        ]),
+        RiskLevel.alto(customItems: [
+          'Zonal (Cuadra, manzana, barrio)'
+        ]),
+      ],
+    );
+  }
+
+  // ========== CATEGORÍAS PARA ESTRUCTURAL ==========
+
+  // ========== AMENAZA - PROBABILIDAD ==========
+
+  /// PROBABILIDAD - ESTADO DE DETERIORO
+  static RiskCategory _createEstructuralEstadoDeterioro() {
+    return RiskCategory(
+      id: 'estado_deterioro_estructural',
+      title: 'Estado de Deterioro',
+      description: 'Evaluación del estado físico y deterioro de la estructura',
+      levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      value: 3,
+      order: 1,
+      detailedLevels: [
+        RiskLevel.bajo(customItems: [
+          '• Sin lesiones mecánicas',
+          '• Vibraciones leves',
+          '• lesiones físicas de baja intensidad'
+        ]),
+        RiskLevel.medioBajo(customItems: [
+          '• Deformaciones y lesiones mecánicas en elementos no estructurales.',
+          '• Vibraciones excesivas',
+          '• Lesiones químicas'
+        ]),
+        RiskLevel.medioAlto(customItems: [
+          '• Deformaciones y lesiones mecánicas en elementos estructurales que no comprometen la estabilidad de la edificación en el futuro inmediato, pues aún ocurre en el intervalo elástico del material.',
+          '• Deformaciones y/o lesiones importantes en elementos no estructurales que condicionan su funcionamiento y seguridad , pero no el de la edificación.'
+        ]),
+        RiskLevel.alto(customItems: [
+          '•Inestabilidad, pérdida de equilibrio ( pérdida de verticalidad de la edificación).',
+          '• Pandeo elástico, fatiga, rotura.',
+          '• Falla de un elemento principal: colapso progresivo (falta de hiperestaticidad y falla secuencial)',
+          '• Formación de mecanismo plástico.'
+        ]),
+      ],
+    );
+  }
+
+  /// PROBABILIDAD - INCREMENTO DE CARGA, REDUCCIÓN DE RESISTENCIA Y/O MODIFICACIÓN DEL SISTEMA ESTRUCTURAL
+  static RiskCategory _createEstructuralIncrementoCargaReduccionResistencia() {
+    return RiskCategory(
+      id: 'incremento_carga_reduccion_resistencia',
+      title: 'Incremento de Carga, Reducción de Resistencia y/o Modificación del Sistema Estructural',
+      description: 'Evaluación de modificaciones que afectan la capacidad estructural',
+      levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      value: 1,
+      order: 2,
+      detailedLevels: [
+        RiskLevel.bajo(customItems: [
+          'No existe evidencia de modificación del sistema estructural ni de incremento de las cargas'
+        ]),
+        RiskLevel.medioBajo(customItems: [
+          '• Cambio de uso la edificación y/o incremento de cargas vivas sin evidencia de lesiones mecánicas.',
+          '• Sustitución de elementos del sistema estructural que no condicionan la estabilidad de la edificación bajo las cargas de servicio.'
+        ]),
+        RiskLevel.medioAlto(customItems: [
+          '• Cambio de uso la edificación y/o incremento de cargas vivas con evidencia de lesiones mecánicas en elementos no estructurales.',
+          '• Hay evidenica de problemas de resistencia de los elementos, pero no compromete la estabilidad de la edificación en el futuro inmediato.'
+        ]),
+        RiskLevel.alto(customItems: [
+          '• Adiciones en altura en sistemas estructurales de baja resistencia y rigidez.',
+          '• Supresión de elementos estructurales.',
+          '• Cambio de uso en la edificación y/o incremento de cargas vivas con evidencia de lesiones mecánicas en elementos estructurales.',
+          '• Incremento súbito y severo de las cargas por factores externos.',
+          '• Desconfinamiento del terreno de cimentación'
+        ]),
+      ],
+    );
+  }
+
+  // ========== AMENAZA - INTENSIDAD ==========
+
+  /// INTENSIDAD - POTENCIAL DE DAÑO EN EDIFICACIONES ADYACENTES
+  static RiskCategory _createEstructuralPotencialDanoEdificaciones() {
+    return RiskCategory(
+      id: 'potencial_dano_edificaciones_estructural',
+      title: 'Potencial de Daño en Edificaciones Adyacentes',
+      description: 'Evaluación del potencial de daño a edificaciones adyacentes por evento estructural',
+      levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      value: 4,
+      order: 1,
+      detailedLevels: [
+        RiskLevel.bajo(customItems: [
+          'De presentarse el evento, la probabilidad de ocasionar afectaciones en las edificaciones adyacentes es nula.'
+        ]),
+        RiskLevel.medioBajo(customItems: [
+          'Se pueden presentar daños leves en las edificaciones adyacentes que no pongan en peligro la estabilidad de las mismas.'
+        ]),
+        RiskLevel.medioAlto(customItems: [
+          'Por las características del fenómeno, su magnitud e intensidad son considerables, por lo que pueden presentar daños importantes sobre las edificaciones adyacentes. Posiblemente se presente el colapso o falla de alguna de ellas.'
+        ]),
+        RiskLevel.alto(customItems: [
+          'Por las características del fenómeno, su magnitud e intensidad son muy altas, por lo que podría ser inminente el colapso o falla de las edificaciones adyacentes.'
+        ]),
+      ],
+    );
+  }
+
+  /// INTENSIDAD - CAPACIDAD DE GENERAR PÉRDIDA DE VIDAS HUMANAS
+  static RiskCategory _createEstructuralCapacidadPerdidaVidas() {
+    return RiskCategory(
+      id: 'capacidad_perdida_vidas_estructural',
+      title: 'Capacidad de Generar Pérdida de Vidas Humanas',
+      description: 'Potencial de generar víctimas mortales o lesionados por evento estructural',
+      levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      value: 4,
+      order: 2,
+      detailedLevels: [
+        RiskLevel.bajo(customItems: [
+          'No se estiman personas lesionadas ni muertos'
+        ]),
+        RiskLevel.medioBajo(customItems: [
+          'Difícilmente genera personas muertas o lesionadas'
+        ]),
+        RiskLevel.medioAlto(customItems: [
+          'Puede presentar personas lesionadas y posiblemente algún muerto'
+        ]),
+        RiskLevel.alto(customItems: [
+          'Puede presentar numerosos muertos y lesionados.'
+        ]),
+      ],
+    );
+  }
+
+  /// INTENSIDAD - ALTERACIÓN DEL FUNCIONAMIENTO DE LÍNEAS VITALES Y ESPACIO PÚBLICO
+  static RiskCategory _createEstructuralAlteracionLineasVitales() {
+    return RiskCategory(
+      id: 'alteracion_lineas_vitales_estructural',
+      title: 'Alteración del Funcionamiento de Líneas Vitales y Espacio Público',
+      description: 'Afectación a servicios públicos e infraestructura vital por evento estructural',
+      levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      value: 3,
+      order: 3,
+      detailedLevels: [
+        RiskLevel.bajo(customItems: [
+          'No se altera el funcionamiento u operación de los elementos, de manera que no se compromete la prestación del servicio.'
+        ]),
+        RiskLevel.medioBajo(customItems: [
+          'Se presentan daños leves en los elementos pero no se compromete la prestación del servicio.'
+        ]),
+        RiskLevel.medioAlto(customItems: [
+          'El funcionamiento u operación de los elementos se ve alterado, de manera que se compromete la prestación del servicio pero se puede recuperar en el corto plazo (acciones de reparación).'
+        ]),
+        RiskLevel.alto(customItems: [
+          'Se altera completamente el funcionamiento u operación de los elementos y su recuperación es difícil en el corto plazo (acciones de reconstrucción).'
+        ]),
+      ],
+    );
+  }
+
+  // ========== VULNERABILIDAD - FRAGILIDAD FÍSICA ==========
+
+  /// FRAGILIDAD FÍSICA - CALIDAD DE LOS MATERIALES Y PROCESOS CONSTRUCTIVOS
+  static RiskCategory _createEstructuralCalidadMaterialesProcesos() {
+    return RiskCategory(
+      id: 'calidad_materiales_procesos_estructural',
+      title: 'Calidad de los Materiales y Procesos Constructivos',
+      description: 'Evaluación de la calidad de materiales y técnicas constructivas ante eventos estructurales',
+      levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      value: 3,
+      order: 1,
+      detailedLevels: [
+        RiskLevel.bajo(customItems: [
+          'Estructura con materiales de muy buena calidad y adecuada técnica constructiva'
+        ]),
+        RiskLevel.medioBajo(customItems: [
+          'Estructura con materiales de regular calidad, pero adecuada técnica constructiva'
+        ]),
+        RiskLevel.medioAlto(customItems: [
+          'Estructura con materiales de buena calidad, pero con deficiencias constructivas'
+        ]),
+        RiskLevel.alto(customItems: [
+          'Estructura con materiales de mala calidad y con deficiencias constructivas'
+        ]),
+      ],
+    );
+  }
+
+  /// FRAGILIDAD FÍSICA - TIPOLOGÍA ESTRUCTURAL
+  static RiskCategory _createEstructuralTipologiaEstructural() {
+    return RiskCategory(
+      id: 'tipologia_estructural_estructural',
+      title: 'Tipología Estructural',
+      description: 'Tipo de sistema estructural y su resistencia ante eventos estructurales',
+      levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      value: 2,
+      order: 2,
+      detailedLevels: [
+        RiskLevel.bajo(customItems: [
+          'Edificaciones reforzadas o con reforzamiento especial. Edificaciones en concreto reforzado y acero, diseñadas y construidas con requerimientos de norma o superiores (pórticos, sistemas combinados, duales, muros de concreto reforzado)'
+        ]),
+        RiskLevel.medioBajo(customItems: [
+          'Mampostería confinada o reforzada'
+        ]),
+        RiskLevel.medioAlto(customItems: [
+          'Edificaciones con confinamiento deficiente, estructuras híbridas. Mampostería no reforzada, no confinada, pero con una configuración estructural que brinda cierta resistencia al evento.'
+        ]),
+        RiskLevel.alto(customItems: [
+          'Estructuras ligeras y construcciones simples. Edificaciones no reforzadas, no confinadas, con baja resistencia.'
+        ]),
+      ],
+    );
+  }
+
+  // ========== VULNERABILIDAD - FRAGILIDAD EN PERSONAS ==========
+
+  /// FRAGILIDAD EN PERSONAS - NIVEL DE ORGANIZACIÓN
+  static RiskCategory _createEstructuralNivelOrganizacion() {
+    return RiskCategory(
+      id: 'nivel_organizacion_estructural',
+      title: 'Nivel de Organización',
+      description: 'Capacidad organizacional y preparación de la comunidad ante eventos estructurales',
+      levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      value: 2,
+      order: 1,
+      detailedLevels: [
+        RiskLevel.bajo(customItems: [
+          'La comunidad tiene total conocimiento de los riesgos presentes en el territorio y asume su compromiso frente al tema. La población cuenta con sistemas de alerta temprana.'
+        ]),
+        RiskLevel.medioBajo(customItems: [
+          'La comunidad tiene conocimiento de los riesgos presentes y manifiesta un compromiso frente al tema. La población cuenta con planes comunitarios para la gestión del riesgo de desastres.'
+        ]),
+        RiskLevel.medioAlto(customItems: [
+          'La población tiene conocimiento de los riesgos presentes, pero manifiesta poco compromiso frente al tema.'
+        ]),
+        RiskLevel.alto(customItems: [
+          'La población no tiene conocimiento de los riesgos presentes, y no manifiesta compromiso frente al tema.'
+        ]),
+      ],
+    );
+  }
+
+  /// FRAGILIDAD EN PERSONAS - SUFICIENCIA ECONÓMICA
+  static RiskCategory _createEstructuralSuficienciaEconomica() {
+    return RiskCategory(
+      id: 'suficiencia_economica_estructural',
+      title: 'Suficiencia Económica',
+      description: 'Capacidad económica para enfrentar y recuperarse de eventos estructurales',
+      levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      value: 3,
+      order: 2,
+      detailedLevels: [
+        RiskLevel.bajo(customItems: [
+          'El actor responsable tiene la capacidad de resolver la problemática con sus propios medios.'
+        ]),
+        RiskLevel.medioBajo(customItems: [
+          'El actor responsable tiene la capacidad de resolver parcialmente la problemática en el corto plazo.'
+        ]),
+        RiskLevel.medioAlto(customItems: [
+          'El actor responsable tiene la capacidad de resolver parcialmente la problemática en el largo plazo.'
+        ]),
+        RiskLevel.alto(customItems: [
+          'El actor responsable no tiene la capacidad de resolver la problemática y requiere de apoyo de terceros.'
+        ]),
+      ],
+    );
+  }
+
+  // ========== VULNERABILIDAD - EXPOSICIÓN ==========
+
+  /// EXPOSICIÓN - EDIFICACIONES EXPUESTAS
+  static RiskCategory _createEstructuralEdificacionesExpuestas() {
+    return RiskCategory(
+      id: 'edificaciones_expuestas_estructural',
+      title: 'Edificaciones Expuestas',
+      description: 'Tipo de edificaciones expuestas a eventos estructurales según su importancia',
+      levels: ['BAJO', 'MEDIO', 'MEDIO\nALTO', 'ALTO'],
+      value: 1,
+      order: 1,
+      detailedLevels: [
+        RiskLevel.bajo(customItems: [
+          'Estructuras de ocupación normal según NSR-10'
+        ]),
+        RiskLevel.medioBajo(customItems: [
+          'Estructuras de ocupación especial según NSR-10'
+        ]),
+        RiskLevel.medioAlto(customItems: [
+          'Edificaciones de atención a la comunidad según NSR-10.'
+        ]),
+        RiskLevel.alto(customItems: [
+          'Edificaciones indispensables según la NSR-10.'
+        ]),
+      ],
+    );
+  }
+
+  /// EXPOSICIÓN - OTROS ELEMENTOS EXPUESTOS (Líneas vitales y drenajes)
+  static RiskCategory _createEstructuralOtrosElementosExpuestos() {
+    return RiskCategory(
+      id: 'otros_elementos_expuestos_estructural',
+      title: 'Otros Elementos Expuestos (Líneas vitales y drenajes)',
+      description: 'Infraestructura vital expuesta a eventos estructurales',
+      levels: ['BAJO', 'MEDIO', 'MEDIO\nALTO', 'ALTO'],
+      value: 3,
+      order: 2,
+      detailedLevels: [
+        RiskLevel.bajo(customItems: [
+          'Redes eléctricas y de telecomunicaciones.'
+        ]),
+        RiskLevel.medioBajo(customItems: [
+          'Vías y senderos peatonales que no representan únicas rutas de acceso y evacuación.'
+        ]),
+        RiskLevel.medioAlto(customItems: [
+          'Redes locales de servicios públicos'
+        ]),
+        RiskLevel.alto(customItems: [
+          '• Puentes, vías principales o vías que representen una única ruta de acceso y evacuación.',
+          '• Redes primarias de servicios públicos (acueducto, alcantarillado y gas).',
+          '• Drenajes'
+        ]),
+      ],
+    );
+  }
+
+  /// EXPOSICIÓN - ESCALA DE AFECTACIÓN
+  static RiskCategory _createEstructuralEscalaAfectacion() {
+    return RiskCategory(
+      id: 'escala_afectacion_estructural',
+      title: 'Escala de Afectación',
+      description: 'Escala territorial de la afectación por evento estructural',
+      levels: ['BAJO', 'MEDIO', 'MEDIO\nALTO', 'ALTO'],
+      value: 4,
       order: 3,
       detailedLevels: [
         RiskLevel.bajo(customItems: [
