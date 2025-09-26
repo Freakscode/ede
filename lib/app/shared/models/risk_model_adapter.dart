@@ -177,11 +177,6 @@ class RiskModelAdapter {
   /// Migra gradualmente del sistema de DropdownCategory al nuevo modelo
   static void migrateEventData(String eventName, Map<String, String> selections) {
     final debugInfo = getEventDebugInfo(eventName);
-    print('🔄 Migrating event data for: $eventName');
-    print('📊 Event info: ${debugInfo.toString()}');
-    print('📝 Selections: ${selections.toString()}');
-    
-    // Aquí se puede implementar lógica de migración de datos
     // Por ahora solo registramos la información para debugging
   }
 }

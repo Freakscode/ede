@@ -251,17 +251,10 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     // Usar el nuevo modelo jerárquico con adaptador para mantener compatibilidad
     final categories = RiskModelAdapter.getProbabilityCategoriesForEvent(selectedEvent);
     
-    // Debug: información del evento
-    final debugInfo = RiskModelAdapter.getEventDebugInfo(selectedEvent);
-    print('🔥 RiskThreatAnalysisBloc: Información del evento: $debugInfo');
-    
     if (categories.isNotEmpty) {
-      print('🔥 RiskThreatAnalysisBloc: Usando nuevo modelo para $selectedEvent (${categories.length} categorías)');
       return categories;
     }
     
-    // Fallback al sistema antiguo si el nuevo no tiene datos
-    print('🔥 RiskThreatAnalysisBloc: Fallback al sistema antiguo para $selectedEvent');
     switch (selectedEvent) {
       case 'Movimiento en Masa':
         return DropdownCategory.movimientoEnMasaCategories;
@@ -279,29 +272,20 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
   // Método para obtener categorías dinámicas basadas en el evento seleccionado desde el estado interno
   List<DropdownCategory> getCategoriesForSelectedEvent() {
     final selectedEvent = state.selectedRiskEvent;
-    
-    // Debug: imprimir el evento seleccionado
-    print('🔥 RiskThreatAnalysisBloc: Evento seleccionado: $selectedEvent');
-    
     final categories = getCategoriesForEvent(selectedEvent);
-    print('🔥 RiskThreatAnalysisBloc: Cargando ${categories.length} categorías para $selectedEvent');
     return categories;
   }
 
-  // Método para obtener las categorías de intensidad dinámicamente
   List<DropdownCategory> getIntensidadCategories() {
     final selectedEvent = state.selectedRiskEvent;
     
-    // Usar el nuevo modelo jerárquico con adaptador para mantener compatibilidad
     final categories = RiskModelAdapter.getIntensityCategoriesForEvent(selectedEvent);
     
     if (categories.isNotEmpty) {
-      print('🔥 RiskThreatAnalysisBloc: Usando nuevo modelo de intensidad para $selectedEvent (${categories.length} categorías)');
       return categories;
     }
     
     // Fallback al sistema antiguo si el nuevo no tiene datos
-    print('🔥 RiskThreatAnalysisBloc: Fallback intensidad al sistema antiguo para $selectedEvent');
     switch (selectedEvent) {
       case 'Movimiento en Masa':
         return DropdownCategory.movimientoEnMasaIntensidadCategories;
@@ -320,8 +304,6 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
   List<RiskSubClassification> getAmenazaSubClassifications() {
     final selectedEvent = state.selectedRiskEvent;
     final threatClassifications = RiskModelAdapter.getThreatSubClassifications(selectedEvent);
-    
-    print('🔥 RiskThreatAnalysisBloc: Subclasificaciones de amenaza para $selectedEvent: ${threatClassifications.length}');
     return threatClassifications;
   }
 
@@ -339,14 +321,12 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
         
         if (subClassification != null) {
           final categories = RiskModelAdapter.convertToDropdownCategories(subClassification.categories);
-          print('🔥 RiskThreatAnalysisBloc: Categorías para $subClassificationId: ${categories.length}');
           return categories;
         }
       }
     }
     
     // Fallback al sistema antiguo
-    print('🔥 RiskThreatAnalysisBloc: Fallback al sistema antiguo para $subClassificationId');
     if (subClassificationId == 'probabilidad') {
       return getCategoriesForSelectedEvent();
     } else if (subClassificationId == 'intensidad') {
