@@ -52,54 +52,6 @@ class _CalificacionScreenState extends State<CalificacionScreen> {
     });
   }
 
-  /// Obtiene el valor seleccionado para una subclasificación específica
-  String? _getValueForSubClassification(RiskThreatAnalysisState state, String subClassificationId) {
-    switch (subClassificationId) {
-      case 'probabilidad':
-        return state.selectedProbabilidad;
-      case 'intensidad':
-        return state.selectedIntensidad;
-      default:
-        return null;
-    }
-  }
-
-  /// Verifica si el dropdown está abierto para una subclasificación específica
-  bool _getIsSelectedForSubClassification(RiskThreatAnalysisState state, String subClassificationId) {
-    switch (subClassificationId) {
-      case 'probabilidad':
-        return state.isProbabilidadDropdownOpen;
-      case 'intensidad':
-        return state.isIntensidadDropdownOpen;
-      default:
-        return false;
-    }
-  }
-
-  /// Maneja el tap en un dropdown específico
-  void _handleDropdownTap(BuildContext context, String subClassificationId) {
-    switch (subClassificationId) {
-      case 'probabilidad':
-        context.read<RiskThreatAnalysisBloc>().add(ToggleProbabilidadDropdown());
-        break;
-      case 'intensidad':
-        context.read<RiskThreatAnalysisBloc>().add(ToggleIntensidadDropdown());
-        break;
-    }
-  }
-
-  /// Maneja la selección de una categoría en un dropdown específico
-  void _handleSelectionChanged(BuildContext context, String subClassificationId, String category, String level) {
-    switch (subClassificationId) {
-      case 'probabilidad':
-        context.read<RiskThreatAnalysisBloc>().add(UpdateProbabilidadSelection(category, level));
-        break;
-      case 'intensidad':
-        context.read<RiskThreatAnalysisBloc>().add(UpdateIntensidadSelection(category, level));
-        break;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -190,14 +142,14 @@ class _CalificacionScreenState extends State<CalificacionScreen> {
                         children: [
                           ExpandableDropdownField(
                             hint: subClassification.name,
-                            value: _getValueForSubClassification(state, subClassification.id),
-                            isSelected: _getIsSelectedForSubClassification(state, subClassification.id),
+                            value: bloc.getValueForSubClassification(subClassification.id),
+                            isSelected: bloc.getIsSelectedForSubClassification(subClassification.id),
                             categories: bloc.getCategoriesForCurrentSubClassification(subClassification.id),
                             onTap: () {
-                              _handleDropdownTap(context, subClassification.id);
+                              bloc.handleDropdownTap(subClassification.id);
                             },
                             onSelectionChanged: (category, level) {
-                              _handleSelectionChanged(context, subClassification.id, category, level);
+                              bloc.handleSelectionChanged(subClassification.id, category, level);
                             },
                           ),
                           // Agregar espaciado entre dropdowns, excepto después del último

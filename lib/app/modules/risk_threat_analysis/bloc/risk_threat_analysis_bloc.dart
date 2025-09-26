@@ -403,5 +403,56 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     return [];
   }
 
+  // ============================================================================
+  // MÉTODOS DE LÓGICA DE DROPDOWN (MOVIDOS DESDE UI)
+  // ============================================================================
+
+  /// Obtiene el valor seleccionado para una subclasificación específica
+  String? getValueForSubClassification(String subClassificationId) {
+    switch (subClassificationId) {
+      case 'probabilidad':
+        return state.selectedProbabilidad;
+      case 'intensidad':
+        return state.selectedIntensidad;
+      default:
+        return null;
+    }
+  }
+
+  /// Verifica si el dropdown está abierto para una subclasificación específica
+  bool getIsSelectedForSubClassification(String subClassificationId) {
+    switch (subClassificationId) {
+      case 'probabilidad':
+        return state.isProbabilidadDropdownOpen;
+      case 'intensidad':
+        return state.isIntensidadDropdownOpen;
+      default:
+        return false;
+    }
+  }
+
+  /// Maneja el tap en un dropdown específico
+  void handleDropdownTap(String subClassificationId) {
+    switch (subClassificationId) {
+      case 'probabilidad':
+        add(ToggleProbabilidadDropdown());
+        break;
+      case 'intensidad':
+        add(ToggleIntensidadDropdown());
+        break;
+    }
+  }
+
+  /// Maneja la selección de una categoría en un dropdown específico
+  void handleSelectionChanged(String subClassificationId, String category, String level) {
+    switch (subClassificationId) {
+      case 'probabilidad':
+        add(UpdateProbabilidadSelection(category, level));
+        break;
+      case 'intensidad':
+        add(UpdateIntensidadSelection(category, level));
+        break;
+    }
+  }
 
 }
