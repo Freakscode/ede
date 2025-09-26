@@ -315,6 +315,7 @@ class RiskEventFactory {
       description: 'Evaluación de las condiciones del suelo y pendientes',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
       order: 1,
+      value: 2, // Valor inicial (1-4, donde 1=BAJO, 2=MEDIO BAJO, 3=MEDIO ALTO, 4=ALTO)
       detailedLevels: [
         RiskLevel.bajo(
           customItems: [
@@ -354,6 +355,7 @@ class RiskEventFactory {
       description: 'Evaluación del impacto de las actividades humanas en la estabilidad',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
       order: 2,
+      value: 1, // Valor inicial (1-4, donde 1=BAJO, 2=MEDIO BAJO, 3=MEDIO ALTO, 4=ALTO)
       detailedLevels: [
         RiskLevel.bajo(
           customItems: [
@@ -392,6 +394,7 @@ class RiskEventFactory {
       description: 'Evaluación del sistema de drenaje y manejo pluvial',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
       order: 3,
+      value: 3, // Valor inicial (1-4, donde 1=BAJO, 2=MEDIO BAJO, 3=MEDIO ALTO, 4=ALTO)
       detailedLevels: [
         RiskLevel.bajo(
           customItems: [
@@ -429,6 +432,7 @@ class RiskEventFactory {
       description: 'Estado y manejo de las redes de servicios públicos',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
       order: 4,
+      value: 4, // Valor inicial (1-4)
       detailedLevels: [
         RiskLevel.bajo(
           customItems: [
@@ -466,6 +470,7 @@ class RiskEventFactory {
       description: 'Historial de eventos previos en la zona',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
       order: 5,
+      value: 2, // Valor inicial (1-4)
       detailedLevels: [
         RiskLevel.bajo(
           customItems: [
@@ -503,6 +508,7 @@ class RiskEventFactory {
       description: 'Signos visibles de inestabilidad actual',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
       order: 6,
+      value: 1, // Valor inicial (1-4)
       detailedLevels: [
         RiskLevel.bajo(
           customItems: [
@@ -544,6 +550,7 @@ class RiskEventFactory {
       description: 'Volumen estimado de material en movimiento',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
       order: 1,
+      value: 2, // Valor inicial (1-4)
       detailedLevels: [
         RiskLevel.bajo(
           customItems: [
@@ -581,6 +588,7 @@ class RiskEventFactory {
       description: 'Velocidad estimada del proceso de movimiento',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
       order: 2,
+      value: 3, // Valor inicial (1-4)
       detailedLevels: [
         RiskLevel.bajo(
           customItems: [
@@ -618,6 +626,7 @@ class RiskEventFactory {
       description: 'Área de influencia y alcance del movimiento',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
       order: 3,
+      value: 2, // Valor inicial (1-4)
       detailedLevels: [
         RiskLevel.bajo(
           customItems: [
@@ -657,6 +666,7 @@ class RiskEventFactory {
       description: 'Disponibilidad y características del material combustible',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
       order: 1,
+      value: 2, // Valor inicial (1-4)
       detailedLevels: [
         RiskLevel.bajo(
           customItems: [
@@ -694,6 +704,7 @@ class RiskEventFactory {
       description: 'Factores climáticos que favorecen los incendios',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
       order: 2,
+      value: 2, // Valor inicial (1-4)
       detailedLevels: [
         RiskLevel.bajo(
           customItems: [
@@ -737,6 +748,7 @@ class RiskEventFactory {
       title: 'Velocidad de Propagación',
       description: 'Velocidad de avance del fuego',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      value: 2, // Valor inicial (1-4)
       order: 1,
       detailedLevels: [
         RiskLevel.bajo(
@@ -774,6 +786,7 @@ class RiskEventFactory {
       title: 'Altura de Llama',
       description: 'Altura característica de las llamas',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      value: 2, // Valor inicial (1-4)
       order: 2,
       detailedLevels: [
         RiskLevel.bajo(
@@ -811,6 +824,7 @@ class RiskEventFactory {
       title: 'Área Afectada',
       description: 'Extensión del área potencialmente afectada',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      value: 2, // Valor inicial (1-4)
       order: 3,
       detailedLevels: [
         RiskLevel.bajo(
@@ -850,6 +864,7 @@ class RiskEventFactory {
       title: 'Características Hidrológicas',
       description: 'Características de la cuenca y drenaje',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      value: 2, // Valor inicial (1-4)
       order: 1,
       detailedLevels: [
         RiskLevel.bajo(
@@ -891,6 +906,7 @@ class RiskEventFactory {
       title: 'Precipitación',
       description: 'Características de las precipitaciones en la zona',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      value: 2, // Valor inicial (1-4)
       order: 2,
       detailedLevels: [
         RiskLevel.bajo(
@@ -928,6 +944,7 @@ class RiskEventFactory {
       title: 'Profundidad del Agua',
       description: 'Profundidad estimada del agua en inundación',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      value: 2, // Valor inicial (1-4)
       order: 1,
       detailedLevels: [
         RiskLevel.bajo(
@@ -965,6 +982,7 @@ class RiskEventFactory {
       title: 'Velocidad del Flujo',
       description: 'Velocidad del agua durante la inundación',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      value: 2, // Valor inicial (1-4)
       order: 2,
       detailedLevels: [
         RiskLevel.bajo(
@@ -1002,6 +1020,7 @@ class RiskEventFactory {
       title: 'Duración de la Inundación',
       description: 'Tiempo estimado de permanencia del agua',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      value: 2, // Valor inicial (1-4)
       order: 3,
       detailedLevels: [
         RiskLevel.bajo(
@@ -1041,6 +1060,7 @@ class RiskEventFactory {
       title: 'Características de la Cuenca',
       description: 'Características geomorfológicas de la cuenca',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      value: 2, // Valor inicial (1-4)
       order: 1,
       detailedLevels: [
         RiskLevel.bajo(
@@ -1082,6 +1102,7 @@ class RiskEventFactory {
       title: 'Sedimentos y Detritos',
       description: 'Disponibilidad de material sólido transportable',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      value: 2, // Valor inicial (1-4)
       order: 2,
       detailedLevels: [
         RiskLevel.bajo(
@@ -1120,6 +1141,7 @@ class RiskEventFactory {
       title: 'Caudal Pico',
       description: 'Caudal máximo estimado durante el evento',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      value: 2, // Valor inicial (1-4)
       order: 1,
       detailedLevels: [
         RiskLevel.bajo(
@@ -1157,6 +1179,7 @@ class RiskEventFactory {
       title: 'Concentración de Sedimentos',
       description: 'Porcentaje de sedimentos en el flujo',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      value: 2, // Valor inicial (1-4)
       order: 2,
       detailedLevels: [
         RiskLevel.bajo(
@@ -1194,6 +1217,7 @@ class RiskEventFactory {
       title: 'Poder Destructivo',
       description: 'Capacidad de daño del flujo torrencial',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      value: 2, // Valor inicial (1-4)
       order: 3,
       detailedLevels: [
         RiskLevel.bajo(
@@ -1234,6 +1258,7 @@ class RiskEventFactory {
       title: 'Estado Estructural',
       description: 'Condición actual de los elementos estructurales',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      value: 2, // Valor inicial (1-4)
       order: 1,
       detailedLevels: [
         RiskLevel.bajo(
@@ -1275,6 +1300,7 @@ class RiskEventFactory {
       title: 'Calidad de Materiales',
       description: 'Calidad y especificaciones de los materiales de construcción',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      value: 2, // Valor inicial (1-4)
       order: 2,
       detailedLevels: [
         RiskLevel.bajo(
@@ -1316,6 +1342,7 @@ class RiskEventFactory {
       title: 'Antigüedad de la Estructura',
       description: 'Tiempo transcurrido desde la construcción y vida útil',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      value: 2, // Valor inicial (1-4)
       order: 3,
       detailedLevels: [
         RiskLevel.bajo(
@@ -1357,6 +1384,7 @@ class RiskEventFactory {
       title: 'Mantenimiento de la Estructura',
       description: 'Historial y calidad del mantenimiento estructural',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      value: 2, // Valor inicial (1-4)
       order: 4,
       detailedLevels: [
         RiskLevel.bajo(
@@ -1398,6 +1426,7 @@ class RiskEventFactory {
       title: 'Tipo de Falla Estructural',
       description: 'Tipo y mecanismo de falla esperado',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      value: 2, // Valor inicial (1-4)
       order: 1,
       detailedLevels: [
         RiskLevel.bajo(
@@ -1439,6 +1468,7 @@ class RiskEventFactory {
       title: 'Magnitud del Colapso',
       description: 'Extensión y severidad del colapso estructural',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      value: 2, // Valor inicial (1-4)
       order: 2,
       detailedLevels: [
         RiskLevel.bajo(
@@ -1480,6 +1510,7 @@ class RiskEventFactory {
       title: 'Área Afectada',
       description: 'Extensión del área comprometida por la falla estructural',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      value: 2, // Valor inicial (1-4)
       order: 3,
       detailedLevels: [
         RiskLevel.bajo(
@@ -1523,6 +1554,7 @@ class RiskEventFactory {
       title: 'Factor de Probabilidad Específico',
       description: 'Factor específico que influye en la probabilidad del evento particular',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      value: 2, // Valor inicial (1-4)
       order: 1,
       detailedLevels: [
         RiskLevel.bajo(
@@ -1564,6 +1596,7 @@ class RiskEventFactory {
       title: 'Factor Complementario',
       description: 'Factor adicional que contribuye a la probabilidad del evento',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      value: 2, // Valor inicial (1-4)
       order: 2,
       detailedLevels: [
         RiskLevel.bajo(
@@ -1605,6 +1638,7 @@ class RiskEventFactory {
       title: 'Magnitud del Evento',
       description: 'Escala e intensidad estimada del evento específico',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      value: 2, // Valor inicial (1-4)
       order: 1,
       detailedLevels: [
         RiskLevel.bajo(
@@ -1646,6 +1680,7 @@ class RiskEventFactory {
       title: 'Alcance del Impacto',
       description: 'Extensión geográfica y temporal del impacto del evento',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      value: 2, // Valor inicial (1-4)
       order: 2,
       detailedLevels: [
         RiskLevel.bajo(

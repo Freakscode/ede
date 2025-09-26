@@ -100,6 +100,7 @@ class RiskCategory {
   final List<RiskLevel> detailedLevels;
   final bool isRequired;
   final int order;
+  final int value; // Valor seleccionado de la categoría (1-4)
   final Map<String, dynamic>? metadata;
 
   const RiskCategory({
@@ -108,6 +109,7 @@ class RiskCategory {
     required this.description,
     required this.levels,
     required this.detailedLevels,
+    required this.value,
     this.isRequired = true,
     this.order = 0,
     this.metadata,
@@ -122,6 +124,7 @@ class RiskCategory {
       detailedLevels: (map['detailedLevels'] as List)
           .map((e) => RiskLevel.fromMap(e as Map<String, dynamic>))
           .toList(),
+      value: map['value'] as int? ?? 1, // Valor por defecto 1 si no existe
       isRequired: map['isRequired'] as bool? ?? true,
       order: map['order'] as int? ?? 0,
       metadata: map['metadata'] as Map<String, dynamic>?,
@@ -135,14 +138,40 @@ class RiskCategory {
       'description': description,
       'levels': levels,
       'detailedLevels': detailedLevels.map((e) => e.toMap()).toList(),
+      'value': value,
       'isRequired': isRequired,
       'order': order,
       if (metadata != null) 'metadata': metadata,
     };
   }
 
+  /// Crea una copia de la categoría con los valores especificados
+  RiskCategory copyWith({
+    String? id,
+    String? title,
+    String? description,
+    List<String>? levels,
+    List<RiskLevel>? detailedLevels,
+    int? value,
+    bool? isRequired,
+    int? order,
+    Map<String, dynamic>? metadata,
+  }) {
+    return RiskCategory(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      levels: levels ?? this.levels,
+      detailedLevels: detailedLevels ?? this.detailedLevels,
+      value: value ?? this.value,
+      isRequired: isRequired ?? this.isRequired,
+      order: order ?? this.order,
+      metadata: metadata ?? this.metadata,
+    );
+  }
+
   @override
-  String toString() => 'RiskCategory(id: $id, title: $title)';
+  String toString() => 'RiskCategory(id: $id, title: $title, value: $value)';
 }
 
 /// Representa un evento de riesgo completo
