@@ -47,23 +47,46 @@ class RiskEventFactory {
             ),
           ],
         ),
-        // VULNERABILIDAD (para futura implementación)
+        // VULNERABILIDAD
         RiskClassification(
           id: 'vulnerabilidad',
           name: 'Vulnerabilidad',
           description: 'Factores de vulnerabilidad de la población y elementos expuestos',
           subClassifications: [
+            // FRAGILIDAD FÍSICA
             RiskSubClassification(
-              id: 'social',
-              name: 'Social',
-              description: 'Vulnerabilidad de la población',
-              categories: [],
-            ),
-            RiskSubClassification(
-              id: 'fisica',
-              name: 'Física',
+              id: 'fragilidad_fisica',
+              name: 'Fragilidad Física',
               description: 'Vulnerabilidad de infraestructura y edificaciones',
-              categories: [],
+              weight: 0.33,
+              categories: [
+                _createCalidadMaterialesProcesos(),
+                _createEstadoConservacion(),
+                _createTipologiaEstructural(),
+              ],
+            ),
+            // FRAGILIDAD EN PERSONAS
+            RiskSubClassification(
+              id: 'fragilidad_personas',
+              name: 'Fragilidad en Personas',
+              description: 'Vulnerabilidad de la población y capacidad de respuesta',
+              weight: 0.33,
+              categories: [
+                _createNivelOrganizacion(),
+                _createSuficienciaEconomica(),
+              ],
+            ),
+            // EXPOSICIÓN
+            RiskSubClassification(
+              id: 'exposicion',
+              name: 'Exposición',
+              description: 'Elementos expuestos al riesgo',
+              weight: 0.34,
+              categories: [
+                _createEdificacionesExpuestas(),
+                _createOtrosElementosExpuestos(),
+                _createEscalaAfectacion(),
+              ],
             ),
           ],
         ),
@@ -1678,6 +1701,278 @@ class RiskEventFactory {
             'Impacto de larga duración.',
             'Afectación masiva de población.',
             'Consecuencias a largo plazo.',
+          ],
+        ),
+      ],
+    );
+  }
+
+  // ========== CATEGORÍAS DE VULNERABILIDAD - FRAGILIDAD FÍSICA ==========
+
+  static RiskCategory _createCalidadMaterialesProcesos() {
+    return RiskCategory(
+      id: 'calidad_materiales_procesos',
+      title: 'Calidad de los Materiales y Procesos Constructivos',
+      description: 'Evaluación de la calidad de materiales y técnicas constructivas',
+      levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      order: 1,
+      value: 3, // Valor según tabla oficial
+      detailedLevels: [
+        RiskLevel.bajo(
+          customItems: [
+            'Estructura con materiales de muy buena calidad y adecuada técnica constructiva.',
+          ],
+        ),
+        RiskLevel.medioBajo(
+          customItems: [
+            'Estructura con materiales de regular calidad, pero adecuada técnica constructiva.',
+          ],
+        ),
+        RiskLevel.medioAlto(
+          customItems: [
+            'Estructura con materiales de buena calidad, pero con deficiencias constructivas.',
+          ],
+        ),
+        RiskLevel.alto(
+          customItems: [
+            'Estructura con materiales de mala calidad y con deficiencias constructivas.',
+          ],
+        ),
+      ],
+    );
+  }
+
+  static RiskCategory _createEstadoConservacion() {
+    return RiskCategory(
+      id: 'estado_conservacion',
+      title: 'Estado de Conservación',
+      description: 'Evaluación del estado actual de conservación de la estructura',
+      levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      order: 2,
+      value: 2, // Valor según tabla oficial
+      detailedLevels: [
+        RiskLevel.bajo(
+          customItems: [
+            'Buen estado de conservación. No hay lesiones considerables o solo observan daños superficiales leves en los acabados.',
+          ],
+        ),
+        RiskLevel.medioBajo(
+          customItems: [
+            'Buen estado de conservación. Hay lesiones menores que no comprometen la seguridad de la edificación.',
+          ],
+        ),
+        RiskLevel.medioAlto(
+          customItems: [
+            'Estado de deterioro moderado. Hay evidencia de lesiones importantes pero no comprometen la seguridad de la estructura.',
+          ],
+        ),
+        RiskLevel.alto(
+          customItems: [
+            'Estado precario de conservación. Alta densidad de lesiones que comprometen la seguridad de la estructura y deformaciones graves (unidades de mampostería o concreto con fallas por aplastamiento, inclinaciones del elemento fuera de su plano vertical).',
+          ],
+        ),
+      ],
+    );
+  }
+
+  static RiskCategory _createTipologiaEstructural() {
+    return RiskCategory(
+      id: 'tipologia_estructural',
+      title: 'Tipología Estructural',
+      description: 'Evaluación del tipo de sistema estructural y su resistencia',
+      levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      order: 3,
+      value: 3, // Valor según tabla oficial
+      detailedLevels: [
+        RiskLevel.bajo(
+          customItems: [
+            'Edificaciones reforzadas o con reforzamiento especial. Edificaciones en concreto reforzado y acero, diseñadas y construidas con requerimientos de norma o superiores (pórticos, sistemas combinados, duales, muros de concreto reforzado).',
+          ],
+        ),
+        RiskLevel.medioBajo(
+          customItems: [
+            'Mampostería confinada o reforzada.',
+          ],
+        ),
+        RiskLevel.medioAlto(
+          customItems: [
+            'Edificaciones con confinamiento deficiente, estructuras híbridas. Mampostería no reforzada, no confinada, pero con una configuración estructural que brinda cierta resistencia al evento.',
+          ],
+        ),
+        RiskLevel.alto(
+          customItems: [
+            'Estructuras ligeras y construcciones simples. Edificaciones no reforzadas, no confinadas, con baja resistencia a cargas laterales y/o impactos generados por los fenómenos.',
+          ],
+        ),
+      ],
+    );
+  }
+
+  // ========== CATEGORÍAS DE VULNERABILIDAD - FRAGILIDAD EN PERSONAS ==========
+
+  static RiskCategory _createNivelOrganizacion() {
+    return RiskCategory(
+      id: 'nivel_organizacion',
+      title: 'Nivel de Organización',
+      description: 'Evaluación del nivel de preparación y organización comunitaria',
+      levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      order: 1,
+      value: 1, // Valor según tabla oficial
+      detailedLevels: [
+        RiskLevel.bajo(
+          customItems: [
+            'La comunidad tiene total conocimiento de los riesgos presentes en el territorio y asume su compromiso frente al tema. La población cuenta con sistemas de alerta temprana.',
+          ],
+        ),
+        RiskLevel.medioBajo(
+          customItems: [
+            'La comunidad tiene conocimiento de los riesgos presentes y manifiesta un compromiso frente al tema. La población cuenta con planes comunitarios para la gestión del riesgo de desastres.',
+          ],
+        ),
+        RiskLevel.medioAlto(
+          customItems: [
+            'La población tiene conocimiento de los riesgos presentes, pero manifiesta poco compromiso frente al tema.',
+          ],
+        ),
+        RiskLevel.alto(
+          customItems: [
+            'La población no tiene conocimiento de los riesgos presentes, y no manifiesta compromiso frente al tema.',
+          ],
+        ),
+      ],
+    );
+  }
+
+  static RiskCategory _createSuficienciaEconomica() {
+    return RiskCategory(
+      id: 'suficiencia_economica',
+      title: 'Suficiencia Económica',
+      description: 'Evaluación de la capacidad económica para enfrentar el riesgo',
+      levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      order: 2,
+      value: 1, // Valor según tabla oficial
+      detailedLevels: [
+        RiskLevel.bajo(
+          customItems: [
+            'El actor responsable tiene la capacidad de resolver la problemática con sus propios medios.',
+          ],
+        ),
+        RiskLevel.medioBajo(
+          customItems: [
+            'El actor responsable tiene la capacidad de resolver parcialmente la problemática en el corto plazo.',
+          ],
+        ),
+        RiskLevel.medioAlto(
+          customItems: [
+            'El actor responsable tiene la capacidad de resolver parcialmente la problemática en el largo plazo.',
+          ],
+        ),
+        RiskLevel.alto(
+          customItems: [
+            'El actor responsable no tiene la capacidad de resolver la problemática y requiere de apoyo de terceros.',
+          ],
+        ),
+      ],
+    );
+  }
+
+  // ========== CATEGORÍAS DE VULNERABILIDAD - EXPOSICIÓN ==========
+
+  static RiskCategory _createEdificacionesExpuestas() {
+    return RiskCategory(
+      id: 'edificaciones_expuestas',
+      title: 'Edificaciones Expuestas',
+      description: 'Evaluación del tipo de edificaciones según su importancia',
+      levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      order: 1,
+      value: 1, // Valor según tabla oficial
+      detailedLevels: [
+        RiskLevel.bajo(
+          customItems: [
+            'Estructuras de ocupación normal según NSR-10.',
+          ],
+        ),
+        RiskLevel.medioBajo(
+          customItems: [
+            'Estructuras de ocupación especial según NSR-10.',
+          ],
+        ),
+        RiskLevel.medioAlto(
+          customItems: [
+            'Edificaciones de atención a la comunidad según NSR-10.',
+          ],
+        ),
+        RiskLevel.alto(
+          customItems: [
+            'Edificaciones indispensables según la NSR-10.',
+          ],
+        ),
+      ],
+    );
+  }
+
+  static RiskCategory _createOtrosElementosExpuestos() {
+    return RiskCategory(
+      id: 'otros_elementos_expuestos',
+      title: 'Otros Elementos Expuestos (Líneas vitales y drenajes)',
+      description: 'Evaluación de infraestructura vital y servicios expuestos',
+      levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      order: 2,
+      value: 2, // Valor según tabla oficial
+      detailedLevels: [
+        RiskLevel.bajo(
+          customItems: [
+            'Redes eléctricas y de telecomunicaciones.',
+          ],
+        ),
+        RiskLevel.medioBajo(
+          customItems: [
+            'Vías y senderos peatonales que no representan únicas rutas de acceso y evacuación.',
+          ],
+        ),
+        RiskLevel.medioAlto(
+          customItems: [
+            'Redes locales de servicios públicos.',
+          ],
+        ),
+        RiskLevel.alto(
+          customItems: [
+            'Puentes, vías principales o vías que representen una única ruta de acceso y evacuación.',
+            'Redes primarias de servicios públicos (acueducto, alcantarillado y gas).',
+            'Drenajes.',
+          ],
+        ),
+      ],
+    );
+  }
+
+  static RiskCategory _createEscalaAfectacion() {
+    return RiskCategory(
+      id: 'escala_afectacion',
+      title: 'Escala de Afectación',
+      description: 'Evaluación del número de elementos expuestos',
+      levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
+      order: 3,
+      value: 3, // Valor según tabla oficial
+      detailedLevels: [
+        RiskLevel.bajo(
+          customItems: [
+            'Puntual (1 vivienda).',
+          ],
+        ),
+        RiskLevel.medioBajo(
+          customItems: [
+            'Entre 2 y 3 viviendas.',
+          ],
+        ),
+        RiskLevel.medioAlto(
+          customItems: [
+            'Entre 4 y 5 viviendas.',
+          ],
+        ),
+        RiskLevel.alto(
+          customItems: [
+            'Zonal (Cuadra, manzana, barrio).',
           ],
         ),
       ],
