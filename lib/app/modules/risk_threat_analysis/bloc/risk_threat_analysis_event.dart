@@ -46,3 +46,10 @@ class UpdateSelectedRiskEvent extends RiskThreatAnalysisEvent {
   
   UpdateSelectedRiskEvent(this.riskEvent);
 }
+
+// Event to select classification (Amenaza or Vulnerabilidad)
+class SelectClassification extends RiskThreatAnalysisEvent {
+  final String classification; // 'amenaza' or 'vulnerabilidad'
+  
+  SelectClassification(this.classification);
+}

@@ -7,6 +7,7 @@ class RiskThreatAnalysisState {
   final Map<String, String> probabilidadSelections;
   final Map<String, String> intensidadSelections;
   final String selectedRiskEvent;
+  final String selectedClassification; // Nueva propiedad para Amenaza/Vulnerabilidad
 
   const RiskThreatAnalysisState({
     this.isProbabilidadDropdownOpen = false,
@@ -17,6 +18,7 @@ class RiskThreatAnalysisState {
     this.probabilidadSelections = const {},
     this.intensidadSelections = const {},
     this.selectedRiskEvent = 'Movimiento en Masa', // Default
+    this.selectedClassification = 'amenaza', // Default: amenaza
   });
 
   RiskThreatAnalysisState copyWith({
@@ -28,6 +30,7 @@ class RiskThreatAnalysisState {
     Map<String, String>? probabilidadSelections,
     Map<String, String>? intensidadSelections,
     String? selectedRiskEvent,
+    String? selectedClassification,
   }) {
     return RiskThreatAnalysisState(
       isProbabilidadDropdownOpen: isProbabilidadDropdownOpen ?? this.isProbabilidadDropdownOpen,
@@ -38,6 +41,7 @@ class RiskThreatAnalysisState {
       probabilidadSelections: probabilidadSelections ?? this.probabilidadSelections,
       intensidadSelections: intensidadSelections ?? this.intensidadSelections,
       selectedRiskEvent: selectedRiskEvent ?? this.selectedRiskEvent,
+      selectedClassification: selectedClassification ?? this.selectedClassification,
     );
   }
 }

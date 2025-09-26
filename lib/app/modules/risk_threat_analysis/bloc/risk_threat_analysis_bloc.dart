@@ -16,6 +16,7 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     on<UpdateProbabilidadSelection>(_onUpdateProbabilidadSelection);
     on<UpdateIntensidadSelection>(_onUpdateIntensidadSelection);
     on<UpdateSelectedRiskEvent>(_onUpdateSelectedRiskEvent);
+    on<SelectClassification>(_onSelectClassification);
   }
 
   void _onToggleProbabilidadDropdown(
@@ -99,6 +100,18 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     emit(state.copyWith(
       selectedRiskEvent: event.riskEvent,
       // Reset selections when event changes
+      probabilidadSelections: {},
+      intensidadSelections: {},
+    ));
+  }
+
+  void _onSelectClassification(
+    SelectClassification event,
+    Emitter<RiskThreatAnalysisState> emit,
+  ) {
+    emit(state.copyWith(
+      selectedClassification: event.classification,
+      // Reset selections when classification changes
       probabilidadSelections: {},
       intensidadSelections: {},
     ));
@@ -331,6 +344,60 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
       return getCategoriesForSelectedEvent();
     } else if (subClassificationId == 'intensidad') {
       return getIntensidadCategories();
+    }
+    
+    return [];
+  }
+
+  /// Obtiene todas las subclasificaciones de vulnerabilidad para el evento seleccionado
+  List<RiskSubClassification> getVulnerabilidadSubClassifications() {
+    final selectedEvent = state.selectedRiskEvent;
+    final eventModel = RiskModelAdapter.getEventModel(selectedEvent);
+    
+    if (eventModel != null) {
+      final vulnerabilidadClassification = eventModel.getClassificationById('vulnerabilidad');
+      if (vulnerabilidadClassification != null) {
+        return vulnerabilidadClassification.subClassifications;
+      }
+    }
+    
+    return [];
+  }
+
+  /// Obtiene las subclasificaciones basadas en la clasificación seleccionada (amenaza o vulnerabilidad)
+  List<RiskSubClassification> getCurrentSubClassifications() {
+    switch (state.selectedClassification) {
+      case 'amenaza':
+        return getAmenazaSubClassifications();
+      case 'vulnerabilidad':
+        return getVulnerabilidadSubClassifications();
+      default:
+        return getAmenazaSubClassifications();
+    }
+  }
+
+  /// Obtiene las categorías para una subclasificación específica considerando la clasificación actual
+  List<DropdownCategory> getCategoriesForCurrentSubClassification(String subClassificationId) {
+    final selectedEvent = state.selectedRiskEvent;
+    final eventModel = RiskModelAdapter.getEventModel(selectedEvent);
+    
+    if (eventModel != null) {
+      final classification = eventModel.getClassificationById(state.selectedClassification);
+      if (classification != null) {
+        final subClassification = classification.subClassifications
+            .where((sub) => sub.id == subClassificationId)
+            .firstOrNull;
+        
+        if (subClassification != null) {
+          final categories = RiskModelAdapter.convertToDropdownCategories(subClassification.categories);
+          return categories;
+        }
+      }
+    }
+    
+    // Fallback to original method for amenaza
+    if (state.selectedClassification == 'amenaza') {
+      return getCategoriesForSubClassification(subClassificationId);
     }
     
     return [];

@@ -9,8 +9,48 @@ import '../../bloc/risk_threat_analysis_bloc.dart';
 import '../../bloc/risk_threat_analysis_event.dart';
 import '../../bloc/risk_threat_analysis_state.dart';
 
-class CalificacionScreen extends StatelessWidget {
-  const CalificacionScreen({super.key});
+
+class CalificacionScreen extends StatefulWidget {
+  final Map<String, dynamic>? navigationData;
+  
+  const CalificacionScreen({super.key, this.navigationData});
+  
+  @override
+  State<CalificacionScreen> createState() => _CalificacionScreenState();
+}
+
+class _CalificacionScreenState extends State<CalificacionScreen> {
+  
+  @override
+  void initState() {
+    super.initState();
+    // Inicializar el Bloc con la clasificación desde los datos de navegación
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (widget.navigationData != null) {
+        final classificationName = widget.navigationData!['classification'] as String?;
+        final eventName = widget.navigationData!['event'] as String?;
+        
+        // Configurar el evento seleccionado
+        if (eventName != null) {
+          context.read<RiskThreatAnalysisBloc>().add(
+            UpdateSelectedRiskEvent(eventName)
+          );
+        }
+        
+        // Configurar la clasificación seleccionada
+        if (classificationName != null) {
+          context.read<RiskThreatAnalysisBloc>().add(
+            SelectClassification(classificationName)
+          );
+        }
+      } else {
+        // Fallback: usar valores por defecto
+        context.read<RiskThreatAnalysisBloc>().add(
+          SelectClassification('amenaza')
+        );
+      }
+    });
+  }
 
   /// Obtiene el valor seleccionado para una subclasificación específica
   String? _getValueForSubClassification(RiskThreatAnalysisState state, String subClassificationId) {
@@ -81,47 +121,65 @@ class CalificacionScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 10),
-              ListTile(
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 27,
-                ),
-                title: Text(
-                  'Calificación de la Amenaza',
-                  style: const TextStyle(
-                    color: Color(0xFF706F6F),
-                    fontFamily: 'Work Sans',
-                    fontSize: 18,
-                    fontStyle: FontStyle.normal,
-                    fontWeight: FontWeight.w600,
-                    height: 28 / 18,
-                  ),
-                ),
-                trailing: SvgPicture.asset(
-                  AppIcons.info,
-                  width: 30,
-                  height: 30,
-                  colorFilter: ColorFilter.mode(
-                    DAGRDColors.amarDAGRD,
-                    BlendMode.srcIn,
-                  ),
-                ),
+              // Título dinámico basado en la clasificación seleccionada
+              BlocBuilder<RiskThreatAnalysisBloc, RiskThreatAnalysisState>(
+                builder: (context, state) {
+                  final subtitle = state.selectedClassification == 'amenaza' 
+                    ? 'Calificación de la Amenaza'
+                    : 'Calificación de la Vulnerabilidad';
+                  
+                  return ListTile(
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 27,
+                    ),
+                    title: Text(
+                      subtitle,
+                      style: const TextStyle(
+                        color: Color(0xFF706F6F),
+                        fontFamily: 'Work Sans',
+                        fontSize: 18,
+                        fontStyle: FontStyle.normal,
+                        fontWeight: FontWeight.w600,
+                        height: 28 / 18,
+                      ),
+                    ),
+                    trailing: SvgPicture.asset(
+                      AppIcons.info,
+                      width: 30,
+                      height: 30,
+                      colorFilter: ColorFilter.mode(
+                        DAGRDColors.amarDAGRD,
+                        BlendMode.srcIn,
+                      ),
+                    ),
+                  );
+                },
               ),
               const SizedBox(height: 18),
-              CustomElevatedButton(
-                text: 'Factor de Amenaza',
-                onPressed: () {},
-                backgroundColor: DAGRDColors.azulDAGRD,
-                textColor: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.w500,
-                borderRadius: 8,
+              // Botón dinámico basado en la clasificación seleccionada
+              BlocBuilder<RiskThreatAnalysisBloc, RiskThreatAnalysisState>(
+                builder: (context, state) {
+                  final buttonText = state.selectedClassification == 'amenaza' 
+                    ? 'Factor de Amenaza'
+                    : 'Factor de Vulnerabilidad';
+                  
+                  return CustomElevatedButton(
+                    text: buttonText,
+                    onPressed: () {}, // Solo informativo, no hace nada
+                    backgroundColor: DAGRDColors.azulDAGRD,
+                    textColor: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w500,
+                    borderRadius: 8,
+                  );
+                },
               ),
               const SizedBox(height: 24),
-              // Generar dropdowns dinámicamente basados en las RiskSubClassification
+              // Generar dropdowns dinámicamente basados en la clasificación seleccionada
               BlocBuilder<RiskThreatAnalysisBloc, RiskThreatAnalysisState>(
                 builder: (context, state) {
                   final bloc = context.read<RiskThreatAnalysisBloc>();
-                  final subClassifications = bloc.getAmenazaSubClassifications();
+                  final subClassifications = bloc.getCurrentSubClassifications();
                   
                   return Column(
                     children: subClassifications.asMap().entries.map((entry) {
@@ -134,7 +192,7 @@ class CalificacionScreen extends StatelessWidget {
                             hint: subClassification.name,
                             value: _getValueForSubClassification(state, subClassification.id),
                             isSelected: _getIsSelectedForSubClassification(state, subClassification.id),
-                            categories: bloc.getCategoriesForSubClassification(subClassification.id),
+                            categories: bloc.getCategoriesForCurrentSubClassification(subClassification.id),
                             onTap: () {
                               _handleDropdownTap(context, subClassification.id);
                             },
@@ -179,16 +237,24 @@ class CalificacionScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 8),
-                      const Expanded(
-                        child: Text(
-                          'Ver Niveles de Amenaza',
-                          style: TextStyle(
-                            color: Color(0xFF2563EB),
-                            fontFamily: 'Work Sans',
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            height: 24 / 16, // 150% line-height
-                          ),
+                      Expanded(
+                        child: BlocBuilder<RiskThreatAnalysisBloc, RiskThreatAnalysisState>(
+                          builder: (context, state) {
+                            final displayText = state.selectedClassification == 'amenaza' 
+                              ? 'Ver Niveles de Amenaza'
+                              : 'Ver Niveles de Vulnerabilidad';
+                            
+                            return Text(
+                              displayText,
+                              style: const TextStyle(
+                                color: Color(0xFF2563EB),
+                                fontFamily: 'Work Sans',
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                height: 24 / 16, // 150% line-height
+                              ),
+                            );
+                          },
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -257,10 +323,12 @@ class CalificacionScreen extends StatelessWidget {
                   return Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        'Calificación Amenaza',
+                      Text(
+                        state.selectedClassification == 'amenaza' 
+                          ? 'Calificación Amenaza'
+                          : 'Calificación Vulnerabilidad',
                         textAlign: TextAlign.center,
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Color(0xFF232B48),
                           fontFamily: 'Work Sans',
                           fontSize: 16,

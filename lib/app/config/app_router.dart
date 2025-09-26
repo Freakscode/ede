@@ -46,8 +46,17 @@ GoRouter getAppRouter(BuildContext context) {
       GoRoute(
         path: '/risk_threat_analysis',
         builder: (context, state) {
-          final selectedEvent = state.extra as String?;
-          return RiskThreatAnalysisScreen(selectedEvent: selectedEvent);
+          // Manejar tanto String (compatibilidad) como Map (nuevo formato)
+          if (state.extra is Map<String, dynamic>) {
+            final navigationData = state.extra as Map<String, dynamic>;
+            return RiskThreatAnalysisScreen(
+              selectedEvent: navigationData['event'] as String?,
+              navigationData: navigationData,
+            );
+          } else {
+            final selectedEvent = state.extra as String?;
+            return RiskThreatAnalysisScreen(selectedEvent: selectedEvent);
+          }
         },
       ),
 

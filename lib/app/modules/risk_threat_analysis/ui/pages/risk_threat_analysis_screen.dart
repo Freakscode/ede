@@ -11,8 +11,9 @@ import '../../bloc/risk_threat_analysis_state.dart';
 
 class RiskThreatAnalysisScreen extends StatefulWidget {
   final String? selectedEvent;
+  final Map<String, dynamic>? navigationData;
   
-  const RiskThreatAnalysisScreen({super.key, this.selectedEvent});
+  const RiskThreatAnalysisScreen({super.key, this.selectedEvent, this.navigationData});
 
   @override
   State<RiskThreatAnalysisScreen> createState() => _RiskThreatAnalysisScreenState();
@@ -22,7 +23,7 @@ class _RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
   @override
   Widget build(BuildContext context) {
     final List<Widget> screens = [
-      const CalificacionScreen(),
+      CalificacionScreen(navigationData: widget.navigationData),
       const Center(child: Text('Evidencias Screen')),
       const Center(child: Text('Resultados Screen')),
     ];

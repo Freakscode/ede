@@ -77,8 +77,12 @@ class RiskCategoriesScreen extends StatelessWidget {
                             context.read<HomeBloc>().add(
                               SelectRiskCategory(classification.name, selectedEvent),
                             );
-                            // Navegar a siguiente pantalla
-                            context.go('/risk_threat_analysis', extra: selectedEvent);
+                            // Navegar a siguiente pantalla pasando tanto el evento como la clasificación
+                            final navigationData = {
+                              'event': selectedEvent,
+                              'classification': classification.name.toLowerCase(),
+                            };
+                            context.go('/risk_threat_analysis', extra: navigationData);
                           },
                         ),
                         // Agregar espaciado entre cards, excepto después del último
