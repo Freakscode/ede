@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:caja_herramientas/app/core/icons/app_icons.dart';
 import '../../home/services/tutorial_overlay_service.dart';
 import 'home_event.dart';
 import 'home_state.dart';
@@ -81,5 +82,26 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       await TutorialOverlayService.clearTutorialBox();
       emit(state.copyWith(showTutorial: true));
     });
+  }
+
+  /// Mapea los nombres de eventos a sus iconos correspondientes
+  String getIconForEvent(String eventName) {
+    switch (eventName) {
+      case 'Movimiento en Masa':
+        return AppIcons.movimientoMasa;
+      case 'Avenida Torrencial':
+      case 'Avenidas torrenciales':
+        return AppIcons.movimientoMasa; // Usar icono temporal
+      case 'Inundación':
+        return AppIcons.inundacionCH;
+      case 'Estructural':
+        return AppIcons.estructuralCH;
+      case 'Incendio Forestal':
+        return AppIcons.movimientoMasa; // Usar icono temporal
+      case 'Otros':
+        return AppIcons.inundacionCH; // Usar icono temporal
+      default:
+        return AppIcons.movimientoMasa; // Icono por defecto
+    }
   }
 }

@@ -1,12 +1,14 @@
-import 'package:caja_herramientas/app/core/icons/app_icons.dart';
 import 'package:caja_herramientas/app/modules/home/ui/widgets/event_card.dart';
 import 'package:caja_herramientas/app/modules/home/bloc/home_bloc.dart';
 import 'package:caja_herramientas/app/modules/home/bloc/home_event.dart';
+import 'package:caja_herramientas/app/shared/models/risk_event_factory.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class RiskEventsScreen extends StatelessWidget {
   const RiskEventsScreen({super.key});
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -47,60 +49,30 @@ class RiskEventsScreen extends StatelessWidget {
             const SizedBox(height: 24),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: GridView.count(
-                crossAxisCount: 2,
-                mainAxisSpacing: 18,
-                crossAxisSpacing: 18,
-                childAspectRatio: 1,
+              child: GridView.builder(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  mainAxisSpacing: 18,
+                  crossAxisSpacing: 18,
+                  childAspectRatio: 1,
+                ),
                 physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
-                children: [
-                  EventCard(
-                    iconAsset: AppIcons.movimientoMasa,
-                    title: 'Movimiento en Masa',
+                itemCount: RiskEventFactory.getAllEvents().length,
+                itemBuilder: (context, index) {
+                  final riskEvent = RiskEventFactory.getAllEvents()[index];
+                  final homeBloc = context.read<HomeBloc>();
+                  
+                  return EventCard(
+                    iconAsset: homeBloc.getIconForEvent(riskEvent.name),
+                    title: riskEvent.name,
                     onTap: () {
-                      context.read<HomeBloc>().add(
-                        SelectRiskEvent('Movimiento en Masa'),
+                      homeBloc.add(
+                        SelectRiskEvent(riskEvent.name),
                       );
                     },
-                  ),
-                  EventCard(
-                    iconAsset: AppIcons.movimientoMasa,
-                    title: 'Avenidas torrenciales',
-                    onTap: () {
-                      context.read<HomeBloc>().add(
-                        SelectRiskEvent('Avenidas torrenciales'),
-                      );
-                    },
-                  ),
-                  EventCard(
-                    iconAsset: AppIcons.inundacionCH,
-                    title: 'Inundación',
-                    onTap: () {
-                      context.read<HomeBloc>().add(
-                        SelectRiskEvent('Inundación'),
-                      );
-                    },
-                  ),
-                  EventCard(
-                    iconAsset: AppIcons.estructuralCH,
-                    title: 'Estructural',
-                    onTap: () {
-                      context.read<HomeBloc>().add(
-                        SelectRiskEvent('Estructural'),
-                      );
-                    },
-                  ),
-                  EventCard(
-                    iconAsset: AppIcons.inundacionCH,
-                    title: 'Otros',
-                    onTap: () {
-                      context.read<HomeBloc>().add(
-                        SelectRiskEvent('Otros'),
-                      );
-                    },
-                  ),
-                ],
+                  );
+                },
               ),
             ),
             const SizedBox(height: 100),

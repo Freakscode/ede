@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:caja_herramientas/app/shared/models/models.dart';
+import 'package:caja_herramientas/app/shared/models/risk_model_adapter.dart';
 import 'risk_threat_analysis_event.dart';
 import 'risk_threat_analysis_state.dart';
 
@@ -247,6 +248,20 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
 
   // Método para obtener categorías dinámicas basadas en el evento seleccionado
   List<DropdownCategory> getCategoriesForEvent(String selectedEvent) {
+    // Usar el nuevo modelo jerárquico con adaptador para mantener compatibilidad
+    final categories = RiskModelAdapter.getProbabilityCategoriesForEvent(selectedEvent);
+    
+    // Debug: información del evento
+    final debugInfo = RiskModelAdapter.getEventDebugInfo(selectedEvent);
+    print('🔥 RiskThreatAnalysisBloc: Información del evento: $debugInfo');
+    
+    if (categories.isNotEmpty) {
+      print('🔥 RiskThreatAnalysisBloc: Usando nuevo modelo para $selectedEvent (${categories.length} categorías)');
+      return categories;
+    }
+    
+    // Fallback al sistema antiguo si el nuevo no tiene datos
+    print('🔥 RiskThreatAnalysisBloc: Fallback al sistema antiguo para $selectedEvent');
     switch (selectedEvent) {
       case 'Movimiento en Masa':
         return DropdownCategory.movimientoEnMasaCategories;
@@ -277,6 +292,16 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
   List<DropdownCategory> getIntensidadCategories() {
     final selectedEvent = state.selectedRiskEvent;
     
+    // Usar el nuevo modelo jerárquico con adaptador para mantener compatibilidad
+    final categories = RiskModelAdapter.getIntensityCategoriesForEvent(selectedEvent);
+    
+    if (categories.isNotEmpty) {
+      print('🔥 RiskThreatAnalysisBloc: Usando nuevo modelo de intensidad para $selectedEvent (${categories.length} categorías)');
+      return categories;
+    }
+    
+    // Fallback al sistema antiguo si el nuevo no tiene datos
+    print('🔥 RiskThreatAnalysisBloc: Fallback intensidad al sistema antiguo para $selectedEvent');
     switch (selectedEvent) {
       case 'Movimiento en Masa':
         return DropdownCategory.movimientoEnMasaIntensidadCategories;
