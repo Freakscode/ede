@@ -18,6 +18,10 @@ class RiskCategoriesScreen extends StatelessWidget {
       builder: (context, state) {
         final selectedEvent = state.selectedRiskEvent;
         
+        // Obtener las clasificaciones del evento seleccionado a través del Bloc
+        final homeBloc = context.read<HomeBloc>();
+        final classifications = homeBloc.getEventClassifications(selectedEvent);
+        
         return SingleChildScrollView(
       child: Padding(
         padding: EdgeInsets.zero,
@@ -59,32 +63,30 @@ class RiskCategoriesScreen extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
                 children: [
-                  // Amenaza - dinámico basado en selección
-                  CategoryCard(
-                    title: 'Amenaza $selectedEvent',
-                    onTap: () {
-                      // Guardar la categoría seleccionada
-                      context.read<HomeBloc>().add(
-                        SelectRiskCategory('Amenaza', selectedEvent),
-                      );
-                      // Navegar a siguiente pantalla
-                      context.go('/risk_threat_analysis', extra: selectedEvent);
-                    },
-                  ),
-                  const SizedBox(height: 18),
-
-                  // Vulnerabilidad - dinámico basado en selección
-                  CategoryCard(
-                    title: 'Vulnerabilidad $selectedEvent',
-                    onTap: () {
-                      // Guardar la categoría seleccionada
-                      context.read<HomeBloc>().add(
-                        SelectRiskCategory('Vulnerabilidad', selectedEvent),
-                      );
-                      // Navegar a siguiente pantalla
-                      context.go('/risk_threat_analysis');
-                    },
-                  ),
+                  // Generar CategoryCards dinámicamente basadas en las clasificaciones del modelo
+                  ...classifications.asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final classification = entry.value;
+                    
+                    return Column(
+                      children: [
+                        CategoryCard(
+                          title: '${classification.name} $selectedEvent',
+                          onTap: () {
+                            // Guardar la categoría seleccionada
+                            context.read<HomeBloc>().add(
+                              SelectRiskCategory(classification.name, selectedEvent),
+                            );
+                            // Navegar a siguiente pantalla
+                            context.go('/risk_threat_analysis', extra: selectedEvent);
+                          },
+                        ),
+                        // Agregar espaciado entre cards, excepto después del último
+                        if (index < classifications.length - 1) 
+                          const SizedBox(height: 18),
+                      ],
+                    );
+                  }).toList(),
 
                   const SizedBox(height: 24),
 

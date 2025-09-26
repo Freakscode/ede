@@ -1,5 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:caja_herramientas/app/core/icons/app_icons.dart';
+import 'package:caja_herramientas/app/shared/models/risk_event_factory.dart';
+import 'package:caja_herramientas/app/shared/models/risk_event_model.dart';
 import '../../home/services/tutorial_overlay_service.dart';
 import 'home_event.dart';
 import 'home_state.dart';
@@ -103,5 +105,21 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       default:
         return AppIcons.movimientoMasa; // Icono por defecto
     }
+  }
+
+  /// Obtiene el modelo completo de un evento de riesgo
+  RiskEventModel? getRiskEventModel(String eventName) {
+    return RiskEventFactory.getEventByName(eventName);
+  }
+
+  /// Obtiene las clasificaciones de un evento específico
+  List<RiskClassification> getEventClassifications(String eventName) {
+    final model = getRiskEventModel(eventName);
+    return model?.classifications ?? [];
+  }
+
+  /// Obtiene todos los eventos disponibles
+  List<RiskEventModel> getAllRiskEvents() {
+    return RiskEventFactory.getAllEvents();
   }
 }
