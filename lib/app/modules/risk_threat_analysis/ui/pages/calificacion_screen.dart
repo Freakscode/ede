@@ -323,19 +323,28 @@ class _CalificacionScreenState extends State<CalificacionScreen> {
                   return Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        state.selectedClassification == 'amenaza' 
-                          ? 'Calificación Amenaza'
-                          : 'Calificación Vulnerabilidad',
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          color: Color(0xFF232B48),
-                          fontFamily: 'Work Sans',
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          height: 16 / 16,
+                      // Título de calificación dinámico
+                      Expanded(
+                        flex: 2,
+                        child: Text(
+                          state.selectedClassification == 'amenaza' 
+                            ? 'Calificación Amenaza'
+                            : 'Calificación Vulnerabilidad',
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: Color(0xFF232B48),
+                            fontFamily: 'Work Sans',
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            height: 1.0,
+                          ),
                         ),
                       ),
+                      
+                      const SizedBox(width: 16),
+                      
+                      // Contenedor de calificación con colores dinámicos
                       Container(
                         width: 165,
                         height: 40,
@@ -356,7 +365,7 @@ class _CalificacionScreenState extends State<CalificacionScreen> {
                               fontFamily: 'Work Sans',
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
-                              height: 16 / 16,
+                              height: 1.0,
                             ),
                           ),
                         ),
