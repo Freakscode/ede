@@ -299,7 +299,7 @@ class _CalificacionScreenState extends State<CalificacionScreen> {
                       // Contenedor de calificación con colores dinámicos
                       Container(
                         width: 165,
-                        height: 40,
+                        height: 50,
                         padding: const EdgeInsets.symmetric(
                           horizontal: 20,
                           vertical: 10,
@@ -309,17 +309,8 @@ class _CalificacionScreenState extends State<CalificacionScreen> {
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Center(
-                          child: Text(
-                            bloc.getFormattedThreatRating(),
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: bloc.getThreatTextColor(),
-                              fontFamily: 'Work Sans',
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              height: 1.0,
-                            ),
-                          ),
+                          child: Text(bloc.getFormattedThreatRating(), textAlign: TextAlign.center, 
+                            style: TextStyle(color: bloc.getThreatTextColor(), fontFamily: 'Work Sans', fontSize: 16, fontWeight: FontWeight.w600, height: 1.0)),
                         ),
                       ),
                     ],
