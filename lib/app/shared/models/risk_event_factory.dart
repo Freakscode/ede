@@ -40,9 +40,9 @@ class RiskEventFactory {
               description: 'Factores que determinan la magnitud e impacto del evento',
               weight: 0.5,
               categories: [
-                _createVolumenDeslizamiento(),
-                _createVelocidadMovimiento(),
-                _createAlcanceImpacto(),
+                _createPotencialDanoEdificaciones(),
+                _createCapacidadGenerarPerdidaVidas(),
+                _createAlteracionLineasVitales(),
               ],
             ),
           ],
@@ -338,11 +338,11 @@ class RiskEventFactory {
         RiskLevel.alto(
           customItems: [
             'Pendientes medias o altas modeladas en roca fracturada.',
-            'Pendientes muy altas modeladas en suelos (> 30°).',
+            'Pendientes muy altas modeladas en suelos ( > 30°).',
             'Pendientes altas modeladas en suelos (15° - 30°), en condiciones saturadas.',
             'Pendientes medias o altas, modeladas en llenos antrópicos.',
           ],
-          customNote: 'NOTA: En caso de tratarse de llenos antrópicos constituidos sin sustento técnico',
+          customNote: 'NOTA: En caso de tratarse de llenos antrópicos constituidos sin sustento técnico (vertimiento libre de materiales de excavación, escombros y basuras), ASIGNAR EL VALOR DE 4',
         ),
       ],
     );
@@ -355,32 +355,29 @@ class RiskEventFactory {
       description: 'Evaluación del impacto de las actividades humanas en la estabilidad',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
       order: 2,
-      value: 1, // Valor inicial (1-4, donde 1=BAJO, 2=MEDIO BAJO, 3=MEDIO ALTO, 4=ALTO)
+      value: 2, // Valor según tabla (1-4, donde 1=BAJO, 2=MEDIO BAJO, 3=MEDIO ALTO, 4=ALTO)
       detailedLevels: [
         RiskLevel.bajo(
           customItems: [
-            'Sin intervención antrópica significativa.',
-            'Manejo adecuado del terreno.',
+            'No se evidencian intervenciones antrópicas que condicionen la estabilidad del terreno.',
+            'Se han desarrollado cortes o excavaciones que pueden afectar la estabilidad del terreno, pero se han ejecutado obras de estabilización o mitigación aparentemente adecuadas.',
           ],
         ),
         RiskLevel.medioBajo(
           customItems: [
-            'Intervención mínima controlada.',
-            'Medidas de control implementadas.',
+            'Se presentan cortes o excavaciones menores de 3 metros de altura que no tienden a comprometer la estabilidad del terreno.',
           ],
         ),
         RiskLevel.medioAlto(
           customItems: [
-            'Intervención moderada sin control adecuado.',
-            'Cortes y rellenos sin técnica apropiada.',
+            'Se presentan cortes o excavaciones que comprometen la estabilidad del terreno, pero se han desarrollado obras de mitigación menores (bioingeniería, drenaje superficial y subsuperficial, entre otros) que no garantizan su estabilidad.',
           ],
         ),
         RiskLevel.alto(
           customItems: [
-            'Intervención severa descontrolada.',
-            'Cortes verticales sin soporte.',
-            'Rellenos sin compactación.',
-            'Modificación drástica del drenaje natural.',
+            'Se presentan cortes o excavaciones que comprometen la estabilidad del terreno y no se han desarrollado obras de estabilización o mitigación.',
+            'Se presenta acumulación de material de excavación, escombros y basuras sobre la parte alta o media del talud/ladera, generando sobrecargas que condicionan su estabilidad.',
+            'Existen sobrecargas asociadas a la construcción de edificaciones, adiciones o infraestructura que pueden comprometer la estabilidad del talud/ladera.',
           ],
         ),
       ],
@@ -391,34 +388,30 @@ class RiskEventFactory {
     return RiskCategory(
       id: 'manejo_aguas_lluvia',
       title: 'Manejo de Aguas de Lluvia',
-      description: 'Evaluación del sistema de drenaje y manejo pluvial',
+      description: 'Evaluación del sistema de drenaje y manejo pluvial (canoas, bajantes, cunetas, sumideros, entre otros)',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
       order: 3,
-      value: 3, // Valor inicial (1-4, donde 1=BAJO, 2=MEDIO BAJO, 3=MEDIO ALTO, 4=ALTO)
+      value: 3, // Valor según tabla (1-4, donde 1=BAJO, 2=MEDIO BAJO, 3=MEDIO ALTO, 4=ALTO)
       detailedLevels: [
         RiskLevel.bajo(
           customItems: [
-            'Sistema de drenaje excelente.',
-            'Obras de protección adecuadas.',
+            'Existen obras de captación y manejo de aguas lluvias y de escorrentía de buena capacidad hidráulica.',
           ],
         ),
         RiskLevel.medioBajo(
           customItems: [
-            'Sistema de drenaje bueno.',
-            'Obras de protección parciales.',
+            'Existen obras de captación y manejo de aguas lluvias y de escorrentía de insuficiente capacidad hidráulica.',
           ],
         ),
         RiskLevel.medioAlto(
           customItems: [
-            'Sistema de drenaje deficiente.',
-            'Concentración de aguas sin control.',
+            'Deficientes sistemas de captación de aguas lluvias y de escorrentía.',
           ],
         ),
         RiskLevel.alto(
           customItems: [
-            'Sin sistema de drenaje.',
-            'Concentración severa de aguas.',
-            'Saturación permanente del suelo.',
+            'Ausencia total de sistemas de captación y manejo de aguas lluvias y de escorrentía.',
+            'Descoles inadecuados de obras de captación.',
           ],
         ),
       ],
@@ -432,31 +425,27 @@ class RiskEventFactory {
       description: 'Estado y manejo de las redes de servicios públicos',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
       order: 4,
-      value: 4, // Valor inicial (1-4)
+      value: 4, // Valor según tabla (1-4)
       detailedLevels: [
         RiskLevel.bajo(
           customItems: [
-            'Redes en excelente estado.',
-            'Sin fugas ni infiltraciones.',
+            'Existen redes convencionales de servicios públicos que funcionan adecuadamente.',
           ],
         ),
         RiskLevel.medioBajo(
           customItems: [
-            'Redes en buen estado.',
-            'Fugas menores controladas.',
+            'Existen redes de servicios públicos no convencionales o comunitarias, cuyo funcionamiento es aceptable.',
           ],
         ),
         RiskLevel.medioAlto(
           customItems: [
-            'Redes con deterioro moderado.',
-            'Fugas frecuentes.',
+            'Se presentan deficiencias en las redes de servicio existentes.',
           ],
         ),
         RiskLevel.alto(
           customItems: [
-            'Redes en mal estado.',
-            'Fugas permanentes y significativas.',
-            'Saturación del suelo por filtraciones.',
+            'No existen redes de servicio.',
+            'Se presentan descargas de aguas residuales a media ladera, fugas de agua en tuberías o mangueras y/o rebose de tanques de almacenamiento de aguas.',
           ],
         ),
       ],
@@ -470,31 +459,27 @@ class RiskEventFactory {
       description: 'Historial de eventos previos en la zona',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
       order: 5,
-      value: 2, // Valor inicial (1-4)
+      value: 3, // Valor según tabla (1-4)
       detailedLevels: [
         RiskLevel.bajo(
           customItems: [
-            'Sin antecedentes de movimientos.',
-            'Zona estable históricamente.',
+            'No se presentan rasgos indicadores de inestabilidad en el entorno, ni características morfológicas que evidencien la ocurrencia de procesos morfodinámicos en el pasado.',
           ],
         ),
         RiskLevel.medioBajo(
           customItems: [
-            'Antecedentes menores aislados.',
-            'Eventos de baja magnitud.',
+            'Se presentan algunas características en el entorno que sugieren el desarrollo de procesos morfodinámicos en el pasado, los cuales ya se encuentran inactivos y/o revegetalizados.',
           ],
         ),
         RiskLevel.medioAlto(
           customItems: [
-            'Antecedentes moderados documentados.',
-            'Eventos recurrentes de magnitud media.',
+            'Existen evidencias morfológicas en el entorno que podrían sugerir el desarrollo de procesos morfodinámicos superficiales recientes (desgarres).',
           ],
         ),
         RiskLevel.alto(
           customItems: [
-            'Antecedentes de eventos mayores.',
-            'Historial de deslizamientos significativos.',
-            'Eventos recientes y recurrentes.',
+            'Existen múltiples rasgos indicadores de inestabilidad en el entorno.',
+            'Se presentan movimientos en masa activos y procesos de erosión concentrada.',
           ],
         ),
       ],
@@ -508,34 +493,32 @@ class RiskEventFactory {
       description: 'Signos visibles de inestabilidad actual',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
       order: 6,
-      value: 1, // Valor inicial (1-4)
+      value: 3, // Valor según tabla (1-4)
       detailedLevels: [
         RiskLevel.bajo(
           customItems: [
-            'Sin evidencias visibles.',
-            'Terreno estable.',
+            'No hay evidencias o manifestaciones que indiquen la posibilidad de ocurrencia del evento.',
+            'El evento no tiene probabilidad de expandirse.',
           ],
         ),
         RiskLevel.medioBajo(
           customItems: [
-            'Evidencias menores localizadas.',
-            'Grietas superficiales aisladas.',
+            'Las evidencias o manifestaciones que sugieren la ocurrencia del evento no están muy definidas, pero las condiciones propias del terreno no permiten descartar la posibilidad de que se desarrolle el fenómeno.',
+            'El evento no muestra rasgos indicadores de evolución, sin embargo, las características físicas del talud podrían favorecer su expansión.',
           ],
         ),
         RiskLevel.medioAlto(
           customItems: [
-            'Evidencias moderadas.',
-            'Grietas en desarrollo.',
-            'Deformaciones menores.',
+            'Existen evidencias y manifestaciones que sugieren la ocurrencia del evento, pero puede no ser inminente en el futuro inmediato.',
+            'El evento muestra algunos rasgos indicadores de evolución (grietas incipientes, material suspendido y acumulado).',
           ],
         ),
         RiskLevel.alto(
           customItems: [
-            'Evidencias claras de inestabilidad.',
-            'Grietas activas y en expansión.',
-            'Movimientos visibles recientes.',
-            'Deformaciones significativas.',
+            'Existen evidencias y manifestaciones que hacen inminente la ocurrencia del evento.',
+            'El evento tiene tendencia retrogresiva, progresiva y de crecimiento lateral a corto plazo, y presenta rasgos indicadores de evolución rápida (grietas de tracción, gran cantidad de material suspendido, acumulado e inestable).',
           ],
+          customNote: 'NOTA: Si durante el proceso de calificación se asigna en esta categoría el valor de 4, se deben ignorar las demás variables de la POSIBILIDAD.',
         ),
       ],
     );
@@ -543,114 +526,99 @@ class RiskEventFactory {
 
   // ========== CATEGORÍAS DE INTENSIDAD ==========
 
-  static RiskCategory _createVolumenDeslizamiento() {
+  static RiskCategory _createPotencialDanoEdificaciones() {
     return RiskCategory(
-      id: 'volumen_deslizamiento',
-      title: 'Volumen del Deslizamiento',
-      description: 'Volumen estimado de material en movimiento',
+      id: 'potencial_dano_edificaciones',
+      title: 'Potencial de Daño en Edificaciones',
+      description: 'Evaluación del potencial de daño a las edificaciones',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
       order: 1,
-      value: 2, // Valor inicial (1-4)
+      value: 1, // Valor según tabla oficial
       detailedLevels: [
         RiskLevel.bajo(
           customItems: [
-            'Volumen menor a 100 m³.',
-            'Movimientos superficiales localizados.',
+            'Las características del fenómeno sugieren un bajo potencial de daño, por lo que las edificaciones no se verían afectadas.',
           ],
         ),
         RiskLevel.medioBajo(
           customItems: [
-            'Volumen entre 100 - 1,000 m³.',
-            'Movimientos de tamaño moderado.',
+            'Las características del fenómeno sugieren la ocurrencia de daños leves en las edificaciones, recuperables fácilmente.',
           ],
         ),
         RiskLevel.medioAlto(
           customItems: [
-            'Volumen entre 1,000 - 10,000 m³.',
-            'Movimientos de gran escala.',
+            'Las características del fenómeno sugieren la ocurrencia de daños importantes en las edificaciones.',
           ],
         ),
         RiskLevel.alto(
           customItems: [
-            'Volumen mayor a 10,000 m³.',
-            'Movimientos masivos que afectan grandes áreas.',
-            'Deslizamientos que pueden generar represamientos.',
+            'Las características del fenómeno sugieren un potencial de daño muy alto, por lo que podría ser inminente el colapso o la falla de las edificaciones.',
           ],
         ),
       ],
     );
   }
 
-  static RiskCategory _createVelocidadMovimiento() {
+  static RiskCategory _createCapacidadGenerarPerdidaVidas() {
     return RiskCategory(
-      id: 'velocidad_movimiento',
-      title: 'Velocidad del Movimiento',
-      description: 'Velocidad estimada del proceso de movimiento',
+      id: 'capacidad_generar_perdida_vidas',
+      title: 'Capacidad de Generar Pérdida de Vidas Humanas',
+      description: 'Evaluación del potencial de generar víctimas mortales y lesionados',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
       order: 2,
-      value: 3, // Valor inicial (1-4)
+      value: 2, // Valor según tabla oficial
       detailedLevels: [
         RiskLevel.bajo(
           customItems: [
-            'Movimiento muy lento (<1 cm/año).',
-            'Deformación progresiva imperceptible.',
+            'No se estiman personas lesionadas ni muertos.',
           ],
         ),
         RiskLevel.medioBajo(
           customItems: [
-            'Movimiento lento (1 cm/año - 1 cm/mes).',
-            'Deformación visible con el tiempo.',
+            'Difícilmente genera personas muertas o lesionadas.',
           ],
         ),
         RiskLevel.medioAlto(
           customItems: [
-            'Movimiento moderado (1 cm/mes - 1 cm/día).',
-            'Desarrollo de grietas y deformaciones evidentes.',
+            'Puede presentar personas lesionadas y posiblemente algún muerto.',
           ],
         ),
         RiskLevel.alto(
           customItems: [
-            'Movimiento rápido (>1 cm/día).',
-            'Movimiento súbito y catastrófico.',
-            'Sin tiempo para evacuación preventiva.',
+            'Puede presentar numerosos muertos y lesionados.',
           ],
         ),
       ],
     );
   }
 
-  static RiskCategory _createAlcanceImpacto() {
+  static RiskCategory _createAlteracionLineasVitales() {
     return RiskCategory(
-      id: 'alcance_impacto',
-      title: 'Alcance del Impacto',
-      description: 'Área de influencia y alcance del movimiento',
+      id: 'alteracion_lineas_vitales',
+      title: 'Alteración del Funcionamiento de Líneas Vitales y Espacio Público',
+      description: 'Evaluación del impacto en servicios públicos e infraestructura vital',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
       order: 3,
-      value: 2, // Valor inicial (1-4)
+      value: 3, // Valor según tabla oficial
       detailedLevels: [
         RiskLevel.bajo(
           customItems: [
-            'Impacto localizado (<50 m de alcance).',
-            'Afectación mínima de infraestructura.',
+            'No se altera el funcionamiento u operación de los elementos, de manera que no se compromete la prestación del servicio.',
           ],
         ),
         RiskLevel.medioBajo(
           customItems: [
-            'Impacto moderado (50-200 m de alcance).',
-            'Afectación parcial de infraestructura.',
+            'Se presentan daños leves en los elementos pero no se compromete la prestación del servicio.',
           ],
         ),
         RiskLevel.medioAlto(
           customItems: [
-            'Impacto extenso (200-500 m de alcance).',
-            'Afectación significativa de infraestructura y viviendas.',
+            'El funcionamiento u operación de los elementos se ve alterado, de manera que se compromete la prestación del servicio pero se puede recuperar en el corto plazo (acciones de reparación).',
           ],
         ),
         RiskLevel.alto(
           customItems: [
-            'Impacto masivo (>500 m de alcance).',
-            'Destrucción total de infraestructura.',
-            'Afectación de múltiples comunidades.',
+            'Se altera completamente el funcionamiento u operación de los elementos y su recuperación es difícil en el corto plazo (acciones de reconstrucción).',
           ],
         ),
       ],
