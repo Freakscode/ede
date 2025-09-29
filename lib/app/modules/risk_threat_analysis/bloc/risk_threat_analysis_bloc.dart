@@ -217,6 +217,54 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     return 0;
   }
 
+  /// Obtiene la calificación (wi * value) de una categoría específica
+  /// basándose en la selección actual del usuario en el dropdown
+  int getCategoryCalificacion(String subClassificationId, String categoryId, int wi) {
+    final selections = getSelectionsForSubClassification(subClassificationId);
+    final selectedLevel = selections[categoryId];
+    
+    if (selectedLevel == null) return 0;
+    
+    final value = _getLevelValue(selectedLevel);
+    return wi * value;
+  }
+
+  // Método helper para obtener la calificación ponderada desde el modelo cuando esté disponible
+  double _getCategoryWeightedScore(String subClassificationId, String categoryTitle) {
+    try {
+      final selectedEvent = state.selectedRiskEvent;
+      final eventModel = RiskModelAdapter.getEventModel(selectedEvent);
+      
+      if (eventModel != null) {
+        final classification = eventModel.getClassificationById(state.selectedClassification);
+        if (classification != null) {
+          final subClassification = classification.subClassifications
+              .where((sub) => sub.id == subClassificationId)
+              .firstOrNull;
+          
+          if (subClassification != null) {
+            final category = subClassification.categories
+                .where((cat) => cat.title == categoryTitle)
+                .firstOrNull;
+            
+            if (category != null) {
+              // Usar la calificación ponderada del modelo (value * wi)
+              return category.weightedScore;
+            }
+          }
+        }
+      }
+      
+      // Fallback: usar el método anterior sin ponderación
+      final selectedLevel = getSelectionsForSubClassification(subClassificationId)[categoryTitle];
+      return selectedLevel != null ? _getLevelValue(selectedLevel).toDouble() : 0.0;
+    } catch (e) {
+      // En caso de error, usar el método de fallback
+      final selectedLevel = getSelectionsForSubClassification(subClassificationId)[categoryTitle];
+      return selectedLevel != null ? _getLevelValue(selectedLevel).toDouble() : 0.0;
+    }
+  }
+
   // Método helper para obtener el valor numérico desde el modelo cuando esté disponible
   int _getCategoryValue(String subClassificationId, String categoryTitle) {
     try {
@@ -283,7 +331,7 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     }
   }
 
-  // Método específico para calcular calificación de vulnerabilidad
+  // Método específico para calcular calificación de vulnerabilidad usando calificaciones ponderadas
   String _calculateVulnerabilidadRating() {
     final subClassifications = getCurrentSubClassifications();
     
@@ -291,37 +339,59 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
       return 'SIN CALIFICAR';
     }
     
-    // Calcular el promedio de todas las subclasificaciones de vulnerabilidad
-    double totalScore = 0.0;
-    int count = 0;
+    // Calcular el promedio ponderado de todas las subclasificaciones de vulnerabilidad
+    double totalWeightedScore = 0.0;
+    double totalWeight = 0.0;
     
     for (final subClassification in subClassifications) {
       final selections = state.dynamicSelections[subClassification.id] ?? {};
       
       if (selections.isNotEmpty) {
-        double subScore = 0.0;
-        int subCount = 0;
+        double subWeightedScore = 0.0;
+        double subWeight = 0.0;
         
-        for (final level in selections.values) {
-          int value = _getLevelValue(level);
-          if (value > 0) {
-            subScore += value;
-            subCount++;
+        // Calcular score ponderado para cada categoría en esta subclasificación
+        for (final categoryTitle in selections.keys) {
+          // Obtener la categoría del modelo para acceder al peso wi
+          final selectedEvent = state.selectedRiskEvent;
+          final eventModel = RiskModelAdapter.getEventModel(selectedEvent);
+          
+          if (eventModel != null) {
+            final classification = eventModel.getClassificationById(state.selectedClassification);
+            if (classification != null) {
+              final subClass = classification.subClassifications
+                  .where((sub) => sub.id == subClassification.id)
+                  .firstOrNull;
+              
+              if (subClass != null) {
+                final riskCategory = subClass.categories
+                    .where((cat) => cat.title == categoryTitle)
+                    .firstOrNull;
+                
+                if (riskCategory != null) {
+                  final weightedScore = riskCategory.weightedScore;
+                  if (weightedScore > 0) {
+                    subWeightedScore += weightedScore;
+                    subWeight += riskCategory.wi;
+                  }
+                }
+              }
+            }
           }
         }
         
-        if (subCount > 0) {
-          totalScore += (subScore / subCount);
-          count++;
+        if (subWeight > 0) {
+          totalWeightedScore += subWeightedScore;
+          totalWeight += subWeight;
         }
       }
     }
     
-    if (count == 0) {
+    if (totalWeight == 0) {
       return 'SIN CALIFICAR';
     }
     
-    final finalScore = totalScore / count;
+    final finalScore = totalWeightedScore / totalWeight;
     
     if (finalScore <= 1.5) {
       return 'BAJO';
@@ -385,7 +455,7 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     return (probAverage + intAverage) / 2;
   }
 
-  // Método específico para calcular puntaje final de vulnerabilidad
+  // Método específico para calcular puntaje final de vulnerabilidad usando calificaciones ponderadas
   double _calculateVulnerabilidadFinalScore() {
     final subClassifications = getCurrentSubClassifications();
     
@@ -393,33 +463,44 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
       return 0.0;
     }
     
-    // Calcular el promedio de todas las subclasificaciones de vulnerabilidad
-    double totalScore = 0.0;
-    int count = 0;
+    // Calcular el promedio ponderado de todas las subclasificaciones de vulnerabilidad
+    double totalWeightedScore = 0.0;
+    double totalWeight = 0.0;
     
     for (final subClassification in subClassifications) {
       final selections = state.dynamicSelections[subClassification.id] ?? {};
       
       if (selections.isNotEmpty) {
-        double subScore = 0.0;
-        int subCount = 0;
-        
-        for (final level in selections.values) {
-          int value = _getLevelValue(level);
-          if (value > 0) {
-            subScore += value;
-            subCount++;
+        // Calcular score ponderado para cada categoría en esta subclasificación
+        for (final categoryTitle in selections.keys) {
+          // Obtener la categoría del modelo para acceder al peso wi
+          final selectedEvent = state.selectedRiskEvent;
+          final eventModel = RiskModelAdapter.getEventModel(selectedEvent);
+          
+          if (eventModel != null) {
+            final classification = eventModel.getClassificationById(state.selectedClassification);
+            if (classification != null) {
+              final subClass = classification.subClassifications
+                  .where((sub) => sub.id == subClassification.id)
+                  .firstOrNull;
+              
+              if (subClass != null) {
+                final riskCategory = subClass.categories
+                    .where((cat) => cat.title == categoryTitle)
+                    .firstOrNull;
+                
+                if (riskCategory != null) {
+                  totalWeightedScore += riskCategory.weightedScore;
+                  totalWeight += riskCategory.wi;
+                }
+              }
+            }
           }
-        }
-        
-        if (subCount > 0) {
-          totalScore += (subScore / subCount);
-          count++;
         }
       }
     }
     
-    return count > 0 ? totalScore / count : 0.0;
+    return totalWeight > 0 ? totalWeightedScore / totalWeight : 0.0;
   }
 
   // Método para obtener el color de fondo basado en la calificación

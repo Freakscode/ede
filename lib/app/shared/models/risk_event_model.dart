@@ -101,6 +101,7 @@ class RiskCategory {
   final bool isRequired;
   final int order;
   final int value; // Valor seleccionado de la categoría (1-4)
+  final int wi; // Peso/weight para la calificación ponderada
   final Map<String, dynamic>? metadata;
 
   const RiskCategory({
@@ -110,6 +111,7 @@ class RiskCategory {
     required this.levels,
     required this.detailedLevels,
     required this.value,
+    this.wi = 1, // Peso por defecto 1
     this.isRequired = true,
     this.order = 0,
     this.metadata,
@@ -125,6 +127,7 @@ class RiskCategory {
           .map((e) => RiskLevel.fromMap(e as Map<String, dynamic>))
           .toList(),
       value: map['value'] as int? ?? 1, // Valor por defecto 1 si no existe
+      wi: map['wi'] as int? ?? 1, // Peso por defecto 1 si no existe
       isRequired: map['isRequired'] as bool? ?? true,
       order: map['order'] as int? ?? 0,
       metadata: map['metadata'] as Map<String, dynamic>?,
@@ -139,6 +142,7 @@ class RiskCategory {
       'levels': levels,
       'detailedLevels': detailedLevels.map((e) => e.toMap()).toList(),
       'value': value,
+      'wi': wi,
       'isRequired': isRequired,
       'order': order,
       if (metadata != null) 'metadata': metadata,
@@ -153,6 +157,7 @@ class RiskCategory {
     List<String>? levels,
     List<RiskLevel>? detailedLevels,
     int? value,
+    int? wi,
     bool? isRequired,
     int? order,
     Map<String, dynamic>? metadata,
@@ -164,14 +169,22 @@ class RiskCategory {
       levels: levels ?? this.levels,
       detailedLevels: detailedLevels ?? this.detailedLevels,
       value: value ?? this.value,
+      wi: wi ?? this.wi,
       isRequired: isRequired ?? this.isRequired,
       order: order ?? this.order,
       metadata: metadata ?? this.metadata,
     );
   }
 
+  /// Calcula la calificación ponderada (value * wi)
+  double get weightedScore => (value * wi).toDouble();
+
+  /// Calcula la calificación como la multiplicación de wi * value
+  /// Se actualiza automáticamente cuando el value cambia en el dropdown
+  int get calificacion => wi * value;
+
   @override
-  String toString() => 'RiskCategory(id: $id, title: $title, value: $value)';
+  String toString() => 'RiskCategory(id: $id, title: $title, value: $value, wi: $wi, calificacion: $calificacion)';
 }
 
 /// Representa un evento de riesgo completo

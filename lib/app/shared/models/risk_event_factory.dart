@@ -517,7 +517,8 @@ class RiskEventFactory {
       description: 'Evaluación de las condiciones del suelo y pendientes',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
       order: 1,
-      value: 2, // Valor inicial (1-4, donde 1=BAJO, 2=MEDIO BAJO, 3=MEDIO ALTO, 4=ALTO)
+      value: 0, // Valor inicial sin calificación
+      wi: 15, // Peso según tabla oficial
       detailedLevels: [
         RiskLevel.bajo(
           customItems: [
@@ -557,7 +558,8 @@ class RiskEventFactory {
       description: 'Evaluación del impacto de las actividades humanas en la estabilidad',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
       order: 2,
-      value: 2, // Valor según tabla (1-4, donde 1=BAJO, 2=MEDIO BAJO, 3=MEDIO ALTO, 4=ALTO)
+      value: 0, // Valor inicial sin calificación
+      wi: 20, // Peso según tabla oficial
       detailedLevels: [
         RiskLevel.bajo(
           customItems: [
@@ -593,7 +595,8 @@ class RiskEventFactory {
       description: 'Evaluación del sistema de drenaje y manejo pluvial (canoas, bajantes, cunetas, sumideros, entre otros)',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
       order: 3,
-      value: 3, // Valor según tabla (1-4, donde 1=BAJO, 2=MEDIO BAJO, 3=MEDIO ALTO, 4=ALTO)
+      value: 0, // Valor inicial sin calificación
+      wi: 15, // Peso según tabla oficial
       detailedLevels: [
         RiskLevel.bajo(
           customItems: [
@@ -627,7 +630,8 @@ class RiskEventFactory {
       description: 'Estado y manejo de las redes de servicios públicos',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
       order: 4,
-      value: 4, // Valor según tabla (1-4)
+      value: 0, // Valor inicial sin calificación
+      wi: 10, // Peso según tabla oficial
       detailedLevels: [
         RiskLevel.bajo(
           customItems: [
@@ -661,7 +665,8 @@ class RiskEventFactory {
       description: 'Historial de eventos previos en la zona',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
       order: 5,
-      value: 3, // Valor según tabla (1-4)
+      value: 0, // Valor inicial sin calificación
+      wi: 10, // Peso según tabla oficial
       detailedLevels: [
         RiskLevel.bajo(
           customItems: [
@@ -695,7 +700,8 @@ class RiskEventFactory {
       description: 'Signos visibles de inestabilidad actual',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
       order: 6,
-      value: 3, // Valor según tabla (1-4)
+      value: 0, // Valor inicial sin calificación
+      wi: 30, // Peso según tabla oficial
       detailedLevels: [
         RiskLevel.bajo(
           customItems: [
@@ -735,7 +741,8 @@ class RiskEventFactory {
       description: 'Evaluación del potencial de daño a las edificaciones',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
       order: 1,
-      value: 1, // Valor según tabla oficial
+      value: 0, // Valor inicial sin calificación
+      wi: 35, // Peso según tabla oficial de intensidad
       detailedLevels: [
         RiskLevel.bajo(
           customItems: [
@@ -768,7 +775,8 @@ class RiskEventFactory {
       description: 'Evaluación del potencial de generar víctimas mortales y lesionados',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
       order: 2,
-      value: 2, // Valor según tabla oficial
+      value: 0, // Valor inicial sin calificación
+      wi: 35, // Peso según tabla oficial de intensidad
       detailedLevels: [
         RiskLevel.bajo(
           customItems: [
@@ -801,7 +809,8 @@ class RiskEventFactory {
       description: 'Evaluación del impacto en servicios públicos e infraestructura vital',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
       order: 3,
-      value: 3, // Valor según tabla oficial
+      value: 0, // Valor inicial sin calificación
+      wi: 30, // Peso según tabla oficial de intensidad
       detailedLevels: [
         RiskLevel.bajo(
           customItems: [
@@ -836,7 +845,7 @@ class RiskEventFactory {
       description: 'Disponibilidad y características del material combustible',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
       order: 1,
-      value: 2, // Valor inicial (1-4)
+      value: 0, // Valor inicial sin calificación
       detailedLevels: [
         RiskLevel.bajo(
           customItems: [
@@ -874,7 +883,7 @@ class RiskEventFactory {
       description: 'Factores climáticos que favorecen los incendios',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
       order: 2,
-      value: 2, // Valor inicial (1-4)
+      value: 0, // Valor inicial sin calificación
       detailedLevels: [
         RiskLevel.bajo(
           customItems: [
@@ -918,7 +927,7 @@ class RiskEventFactory {
       title: 'Velocidad de Propagación',
       description: 'Velocidad de avance del fuego',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 2, // Valor inicial (1-4)
+      value: 0, // Valor inicial sin calificación
       order: 1,
       detailedLevels: [
         RiskLevel.bajo(
@@ -956,7 +965,7 @@ class RiskEventFactory {
       title: 'Altura de Llama',
       description: 'Altura característica de las llamas',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 2, // Valor inicial (1-4)
+      value: 0, // Valor inicial sin calificación
       order: 2,
       detailedLevels: [
         RiskLevel.bajo(
@@ -994,7 +1003,7 @@ class RiskEventFactory {
       title: 'Área Afectada',
       description: 'Extensión del área potencialmente afectada',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 2, // Valor inicial (1-4)
+      value: 0, // Valor inicial sin calificación
       order: 3,
       detailedLevels: [
         RiskLevel.bajo(
@@ -1034,7 +1043,7 @@ class RiskEventFactory {
       title: 'Características Hidrológicas',
       description: 'Características de la cuenca y drenaje',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 2, // Valor inicial (1-4)
+      value: 0, // Valor inicial sin calificación
       order: 1,
       detailedLevels: [
         RiskLevel.bajo(
@@ -1076,7 +1085,7 @@ class RiskEventFactory {
       title: 'Precipitación',
       description: 'Características de las precipitaciones en la zona',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 2, // Valor inicial (1-4)
+      value: 0, // Valor inicial sin calificación
       order: 2,
       detailedLevels: [
         RiskLevel.bajo(
@@ -1114,7 +1123,7 @@ class RiskEventFactory {
       title: 'Profundidad del Agua',
       description: 'Profundidad estimada del agua en inundación',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 2, // Valor inicial (1-4)
+      value: 0, // Valor inicial sin calificación
       order: 1,
       detailedLevels: [
         RiskLevel.bajo(
@@ -1152,7 +1161,7 @@ class RiskEventFactory {
       title: 'Velocidad del Flujo',
       description: 'Velocidad del agua durante la inundación',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 2, // Valor inicial (1-4)
+      value: 0, // Valor inicial sin calificación
       order: 2,
       detailedLevels: [
         RiskLevel.bajo(
@@ -1190,7 +1199,7 @@ class RiskEventFactory {
       title: 'Duración de la Inundación',
       description: 'Tiempo estimado de permanencia del agua',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 2, // Valor inicial (1-4)
+      value: 0, // Valor inicial sin calificación
       order: 3,
       detailedLevels: [
         RiskLevel.bajo(
@@ -1230,7 +1239,7 @@ class RiskEventFactory {
       title: 'Características de la Cuenca',
       description: 'Características geomorfológicas de la cuenca',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 2, // Valor inicial (1-4)
+      value: 0, // Valor inicial sin calificación
       order: 1,
       detailedLevels: [
         RiskLevel.bajo(
@@ -1272,7 +1281,7 @@ class RiskEventFactory {
       title: 'Sedimentos y Detritos',
       description: 'Disponibilidad de material sólido transportable',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 2, // Valor inicial (1-4)
+      value: 0, // Valor inicial sin calificación
       order: 2,
       detailedLevels: [
         RiskLevel.bajo(
@@ -1311,7 +1320,7 @@ class RiskEventFactory {
       title: 'Caudal Pico',
       description: 'Caudal máximo estimado durante el evento',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 2, // Valor inicial (1-4)
+      value: 0, // Valor inicial sin calificación
       order: 1,
       detailedLevels: [
         RiskLevel.bajo(
@@ -1349,7 +1358,7 @@ class RiskEventFactory {
       title: 'Concentración de Sedimentos',
       description: 'Porcentaje de sedimentos en el flujo',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 2, // Valor inicial (1-4)
+      value: 0, // Valor inicial sin calificación
       order: 2,
       detailedLevels: [
         RiskLevel.bajo(
@@ -1387,7 +1396,7 @@ class RiskEventFactory {
       title: 'Poder Destructivo',
       description: 'Capacidad de daño del flujo torrencial',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 2, // Valor inicial (1-4)
+      value: 0, // Valor inicial sin calificación
       order: 3,
       detailedLevels: [
         RiskLevel.bajo(
@@ -1429,8 +1438,9 @@ class RiskEventFactory {
       title: 'Categorización de Amenaza en Mapas de Inundación',
       description: 'Clasificación según mapas oficiales de amenaza por inundación',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 1,
+      value: 0,
       order: 1,
+      wi: 15,
       detailedLevels: [
         RiskLevel.bajo(customItems: ['No presenta']),
         RiskLevel.medioBajo(customItems: ['Bajo']),
@@ -1447,8 +1457,9 @@ class RiskEventFactory {
       title: 'Frecuencia',
       description: 'Frecuencia de ocurrencia del evento de inundación',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 3,
+      value: 0,
       order: 2,
+      wi: 10,
       detailedLevels: [
         RiskLevel.bajo(customItems: [
           'El evento se presenta por lo menos una vez en un periodo superior a diez (10) años'
@@ -1473,8 +1484,9 @@ class RiskEventFactory {
       title: 'Profundidad del Cauce',
       description: 'Características de la profundidad del cauce y probabilidad de desbordamiento',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 2,
+      value: 0,
       order: 3,
+      wi: 10,
       detailedLevels: [
         RiskLevel.bajo(customItems: [
           'El drenaje tiene un canal profundo, encañonado y con márgenes muy altas, así que existen muy pocas probabilidades de desbordamiento'
@@ -1499,8 +1511,9 @@ class RiskEventFactory {
       title: 'Cambios en la Sección Hidráulica',
       description: 'Modificaciones en la sección del canal que afectan el flujo',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 1,
+      value: 0,
       order: 4,
+      wi: 20,
       detailedLevels: [
         RiskLevel.bajo(customItems: [
           'En el tramo evaluado no existen reducciones ni cambios en la sección hidráulica del canal que puedan afectar el curso del agua'
@@ -1525,8 +1538,9 @@ class RiskEventFactory {
       title: 'Características del Cauce',
       description: 'Condiciones del cauce que afectan el flujo del agua',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 4,
+      value: 0,
       order: 5,
+      wi: 10,
       detailedLevels: [
         RiskLevel.bajo(customItems: [
           '• En el cauce predomina la presencia de suelos finos y las aguas son conducidas por una estructura hidráulica como canal en concreto',
@@ -1559,8 +1573,9 @@ class RiskEventFactory {
       title: 'Cambios en el Alineamiento del Cauce',
       description: 'Modificaciones en la dirección del cauce',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 2,
+      value: 0,
       order: 6,
+      wi: 10,
       detailedLevels: [
         RiskLevel.bajo(customItems: [
           'Cauce recto sin cambios de dirección en el lineamiento horizontal'
@@ -1585,8 +1600,9 @@ class RiskEventFactory {
       title: 'Residuos Sólidos en el Cauce',
       description: 'Presencia de residuos sólidos que pueden causar obstrucciones',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 1,
+      value: 0,
       order: 7,
+      wi: 25,
       detailedLevels: [
         RiskLevel.bajo(customItems: [
           'No se observan residuos sólidos en este tramo del cauce'
@@ -1613,8 +1629,9 @@ class RiskEventFactory {
       title: 'Potencial de Daño en Edificaciones',
       description: 'Capacidad del evento para generar daños en edificaciones',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 2,
+      value: 0,
       order: 1,
+      wi: 35,
       detailedLevels: [
         RiskLevel.bajo(customItems: [
           'Las características del fenómeno sugieren un bajo potencial de daño, por lo que las edificaciones no se verían afectadas.'
@@ -1639,8 +1656,9 @@ class RiskEventFactory {
       title: 'Capacidad de Generar Pérdida de Vidas Humanas',
       description: 'Potencial del evento para causar lesiones o muertes',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 3,
+      value: 0,
       order: 2,
+      wi: 35,
       detailedLevels: [
         RiskLevel.bajo(customItems: [
           'No se estiman personas lesionadas ni muertos'
@@ -1665,8 +1683,9 @@ class RiskEventFactory {
       title: 'Alteración del Funcionamiento de Líneas Vitales y Espacio Público',
       description: 'Impacto en infraestructura crítica y servicios públicos',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 1,
+      value: 0,
       order: 3,
+      wi: 30,
       detailedLevels: [
         RiskLevel.bajo(customItems: [
           'No se altera el funcionamiento u operación de los elementos, de manera que no se compromete la prestación del servicio.'
@@ -1693,8 +1712,9 @@ class RiskEventFactory {
       title: 'Calidad de los Materiales y Procesos Constructivos',
       description: 'Evaluación de la calidad de materiales y técnicas constructivas ante inundación',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 2,
+      value: 0,
       order: 1,
+      wi: 30,
       detailedLevels: [
         RiskLevel.bajo(customItems: [
           'Estructura con materiales de muy buena calidad y adecuada técnica constructiva'
@@ -1719,8 +1739,9 @@ class RiskEventFactory {
       title: 'Estado de Conservación',
       description: 'Estado de conservación de las edificaciones ante inundación',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 2,
+      value: 0,
       order: 2,
+      wi: 30,
       detailedLevels: [
         RiskLevel.bajo(customItems: [
           'Buen estado de conservación. No hay lesiones considerables o solo observan daños superficiales leves en los acabados.'
@@ -1745,8 +1766,9 @@ class RiskEventFactory {
       title: 'Tipología Estructural',
       description: 'Tipo de sistema estructural y su resistencia ante inundación',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 3,
+      value: 0,
       order: 3,
+      wi: 40,
       detailedLevels: [
         RiskLevel.bajo(customItems: [
           'Edificaciones reforzadas o con reforzamiento especial. Edificaciones en concreto reforzado y acero, diseñadas y construidas con requerimientos de norma o superiores (pórticos, sistemas combinados, duales, muros de concreto reforzado)'
@@ -1771,8 +1793,9 @@ class RiskEventFactory {
       title: 'Nivel de Organización',
       description: 'Capacidad organizacional y preparación de la comunidad ante inundación',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 1,
+      value: 0,
       order: 1,
+      wi: 60,
       detailedLevels: [
         RiskLevel.bajo(customItems: [
           'La comunidad tiene total conocimiento de los riesgos presentes en el territorio y asume su compromiso frente al tema. La población cuenta con sistemas de alerta temprana.'
@@ -1797,8 +1820,9 @@ class RiskEventFactory {
       title: 'Suficiencia Económica',
       description: 'Capacidad económica para enfrentar y recuperarse de inundación',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 1,
+      value: 0,
       order: 2,
+      wi: 40,
       detailedLevels: [
         RiskLevel.bajo(customItems: [
           'El actor responsable tiene la capacidad de resolver la problemática con sus propios medios.'
@@ -1823,8 +1847,9 @@ class RiskEventFactory {
       title: 'Edificaciones Expuestas',
       description: 'Tipo de edificaciones expuestas a inundación según su importancia',
       levels: ['BAJO', 'MEDIO', 'MEDIO\nALTO', 'ALTO'],
-      value: 1,
+      value: 0,
       order: 1,
+      wi: 25,
       detailedLevels: [
         RiskLevel.bajo(customItems: [
           'Estructuras de ocupación normal según NSR-10'
@@ -1849,8 +1874,9 @@ class RiskEventFactory {
       title: 'Otros Elementos Expuestos (Líneas vitales y drenajes)',
       description: 'Infraestructura vital expuesta a inundación',
       levels: ['BAJO', 'MEDIO', 'MEDIO\nALTO', 'ALTO'],
-      value: 2,
+      value: 0,
       order: 2,
+      wi: 25,
       detailedLevels: [
         RiskLevel.bajo(customItems: [
           'Redes eléctricas y de telecomunicaciones.'
@@ -1877,8 +1903,9 @@ class RiskEventFactory {
       title: 'Escala de Afectación',
       description: 'Escala territorial de la afectación por inundación',
       levels: ['BAJO', 'MEDIO', 'MEDIO\nALTO', 'ALTO'],
-      value: 3,
+      value: 0,
       order: 3,
+      wi: 50,
       detailedLevels: [
         RiskLevel.bajo(customItems: [
           'Puntual (1 vivienda)'
@@ -1904,7 +1931,7 @@ class RiskEventFactory {
       title: 'Estado Estructural',
       description: 'Condición actual de los elementos estructurales',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 2, // Valor inicial (1-4)
+      value: 0, // Valor inicial sin calificación
       order: 1,
       detailedLevels: [
         RiskLevel.bajo(
@@ -1946,7 +1973,7 @@ class RiskEventFactory {
       title: 'Calidad de Materiales',
       description: 'Calidad y especificaciones de los materiales de construcción',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 2, // Valor inicial (1-4)
+      value: 0, // Valor inicial sin calificación
       order: 2,
       detailedLevels: [
         RiskLevel.bajo(
@@ -1988,7 +2015,7 @@ class RiskEventFactory {
       title: 'Antigüedad de la Estructura',
       description: 'Tiempo transcurrido desde la construcción y vida útil',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 2, // Valor inicial (1-4)
+      value: 0, // Valor inicial sin calificación
       order: 3,
       detailedLevels: [
         RiskLevel.bajo(
@@ -2030,7 +2057,7 @@ class RiskEventFactory {
       title: 'Mantenimiento de la Estructura',
       description: 'Historial y calidad del mantenimiento estructural',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 2, // Valor inicial (1-4)
+      value: 0, // Valor inicial sin calificación
       order: 4,
       detailedLevels: [
         RiskLevel.bajo(
@@ -2072,7 +2099,7 @@ class RiskEventFactory {
       title: 'Tipo de Falla Estructural',
       description: 'Tipo y mecanismo de falla esperado',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 2, // Valor inicial (1-4)
+      value: 0, // Valor inicial sin calificación
       order: 1,
       detailedLevels: [
         RiskLevel.bajo(
@@ -2114,7 +2141,7 @@ class RiskEventFactory {
       title: 'Magnitud del Colapso',
       description: 'Extensión y severidad del colapso estructural',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 2, // Valor inicial (1-4)
+      value: 0, // Valor inicial sin calificación
       order: 2,
       detailedLevels: [
         RiskLevel.bajo(
@@ -2156,7 +2183,7 @@ class RiskEventFactory {
       title: 'Área Afectada',
       description: 'Extensión del área comprometida por la falla estructural',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 2, // Valor inicial (1-4)
+      value: 0, // Valor inicial sin calificación
       order: 3,
       detailedLevels: [
         RiskLevel.bajo(
@@ -2200,7 +2227,7 @@ class RiskEventFactory {
       title: 'Factor de Probabilidad Específico',
       description: 'Factor específico que influye en la probabilidad del evento particular',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 2, // Valor inicial (1-4)
+      value: 0, // Valor inicial sin calificación
       order: 1,
       detailedLevels: [
         RiskLevel.bajo(
@@ -2242,7 +2269,7 @@ class RiskEventFactory {
       title: 'Factor Complementario',
       description: 'Factor adicional que contribuye a la probabilidad del evento',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 2, // Valor inicial (1-4)
+      value: 0, // Valor inicial sin calificación
       order: 2,
       detailedLevels: [
         RiskLevel.bajo(
@@ -2284,7 +2311,7 @@ class RiskEventFactory {
       title: 'Magnitud del Evento',
       description: 'Escala e intensidad estimada del evento específico',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 2, // Valor inicial (1-4)
+      value: 0, // Valor inicial sin calificación
       order: 1,
       detailedLevels: [
         RiskLevel.bajo(
@@ -2326,7 +2353,7 @@ class RiskEventFactory {
       title: 'Alcance del Impacto',
       description: 'Extensión geográfica y temporal del impacto del evento',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 2, // Valor inicial (1-4)
+      value: 0, // Valor inicial sin calificación
       order: 2,
       detailedLevels: [
         RiskLevel.bajo(
@@ -2371,7 +2398,8 @@ class RiskEventFactory {
       description: 'Evaluación de la calidad de materiales y técnicas constructivas',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
       order: 1,
-      value: 3, // Valor según tabla oficial
+      value: 0, // Valor inicial sin calificación
+      wi: 30, // Peso según tabla oficial de vulnerabilidad
       detailedLevels: [
         RiskLevel.bajo(
           customItems: [
@@ -2404,7 +2432,8 @@ class RiskEventFactory {
       description: 'Evaluación del estado actual de conservación de la estructura',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
       order: 2,
-      value: 2, // Valor según tabla oficial
+      value: 0, // Valor inicial sin calificación
+      wi: 30, // Peso según tabla oficial de vulnerabilidad
       detailedLevels: [
         RiskLevel.bajo(
           customItems: [
@@ -2437,7 +2466,8 @@ class RiskEventFactory {
       description: 'Evaluación del tipo de sistema estructural y su resistencia',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
       order: 3,
-      value: 3, // Valor según tabla oficial
+      value: 0, // Valor inicial sin calificación
+      wi: 40, // Peso según tabla oficial de vulnerabilidad
       detailedLevels: [
         RiskLevel.bajo(
           customItems: [
@@ -2472,7 +2502,8 @@ class RiskEventFactory {
       description: 'Evaluación del nivel de preparación y organización comunitaria',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
       order: 1,
-      value: 1, // Valor según tabla oficial
+      value: 0, // Valor inicial sin calificación
+      wi: 60, // Peso según tabla oficial de vulnerabilidad
       detailedLevels: [
         RiskLevel.bajo(
           customItems: [
@@ -2505,7 +2536,8 @@ class RiskEventFactory {
       description: 'Evaluación de la capacidad económica para enfrentar el riesgo',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
       order: 2,
-      value: 1, // Valor según tabla oficial
+      value: 0, // Valor inicial sin calificación
+      wi: 40, // Peso según tabla oficial de vulnerabilidad
       detailedLevels: [
         RiskLevel.bajo(
           customItems: [
@@ -2540,7 +2572,8 @@ class RiskEventFactory {
       description: 'Evaluación del tipo de edificaciones según su importancia',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
       order: 1,
-      value: 1, // Valor según tabla oficial
+      value: 0, // Valor inicial sin calificación
+      wi: 25, // Peso según tabla oficial de vulnerabilidad
       detailedLevels: [
         RiskLevel.bajo(
           customItems: [
@@ -2573,7 +2606,8 @@ class RiskEventFactory {
       description: 'Evaluación de infraestructura vital y servicios expuestos',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
       order: 2,
-      value: 2, // Valor según tabla oficial
+      value: 0, // Valor inicial sin calificación
+      wi: 25, // Peso según tabla oficial de vulnerabilidad
       detailedLevels: [
         RiskLevel.bajo(
           customItems: [
@@ -2608,7 +2642,8 @@ class RiskEventFactory {
       description: 'Evaluación del número de elementos expuestos',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
       order: 3,
-      value: 3, // Valor según tabla oficial
+      value: 0, // Valor inicial sin calificación
+      wi: 50, // Peso según tabla oficial de vulnerabilidad
       detailedLevels: [
         RiskLevel.bajo(
           customItems: [
@@ -2645,8 +2680,9 @@ class RiskEventFactory {
       title: 'Categorización de Amenaza en Mapas de Torrencialidad',
       description: 'Clasificación según mapas oficiales de amenaza por torrencialidad',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 2,
+      value: 0,
       order: 1,
+      wi: 15,
       detailedLevels: [
         RiskLevel.bajo(customItems: [
           'No presenta'
@@ -2671,8 +2707,9 @@ class RiskEventFactory {
       title: 'Tipo de Material del Cauce',
       description: 'Características del material presente en el cauce que puede ser arrastrado',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 3,
+      value: 0,
       order: 2,
+      wi: 20,
       detailedLevels: [
         RiskLevel.bajo(customItems: [
           'Ausencia de bloques de roca o gravas'
@@ -2697,8 +2734,9 @@ class RiskEventFactory {
       title: 'Cambios en la Sección Hidráulica',
       description: 'Modificaciones en la capacidad hidráulica del canal',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 1,
+      value: 0,
       order: 3,
+      wi: 20,
       detailedLevels: [
         RiskLevel.bajo(customItems: [
           'En el tramo evaluado no existen reducciones ni cambios en la sección hidráulica del canal que puedan afectar el curso del agua'
@@ -2723,8 +2761,9 @@ class RiskEventFactory {
       title: 'Profundidad del Cauce',
       description: 'Capacidad de contención del cauce y probabilidad de desbordamiento',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 2,
+      value: 0,
       order: 4,
+      wi: 15,
       detailedLevels: [
         RiskLevel.bajo(customItems: [
           'El drenaje tiene un canal profundo, encañonado y con márgenes muy altas, así que existen muy pocas probabilidades de desbordamiento.'
@@ -2749,8 +2788,9 @@ class RiskEventFactory {
       title: 'Estabilidad de los Taludes o Laderas Adyacentes del Cauce',
       description: 'Condición de estabilidad de las márgenes del cauce',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 3,
+      value: 0,
       order: 5,
+      wi: 30,
       detailedLevels: [
         RiskLevel.bajo(customItems: [
           'Las márgenes de la quebrada en el tramo evaluado son estables y es poco probable que se presente un deslizamiento que obstruya el cauce'
@@ -2777,8 +2817,9 @@ class RiskEventFactory {
       title: 'Potencial de Daño en Edificaciones',
       description: 'Evaluación del potencial de daño a las edificaciones por avenida torrencial',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 2,
+      value: 0,
       order: 1,
+      wi: 35,
       detailedLevels: [
         RiskLevel.bajo(customItems: [
           'Las características del fenómeno sugieren un bajo potencial de daño, por lo que las edificaciones no se verían afectadas.'
@@ -2803,8 +2844,9 @@ class RiskEventFactory {
       title: 'Capacidad de Generar Pérdida de Vidas Humanas',
       description: 'Potencial de generar víctimas mortales o lesionados por avenida torrencial',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 4,
+      value: 0,
       order: 2,
+      wi: 35,
       detailedLevels: [
         RiskLevel.bajo(customItems: [
           'No se estiman personas lesionadas ni muertos'
@@ -2829,8 +2871,9 @@ class RiskEventFactory {
       title: 'Alteración del Funcionamiento de Líneas Vitales y Espacio Público',
       description: 'Afectación a servicios públicos e infraestructura vital por avenida torrencial',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 1,
+      value: 0,
       order: 3,
+      wi: 30,
       detailedLevels: [
         RiskLevel.bajo(customItems: [
           'No se altera el funcionamiento u operación de los elementos, de manera que no se compromete la prestación del servicio.'
@@ -2857,8 +2900,9 @@ class RiskEventFactory {
       title: 'Calidad de los Materiales y Procesos Constructivos',
       description: 'Evaluación de la calidad de materiales y técnicas constructivas ante avenida torrencial',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 2,
+      value: 0,
       order: 1,
+      wi: 30,
       detailedLevels: [
         RiskLevel.bajo(customItems: [
           'Estructura con materiales de muy buena calidad y adecuada técnica constructiva'
@@ -2883,8 +2927,9 @@ class RiskEventFactory {
       title: 'Estado de Conservación',
       description: 'Estado de conservación de las edificaciones ante avenida torrencial',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 1,
+      value: 0,
       order: 2,
+      wi: 30,
       detailedLevels: [
         RiskLevel.bajo(customItems: [
           'Buen estado de conservación. No hay lesiones considerables o solo observan daños superficiales leves en los acabados.'
@@ -2909,8 +2954,9 @@ class RiskEventFactory {
       title: 'Tipología Estructural',
       description: 'Tipo de sistema estructural y su resistencia ante avenida torrencial',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 2,
+      value: 0,
       order: 3,
+      wi: 40,
       detailedLevels: [
         RiskLevel.bajo(customItems: [
           'Edificaciones reforzadas o con reforzamiento especial. Edificaciones en concreto reforzado y acero, diseñadas y construidas con requerimientos de norma o superiores (pórticos, sistemas combinados, duales, muros de concreto reforzado)'
@@ -2937,8 +2983,9 @@ class RiskEventFactory {
       title: 'Nivel de Organización',
       description: 'Capacidad organizacional y preparación de la comunidad ante avenida torrencial',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 2,
+      value: 0,
       order: 1,
+      wi: 60,
       detailedLevels: [
         RiskLevel.bajo(customItems: [
           'La comunidad tiene total conocimiento de los riesgos presentes en el territorio y asume su compromiso frente al tema. La población cuenta con sistemas de alerta temprana.'
@@ -2963,8 +3010,9 @@ class RiskEventFactory {
       title: 'Suficiencia Económica',
       description: 'Capacidad económica para enfrentar y recuperarse de avenida torrencial',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 1,
+      value: 0,
       order: 2,
+      wi: 40,
       detailedLevels: [
         RiskLevel.bajo(customItems: [
           'El actor responsable tiene la capacidad de resolver la problemática con sus propios medios.'
@@ -2991,8 +3039,9 @@ class RiskEventFactory {
       title: 'Edificaciones Expuestas',
       description: 'Tipo de edificaciones expuestas a avenida torrencial según su importancia',
       levels: ['BAJO', 'MEDIO', 'MEDIO\nALTO', 'ALTO'],
-      value: 3,
+      value: 0,
       order: 1,
+      wi: 25,
       detailedLevels: [
         RiskLevel.bajo(customItems: [
           'Estructuras de ocupación normal según NSR-10'
@@ -3017,8 +3066,9 @@ class RiskEventFactory {
       title: 'Otros Elementos Expuestos (Líneas vitales y drenajes)',
       description: 'Infraestructura vital expuesta a avenida torrencial',
       levels: ['BAJO', 'MEDIO', 'MEDIO\nALTO', 'ALTO'],
-      value: 1,
+      value: 0,
       order: 2,
+      wi: 25,
       detailedLevels: [
         RiskLevel.bajo(customItems: [
           'Redes eléctricas y de telecomunicaciones.'
@@ -3045,8 +3095,9 @@ class RiskEventFactory {
       title: 'Escala de Afectación',
       description: 'Escala territorial de la afectación por avenida torrencial',
       levels: ['BAJO', 'MEDIO', 'MEDIO\nALTO', 'ALTO'],
-      value: 2,
+      value: 0,
       order: 3,
+      wi: 50,
       detailedLevels: [
         RiskLevel.bajo(customItems: [
           'Puntual (1 vivienda)'
@@ -3075,8 +3126,9 @@ class RiskEventFactory {
       title: 'Estado de Deterioro',
       description: 'Evaluación del estado físico y deterioro de la estructura',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 3,
+      value: 0,
       order: 1,
+      wi: 60,
       detailedLevels: [
         RiskLevel.bajo(customItems: [
           '• Sin lesiones mecánicas',
@@ -3109,8 +3161,9 @@ class RiskEventFactory {
       title: 'Incremento de Carga, Reducción de Resistencia y/o Modificación del Sistema Estructural',
       description: 'Evaluación de modificaciones que afectan la capacidad estructural',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 1,
+      value: 0,
       order: 2,
+      wi: 40,
       detailedLevels: [
         RiskLevel.bajo(customItems: [
           'No existe evidencia de modificación del sistema estructural ni de incremento de las cargas'
@@ -3143,8 +3196,9 @@ class RiskEventFactory {
       title: 'Potencial de Daño en Edificaciones Adyacentes',
       description: 'Evaluación del potencial de daño a edificaciones adyacentes por evento estructural',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 4,
+      value: 0,
       order: 1,
+      wi: 35,
       detailedLevels: [
         RiskLevel.bajo(customItems: [
           'De presentarse el evento, la probabilidad de ocasionar afectaciones en las edificaciones adyacentes es nula.'
@@ -3169,8 +3223,9 @@ class RiskEventFactory {
       title: 'Capacidad de Generar Pérdida de Vidas Humanas',
       description: 'Potencial de generar víctimas mortales o lesionados por evento estructural',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 4,
+      value: 0,
       order: 2,
+      wi: 35,
       detailedLevels: [
         RiskLevel.bajo(customItems: [
           'No se estiman personas lesionadas ni muertos'
@@ -3195,8 +3250,9 @@ class RiskEventFactory {
       title: 'Alteración del Funcionamiento de Líneas Vitales y Espacio Público',
       description: 'Afectación a servicios públicos e infraestructura vital por evento estructural',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 3,
+      value: 0,
       order: 3,
+      wi: 30,
       detailedLevels: [
         RiskLevel.bajo(customItems: [
           'No se altera el funcionamiento u operación de los elementos, de manera que no se compromete la prestación del servicio.'
@@ -3223,8 +3279,9 @@ class RiskEventFactory {
       title: 'Calidad de los Materiales y Procesos Constructivos',
       description: 'Evaluación de la calidad de materiales y técnicas constructivas ante eventos estructurales',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 3,
+      value: 0,
       order: 1,
+      wi: 40,
       detailedLevels: [
         RiskLevel.bajo(customItems: [
           'Estructura con materiales de muy buena calidad y adecuada técnica constructiva'
@@ -3249,8 +3306,9 @@ class RiskEventFactory {
       title: 'Tipología Estructural',
       description: 'Tipo de sistema estructural y su resistencia ante eventos estructurales',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 2,
+      value: 0,
       order: 2,
+      wi: 60,
       detailedLevels: [
         RiskLevel.bajo(customItems: [
           'Edificaciones reforzadas o con reforzamiento especial. Edificaciones en concreto reforzado y acero, diseñadas y construidas con requerimientos de norma o superiores (pórticos, sistemas combinados, duales, muros de concreto reforzado)'
@@ -3277,8 +3335,9 @@ class RiskEventFactory {
       title: 'Nivel de Organización',
       description: 'Capacidad organizacional y preparación de la comunidad ante eventos estructurales',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 2,
+      value: 0,
       order: 1,
+      wi: 60,
       detailedLevels: [
         RiskLevel.bajo(customItems: [
           'La comunidad tiene total conocimiento de los riesgos presentes en el territorio y asume su compromiso frente al tema. La población cuenta con sistemas de alerta temprana.'
@@ -3303,8 +3362,9 @@ class RiskEventFactory {
       title: 'Suficiencia Económica',
       description: 'Capacidad económica para enfrentar y recuperarse de eventos estructurales',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 3,
+      value: 0,
       order: 2,
+      wi: 40,
       detailedLevels: [
         RiskLevel.bajo(customItems: [
           'El actor responsable tiene la capacidad de resolver la problemática con sus propios medios.'
@@ -3331,8 +3391,9 @@ class RiskEventFactory {
       title: 'Edificaciones Expuestas',
       description: 'Tipo de edificaciones expuestas a eventos estructurales según su importancia',
       levels: ['BAJO', 'MEDIO', 'MEDIO\nALTO', 'ALTO'],
-      value: 1,
+      value: 0,
       order: 1,
+      wi: 25,
       detailedLevels: [
         RiskLevel.bajo(customItems: [
           'Estructuras de ocupación normal según NSR-10'
@@ -3357,8 +3418,9 @@ class RiskEventFactory {
       title: 'Otros Elementos Expuestos (Líneas vitales y drenajes)',
       description: 'Infraestructura vital expuesta a eventos estructurales',
       levels: ['BAJO', 'MEDIO', 'MEDIO\nALTO', 'ALTO'],
-      value: 3,
+      value: 0,
       order: 2,
+      wi: 25,
       detailedLevels: [
         RiskLevel.bajo(customItems: [
           'Redes eléctricas y de telecomunicaciones.'
@@ -3385,8 +3447,9 @@ class RiskEventFactory {
       title: 'Escala de Afectación',
       description: 'Escala territorial de la afectación por evento estructural',
       levels: ['BAJO', 'MEDIO', 'MEDIO\nALTO', 'ALTO'],
-      value: 4,
+      value: 0,
       order: 3,
+      wi: 50,
       detailedLevels: [
         RiskLevel.bajo(customItems: [
           'Puntual (1 vivienda)'
@@ -3415,8 +3478,9 @@ class RiskEventFactory {
       title: 'Frecuencia',
       description: 'Frecuencia de ocurrencia del evento específico',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 3,
+      value: 0,
       order: 1,
+      wi: 20,
       detailedLevels: [
         RiskLevel.bajo(customItems: [
           'El evento se presenta por lo menos una vez en un periodo superior a diez (10) años'
@@ -3441,8 +3505,9 @@ class RiskEventFactory {
       title: 'Evidencias de Materialización',
       description: 'Signos visibles que indican la posibilidad de ocurrencia del evento',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 2,
+      value: 0,
       order: 2,
+      wi: 60,
       detailedLevels: [
         RiskLevel.bajo(customItems: [
           'No hay evidencias o manifestaciones que posibiliten la ocurrencia del evento.'
@@ -3467,8 +3532,9 @@ class RiskEventFactory {
       title: 'Antecedentes',
       description: 'Historial de eventos similares en la zona',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 2,
+      value: 0,
       order: 3,
+      wi: 20,
       detailedLevels: [
         RiskLevel.bajo(customItems: [
           'El evento nunca ha ocurrido y se estima que es difícil que ocurra.'
@@ -3496,8 +3562,9 @@ class RiskEventFactory {
       title: 'Potencial de Daño en Edificaciones',
       description: 'Evaluación del potencial de daño a las edificaciones por evento genérico',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 3,
+      value: 0,
       order: 1,
+      wi: 35,
       detailedLevels: [
         RiskLevel.bajo(customItems: [
           'Las características del fenómeno sugieren un bajo potencial de daño, por lo que las edificaciones no se verían afectadas.'
@@ -3522,8 +3589,9 @@ class RiskEventFactory {
       title: 'Capacidad de Generar Pérdida de Vidas Humanas',
       description: 'Potencial de generar víctimas mortales o lesionados por evento genérico',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 4,
+      value: 0,
       order: 2,
+      wi: 35,
       detailedLevels: [
         RiskLevel.bajo(customItems: [
           'No se estiman personas lesionadas ni muertos'
@@ -3548,8 +3616,9 @@ class RiskEventFactory {
       title: 'Alteración del Funcionamiento de Líneas Vitales y Espacio Público',
       description: 'Afectación a servicios públicos e infraestructura vital por evento genérico',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 3,
+      value: 0,
       order: 3,
+      wi: 30,
       detailedLevels: [
         RiskLevel.bajo(customItems: [
           'No se altera el funcionamiento u operación de los elementos, de manera que no se compromete la prestación del servicio.'
@@ -3576,8 +3645,9 @@ class RiskEventFactory {
       title: 'Calidad de los Materiales y Procesos Constructivos',
       description: 'Evaluación de la calidad de materiales y técnicas constructivas ante eventos genéricos',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 1,
+      value: 0,
       order: 1,
+      wi: 30,
       detailedLevels: [
         RiskLevel.bajo(customItems: [
           'Estructura con materiales de muy buena calidad y adecuada técnica constructiva'
@@ -3602,8 +3672,9 @@ class RiskEventFactory {
       title: 'Estado de Conservación',
       description: 'Estado de conservación de las edificaciones ante eventos genéricos',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 2,
+      value: 0,
       order: 2,
+      wi: 30,
       detailedLevels: [
         RiskLevel.bajo(customItems: [
           'Buen estado de conservación. No hay lesiones considerables o solo observan daños superficiales leves en los acabados.'
@@ -3628,8 +3699,9 @@ class RiskEventFactory {
       title: 'Tipología Estructural',
       description: 'Tipo de sistema estructural y su resistencia ante eventos genéricos',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 3,
+      value: 0,
       order: 3,
+      wi: 40,
       detailedLevels: [
         RiskLevel.bajo(customItems: [
           'Edificaciones reforzadas o con reforzamiento especial. Edificaciones en concreto reforzado y acero, diseñadas y construidas con requerimientos de norma o superiores (pórticos, sistemas combinados, duales, muros de concreto reforzado)'
@@ -3656,8 +3728,9 @@ class RiskEventFactory {
       title: 'Nivel de Organización',
       description: 'Capacidad organizacional y preparación de la comunidad ante eventos genéricos',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 1,
+      value: 0,
       order: 1,
+      wi: 60,
       detailedLevels: [
         RiskLevel.bajo(customItems: [
           'La comunidad tiene total conocimiento de los riesgos presentes en el territorio y asume su compromiso frente al tema. La población cuenta con sistemas de alerta temprana.'
@@ -3682,8 +3755,9 @@ class RiskEventFactory {
       title: 'Suficiencia Económica',
       description: 'Capacidad económica para enfrentar y recuperarse de eventos genéricos',
       levels: ['BAJO', 'MEDIO\nBAJO', 'MEDIO\nALTO', 'ALTO'],
-      value: 1,
+      value: 0,
       order: 2,
+      wi: 40,
       detailedLevels: [
         RiskLevel.bajo(customItems: [
           'El actor responsable tiene la capacidad de resolver la problemática con sus propios medios.'
@@ -3710,8 +3784,9 @@ class RiskEventFactory {
       title: 'Edificaciones Expuestas',
       description: 'Tipo de edificaciones expuestas a eventos genéricos según su importancia',
       levels: ['BAJO', 'MEDIO', 'MEDIO\nALTO', 'ALTO'],
-      value: 1,
+      value: 0,
       order: 1,
+      wi: 25,
       detailedLevels: [
         RiskLevel.bajo(customItems: [
           'Estructuras de ocupación normal según NSR-10'
@@ -3736,8 +3811,9 @@ class RiskEventFactory {
       title: 'Otros Elementos Expuestos (Líneas vitales y drenajes)',
       description: 'Infraestructura vital expuesta a eventos genéricos',
       levels: ['BAJO', 'MEDIO', 'MEDIO\nALTO', 'ALTO'],
-      value: 2,
+      value: 0,
       order: 2,
+      wi: 25,
       detailedLevels: [
         RiskLevel.bajo(customItems: [
           'Redes eléctricas y de telecomunicaciones.'
@@ -3764,8 +3840,9 @@ class RiskEventFactory {
       title: 'Escala de Afectación',
       description: 'Escala territorial de la afectación por evento genérico',
       levels: ['BAJO', 'MEDIO', 'MEDIO\nALTO', 'ALTO'],
-      value: 3,
+      value: 0,
       order: 3,
+      wi: 50,
       detailedLevels: [
         RiskLevel.bajo(customItems: [
           'Puntual (1 vivienda)'
