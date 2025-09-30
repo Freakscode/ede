@@ -12,7 +12,7 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 
     <application
-        android:label="EDE"
+        android:label="Caja de Herramientas"
         android:icon="@mipmap/ic_launcher">
         
         <!-- API Key de Google Maps -->
