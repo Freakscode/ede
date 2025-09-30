@@ -100,8 +100,9 @@ class HomeScreen extends StatelessWidget {
             appBar:  CustomAppBar(
               showBack: (state.mostrarEventosRiesgo || state.mostrarCategoriasRiesgo),
               onBack: () {
-                // Si estamos en eventos o categorías de riesgo, volver al home principal
-                if (state.mostrarEventosRiesgo || state.mostrarCategoriasRiesgo) {
+                if (state.mostrarCategoriasRiesgo) {
+                  context.read<HomeBloc>().add(HomeShowRiskEventsSection());
+                } else if (state.mostrarEventosRiesgo) {
                   context.read<HomeBloc>().add(HomeResetRiskSections());
                 }
               },
