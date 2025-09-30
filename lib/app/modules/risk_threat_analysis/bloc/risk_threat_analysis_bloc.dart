@@ -99,28 +99,44 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     UpdateSelectedRiskEvent event,
     Emitter<RiskThreatAnalysisState> emit,
   ) {
-    emit(state.copyWith(
-      selectedRiskEvent: event.riskEvent,
-      // Reset selections when event changes
-      probabilidadSelections: {},
-      intensidadSelections: {},
-      dropdownOpenStates: {}, // Reset dynamic dropdown states
-      dynamicSelections: {}, // Reset dynamic selections
-    ));
+    // Solo resetear las selecciones si el evento realmente cambió
+    if (state.selectedRiskEvent != event.riskEvent) {
+      emit(state.copyWith(
+        selectedRiskEvent: event.riskEvent,
+        // Reset selections only when event actually changes
+        probabilidadSelections: {},
+        intensidadSelections: {},
+        dropdownOpenStates: {}, // Reset dynamic dropdown states
+        dynamicSelections: {}, // Reset dynamic selections
+      ));
+    } else {
+      // Si es el mismo evento, solo actualizar el valor sin resetear
+      emit(state.copyWith(
+        selectedRiskEvent: event.riskEvent,
+      ));
+    }
   }
 
   void _onSelectClassification(
     SelectClassification event,
     Emitter<RiskThreatAnalysisState> emit,
   ) {
-    emit(state.copyWith(
-      selectedClassification: event.classification,
-      // Reset selections when classification changes
-      probabilidadSelections: {},
-      intensidadSelections: {},
-      dropdownOpenStates: {}, // Reset dynamic dropdown states
-      dynamicSelections: {}, // Reset dynamic selections
-    ));
+    // Solo resetear las selecciones si la clasificación realmente cambió
+    if (state.selectedClassification != event.classification) {
+      emit(state.copyWith(
+        selectedClassification: event.classification,
+        // Reset selections only when classification actually changes
+        probabilidadSelections: {},
+        intensidadSelections: {},
+        dropdownOpenStates: {}, // Reset dynamic dropdown states
+        dynamicSelections: {}, // Reset dynamic selections
+      ));
+    } else {
+      // Si es la misma clasificación, solo actualizar el valor sin resetear
+      emit(state.copyWith(
+        selectedClassification: event.classification,
+      ));
+    }
   }
 
   void _onToggleDynamicDropdown(

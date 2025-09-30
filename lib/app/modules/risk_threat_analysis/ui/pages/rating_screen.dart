@@ -25,27 +25,31 @@ class _RatingScreenState extends State<RatingScreen> {
   @override
   void initState() {
     super.initState();
-    // Inicializar el Bloc con la clasificación desde los datos de navegación
+    // Inicializar el Bloc SOLO SI no ha sido inicializado antes
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      final currentState = context.read<RiskThreatAnalysisBloc>().state;
+      
+      // Solo inicializar si el estado está vacío o es el primer uso
+      
       if (widget.navigationData != null) {
         final classificationName = widget.navigationData!['classification'] as String?;
         final eventName = widget.navigationData!['event'] as String?;
         
-        // Configurar el evento seleccionado
-        if (eventName != null) {
+        // Solo actualizar el evento si es diferente al actual
+        if (eventName != null && currentState.selectedRiskEvent != eventName) {
           context.read<RiskThreatAnalysisBloc>().add(
             UpdateSelectedRiskEvent(eventName)
           );
         }
         
-        // Configurar la clasificación seleccionada
-        if (classificationName != null) {
+        // Solo actualizar la clasificación si es diferente a la actual
+        if (classificationName != null && currentState.selectedClassification != classificationName) {
           context.read<RiskThreatAnalysisBloc>().add(
             SelectClassification(classificationName)
           );
         }
-      } else {
-        // Fallback: usar valores por defecto
+      } else if (currentState.selectedClassification.isEmpty) {
+        // Fallback: usar valores por defecto SOLO si no hay clasificación
         context.read<RiskThreatAnalysisBloc>().add(
           SelectClassification('amenaza')
         );
