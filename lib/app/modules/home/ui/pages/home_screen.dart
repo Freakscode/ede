@@ -20,8 +20,6 @@ class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key, this.navigationData});
 
   void _showTutorialOverlay(BuildContext context) async {
-    final showTutorial = context.read<HomeBloc>().state.showTutorial;
-    print('showTutorial (antes de overlay): $showTutorial');
     await showDialog(
       context: context,
       builder: (dialogContext) {
