@@ -416,7 +416,7 @@ class _CalificacionScreenState extends State<CalificacionScreen> {
                   ),
                 ],
               ),
-              const SizedBox(height: 20), // Padding bottom adicional
+              const SizedBox(height: 50), // Padding bottom adicional
             ],
           );
         },
