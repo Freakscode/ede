@@ -41,7 +41,10 @@ GoRouter getAppRouter(BuildContext context) {
       // Home - Pantalla principal
       GoRoute(
         path: '/home',
-        builder: (context, state) => const home.HomeScreen(),
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>?;
+          return home.HomeScreen(navigationData: extra);
+        },
       ),
       GoRoute(
         path: '/risk_threat_analysis',
