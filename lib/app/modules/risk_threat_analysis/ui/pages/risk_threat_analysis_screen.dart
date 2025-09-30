@@ -1,6 +1,6 @@
 import 'package:caja_herramientas/app/core/icons/app_icons.dart';
-import 'package:caja_herramientas/app/modules/risk_threat_analysis/ui/pages/calificacion_screen.dart';
-import 'package:caja_herramientas/app/modules/risk_threat_analysis/ui/pages/evidencia_screen.dart';
+import 'package:caja_herramientas/app/modules/risk_threat_analysis/ui/pages/rating_screen.dart';
+import 'package:caja_herramientas/app/modules/risk_threat_analysis/ui/pages/evidence_screen.dart';
 import 'package:caja_herramientas/app/shared/widgets/layouts/custom_app_bar.dart';
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import 'package:caja_herramientas/app/shared/widgets/layouts/custom_bottom_nav_bar.dart';
@@ -24,8 +24,8 @@ class _RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
   @override
   Widget build(BuildContext context) {
     final List<Widget> screens = [
-      CalificacionScreen(navigationData: widget.navigationData),
-      const EvidenciaScreen(),
+      RatingScreen(navigationData: widget.navigationData),
+      const EvidenceScreen(),
       const Center(child: Text('Resultados Screen')),
     ];
 

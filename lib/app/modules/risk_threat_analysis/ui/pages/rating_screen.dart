@@ -10,16 +10,16 @@ import '../../bloc/risk_threat_analysis_event.dart';
 import '../../bloc/risk_threat_analysis_state.dart';
 
 
-class CalificacionScreen extends StatefulWidget {
+class RatingScreen extends StatefulWidget {
   final Map<String, dynamic>? navigationData;
   
-  const CalificacionScreen({super.key, this.navigationData});
+  const RatingScreen({super.key, this.navigationData});
   
   @override
-  State<CalificacionScreen> createState() => _CalificacionScreenState();
+  State<RatingScreen> createState() => _RatingScreenState();
 }
 
-class _CalificacionScreenState extends State<CalificacionScreen> {
+class _RatingScreenState extends State<RatingScreen> {
   
   @override
   void initState() {

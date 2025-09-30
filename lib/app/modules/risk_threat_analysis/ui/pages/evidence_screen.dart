@@ -10,14 +10,14 @@ import '../../bloc/risk_threat_analysis_state.dart';
 import '../widgets/info_note_widget.dart';
 import '../widgets/image_upload_area_widget.dart';
 
-class EvidenciaScreen extends StatefulWidget {
-  const EvidenciaScreen({super.key});
+class EvidenceScreen extends StatefulWidget {
+  const EvidenceScreen({super.key});
 
   @override
-  State<EvidenciaScreen> createState() => _EvidenciaScreenState();
+  State<EvidenceScreen> createState() => _EvidenceScreenState();
 }
 
-class _EvidenciaScreenState extends State<EvidenciaScreen> {
+class _EvidenceScreenState extends State<EvidenceScreen> {
   final List<String> _imagePaths = [];
   final int _maxImages = 3;
   final ImagePicker _picker = ImagePicker();
@@ -455,23 +455,5 @@ class _EvidenciaScreenState extends State<EvidenciaScreen> {
       },
     );
   }
-
-  void _saveProgress() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Progreso guardado exitosamente'),
-        backgroundColor: Colors.green,
-      ),
-    );
-  }
-
-  void _goBack() {
-    Navigator.of(context).pop();
-  }
-
-  void _continue() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Continuando al siguiente paso...')),
-    );
-  }
+  
 }
