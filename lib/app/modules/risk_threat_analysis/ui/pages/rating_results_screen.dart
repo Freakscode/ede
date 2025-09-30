@@ -46,9 +46,7 @@ class RatingResultsScreen extends StatelessWidget {
 
               // Botones de navegación
               NavigationButtonsWidget(
-                onContinuePressed: () {
-                  // Acción para continuar
-                },
+                currentIndex: state.currentBottomNavIndex,
               ),
 
               const SizedBox(height: 50),

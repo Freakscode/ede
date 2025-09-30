@@ -320,9 +320,7 @@ class _RatingScreenState extends State<RatingScreen> {
               ),
               const SizedBox(height: 40),
               NavigationButtonsWidget(
-                onContinuePressed: () {
-                  // Acción para continuar
-                },
+                currentIndex: state.currentBottomNavIndex,
               ),
               const SizedBox(height: 50), // Padding bottom adicional
             ],

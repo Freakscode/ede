@@ -168,9 +168,7 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
               ),
               const SizedBox(height: 40),
               NavigationButtonsWidget(
-                onContinuePressed: () {
-                  // Acción para continuar
-                },
+                currentIndex: state.currentBottomNavIndex,
               ),
               const SizedBox(height: 20),
             ],
