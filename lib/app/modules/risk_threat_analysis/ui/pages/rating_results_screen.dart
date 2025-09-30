@@ -125,10 +125,8 @@ class RatingResultsScreen extends StatelessWidget {
       
       // Crear items basados en las categorías reales del evento
       for (final category in probabilidadSubClass.categories) {
-        // Buscar la selección en dynamicSelections usando el ID de la categoría
-        final selectionKey = '${selectedClassification}_probabilidad_${category.id}';
-        final selectionData = state.dynamicSelections[selectionKey];
-        final selection = selectionData?['selectedLevel'];
+        // Buscar la selección usando el sistema legacy para probabilidad
+        final selection = state.probabilidadSelections[category.title];
         
         final rating = _getRatingFromSelection(selection);
         final color = _getColorFromRating(rating);
@@ -162,10 +160,8 @@ class RatingResultsScreen extends StatelessWidget {
       
       // Crear items basados en las categorías reales del evento
       for (final category in intensidadSubClass.categories) {
-        // Buscar la selección en dynamicSelections usando el ID de la categoría
-        final selectionKey = '${selectedClassification}_intensidad_${category.id}';
-        final selectionData = state.dynamicSelections[selectionKey];
-        final selection = selectionData?['selectedLevel'];
+        // Buscar la selección usando el sistema legacy para intensidad
+        final selection = state.intensidadSelections[category.title];
         
         final rating = _getRatingFromSelection(selection);
         final color = _getColorFromRating(rating);
