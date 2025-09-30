@@ -15,7 +15,9 @@ import 'package:caja_herramientas/app/modules/home/bloc/home_state.dart';
 import 'package:caja_herramientas/app/shared/widgets/layouts/custom_bottom_nav_bar.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+  final bool showRiskCategories;
+  
+  const HomeScreen({super.key, this.showRiskCategories = false});
 
   void _showTutorialOverlay(BuildContext context) async {
     final showTutorial = context.read<HomeBloc>().state.showTutorial;
@@ -34,7 +36,13 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => HomeBloc()..add(HomeCheckAndShowTutorial()),
+      create: (_) {
+        final bloc = HomeBloc()..add(HomeCheckAndShowTutorial());
+        if (showRiskCategories) {
+          bloc.add(HomeShowRiskCategoriesScreen());
+        }
+        return bloc;
+      },
       child: BlocConsumer<HomeBloc, HomeState>(
         listenWhen: (previous, current) =>
             !previous.tutorialShown && current.tutorialShown,
