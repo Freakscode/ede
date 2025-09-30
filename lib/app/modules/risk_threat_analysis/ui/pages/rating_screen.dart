@@ -1,4 +1,6 @@
 import 'package:caja_herramientas/app/core/icons/app_icons.dart';
+import 'package:caja_herramientas/app/modules/risk_threat_analysis/ui/widgets/navigation_buttons_widget.dart';
+import 'package:caja_herramientas/app/modules/risk_threat_analysis/ui/widgets/progress_bar_widget.dart';
 import 'package:caja_herramientas/app/shared/widgets/buttons/custom_elevated_button.dart';
 import 'package:caja_herramientas/app/shared/widgets/inputs/expandable_dropdown_field.dart';
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
@@ -226,47 +228,7 @@ class _RatingScreenState extends State<RatingScreen> {
               ),
               const SizedBox(height: 14),
               // Barra de progreso dinámica
-              BlocBuilder<RiskThreatAnalysisBloc, RiskThreatAnalysisState>(
-                builder: (context, state) {
-                  final bloc = context.read<RiskThreatAnalysisBloc>();
-                  final progress = bloc.calculateCompletionPercentage();
-                  final progressText = '${(progress * 100).toInt()}% completado';
-                  
-                  return Column(
-                    children: [
-                      Container(
-                        height: 16,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFE5E7EB),
-                          borderRadius: BorderRadius.circular(99),
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(99),
-                          child: LinearProgressIndicator(
-                            value: progress,
-                            backgroundColor: Colors.transparent,
-                            valueColor: const AlwaysStoppedAnimation<Color>(
-                              Color(0xFFFFCC00),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        progressText,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          color: DAGRDColors.grisMedio,
-                          fontFamily: 'Work Sans',
-                          fontSize: 12,
-                          fontWeight: FontWeight.w400,
-                          height: 16 / 12,
-                        ),
-                      ),
-                    ],
-                  );
-                },
-              ),
+              const ProgressBarWidget(),
               const SizedBox(height: 32),
               // Sección Calificación Amenaza dinámica
               BlocBuilder<RiskThreatAnalysisBloc, RiskThreatAnalysisState>(
@@ -357,64 +319,10 @@ class _RatingScreenState extends State<RatingScreen> {
                 ),
               ),
               const SizedBox(height: 40),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  // Botón Volver
-                  InkWell(
-                    onTap: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(
-                          Icons.arrow_back_ios,
-                          color: DAGRDColors.negroDAGRD,
-                          size: 18,
-                        ),
-                        const SizedBox(width: 8),
-                        const Text(
-                          'Volver',
-                          style: TextStyle(
-                            color: DAGRDColors.negroDAGRD, // #000
-                            fontFamily: 'Work Sans',
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            height: 18 / 16, // line-height: 112.5%
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  // Botón Continuar
-                  InkWell(
-                    onTap: () {
-                      // Acción para continuar
-                    },
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Text(
-                          'Continuar',
-                          style: TextStyle(
-                            color: DAGRDColors.negroDAGRD, // #000
-                            fontFamily: 'Work Sans',
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            height: 18 / 16, // line-height: 112.5%
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        const Icon(
-                          Icons.arrow_forward_ios,
-                          color: DAGRDColors.negroDAGRD,
-                          size: 18,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+              NavigationButtonsWidget(
+                onContinuePressed: () {
+                  // Acción para continuar
+                },
               ),
               const SizedBox(height: 50), // Padding bottom adicional
             ],
