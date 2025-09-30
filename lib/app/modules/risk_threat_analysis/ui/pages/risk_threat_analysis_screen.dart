@@ -1,6 +1,7 @@
 import 'package:caja_herramientas/app/core/icons/app_icons.dart';
 import 'package:caja_herramientas/app/modules/risk_threat_analysis/ui/pages/rating_screen.dart';
 import 'package:caja_herramientas/app/modules/risk_threat_analysis/ui/pages/evidence_screen.dart';
+import 'package:caja_herramientas/app/modules/risk_threat_analysis/ui/pages/rating_results_screen.dart';
 import 'package:caja_herramientas/app/shared/widgets/layouts/custom_app_bar.dart';
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import 'package:caja_herramientas/app/shared/widgets/layouts/custom_bottom_nav_bar.dart';
@@ -26,7 +27,7 @@ class _RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
     final List<Widget> screens = [
       RatingScreen(navigationData: widget.navigationData),
       const EvidenceScreen(),
-      const Center(child: Text('Resultados Screen')),
+      const RatingResultsScreen(),
     ];
 
     return BlocProvider(
