@@ -14,6 +14,7 @@ class ExpandableDropdownField extends StatefulWidget {
   final Color? backgroundColor;
   final Color? textColor;
   final Function(String category, String level)? onSelectionChanged;
+  final Map<String, dynamic>? calculationDetails;
 
   const ExpandableDropdownField({
     super.key,
@@ -26,6 +27,7 @@ class ExpandableDropdownField extends StatefulWidget {
     this.backgroundColor,
     this.textColor,
     this.onSelectionChanged,
+    this.calculationDetails,
   });
 
   @override
@@ -55,27 +57,47 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
     return 0;
   }
 
-  // Método para calcular el promedio de todos los niveles seleccionados
+  // Método para calcular el promedio usando wi (wi × valor) dividido por total de selecciones
   double _calculateAverageScore() {
-    if (_selectedLevels.isEmpty) return 0.0;
+    if (widget.calculationDetails == null) {
+      // Fallback al método anterior si no hay datos de wi
+      if (_selectedLevels.isEmpty) return 0.0;
+      
+      final selectedCategories = widget.categories.where((category) => 
+          _selectedLevels[category.title] != null).toList();
+      
+      if (selectedCategories.isEmpty) return 0.0;
+      
+      double totalScore = 0.0;
+      int count = 0;
+      
+      for (final category in selectedCategories) {
+        final value = _getSelectedLevelValue(category.title);
+        if (value > 0) {
+          totalScore += value;
+          count++;
+        }
+      }
+      
+      return count > 0 ? totalScore / count : 0.0;
+    }
     
-    final selectedCategories = widget.categories.where((category) => 
-        _selectedLevels[category.title] != null).toList();
+    // Usar datos de wi del calculationDetails
+    final categories = widget.calculationDetails!['categories'] as List<Map<String, dynamic>>?;
+    if (categories == null || categories.isEmpty) return 0.0;
     
-    if (selectedCategories.isEmpty) return 0.0;
+    double totalCalificacion = 0.0;
+    int validCategories = 0;
     
-    double totalScore = 0.0;
-    int count = 0;
-    
-    for (final category in selectedCategories) {
-      final value = _getSelectedLevelValue(category.title);
-      if (value > 0) {
-        totalScore += value;
-        count++;
+    for (final categoryData in categories) {
+      final calificacion = categoryData['calificacion'] as int? ?? 0;
+      if (calificacion > 0) {
+        totalCalificacion += calificacion.toDouble();
+        validCategories++;
       }
     }
     
-    return count > 0 ? totalScore / count : 0.0;
+    return validCategories > 0 ? totalCalificacion / validCategories : 0.0;
   }
 
   // Método para obtener el color dinámico basado en el promedio
@@ -132,19 +154,25 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
             child: Row(
               children: [
                 Expanded(
-                  child: Text(
-                    widget.value ?? widget.hint,
-                    style: TextStyle(
-                      color: widget.isSelected
-                          ? const Color(0xFF1E1E1E)
-                          : (widget.value != null
-                                ? (widget.textColor ?? const Color(0xFF1E1E1E))
-                                : const Color(0xFF1E1E1E)),
-                      fontFamily: 'Work Sans',
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      height: 24 / 16, // 150% line-height
-                    ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        widget.value ?? widget.hint,
+                        style: TextStyle(
+                          color: widget.isSelected
+                              ? const Color(0xFF1E1E1E)
+                              : (widget.value != null
+                                    ? (widget.textColor ?? const Color(0xFF1E1E1E))
+                                    : const Color(0xFF1E1E1E)),
+                          fontFamily: 'Work Sans',
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          height: 24 / 16, // 150% line-height
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 if (_shouldShowScoreContainer())
@@ -592,21 +620,29 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
               : null,
         ),
         child: Center(
-          child: Text(
-            level,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color:  const Color(0xFF000000),
-              fontFamily: 'Work Sans',
-              fontSize: 12,
-              fontWeight: isSelected 
-                  ? FontWeight.w600 
-                  : FontWeight.w400,
-              height: 1.4, // Aumentado a 1.4 para mejor visibilidad
-            ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                level,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: const Color(0xFF000000),
+                  fontFamily: 'Work Sans',
+                  fontSize: 12,
+                  fontWeight: isSelected 
+                      ? FontWeight.w600 
+                      : FontWeight.w400,
+                  height: 1.2,
+                ),
+              ),
+
+            ],
           ),
         ),
       ),
     );
   }
+
+
 }

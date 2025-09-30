@@ -132,7 +132,7 @@ class _CalificacionScreenState extends State<CalificacionScreen> {
                 builder: (context, state) {
                   final bloc = context.read<RiskThreatAnalysisBloc>();
                   final subClassifications = bloc.getCurrentSubClassifications();
-                  
+                  // RiskCategory
                   return Column(
                     children: subClassifications.asMap().entries.map((entry) {
                       final index = entry.key;
@@ -151,6 +151,7 @@ class _CalificacionScreenState extends State<CalificacionScreen> {
                             onSelectionChanged: (category, level) {
                               bloc.handleSelectionChanged(subClassification.id, category, level);
                             },
+                            calculationDetails: bloc.getSubClassificationCalculationDetails(subClassification.id),
                           ),
                           // Agregar espaciado entre dropdowns, excepto después del último
                           if (index < subClassifications.length - 1) 

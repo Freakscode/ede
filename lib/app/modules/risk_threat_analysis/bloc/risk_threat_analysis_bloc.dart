@@ -265,38 +265,108 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     }
   }
 
-  // Método helper para obtener el valor numérico desde el modelo cuando esté disponible
-  int _getCategoryValue(String subClassificationId, String categoryTitle) {
+  // Método para obtener la calificación de toda una subclasificación (promedio)
+  double getSubClassificationCalificacion(String subClassificationId) {
+    final riskCategories = _getRiskCategoriesForSubClassification(subClassificationId);
+    final selections = getSelectionsForSubClassification(subClassificationId);
+    
+    if (riskCategories.isEmpty || selections.isEmpty) return 0.0;
+    
+    double totalCalificacion = 0.0;
+    int validCategories = 0;
+    
+    for (final category in riskCategories) {
+      final selectedValue = selections[category.title];
+      if (selectedValue != null) {
+        final levelValue = _getLevelValue(selectedValue);
+        final calificacion = category.wi * levelValue;
+        totalCalificacion += calificacion;
+        validCategories++;
+      }
+    }
+    
+    return validCategories > 0 ? totalCalificacion / validCategories : 0.0;
+  }
+  
+  // Método para obtener detalles de cálculo de una subclasificación
+  Map<String, dynamic> getSubClassificationCalculationDetails(String subClassificationId) {
+    final riskCategories = _getRiskCategoriesForSubClassification(subClassificationId);
+    final selections = getSelectionsForSubClassification(subClassificationId);
+    
+    final List<Map<String, dynamic>> categoryDetails = [];
+    double totalCalificacion = 0.0;
+    int validCategories = 0;
+    
+    for (final category in riskCategories) {
+      final selectedValue = selections[category.title];
+      if (selectedValue != null) {
+        final levelValue = _getLevelValue(selectedValue);
+        final calificacion = category.wi * levelValue;
+        
+        categoryDetails.add({
+          'title': category.title,
+          'wi': category.wi,
+          'value': levelValue,
+          'calificacion': calificacion,
+          'selectedLevel': selectedValue,
+        });
+        
+        totalCalificacion += calificacion;
+        validCategories++;
+      }
+    }
+    
+    final promedio = validCategories > 0 ? totalCalificacion / validCategories : 0.0;
+    
+    return {
+      'categories': categoryDetails,
+      'totalCalificacion': totalCalificacion,
+      'promedio': promedio,
+      'validCategories': validCategories,
+    };
+  }
+  
+  // Método helper para obtener las RiskCategory (que tienen wi) para una subclasificación
+  List<RiskCategory> _getRiskCategoriesForSubClassification(String subClassificationId) {
+    final currentEvent = state.selectedRiskEvent;
+    
     try {
-      final categories = getCategoriesForCurrentSubClassification(subClassificationId);
-      final category = categories.where((cat) => cat.title == categoryTitle).firstOrNull;
+      RiskEventModel? event;
       
-      if (category != null && category.detailedLevels != null) {
-        // Si tenemos categorías detalladas con valores específicos, usar esos valores
-        final selectedLevel = getSelectionsForSubClassification(subClassificationId)[categoryTitle];
-        if (selectedLevel != null) {
-          final detailedLevel = category.detailedLevels!
-              .where((level) => level.title.contains(selectedLevel))
-              .firstOrNull;
-          
-          if (detailedLevel != null) {
-            // Extraer el valor del título, ej: "BAJO (1):" -> 1
-            final regex = RegExp(r'\((\d+)\)');
-            final match = regex.firstMatch(detailedLevel.title);
-            if (match != null) {
-              return int.tryParse(match.group(1)!) ?? _getLevelValue(selectedLevel);
-            }
+      switch (currentEvent) {
+        case 'Movimiento en Masa':
+          event = RiskEventFactory.createMovimientoEnMasa();
+          break;
+        case 'Incendio Forestal':
+          event = RiskEventFactory.createIncendioForestal();
+          break;
+        case 'Inundación':
+          event = RiskEventFactory.createInundacion();
+          break;
+        case 'Avenida Torrencial':
+          event = RiskEventFactory.createAvenidaTorrencial();
+          break;
+        case 'Estructural':
+          event = RiskEventFactory.createEstructural();
+          break;
+        case 'Otros':
+          event = RiskEventFactory.createOtros();
+          break;
+        default:
+          event = RiskEventFactory.createMovimientoEnMasa();
+      }
+      
+      // Buscar en todas las clasificaciones y subclasificaciones
+      for (final classification in event.classifications) {
+        for (final subClassification in classification.subClassifications) {
+          if (subClassification.id == subClassificationId) {
+            return subClassification.categories;
           }
         }
       }
-      
-      // Fallback al método de parseo de texto
-      final selectedLevel = getSelectionsForSubClassification(subClassificationId)[categoryTitle];
-      return selectedLevel != null ? _getLevelValue(selectedLevel) : 0;
+      return [];
     } catch (e) {
-      // En caso de error, usar el método de fallback
-      final selectedLevel = getSelectionsForSubClassification(subClassificationId)[categoryTitle];
-      return selectedLevel != null ? _getLevelValue(selectedLevel) : 0;
+      return [];
     }
   }
 
