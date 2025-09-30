@@ -1,16 +1,10 @@
-/// Tipos de navegación disponibles para volver al HomeScreen
 enum HomeNavigationType {
-  /// Mostrar categorías de riesgo
   riskCategories,
-  /// Mostrar eventos de riesgo
   riskEvents,
-  /// Ir a pestaña específica del bottom navigation
   tabIndex,
-  /// Ir al home principal (por defecto)
   home,
 }
 
-/// Extensión para convertir enum a Map para navegación
 extension HomeNavigationTypeExtension on HomeNavigationType {
   Map<String, dynamic> toNavigationData({int? tabIndex}) {
     switch (this) {
