@@ -7,9 +7,11 @@ import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import 'package:caja_herramientas/app/shared/widgets/layouts/custom_bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import '../../bloc/risk_threat_analysis_bloc.dart';
 import '../../bloc/risk_threat_analysis_event.dart';
 import '../../bloc/risk_threat_analysis_state.dart';
+import '../widgets/home_navigation_type.dart';
 
 class RiskThreatAnalysisScreen extends StatelessWidget {
   final String? selectedEvent;
@@ -37,8 +39,19 @@ class RiskThreatAnalysisScreen extends StatelessWidget {
       child: BlocBuilder<RiskThreatAnalysisBloc, RiskThreatAnalysisState>(
         builder: (context, state) {
           return Scaffold(
-            appBar: const CustomAppBar(
-              showBack: false,
+            appBar:  CustomAppBar(
+              showBack: true,
+              onBack: () {
+                if (state.currentBottomNavIndex > 0) {
+                  context.read<RiskThreatAnalysisBloc>().add(
+                    ChangeBottomNavIndex(state.currentBottomNavIndex - 1),
+                  );
+                } else {
+                  // Cuando estamos en el primer índice, volver al HomeScreen con categorías
+                  final navigationData = HomeNavigationType.riskCategories.toNavigationData();
+                  context.go('/home', extra: navigationData);
+                }
+              },
               showInfo: true,
               showProfile: true,
             ),
