@@ -11,21 +11,16 @@ import '../../bloc/risk_threat_analysis_bloc.dart';
 import '../../bloc/risk_threat_analysis_event.dart';
 import '../../bloc/risk_threat_analysis_state.dart';
 
-class RiskThreatAnalysisScreen extends StatefulWidget {
+class RiskThreatAnalysisScreen extends StatelessWidget {
   final String? selectedEvent;
   final Map<String, dynamic>? navigationData;
   
   const RiskThreatAnalysisScreen({super.key, this.selectedEvent, this.navigationData});
 
   @override
-  State<RiskThreatAnalysisScreen> createState() => _RiskThreatAnalysisScreenState();
-}
-
-class _RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
-  @override
   Widget build(BuildContext context) {
     final List<Widget> screens = [
-      RatingScreen(navigationData: widget.navigationData),
+      RatingScreen(navigationData: navigationData),
       const EvidenceScreen(),
       const RatingResultsScreen(),
     ];
@@ -34,8 +29,8 @@ class _RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
       create: (context) {
         final bloc = RiskThreatAnalysisBloc();
         // Si hay un evento seleccionado, actualizarlo en el bloc
-        if (widget.selectedEvent != null && widget.selectedEvent!.isNotEmpty) {
-          bloc.add(UpdateSelectedRiskEvent(widget.selectedEvent!));
+        if (selectedEvent != null && selectedEvent!.isNotEmpty) {
+          bloc.add(UpdateSelectedRiskEvent(selectedEvent!));
         }
         return bloc;
       },
