@@ -15,9 +15,9 @@ import 'package:caja_herramientas/app/modules/home/bloc/home_state.dart';
 import 'package:caja_herramientas/app/shared/widgets/layouts/custom_bottom_nav_bar.dart';
 
 class HomeScreen extends StatelessWidget {
-  final bool showRiskCategories;
+  final Map<String, dynamic>? navigationData;
   
-  const HomeScreen({super.key, this.showRiskCategories = false});
+  const HomeScreen({super.key, this.navigationData});
 
   void _showTutorialOverlay(BuildContext context) async {
     final showTutorial = context.read<HomeBloc>().state.showTutorial;
@@ -38,9 +38,18 @@ class HomeScreen extends StatelessWidget {
     return BlocProvider(
       create: (_) {
         final bloc = HomeBloc()..add(HomeCheckAndShowTutorial());
-        if (showRiskCategories) {
-          bloc.add(HomeShowRiskCategoriesScreen());
+        
+        // Manejar diferentes tipos de navegación
+        if (navigationData != null) {
+          if (navigationData!['showRiskCategories'] == true) {
+            bloc.add(HomeShowRiskCategoriesScreen());
+          } else if (navigationData!['showRiskEvents'] == true) {
+            bloc.add(HomeShowRiskEventsSection());
+          } else if (navigationData!['selectedIndex'] != null) {
+            bloc.add(HomeNavBarTapped(navigationData!['selectedIndex'] as int));
+          }
         }
+        
         return bloc;
       },
       child: BlocConsumer<HomeBloc, HomeState>(

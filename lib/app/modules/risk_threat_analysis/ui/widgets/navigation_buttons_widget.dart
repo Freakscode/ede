@@ -4,17 +4,22 @@ import 'package:go_router/go_router.dart';
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import '../../bloc/risk_threat_analysis_bloc.dart';
 import '../../bloc/risk_threat_analysis_event.dart';
+import 'home_navigation_type.dart';
 
 class NavigationButtonsWidget extends StatelessWidget {
   final int currentIndex;
   final VoidCallback? onBackPressed;
   final VoidCallback? onContinuePressed;
+  final HomeNavigationType homeNavigationType;
+  final int? homeTabIndex;
 
   const NavigationButtonsWidget({
     super.key,
     required this.currentIndex,
     this.onBackPressed,
     this.onContinuePressed,
+    this.homeNavigationType = HomeNavigationType.riskCategories,
+    this.homeTabIndex,
   });
 
   @override
@@ -30,8 +35,9 @@ class NavigationButtonsWidget extends StatelessWidget {
                 ChangeBottomNavIndex(currentIndex - 1),
               );
             } else {
-              // Cuando estamos en el primer índice, volver al HomeScreen con categorías
-              context.go('/home', extra: {'showRiskCategories': true});
+              // Cuando estamos en el primer índice, volver al HomeScreen
+              final navigationData = homeNavigationType.toNavigationData(tabIndex: homeTabIndex);
+              context.go('/home', extra: navigationData);
             }
           },
           child: Row(
