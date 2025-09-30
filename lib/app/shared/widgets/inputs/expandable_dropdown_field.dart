@@ -1,8 +1,12 @@
 import 'package:caja_herramientas/app/core/icons/app_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:caja_herramientas/app/shared/models/models.dart';
+import 'package:caja_herramientas/app/modules/risk_threat_analysis/bloc/risk_threat_analysis_bloc.dart';
+import 'package:caja_herramientas/app/modules/risk_threat_analysis/bloc/risk_threat_analysis_event.dart';
+import 'package:caja_herramientas/app/modules/risk_threat_analysis/bloc/risk_threat_analysis_state.dart';
 
 class ExpandableDropdownField extends StatefulWidget {
   final String hint;
@@ -15,12 +19,14 @@ class ExpandableDropdownField extends StatefulWidget {
   final Color? textColor;
   final Function(String category, String level)? onSelectionChanged;
   final Map<String, dynamic>? calculationDetails;
+  final String subClassificationId; // ID único para identificar este dropdown
 
   const ExpandableDropdownField({
     super.key,
     required this.hint,
     required this.isSelected,
     required this.categories,
+    required this.subClassificationId,
     this.value,
     this.onTap,
     this.borderColor,
@@ -37,11 +43,11 @@ class ExpandableDropdownField extends StatefulWidget {
 
 class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
   Map<String, bool> _expandedCategories = {};
-  Map<String, String?> _selectedLevels = {}; // Para almacenar el nivel seleccionado por categoría
 
   // Método helper para obtener el valor numérico del nivel seleccionado
-  int _getSelectedLevelValue(String categoryTitle) {
-    final selectedLevel = _selectedLevels[categoryTitle];
+  int _getSelectedLevelValue(String categoryTitle, RiskThreatAnalysisState state) {
+    final dropdownSelections = state.dynamicSelections[widget.subClassificationId] ?? {};
+    final selectedLevel = dropdownSelections[categoryTitle];
     if (selectedLevel == null) return 0;
     
     // Mapear los niveles a sus valores numéricos
@@ -58,13 +64,14 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
   }
 
   // Método para calcular el promedio usando wi (wi × valor) dividido por total de selecciones
-  double _calculateAverageScore() {
+  double _calculateAverageScore(RiskThreatAnalysisState state) {
     if (widget.calculationDetails == null) {
       // Fallback al método anterior si no hay datos de wi
-      if (_selectedLevels.isEmpty) return 0.0;
+      final dropdownSelections = state.dynamicSelections[widget.subClassificationId] ?? {};
+      if (dropdownSelections.isEmpty) return 0.0;
       
       final selectedCategories = widget.categories.where((category) => 
-          _selectedLevels[category.title] != null).toList();
+          dropdownSelections[category.title] != null).toList();
       
       if (selectedCategories.isEmpty) return 0.0;
       
@@ -72,7 +79,7 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
       int count = 0;
       
       for (final category in selectedCategories) {
-        final value = _getSelectedLevelValue(category.title);
+        final value = _getSelectedLevelValue(category.title, state);
         if (value > 0) {
           totalScore += value;
           count++;
@@ -101,8 +108,8 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
   }
 
   // Método para obtener el color dinámico basado en el promedio
-  Color _getScoreColor() {
-    final score = _calculateAverageScore();
+  Color _getScoreColor(RiskThreatAnalysisState state) {
+    final score = _calculateAverageScore(state);
     
     if (score == 0) {
       return Colors.transparent; // No mostrar si no hay score
@@ -118,136 +125,142 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
   }
 
   // Método para verificar si debe mostrar el container
-  bool _shouldShowScoreContainer() {
-    final score = _calculateAverageScore();
+  bool _shouldShowScoreContainer(RiskThreatAnalysisState state) {
+    final score = _calculateAverageScore(state);
     return score > 0;
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        // Dropdown Header
-        GestureDetector(
-          onTap: widget.onTap,
-          child: Container(
-            width: double.infinity,
-            height: 50,
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            decoration: BoxDecoration(
-              color: widget.isSelected
-                  ? DAGRDColors.amarDAGRD
-                  : (widget.backgroundColor ?? Colors.white),
-              border: Border.all(
-                color: widget.isSelected
-                    ? DAGRDColors.amarDAGRD
-                    : (widget.borderColor ?? const Color(0xFFD1D5DB)),
-                width: 1,
-              ),
-              borderRadius: widget.isSelected
-                  ? const BorderRadius.only(
-                      topLeft: Radius.circular(8),
-                      topRight: Radius.circular(8),
-                    )
-                  : BorderRadius.circular(8),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        widget.value ?? widget.hint,
-                        style: TextStyle(
-                          color: widget.isSelected
-                              ? const Color(0xFF1E1E1E)
-                              : (widget.value != null
-                                    ? (widget.textColor ?? const Color(0xFF1E1E1E))
-                                    : const Color(0xFF1E1E1E)),
-                          fontFamily: 'Work Sans',
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          height: 24 / 16, // 150% line-height
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                if (_shouldShowScoreContainer())
-                  Container(
-                    width: 50,
-                    height: 32,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(100),
-                      color: _getScoreColor(),
-                    ),
-                    child: Center(
-                      child: Text(
-                        _calculateAverageScore().toStringAsFixed(1).replaceAll('.', ','),
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          color: Color(0xFFFFFFFF), // #FFF
-                          fontFamily: 'Work Sans',
-                          fontSize: 14,
-                          fontStyle: FontStyle.normal,
-                          fontWeight: FontWeight.w700,
-                          height: 16 / 14, // 114.286% line-height (16px/14px)
-                        ),
-                      ),
-                    ),
-                  ),
-                Icon(
-                  widget.isSelected
-                      ? Icons.keyboard_arrow_up
-                      : Icons.keyboard_arrow_down,
+    return BlocBuilder<RiskThreatAnalysisBloc, RiskThreatAnalysisState>(
+      builder: (context, state) {  
+        return Column(
+          children: [
+            // Dropdown Header
+            GestureDetector(
+              onTap: widget.onTap,
+              child: Container(
+                width: double.infinity,
+                height: 50,
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                decoration: BoxDecoration(
                   color: widget.isSelected
-                      ? const Color(0xFF1E1E1E)
-                      : const Color(0xFF666666),
-                  size: 24,
-                ),
-              ],
-            ),
-          ),
-        ),
-        // Expanded Content
-        if (widget.isSelected)
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border.all(color: const Color(0xFFD1D5DB)),
-              borderRadius: const BorderRadius.only(
-                bottomLeft: Radius.circular(8),
-                bottomRight: Radius.circular(8),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 4,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Column(
-              children: [
-                ...widget.categories.map(
-                  (category) => _buildCategorySection(
-                    context,
-                    category,
+                      ? DAGRDColors.amarDAGRD
+                      : (widget.backgroundColor ?? Colors.white),
+                  border: Border.all(
+                    color: widget.isSelected
+                        ? DAGRDColors.amarDAGRD
+                        : (widget.borderColor ?? const Color(0xFFD1D5DB)),
+                    width: 1,
                   ),
+                  borderRadius: widget.isSelected
+                      ? const BorderRadius.only(
+                          topLeft: Radius.circular(8),
+                          topRight: Radius.circular(8),
+                        )
+                      : BorderRadius.circular(8),
                 ),
-              ],
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            widget.value ?? widget.hint,
+                            style: TextStyle(
+                              color: widget.isSelected
+                                  ? const Color(0xFF1E1E1E)
+                                  : (widget.value != null
+                                        ? (widget.textColor ?? const Color(0xFF1E1E1E))
+                                        : const Color(0xFF1E1E1E)),
+                              fontFamily: 'Work Sans',
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              height: 24 / 16, // 150% line-height
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    if (_shouldShowScoreContainer(state))
+                      Container(
+                        width: 50,
+                        height: 32,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(100),
+                          color: _getScoreColor(state),
+                        ),
+                        child: Center(
+                          child: Text(
+                            _calculateAverageScore(state).toStringAsFixed(1).replaceAll('.', ','),
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              color: Color(0xFFFFFFFF), // #FFF
+                              fontFamily: 'Work Sans',
+                              fontSize: 14,
+                              fontStyle: FontStyle.normal,
+                              fontWeight: FontWeight.w700,
+                              height: 16 / 14, // 114.286% line-height (16px/14px)
+                            ),
+                          ),
+                        ),
+                      ),
+                    Icon(
+                      widget.isSelected
+                          ? Icons.keyboard_arrow_up
+                          : Icons.keyboard_arrow_down,
+                      color: widget.isSelected
+                          ? const Color(0xFF1E1E1E)
+                          : const Color(0xFF666666),
+                      size: 24,
+                    ),
+                  ],
+                ),
+              ),
             ),
-          ),
-      ],
+            // Expanded Content
+            if (widget.isSelected)
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  border: Border.all(color: const Color(0xFFD1D5DB)),
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(8),
+                    bottomRight: Radius.circular(8),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    ...widget.categories.map(
+                      (category) => _buildCategorySection(
+                        context,
+                        category,
+                        state,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+          ],
+        );
+      },
     );
   }
 
   Widget _buildCategorySection(
     BuildContext context,
     DropdownCategory category,
+    RiskThreatAnalysisState state,
   ) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -287,10 +300,10 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
                 ),
                 child: Center(
                   child: Text(
-                    _getSelectedLevelValue(category.title).toString(),
+                    _getSelectedLevelValue(category.title, state).toString(),
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: _selectedLevels[category.title] != null 
+                      color: (state.dynamicSelections[widget.subClassificationId]?[category.title] != null) 
                           ? const Color(0xFF1E1E1E)
                           : const Color(0xFFD1D5DB),
                       fontFamily: 'Work Sans',
@@ -310,7 +323,7 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
                   (level) => Expanded(
                     child: Container(
                       margin: const EdgeInsets.only(right: 4),
-                      child: _buildLevelButton(level, category.title),
+                      child: _buildLevelButton(level, category.title, state),
                     ),
                   ),
                 )
@@ -571,8 +584,9 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
     ];
   }
 
-  Widget _buildLevelButton(String level, String categoryTitle) {
-    bool isSelected = _selectedLevels[categoryTitle] == level;
+  Widget _buildLevelButton(String level, String categoryTitle, RiskThreatAnalysisState state) {
+    final dropdownSelections = state.dynamicSelections[widget.subClassificationId] ?? {};
+    bool isSelected = dropdownSelections[categoryTitle] == level;
     
     Color backgroundColor;
     Color selectedBackgroundColor;
@@ -593,20 +607,25 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
 
     return GestureDetector(
       onTap: () {
-        setState(() {
-          // Si el nivel ya está seleccionado, deseleccionarlo
-          if (_selectedLevels[categoryTitle] == level) {
-            _selectedLevels[categoryTitle] = null;
-          } else {
-            // Seleccionar el nuevo nivel
-            _selectedLevels[categoryTitle] = level;
-            
-            // Notificar la selección si hay callback
-            if (widget.onSelectionChanged != null) {
-              widget.onSelectionChanged!(categoryTitle, level);
-            }
+        final dropdownSelections = state.dynamicSelections[widget.subClassificationId] ?? {};
+        
+        // Si el nivel ya está seleccionado, deseleccionarlo
+        if (dropdownSelections[categoryTitle] == level) {
+          // Enviar evento para deseleccionar
+          context.read<RiskThreatAnalysisBloc>().add(
+            UpdateDynamicSelection(widget.subClassificationId, categoryTitle, ''),
+          );
+        } else {
+          // Seleccionar el nuevo nivel
+          context.read<RiskThreatAnalysisBloc>().add(
+            UpdateDynamicSelection(widget.subClassificationId, categoryTitle, level),
+          );
+          
+          // Notificar la selección si hay callback
+          if (widget.onSelectionChanged != null) {
+            widget.onSelectionChanged!(categoryTitle, level);
           }
-        });
+        }
       },
       child: Container(
         width: 80,

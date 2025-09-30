@@ -147,6 +147,7 @@ class _RatingScreenState extends State<RatingScreen> {
                             value: bloc.getValueForSubClassification(subClassification.id),
                             isSelected: bloc.getIsSelectedForSubClassification(subClassification.id),
                             categories: bloc.getCategoriesForCurrentSubClassification(subClassification.id),
+                            subClassificationId: subClassification.id,
                             onTap: () {
                               bloc.handleDropdownTap(subClassification.id);
                             },
