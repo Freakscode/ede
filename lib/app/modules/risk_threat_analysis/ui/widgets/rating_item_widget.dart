@@ -15,11 +15,12 @@ class RatingItemWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isUnrated = rating == 0;
+    final isNotApplicable = rating == -1;
     
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: isUnrated ? const Color(0xFFF3F4F6) : Colors.white,
+        color: (isUnrated || isNotApplicable) ? const Color(0xFFF3F4F6) : Colors.white,
         border: const Border(bottom: BorderSide(color: Color(0xFFE5E7EB), width: 1)),
       ),
       child: Row(
@@ -28,17 +29,17 @@ class RatingItemWidget extends StatelessWidget {
             width: 32,
             height: 32,
             decoration: BoxDecoration(
-              color: color,
+              color: isNotApplicable ? Colors.white : color,
               borderRadius: BorderRadius.circular(4),
             ),
             child: Center(
               child: Text(
-                rating.toString(),
+                isNotApplicable ? 'NA' : rating.toString(),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: isUnrated ? const Color(0xFFFFFFFF) : const Color(0xFF000000),
                   fontFamily: 'Work Sans',
-                  fontSize: 20,
+                  fontSize: isNotApplicable ? 16 : 20,
                   fontStyle: FontStyle.normal,
                   fontWeight: FontWeight.w600,
                   height: 16 / 20,
@@ -47,7 +48,7 @@ class RatingItemWidget extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 12),
-          if (!isUnrated) ...[
+          if (!isUnrated && !isNotApplicable) ...[
             Expanded(
               child: Text(
                 title,

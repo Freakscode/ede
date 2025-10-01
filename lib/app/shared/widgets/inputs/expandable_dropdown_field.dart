@@ -50,6 +50,9 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
     final selectedLevel = dropdownSelections[categoryTitle];
     if (selectedLevel == null) return 0;
     
+    // Si es "No Aplica", devolver -1 para diferenciarlo
+    if (selectedLevel == 'NA') return -1;
+    
     // Mapear los niveles a sus valores numéricos
     if (selectedLevel.contains('BAJO') && !selectedLevel.contains('MEDIO')) {
       return 1;
@@ -63,6 +66,19 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
     return 0;
   }
 
+  // Método helper para obtener el valor de display (NA o número)
+  String _getDisplayValue(String categoryTitle, RiskThreatAnalysisState state) {
+    final dropdownSelections = state.dynamicSelections[widget.subClassificationId] ?? {};
+    final selectedLevel = dropdownSelections[categoryTitle];
+    
+    if (selectedLevel == 'NA') {
+      return 'NA';
+    }
+    
+    final numericValue = _getSelectedLevelValue(categoryTitle, state);
+    return numericValue <= 0 ? '0' : numericValue.toString();
+  }
+
   // Método para calcular el promedio usando wi (wi × valor) dividido por total de selecciones
   double _calculateAverageScore(RiskThreatAnalysisState state) {
     if (widget.calculationDetails == null) {
@@ -71,7 +87,7 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
       if (dropdownSelections.isEmpty) return 0.0;
       
       final selectedCategories = widget.categories.where((category) => 
-          dropdownSelections[category.title] != null).toList();
+          dropdownSelections[category.title] != null && dropdownSelections[category.title]!.isNotEmpty).toList();
       
       if (selectedCategories.isEmpty) return 0.0;
       
@@ -80,6 +96,7 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
       
       for (final category in selectedCategories) {
         final value = _getSelectedLevelValue(category.title, state);
+        // Solo incluir valores válidos (excluir 0 y -1 que es NA)
         if (value > 0) {
           totalScore += value;
           count++;
@@ -300,7 +317,7 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
                 ),
                 child: Center(
                   child: Text(
-                    _getSelectedLevelValue(category.title, state).toString(),
+                    _getDisplayValue(category.title, state),
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: (state.dynamicSelections[widget.subClassificationId]?[category.title] != null) 
@@ -371,7 +388,15 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
               const Spacer(),
               TextButton(
                 onPressed: () {
-                  // Acción para "No Aplica"
+                  // Marcar esta categoría como "No Aplica"
+                  context.read<RiskThreatAnalysisBloc>().add(
+                    UpdateDynamicSelection(widget.subClassificationId, category.title, 'NA'),
+                  );
+                  
+                  // Notificar la selección si hay callback
+                  if (widget.onSelectionChanged != null) {
+                    widget.onSelectionChanged!(category.title, 'NA');
+                  }
                 },
                 style: TextButton.styleFrom(
                   backgroundColor: const Color(0xFFF9FAFB),
@@ -586,7 +611,10 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
 
   Widget _buildLevelButton(String level, String categoryTitle, RiskThreatAnalysisState state) {
     final dropdownSelections = state.dynamicSelections[widget.subClassificationId] ?? {};
-    bool isSelected = dropdownSelections[categoryTitle] == level;
+    final currentSelection = dropdownSelections[categoryTitle];
+    
+    // Si está marcado como NA, ningún botón debe aparecer como seleccionado
+    bool isSelected = currentSelection == level && currentSelection != 'NA';
     
     Color backgroundColor;
     Color selectedBackgroundColor;
@@ -608,15 +636,16 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
     return GestureDetector(
       onTap: () {
         final dropdownSelections = state.dynamicSelections[widget.subClassificationId] ?? {};
+        final currentSelection = dropdownSelections[categoryTitle];
         
         // Si el nivel ya está seleccionado, deseleccionarlo
-        if (dropdownSelections[categoryTitle] == level) {
+        if (currentSelection == level && currentSelection != 'NA') {
           // Enviar evento para deseleccionar
           context.read<RiskThreatAnalysisBloc>().add(
             UpdateDynamicSelection(widget.subClassificationId, categoryTitle, ''),
           );
         } else {
-          // Seleccionar el nuevo nivel
+          // Seleccionar el nuevo nivel (esto también limpia el estado NA si existía)
           context.read<RiskThreatAnalysisBloc>().add(
             UpdateDynamicSelection(widget.subClassificationId, categoryTitle, level),
           );

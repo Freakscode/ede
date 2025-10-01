@@ -131,9 +131,16 @@ class RatingResultsScreen extends StatelessWidget {
         final rating = _getRatingFromSelection(selection);
         final color = _getColorFromRating(rating);
         
+        String title = category.title;
+        if (rating == -1) {
+          title = category.title;
+        } else if (rating == 0) {
+          title = '${category.title} - Sin calificar';
+        }
+        
         items.add({
           'rating': rating,
-          'title': rating == 0 ? '${category.title} - Sin calificar' : category.title,
+          'title': title,
           'color': color,
         });
       }
@@ -166,9 +173,16 @@ class RatingResultsScreen extends StatelessWidget {
         final rating = _getRatingFromSelection(selection);
         final color = _getColorFromRating(rating);
         
+        String title = category.title;
+        if (rating == -1) {
+          title = '${category.title} - No Aplica';
+        } else if (rating == 0) {
+          title = '${category.title} - Sin calificar';
+        }
+        
         items.add({
           'rating': rating,
-          'title': rating == 0 ? '${category.title} - Sin calificar' : category.title,
+          'title': title,
           'color': color,
         });
       }
@@ -179,6 +193,9 @@ class RatingResultsScreen extends StatelessWidget {
 
   int _getRatingFromSelection(String? selectedLevel) {
     if (selectedLevel == null || selectedLevel.isEmpty) return 0;
+    
+    // Si es "No Aplica", devolver -1 para diferenciarlo
+    if (selectedLevel == 'NA') return -1;
     
     if (selectedLevel.contains('BAJO') && !selectedLevel.contains('MEDIO')) {
       return 1;
@@ -194,6 +211,8 @@ class RatingResultsScreen extends StatelessWidget {
 
   Color _getColorFromRating(int rating) {
     switch (rating) {
+      case -1:
+        return const Color(0xFF6B7280); // Gris más oscuro para "No Aplica"
       case 1:
         return Colors.green;
       case 2:
@@ -209,7 +228,7 @@ class RatingResultsScreen extends StatelessWidget {
 
   String _calculateSectionScore(List<Map<String, dynamic>> items) {
     final validRatings = items
-        .where((item) => item['rating'] != 0)
+        .where((item) => item['rating'] != 0 && item['rating'] != -1) // Excluir 0 (sin calificar) y -1 (NA)
         .map((item) => item['rating'] as int)
         .toList();
     
