@@ -79,73 +79,9 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
     return numericValue <= 0 ? '0' : numericValue.toString();
   }
 
-  // Método para calcular el promedio usando wi (wi × valor) dividido por total de selecciones
-  double _calculateAverageScore(RiskThreatAnalysisState state) {
-    if (widget.calculationDetails == null) {
-      // Fallback al método anterior si no hay datos de wi
-      final dropdownSelections = state.dynamicSelections[widget.subClassificationId] ?? {};
-      if (dropdownSelections.isEmpty) return 0.0;
-      
-      final selectedCategories = widget.categories.where((category) => 
-          dropdownSelections[category.title] != null && dropdownSelections[category.title]!.isNotEmpty).toList();
-      
-      if (selectedCategories.isEmpty) return 0.0;
-      
-      double totalScore = 0.0;
-      int count = 0;
-      
-      for (final category in selectedCategories) {
-        final value = _getSelectedLevelValue(category.title, state);
-        // Solo incluir valores válidos (excluir 0 y -1 que es NA)
-        if (value > 0) {
-          totalScore += value;
-          count++;
-        }
-      }
-      
-      return count > 0 ? totalScore / count : 0.0;
-    }
-    
-    // Usar datos de wi del calculationDetails
-    final categories = widget.calculationDetails!['categories'] as List<Map<String, dynamic>>?;
-    if (categories == null || categories.isEmpty) return 0.0;
-    
-    double totalCalificacion = 0.0;
-    int validCategories = 0;
-    
-    for (final categoryData in categories) {
-      final calificacion = categoryData['calificacion'] as int? ?? 0;
-      if (calificacion > 0) {
-        totalCalificacion += calificacion.toDouble();
-        validCategories++;
-      }
-    }
-    
-    return validCategories > 0 ? totalCalificacion / validCategories : 0.0;
-  }
 
-  // Método para obtener el color dinámico basado en el promedio
-  Color _getScoreColor(RiskThreatAnalysisState state) {
-    final score = _calculateAverageScore(state);
-    
-    if (score == 0) {
-      return Colors.transparent; // No mostrar si no hay score
-    } else if (score <= 1.5) {
-      return const Color(0xFF22C55E); // Verde - BAJO
-    } else if (score <= 2.5) {
-      return const Color(0xFFFDE047); // Amarillo - MEDIO
-    } else if (score <= 3.5) {
-      return const Color(0xFFFB923C); // Naranja - MEDIO-ALTO  
-    } else {
-      return const Color(0xFFDC2626); // Rojo - ALTO
-    }
-  }
 
-  // Método para verificar si debe mostrar el container
-  bool _shouldShowScoreContainer(RiskThreatAnalysisState state) {
-    final score = _calculateAverageScore(state);
-    return score > 0;
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -201,29 +137,40 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
                         ],
                       ),
                     ),
-                    if (_shouldShowScoreContainer(state))
-                      Container(
-                        width: 50,
-                        height: 32,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(100),
-                          color: _getScoreColor(state),
-                        ),
-                        child: Center(
-                          child: Text(
-                            _calculateAverageScore(state).toStringAsFixed(1).replaceAll('.', ','),
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              color: Color(0xFFFFFFFF), // #FFF
-                              fontFamily: 'Work Sans',
-                              fontSize: 14,
-                              fontStyle: FontStyle.normal,
-                              fontWeight: FontWeight.w700,
-                              height: 16 / 14, // 114.286% line-height (16px/14px)
+                    BlocBuilder<RiskThreatAnalysisBloc, RiskThreatAnalysisState>(
+                      builder: (context, state) {
+                        final bloc = context.read<RiskThreatAnalysisBloc>();
+                        final shouldShow = bloc.shouldShowScoreContainer(widget.subClassificationId);
+                        
+                        if (!shouldShow) return const SizedBox.shrink();
+                        
+                        final score = bloc.getSubClassificationScore(widget.subClassificationId);
+                        final color = bloc.getSubClassificationColor(widget.subClassificationId);
+                        
+                        return Container(
+                          width: 50,
+                          height: 32,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(100),
+                            color: color,
+                          ),
+                          child: Center(
+                            child: Text(
+                              score.toStringAsFixed(1).replaceAll('.', ','),
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                color: Color(0xFFFFFFFF), // #FFF
+                                fontFamily: 'Work Sans',
+                                fontSize: 14,
+                                fontStyle: FontStyle.normal,
+                                fontWeight: FontWeight.w700,
+                                height: 16 / 14, // 114.286% line-height (16px/14px)
+                              ),
                             ),
                           ),
-                        ),
-                      ),
+                        );
+                      },
+                    ),
                     Icon(
                       widget.isSelected
                           ? Icons.keyboard_arrow_up

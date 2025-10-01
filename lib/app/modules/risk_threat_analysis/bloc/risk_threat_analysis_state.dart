@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 class RiskThreatAnalysisState {
   final bool isProbabilidadDropdownOpen;
   final bool isIntensidadDropdownOpen;
@@ -12,6 +14,10 @@ class RiskThreatAnalysisState {
   // Estado genérico para dropdowns dinámicos
   final Map<String, bool> dropdownOpenStates;
   final Map<String, Map<String, String>> dynamicSelections;
+  
+  // Cálculos dinámicos por subclasificación
+  final Map<String, double> subClassificationScores;
+  final Map<String, Color> subClassificationColors;
 
   const RiskThreatAnalysisState({
     this.isProbabilidadDropdownOpen = false,
@@ -25,6 +31,8 @@ class RiskThreatAnalysisState {
     this.selectedClassification = 'amenaza', // Default: amenaza
     this.dropdownOpenStates = const {},
     this.dynamicSelections = const {},
+    this.subClassificationScores = const {},
+    this.subClassificationColors = const {},
   });
 
   RiskThreatAnalysisState copyWith({
@@ -39,6 +47,8 @@ class RiskThreatAnalysisState {
     String? selectedClassification,
     Map<String, bool>? dropdownOpenStates,
     Map<String, Map<String, String>>? dynamicSelections,
+    Map<String, double>? subClassificationScores,
+    Map<String, Color>? subClassificationColors,
   }) {
     return RiskThreatAnalysisState(
       isProbabilidadDropdownOpen: isProbabilidadDropdownOpen ?? this.isProbabilidadDropdownOpen,
@@ -52,6 +62,8 @@ class RiskThreatAnalysisState {
       selectedClassification: selectedClassification ?? this.selectedClassification,
       dropdownOpenStates: dropdownOpenStates ?? this.dropdownOpenStates,
       dynamicSelections: dynamicSelections ?? this.dynamicSelections,
+      subClassificationScores: subClassificationScores ?? this.subClassificationScores,
+      subClassificationColors: subClassificationColors ?? this.subClassificationColors,
     );
   }
 }

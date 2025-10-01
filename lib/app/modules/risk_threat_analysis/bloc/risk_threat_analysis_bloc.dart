@@ -173,13 +173,270 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     // Update the selection for this category
     currentSelections[subClassificationId]![event.category] = event.level;
     
-    // NO cerrar el dropdown después de la selección - mantenerlo abierto
-    // para permitir múltiples selecciones en la misma subclasificación
+    // Recalcular los scores y colores para todas las subclasificaciones
+    final updatedScores = _calculateAllSubClassificationScores(currentSelections);
+    final updatedColors = _calculateAllSubClassificationColors(updatedScores);
 
     emit(state.copyWith(
       dynamicSelections: currentSelections,
-      // No modificar dropdownOpenStates - mantener el estado actual
+      subClassificationScores: updatedScores,
+      subClassificationColors: updatedColors,
     ));
+  }
+
+  // Calcula todos los scores de subclasificaciones
+  Map<String, double> _calculateAllSubClassificationScores(Map<String, Map<String, String>> selections) {
+    final scores = <String, double>{};
+    
+    for (final subClassificationId in selections.keys) {
+      scores[subClassificationId] = _calculateSubClassificationScore(subClassificationId, selections);
+    }
+    
+    return scores;
+  }
+
+  // Calcula todos los colores de subclasificaciones
+  Map<String, Color> _calculateAllSubClassificationColors(Map<String, double> scores) {
+    final colors = <String, Color>{};
+    
+    for (final entry in scores.entries) {
+      colors[entry.key] = _getScoreColor(entry.value);
+    }
+    
+    return colors;
+  }
+
+  // Calcula el score de una subclasificación específica
+  double _calculateSubClassificationScore(String subClassificationId, Map<String, Map<String, String>> selections) {
+    final subSelections = selections[subClassificationId] ?? {};
+    if (subSelections.isEmpty) return 0.0;
+
+    // Determinar el tipo de cálculo según el contexto
+    final calculationType = _getCalculationType(subClassificationId);
+    
+    switch (calculationType) {
+      case 'critical_variable':
+        return _calculateWithCriticalVariable(subClassificationId, subSelections);
+      case 'weighted_average':
+        return _calculateWeightedAverage(subClassificationId, subSelections);
+      default:
+        return _calculateSimpleAverage(subClassificationId, subSelections);
+    }
+  }
+
+  // Determina qué tipo de cálculo aplicar según el contexto
+  String _getCalculationType(String subClassificationId) {
+    final eventName = state.selectedRiskEvent;
+    final classification = state.selectedClassification;
+    
+    // Movimiento en Masa - Amenaza - Probabilidad (con variable crítica: Evidencias de Materialización)
+    if (eventName == 'Movimiento en Masa' && classification == 'amenaza' && subClassificationId == 'probabilidad') {
+      return 'critical_variable';
+    }
+    
+    // Movimiento en Masa - Amenaza - Intensidad (con variable crítica: Alteración de líneas vitales)
+    if (eventName == 'Movimiento en Masa' && classification == 'amenaza' && subClassificationId == 'intensidad') {
+      return 'critical_variable';
+    }
+    
+    // Movimiento en Masa - Vulnerabilidad (todas las subclasificaciones usan promedio ponderado)
+    if (eventName == 'Movimiento en Masa' && classification == 'vulnerabilidad') {
+      return 'weighted_average';
+    }
+    
+    // Inundación - todas las clasificaciones y subclasificaciones
+    if (eventName == 'Inundación') {
+      return 'weighted_average';
+    }
+    
+    // Incendio Forestal - todas las clasificaciones y subclasificaciones
+    if (eventName == 'Incendio Forestal') {
+      return 'weighted_average';
+    }
+    
+    // Por defecto: promedio simple
+    return 'simple_average';
+  }
+
+  // Calcula usando variable crítica para Movimiento en Masa (Probabilidad e Intensidad)
+  double _calculateWithCriticalVariable(String subClassificationId, Map<String, String> selections) {
+    final eventName = state.selectedRiskEvent;
+    
+    if (eventName == 'Movimiento en Masa') {
+      if (subClassificationId == 'probabilidad') {
+        return _calculateMovimientoEnMasaProbabilidad(selections);
+      } else if (subClassificationId == 'intensidad') {
+        return _calculateMovimientoEnMasaIntensidad(selections);
+      }
+    }
+    
+    // Fallback a cálculo ponderado para otros casos
+    return _calculateWeightedAverage(subClassificationId, selections);
+  }
+
+  // Fórmula específica para Movimiento en Masa - Probabilidad
+  double _calculateMovimientoEnMasaProbabilidad(Map<String, String> selections) {
+    // Variable crítica: "Evidencias de Materialización o Reactivación"
+    final evidenciasValue = _getSelectedLevelValue('Evidencias de Materialización o Reactivación', selections);
+    
+    // Si la variable crítica tiene valor 4 (ALTO), devolver 4 directamente
+    if (evidenciasValue == 4) {
+      return 4.0;
+    }
+    
+    // Si no, calcular usando promedio ponderado
+    return _calculateWeightedAverage('probabilidad', selections);
+  }
+
+  // Fórmula específica para Movimiento en Masa - Intensidad
+  double _calculateMovimientoEnMasaIntensidad(Map<String, String> selections) {
+    // Variable crítica: "Alteración del Funcionamiento de Líneas Vitales y Espacio Público"  
+    // Si esta variable = 4 (ALTO), significa que las líneas vitales estarían gravemente afectadas
+    final lineasVitalesValue = _getSelectedLevelValue('Alteración del Funcionamiento de Líneas Vitales y Espacio Público', selections);
+    
+    // CASO ESPECIAL: Si las líneas vitales se afectarían gravemente → intensidad = máxima
+    if (lineasVitalesValue == 4) {
+      return 4.0;
+    }
+    
+    // CASO NORMAL: Promedio ponderado de las tres variables con sus respectivos Wi:
+    // - Potencial de Daño en Edificaciones (Wi específico)
+    // - Capacidad de Generar Pérdida de Vidas Humanas (Wi específico)  
+    // - Alteración del Funcionamiento de Líneas Vitales y Espacio Público (Wi = 30)
+    return _calculateWeightedAverage('intensidad', selections);
+  }
+
+  // Calcula promedio ponderado usando los valores Wi del RiskEventFactory
+  double _calculateWeightedAverage(String subClassificationId, Map<String, String> selections) {
+    try {
+      // Obtener el modelo del evento actual
+      final eventModel = _getCurrentEventModel();
+      if (eventModel == null) return _calculateSimpleAverage(subClassificationId, selections);
+      
+      // Obtener la clasificación actual (amenaza/vulnerabilidad)
+      final classification = eventModel.classifications
+          .where((c) => c.id == state.selectedClassification)
+          .firstOrNull;
+      if (classification == null) return _calculateSimpleAverage(subClassificationId, selections);
+      
+      // Obtener la subclasificación actual (probabilidad/intensidad/etc.)
+      final subClassification = classification.subClassifications
+          .where((s) => s.id == subClassificationId)
+          .firstOrNull;
+      if (subClassification == null) return _calculateSimpleAverage(subClassificationId, selections);
+      
+      // Calcular usando fórmula ponderada: SUM(calificación * wi) / SUM(wi)
+      double sumCalificacionPorWi = 0.0;
+      double sumWi = 0.0;
+      
+      for (final category in subClassification.categories) {
+        final selectedLevel = selections[category.title];
+        if (selectedLevel != null && selectedLevel.isNotEmpty && selectedLevel != 'NA') {
+          final calificacion = _getSelectedLevelValue(category.title, {category.title: selectedLevel});
+          if (calificacion > 0) { // Excluir 0 y -1 (NA)
+            sumCalificacionPorWi += (calificacion * category.wi);
+            sumWi += category.wi;
+          }
+        }
+      }
+      
+      return sumWi > 0 ? sumCalificacionPorWi / sumWi : 0.0;
+      
+    } catch (e) {
+      // Fallback en caso de error
+      return _calculateSimpleAverage(subClassificationId, selections);
+    }
+  }
+
+  // Obtiene el modelo del evento actual
+  RiskEventModel? _getCurrentEventModel() {
+    final eventName = state.selectedRiskEvent;
+    
+    switch (eventName) {
+      case 'Movimiento en Masa':
+        return RiskEventFactory.createMovimientoEnMasa();
+      case 'Inundación':
+        return RiskEventFactory.createInundacion();
+      case 'Incendio Forestal':
+        return RiskEventFactory.createIncendioForestal();
+      case 'Avenida Torrencial':
+        return RiskEventFactory.createAvenidaTorrencial();
+      case 'Estructural':
+        return RiskEventFactory.createEstructural();
+      case 'Otros':
+        return RiskEventFactory.createOtros();
+      default:
+        return null;
+    }
+  }
+
+  // Calcula promedio simple
+  double _calculateSimpleAverage(String subClassificationId, Map<String, String> selections) {
+    if (selections.isEmpty) return 0.0;
+    
+    double totalScore = 0.0;
+    int count = 0;
+    
+    for (final entry in selections.entries) {
+      final value = _getSelectedLevelValue(entry.key, {entry.key: entry.value});
+      // Solo incluir valores válidos (excluir 0 y -1 que es NA)
+      if (value > 0) {
+        totalScore += value;
+        count++;
+      }
+    }
+    
+    return count > 0 ? totalScore / count : 0.0;
+  }
+
+  // Obtiene el valor numérico del nivel seleccionado
+  int _getSelectedLevelValue(String categoryTitle, Map<String, String> selections) {
+    final selectedLevel = selections[categoryTitle];
+    if (selectedLevel == null) return 0;
+    
+    // Si es "No Aplica", devolver -1 para diferenciarlo
+    if (selectedLevel == 'NA') return -1;
+    
+    // Mapear los niveles a sus valores numéricos
+    if (selectedLevel.contains('BAJO') && !selectedLevel.contains('MEDIO')) {
+      return 1;
+    } else if (selectedLevel.contains('MEDIO') && selectedLevel.contains('ALTO')) {
+      return 3;
+    } else if (selectedLevel.contains('MEDIO')) {
+      return 2;
+    } else if (selectedLevel.contains('ALTO')) {
+      return 4;
+    }
+    return 0;
+  }
+
+  // Obtiene el color basado en el score
+  Color _getScoreColor(double score) {
+    if (score == 0) {
+      return Colors.transparent; // No mostrar si no hay score
+    } else if (score <= 1.5) {
+      return const Color(0xFF22C55E); // Verde - BAJO
+    } else if (score <= 2.5) {
+      return const Color(0xFFFDE047); // Amarillo - MEDIO
+    } else if (score <= 3.5) {
+      return const Color(0xFFFB923C); // Naranja - MEDIO-ALTO  
+    } else {
+      return const Color(0xFFDC2626); // Rojo - ALTO
+    }
+  }
+
+  // Métodos públicos para acceder a los cálculos desde los widgets
+  double getSubClassificationScore(String subClassificationId) {
+    return state.subClassificationScores[subClassificationId] ?? 0.0;
+  }
+
+  Color getSubClassificationColor(String subClassificationId) {
+    return state.subClassificationColors[subClassificationId] ?? Colors.transparent;
+  }
+
+  bool shouldShowScoreContainer(String subClassificationId) {
+    final score = getSubClassificationScore(subClassificationId);
+    return score > 0;
   }
 
   // Método helper para calcular el promedio de probabilidad
@@ -244,41 +501,7 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     return wi * value;
   }
 
-  // Método helper para obtener la calificación ponderada desde el modelo cuando esté disponible
-  double _getCategoryWeightedScore(String subClassificationId, String categoryTitle) {
-    try {
-      final selectedEvent = state.selectedRiskEvent;
-      final eventModel = RiskModelAdapter.getEventModel(selectedEvent);
-      
-      if (eventModel != null) {
-        final classification = eventModel.getClassificationById(state.selectedClassification);
-        if (classification != null) {
-          final subClassification = classification.subClassifications
-              .where((sub) => sub.id == subClassificationId)
-              .firstOrNull;
-          
-          if (subClassification != null) {
-            final category = subClassification.categories
-                .where((cat) => cat.title == categoryTitle)
-                .firstOrNull;
-            
-            if (category != null) {
-              // Usar la calificación ponderada del modelo (value * wi)
-              return category.weightedScore;
-            }
-          }
-        }
-      }
-      
-      // Fallback: usar el método anterior sin ponderación
-      final selectedLevel = getSelectionsForSubClassification(subClassificationId)[categoryTitle];
-      return selectedLevel != null ? _getLevelValue(selectedLevel).toDouble() : 0.0;
-    } catch (e) {
-      // En caso de error, usar el método de fallback
-      final selectedLevel = getSelectionsForSubClassification(subClassificationId)[categoryTitle];
-      return selectedLevel != null ? _getLevelValue(selectedLevel).toDouble() : 0.0;
-    }
-  }
+
 
   // Método para obtener la calificación de toda una subclasificación (promedio)
   double getSubClassificationCalificacion(String subClassificationId) {
