@@ -234,12 +234,27 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
       return 'critical_variable';
     }
     
-    // Movimiento en Masa - Amenaza - Intensidad (con variable crítica: Alteración de líneas vitales)
+    // Movimiento en Masa - Amenaza - Intensidad (con variable crítica: Potencial de Daño en Edificaciones)
     if (eventName == 'Movimiento en Masa' && classification == 'amenaza' && subClassificationId == 'intensidad') {
       return 'critical_variable';
     }
     
-    // Movimiento en Masa - Vulnerabilidad (todas las subclasificaciones usan promedio ponderado)
+    // Movimiento en Masa - Vulnerabilidad - Fragilidad Física (con regla de tope especial)
+    if (eventName == 'Movimiento en Masa' && classification == 'vulnerabilidad' && subClassificationId == 'fragilidad_fisica') {
+      return 'critical_variable';
+    }
+    
+    // Movimiento en Masa - Vulnerabilidad - Fragilidad en Personas (con regla de tope especial)
+    if (eventName == 'Movimiento en Masa' && classification == 'vulnerabilidad' && subClassificationId == 'fragilidad_personas') {
+      return 'critical_variable';
+    }
+    
+    // Movimiento en Masa - Vulnerabilidad - Exposición (siempre promedio ponderado, sin tope)
+    if (eventName == 'Movimiento en Masa' && classification == 'vulnerabilidad' && subClassificationId == 'exposicion') {
+      return 'weighted_average';
+    }
+    
+    // Movimiento en Masa - Vulnerabilidad - Otras subclasificaciones (promedio ponderado)
     if (eventName == 'Movimiento en Masa' && classification == 'vulnerabilidad') {
       return 'weighted_average';
     }
@@ -258,7 +273,7 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     return 'simple_average';
   }
 
-  // Calcula usando variable crítica para Movimiento en Masa (Probabilidad e Intensidad)
+  // Calcula usando variable crítica para Movimiento en Masa (Probabilidad, Intensidad y Vulnerabilidad)
   double _calculateWithCriticalVariable(String subClassificationId, Map<String, String> selections) {
     final eventName = state.selectedRiskEvent;
     
@@ -267,6 +282,10 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
         return _calculateMovimientoEnMasaProbabilidad(selections);
       } else if (subClassificationId == 'intensidad') {
         return _calculateMovimientoEnMasaIntensidad(selections);
+      } else if (subClassificationId == 'fragilidad_fisica') {
+        return _calculateMovimientoEnMasaFragilidadFisica(selections);
+      } else if (subClassificationId == 'fragilidad_personas') {
+        return _calculateMovimientoEnMasaFragilidadPersonas(selections);
       }
     }
     
@@ -305,6 +324,65 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     // - Alteración del Funcionamiento de Líneas Vitales y Espacio Público (Wi específico)
     // Fórmula: SUM(calificaciones) / SUM(pesos Wi)
     return _calculateWeightedAverage('intensidad', selections);
+  }
+
+  // Fórmula específica para Movimiento en Masa - Fragilidad Física
+  double _calculateMovimientoEnMasaFragilidadFisica(Map<String, String> selections) {
+    // PASO 1: Verificar regla de tope
+    final amenazaGlobal = _calculateAmenazaGlobalScore();
+    final potencialDanoEdificaciones = _getPotencialDanoEdificacionesFromAmenaza();
+    
+    // REGLA DE TOPE: Si amenaza global ≥ 2.6 Y potencial daño edificaciones = 4 → fragilidad = 4
+    if (amenazaGlobal >= 2.6 && potencialDanoEdificaciones == 4) {
+      return 4.0;
+    }
+    
+    // CASO NORMAL: Promedio ponderado de las variables de fragilidad física
+    return _calculateWeightedAverage('fragilidad_fisica', selections);
+  }
+
+  // Fórmula específica para Movimiento en Masa - Fragilidad en Personas
+  double _calculateMovimientoEnMasaFragilidadPersonas(Map<String, String> selections) {
+    // PASO 1: Verificar regla de tope
+    final amenazaGlobal = _calculateAmenazaGlobalScore();
+    final potencialDanoEdificaciones = _getPotencialDanoEdificacionesFromAmenaza();
+    
+    // REGLA DE TOPE: Si amenaza global ≥ 2.6 Y potencial daño edificaciones = 4 → fragilidad = 4
+    if (amenazaGlobal >= 2.6 && potencialDanoEdificaciones == 4) {
+      return 4.0;
+    }
+    
+    // CASO NORMAL: Promedio ponderado de las variables de fragilidad en personas
+    return _calculateWeightedAverage('fragilidad_personas', selections);
+  }
+
+  // Método para calcular la amenaza global (con pesos específicos para Movimiento en Masa)
+  double _calculateAmenazaGlobalScore() {
+    final eventName = state.selectedRiskEvent;
+    
+    // Para Movimiento en Masa: usar el cálculo ponderado
+    if (eventName == 'Movimiento en Masa') {
+      return _calculateMovimientoEnMasaAmenazaFinal();
+    }
+    
+    // Para otros eventos: promedio simple
+    final probabilidadScore = state.subClassificationScores['probabilidad'] ?? 0.0;
+    final intensidadScore = state.subClassificationScores['intensidad'] ?? 0.0;
+    
+    // Si alguno es 0, no hay amenaza global calculable
+    if (probabilidadScore == 0.0 || intensidadScore == 0.0) {
+      return 0.0;
+    }
+    
+    // Promedio simple para otros eventos
+    return (probabilidadScore + intensidadScore) / 2;
+  }
+
+  // Método para obtener el valor de "Potencial de Daño en Edificaciones" desde la amenaza
+  int _getPotencialDanoEdificacionesFromAmenaza() {
+    // Buscar en las selecciones de intensidad (amenaza)
+    final intensidadSelections = state.dynamicSelections['intensidad'] ?? {};
+    return _getSelectedLevelValue('Potencial de Daño en Edificaciones', intensidadSelections);
   }
 
   // Calcula promedio ponderado usando los valores Wi del RiskEventFactory
@@ -620,20 +698,18 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
 
   // Método específico para calcular calificación de amenaza
   String _calculateAmenazaRating() {
-    final probAverage = calculateProbabilidadAverage();
-    final intAverage = calculateIntensidadAverage();
+    final finalScore = _calculateAmenazaFinalScore();
     
-    if (probAverage == 0.0 || intAverage == 0.0) {
+    if (finalScore == 0.0) {
       return 'SIN CALIFICAR';
     }
     
-    final finalScore = (probAverage + intAverage) / 2;
-    
-    if (finalScore <= 1.5) {
+    // Rangos específicos para la clasificación de amenaza
+    if (finalScore <= 1.75) {
       return 'BAJO';
-    } else if (finalScore <= 2.5) {
-      return 'MEDIO';
-    } else if (finalScore <= 3.5) {
+    } else if (finalScore <= 2.50) {
+      return 'MEDIO-BAJO';
+    } else if (finalScore <= 3.25) {
       return 'MEDIO-ALTO';
     } else {
       return 'ALTO';
@@ -754,6 +830,14 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
 
   // Método específico para calcular puntaje final de amenaza
   double _calculateAmenazaFinalScore() {
+    final eventName = state.selectedRiskEvent;
+    
+    // Para Movimiento en Masa: usar cálculo ponderado específico
+    if (eventName == 'Movimiento en Masa') {
+      return _calculateMovimientoEnMasaAmenazaFinal();
+    }
+    
+    // Para otros eventos: promedio simple de probabilidad e intensidad
     final probAverage = calculateProbabilidadAverage();
     final intAverage = calculateIntensidadAverage();
     
@@ -762,6 +846,26 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     }
     
     return (probAverage + intAverage) / 2;
+  }
+
+  // Cálculo específico para Movimiento en Masa - Amenaza (con pesos específicos)
+  double _calculateMovimientoEnMasaAmenazaFinal() {
+    // Obtener los scores de probabilidad e intensidad desde el state
+    final probabilidadScore = state.subClassificationScores['probabilidad'] ?? 0.0;
+    final intensidadScore = state.subClassificationScores['intensidad'] ?? 0.0;
+    
+    // Si alguno es 0, no hay calificación calculable
+    if (probabilidadScore == 0.0 || intensidadScore == 0.0) {
+      return 0.0;
+    }
+    
+    // Aplicar pesos específicos para Movimiento en Masa:
+    // Probabilidad: 40% (0.4)
+    // Intensidad: 60% (0.6)
+    final probabilidadPonderada = probabilidadScore * 0.4;
+    final intensidadPonderada = intensidadScore * 0.6;
+    
+    return probabilidadPonderada + intensidadPonderada;
   }
 
   // Método específico para calcular puntaje final de vulnerabilidad usando calificaciones ponderadas
