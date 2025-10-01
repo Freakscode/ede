@@ -156,7 +156,7 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
                           ),
                           child: Center(
                             child: Text(
-                              score.toStringAsFixed(1).replaceAll('.', ','),
+                              score.toStringAsFixed(2).replaceAll('.', ','),
                               textAlign: TextAlign.center,
                               style: const TextStyle(
                                 color: Color(0xFFFFFFFF), // #FFF

@@ -290,19 +290,20 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
 
   // Fórmula específica para Movimiento en Masa - Intensidad
   double _calculateMovimientoEnMasaIntensidad(Map<String, String> selections) {
-    // Variable crítica: "Alteración del Funcionamiento de Líneas Vitales y Espacio Público"  
-    // Si esta variable = 4 (ALTO), significa que las líneas vitales estarían gravemente afectadas
-    final lineasVitalesValue = _getSelectedLevelValue('Alteración del Funcionamiento de Líneas Vitales y Espacio Público', selections);
+    // PASO 1: Revisar la condición - Variable crítica: "Potencial de Daño en Edificaciones"
+    // Si esta variable = 4 (ALTO), significa que el daño en edificaciones es crítico
+    final potencialDanoValue = _getSelectedLevelValue('Potencial de Daño en Edificaciones', selections);
     
-    // CASO ESPECIAL: Si las líneas vitales se afectarían gravemente → intensidad = máxima
-    if (lineasVitalesValue == 4) {
+    // CASO ESPECIAL: Si el daño en edificaciones es crítico (4) → intensidad = 4 directamente
+    if (potencialDanoValue == 4) {
       return 4.0;
     }
     
-    // CASO NORMAL: Promedio ponderado de las tres variables con sus respectivos Wi:
+    // PASO 2-5: CASO NORMAL - Promedio ponderado de las tres variables:
     // - Potencial de Daño en Edificaciones (Wi específico)
     // - Capacidad de Generar Pérdida de Vidas Humanas (Wi específico)  
-    // - Alteración del Funcionamiento de Líneas Vitales y Espacio Público (Wi = 30)
+    // - Alteración del Funcionamiento de Líneas Vitales y Espacio Público (Wi específico)
+    // Fórmula: SUM(calificaciones) / SUM(pesos Wi)
     return _calculateWeightedAverage('intensidad', selections);
   }
 
