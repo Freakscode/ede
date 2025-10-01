@@ -42,7 +42,7 @@ class ExpandableDropdownField extends StatefulWidget {
 }
 
 class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
-  Map<String, bool> _expandedCategories = {};
+  final Map<String, bool> _expandedCategories = {};
 
   // Método helper para obtener el valor numérico del nivel seleccionado
   int _getSelectedLevelValue(String categoryTitle, RiskThreatAnalysisState state) {
