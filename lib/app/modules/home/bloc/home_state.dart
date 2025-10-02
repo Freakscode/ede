@@ -11,6 +11,7 @@ class HomeState extends Equatable {
   final String selectedLanguage;
   final String selectedRiskEvent;
   final String? selectedRiskCategory;
+  final Map<String, bool> completedEvaluations; // Track de evaluaciones completadas por evento
 
   const HomeState({
     required this.selectedIndex,
@@ -23,6 +24,7 @@ class HomeState extends Equatable {
     this.selectedLanguage = 'Español',
     this.selectedRiskEvent = 'Movimiento en Masa',
     this.selectedRiskCategory,
+    this.completedEvaluations = const {},
   });
 
   HomeState copyWith({
@@ -36,6 +38,7 @@ class HomeState extends Equatable {
     String? selectedLanguage,
     String? selectedRiskEvent,
     String? selectedRiskCategory,
+    Map<String, bool>? completedEvaluations,
   }) {
     return HomeState(
       selectedIndex: selectedIndex ?? this.selectedIndex,
@@ -48,9 +51,10 @@ class HomeState extends Equatable {
       selectedLanguage: selectedLanguage ?? this.selectedLanguage,
       selectedRiskEvent: selectedRiskEvent ?? this.selectedRiskEvent,
       selectedRiskCategory: selectedRiskCategory ?? this.selectedRiskCategory,
+      completedEvaluations: completedEvaluations ?? this.completedEvaluations,
     );
   }
 
   @override
-  List<Object?> get props => [selectedIndex, mostrarEventosRiesgo, mostrarCategoriasRiesgo, tutorialShown, showTutorial, notificationsEnabled, darkModeEnabled, selectedLanguage, selectedRiskEvent, selectedRiskCategory];
+  List<Object?> get props => [selectedIndex, mostrarEventosRiesgo, mostrarCategoriasRiesgo, tutorialShown, showTutorial, notificationsEnabled, darkModeEnabled, selectedLanguage, selectedRiskEvent, selectedRiskCategory, completedEvaluations];
 }

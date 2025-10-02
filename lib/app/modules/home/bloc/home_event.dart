@@ -73,3 +73,13 @@ class HomeChangeLanguage extends HomeEvent {
 }
 
 class HomeClearData extends HomeEvent {}
+
+class MarkEvaluationCompleted extends HomeEvent {
+  final String eventName;
+  final String classificationType; // 'amenaza' o 'vulnerabilidad'
+  
+  const MarkEvaluationCompleted(this.eventName, this.classificationType);
+
+  @override
+  List<Object?> get props => [eventName, classificationType];
+}

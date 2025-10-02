@@ -4,8 +4,7 @@ import 'package:caja_herramientas/app/modules/home/ui/widgets/category_card.dart
 import 'package:caja_herramientas/app/modules/home/bloc/home_bloc.dart';
 import 'package:caja_herramientas/app/modules/home/bloc/home_state.dart';
 import 'package:caja_herramientas/app/modules/home/bloc/home_event.dart';
-import 'package:caja_herramientas/app/modules/risk_threat_analysis/bloc/risk_threat_analysis_bloc.dart';
-import 'package:caja_herramientas/app/modules/risk_threat_analysis/bloc/risk_threat_analysis_state.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -14,48 +13,7 @@ import 'package:go_router/go_router.dart';
 class RiskCategoriesScreen extends StatelessWidget {
   const RiskCategoriesScreen({super.key});
 
-  // Método helper para verificar si la amenaza está completa
-  bool _isAmenazaCompleted(RiskThreatAnalysisBloc bloc, RiskThreatAnalysisState state, String selectedEvent) {
-    // Verificar si el evento seleccionado coincide con el del bloc
-    if (state.selectedRiskEvent != selectedEvent) {
-      return false;
-    }
-    
-    // Verificar si hay selecciones de amenaza
-    final hasAmenazaSelections = state.probabilidadSelections.isNotEmpty && 
-                                 state.intensidadSelections.isNotEmpty;
-    
-    if (!hasAmenazaSelections) {
-      return false;
-    }
-    
-    // Para ser más estricto, podemos verificar que todas las categorías estén completas
-    // Obtener todas las subclasificaciones de amenaza
-    final amenazaSubClassifications = bloc.getAmenazaSubClassifications();
-    
-    for (final subClassification in amenazaSubClassifications) {
-      final categories = bloc.getCategoriesForSubClassification(subClassification.id);
-      Map<String, String> selections;
-      
-      if (subClassification.id == 'probabilidad') {
-        selections = state.probabilidadSelections;
-      } else if (subClassification.id == 'intensidad') {
-        selections = state.intensidadSelections;
-      } else {
-        selections = state.dynamicSelections[subClassification.id] ?? {};
-      }
-      
-      // Verificar que todas las categorías de esta subclasificación estén completadas
-      for (final category in categories) {
-        if (!selections.containsKey(category.title) || 
-            selections[category.title]?.isEmpty == true) {
-          return false;
-        }
-      }
-    }
-    
-    return true;
-  }
+
 
   // Método helper para construir las CategoryCard personalizadas
   Widget _buildCategoryCard(
@@ -81,6 +39,8 @@ class RiskCategoriesScreen extends StatelessWidget {
               final navigationData = {
                 'event': selectedEvent,
                 'classification': classification.name.toLowerCase(),
+                // Si está completado, ir directamente a resultados
+                'directToResults': isCompleted,
               };
               context.go('/risk_threat_analysis', extra: navigationData);
             } : () {
@@ -149,13 +109,6 @@ class RiskCategoriesScreen extends StatelessWidget {
         final homeBloc = context.read<HomeBloc>();
         final classifications = homeBloc.getEventClassifications(selectedEvent);
         
-        return BlocBuilder<RiskThreatAnalysisBloc, RiskThreatAnalysisState>(
-          builder: (context, riskState) {
-            final riskBloc = context.read<RiskThreatAnalysisBloc>();
-            
-            // Verificar si la amenaza está completa
-            final isAmenazaCompleted = _isAmenazaCompleted(riskBloc, riskState, selectedEvent);
-        
         return SingleChildScrollView(
       child: Padding(
         padding: EdgeInsets.zero,
@@ -212,15 +165,16 @@ class RiskCategoriesScreen extends StatelessWidget {
                     if (isAmenaza) {
                       // Amenaza siempre está disponible
                       isAvailable = true;
-                      isCompleted = isAmenazaCompleted;
+                      isCompleted = homeState.completedEvaluations['${selectedEvent}_amenaza'] ?? false;
                     } else if (isVulnerabilidad) {
-                      // Vulnerabilidad solo está disponible si amenaza está completa
-                      isAvailable = isAmenazaCompleted;
+                      // Verificar si amenaza está completa usando HomeBloc
+                      final amenazaCompleted = homeState.completedEvaluations['${selectedEvent}_amenaza'] ?? false;
+                      isAvailable = amenazaCompleted;
                       if (!isAvailable) {
                         disabledMessage = 'Complete primero la sección de Amenaza';
                       }
-                      // TODO: Verificar si vulnerabilidad está completa
-                      isCompleted = false;
+                      // Verificar si vulnerabilidad está completa
+                      isCompleted = homeState.completedEvaluations['${selectedEvent}_vulnerabilidad'] ?? false;
                     }
                     
                     return Column(
@@ -269,11 +223,11 @@ class RiskCategoriesScreen extends StatelessWidget {
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                               decoration: BoxDecoration(
-                                color: isAmenazaCompleted ? DAGRDColors.success : DAGRDColors.warning,
+                                color: _getProgressColor(homeState, selectedEvent),
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Text(
-                                isAmenazaCompleted ? '1/2 Completado' : '0/2 Completado',
+                                _getProgressText(homeState, selectedEvent),
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontFamily: 'Work Sans',
@@ -289,19 +243,17 @@ class RiskCategoriesScreen extends StatelessWidget {
                         ClipRRect(
                           borderRadius: BorderRadius.circular(4),
                           child: LinearProgressIndicator(
-                            value: isAmenazaCompleted ? 0.5 : 0.0,
+                            value: _getProgressValue(homeState, selectedEvent),
                             backgroundColor: Colors.grey[300],
                             valueColor: AlwaysStoppedAnimation<Color>(
-                              isAmenazaCompleted ? DAGRDColors.success : DAGRDColors.warning,
+                              _getProgressColor(homeState, selectedEvent),
                             ),
                             minHeight: 6,
                           ),
                         ),
                         const SizedBox(height: 12),
                         Text(
-                          isAmenazaCompleted 
-                            ? '✓ Amenaza completada. Puede continuar con Vulnerabilidad.'
-                            : '1. Complete primero la sección de Amenaza\n2. Luego podrá acceder a Vulnerabilidad',
+                          _getProgressMessage(homeState, selectedEvent),
                           style: const TextStyle(
                             color: DAGRDColors.azulSecundario,
                             fontFamily: 'Work Sans',
@@ -433,9 +385,60 @@ class RiskCategoriesScreen extends StatelessWidget {
         ),
       ),
     );
-          },
-        );
       },
     );
+  }
+
+  // Métodos helper para el progreso
+  String _getProgressText(HomeState homeState, String selectedEvent) {
+    final amenazaCompleted = homeState.completedEvaluations['${selectedEvent}_amenaza'] ?? false;
+    final vulnerabilidadCompleted = homeState.completedEvaluations['${selectedEvent}_vulnerabilidad'] ?? false;
+    
+    if (amenazaCompleted && vulnerabilidadCompleted) {
+      return '2/2 Completado';
+    } else if (amenazaCompleted) {
+      return '1/2 Completado';
+    } else {
+      return '0/2 Completado';
+    }
+  }
+
+  double _getProgressValue(HomeState homeState, String selectedEvent) {
+    final amenazaCompleted = homeState.completedEvaluations['${selectedEvent}_amenaza'] ?? false;
+    final vulnerabilidadCompleted = homeState.completedEvaluations['${selectedEvent}_vulnerabilidad'] ?? false;
+    
+    if (amenazaCompleted && vulnerabilidadCompleted) {
+      return 1.0;
+    } else if (amenazaCompleted) {
+      return 0.5;
+    } else {
+      return 0.0;
+    }
+  }
+
+  Color _getProgressColor(HomeState homeState, String selectedEvent) {
+    final amenazaCompleted = homeState.completedEvaluations['${selectedEvent}_amenaza'] ?? false;
+    final vulnerabilidadCompleted = homeState.completedEvaluations['${selectedEvent}_vulnerabilidad'] ?? false;
+    
+    if (amenazaCompleted && vulnerabilidadCompleted) {
+      return DAGRDColors.success;
+    } else if (amenazaCompleted) {
+      return DAGRDColors.warning;
+    } else {
+      return DAGRDColors.error;
+    }
+  }
+
+  String _getProgressMessage(HomeState homeState, String selectedEvent) {
+    final amenazaCompleted = homeState.completedEvaluations['${selectedEvent}_amenaza'] ?? false;
+    final vulnerabilidadCompleted = homeState.completedEvaluations['${selectedEvent}_vulnerabilidad'] ?? false;
+    
+    if (amenazaCompleted && vulnerabilidadCompleted) {
+      return '✓ ¡Evaluación completa! Ambas secciones han sido diligenciadas.\nPuede revisar los resultados haciendo clic en cualquier sección.';
+    } else if (amenazaCompleted) {
+      return '✓ Amenaza completada. Puede continuar con Vulnerabilidad.\nTambién puede revisar los resultados de Amenaza.';
+    } else {
+      return '1. Complete primero la sección de Amenaza\n2. Luego podrá acceder a Vulnerabilidad';
+    }
   }
 }

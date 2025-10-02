@@ -84,6 +84,14 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       await TutorialOverlayService.clearTutorialBox();
       emit(state.copyWith(showTutorial: true));
     });
+
+    on<MarkEvaluationCompleted>((event, emit) {
+      final key = '${event.eventName}_${event.classificationType}';
+      final updatedCompletedEvaluations = Map<String, bool>.from(state.completedEvaluations);
+      updatedCompletedEvaluations[key] = true;
+      
+      emit(state.copyWith(completedEvaluations: updatedCompletedEvaluations));
+    });
   }
 
   /// Mapea los nombres de eventos a sus iconos correspondientes
@@ -121,5 +129,21 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   /// Obtiene todos los eventos disponibles
   List<RiskEventModel> getAllRiskEvents() {
     return RiskEventFactory.getAllEvents();
+  }
+
+  /// Verifica si una evaluación está completada
+  bool isEvaluationCompleted(String eventName, String classificationType) {
+    final key = '${eventName}_${classificationType}';
+    return state.completedEvaluations[key] ?? false;
+  }
+
+  /// Obtiene el estado de completitud para amenaza
+  bool isAmenazaCompleted(String eventName) {
+    return isEvaluationCompleted(eventName, 'amenaza');
+  }
+
+  /// Obtiene el estado de completitud para vulnerabilidad
+  bool isVulnerabilidadCompleted(String eventName) {
+    return isEvaluationCompleted(eventName, 'vulnerabilidad');
   }
 }

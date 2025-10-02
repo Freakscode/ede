@@ -33,34 +33,33 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) {
-        final bloc = HomeBloc()..add(HomeCheckAndShowTutorial());
-        
-        // Manejar diferentes tipos de navegación
-        if (navigationData != null) {
-          if (navigationData!['showRiskCategories'] == true) {
-            bloc.add(HomeShowRiskCategoriesScreen());
-          } else if (navigationData!['showRiskEvents'] == true) {
-            bloc.add(HomeShowRiskEventsSection());
-          } else if (navigationData!['selectedIndex'] != null) {
-            bloc.add(HomeNavBarTapped(navigationData!['selectedIndex'] as int));
-          }
+    // Usar el HomeBloc global y manejar navigationData
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final bloc = context.read<HomeBloc>();
+      
+      // Manejar diferentes tipos de navegación
+      if (navigationData != null) {
+        if (navigationData!['showRiskCategories'] == true) {
+          bloc.add(HomeShowRiskCategoriesScreen());
+        } else if (navigationData!['showRiskEvents'] == true) {
+          bloc.add(HomeShowRiskEventsSection());
+        } else if (navigationData!['selectedIndex'] != null) {
+          bloc.add(HomeNavBarTapped(navigationData!['selectedIndex'] as int));
         }
-        
-        return bloc;
-      },
-      child: BlocConsumer<HomeBloc, HomeState>(
-        listenWhen: (previous, current) =>
-            !previous.tutorialShown && current.tutorialShown,
-        listener: (context, state) {
-          if (state.tutorialShown && state.showTutorial) {
+      }
+    });
+    
+    return BlocConsumer<HomeBloc, HomeState>(
+      listenWhen: (previous, current) =>
+          !previous.tutorialShown && current.tutorialShown,
+      listener: (context, state) {
+        if (state.tutorialShown && state.showTutorial) {
 
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              _showTutorialOverlay(context);
-            });
-          }
-        },
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            _showTutorialOverlay(context);
+          });
+        }
+      },
         builder: (context, state) {
           Widget bodyContent;
           // Widget bodyContent = const RiskCategoriesScreen();
@@ -140,11 +139,6 @@ class HomeScreen extends StatelessWidget {
             ),
           );
         },
-      ),
-    );
+      );
   }
-}
-
-class RiskThreatAnalysisScreen {
-  const RiskThreatAnalysisScreen();
 }

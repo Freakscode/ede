@@ -28,6 +28,9 @@ import 'app/modules/evaluacion/presentation/bloc/evaluacion_global_bloc.dart';
 // Risk Threat Analysis
 import 'app/modules/risk_threat_analysis/bloc/risk_threat_analysis_bloc.dart';
 
+// Home
+import 'app/modules/home/bloc/home_bloc.dart';
+
 final GetIt sl = GetIt.instance;
 
 Future<void> initializeDependencies() async {
@@ -69,6 +72,7 @@ Future<void> initializeDependencies() async {
   sl.registerFactory(() => EvaluacionDanosBloc());
   sl.registerFactory(() => DescripcionEdificacionBloc());
   sl.registerFactory(() => RiskThreatAnalysisBloc());
+  sl.registerFactory(() => HomeBloc());
   
   // Note: EvaluacionGlobalBloc is created directly in MultiBlocProvider 
   // since it requires access to other BLoC instances from context

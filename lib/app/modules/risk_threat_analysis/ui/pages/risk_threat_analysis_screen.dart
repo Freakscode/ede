@@ -39,10 +39,12 @@ class _RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
       // Si tenemos navigationData con clasificación, procesarla
       if (widget.navigationData != null) {
         final classificationName = widget.navigationData!['classification'] as String?;
+        final directToResults = widget.navigationData!['directToResults'] as bool? ?? false;
         
         if (classificationName != null) {
-          // Resetear a índice 0 cuando se cambia de clasificación
-          bloc.add(ChangeBottomNavIndex(0));
+          // Si debe ir directo a resultados, ir al índice 2, sino al 0
+          final targetIndex = directToResults ? 2 : 0;
+          bloc.add(ChangeBottomNavIndex(targetIndex));
           
           // Aplicar la nueva clasificación
           bloc.add(SelectClassification(classificationName));

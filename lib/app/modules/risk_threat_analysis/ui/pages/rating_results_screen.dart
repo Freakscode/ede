@@ -6,6 +6,8 @@ import '../../bloc/risk_threat_analysis_state.dart';
 import '../widgets/widgets.dart';
 import 'package:caja_herramientas/app/shared/models/risk_event_model.dart';
 import 'package:caja_herramientas/app/shared/models/risk_event_factory.dart';
+import '../../../home/bloc/home_bloc.dart';
+import '../../../home/bloc/home_event.dart';
 
 class RatingResultsScreen extends StatelessWidget {
   const RatingResultsScreen({super.key});
@@ -52,6 +54,11 @@ class RatingResultsScreen extends StatelessWidget {
                   if (state.currentBottomNavIndex == 2) {
                     
                     if (state.selectedClassification.toLowerCase() == 'amenaza') {
+                      // Marcar amenaza como completada
+                      context.read<HomeBloc>().add(
+                        MarkEvaluationCompleted(state.selectedRiskEvent, 'amenaza')
+                      );
+                      
                       // Navegar de vuelta al HomeScreen con RiskCategoriesScreen activo
                       final navigationData = {
                         'showRiskCategories': true,
@@ -67,6 +74,11 @@ class RatingResultsScreen extends StatelessWidget {
                         ),
                       );
                     } else if (state.selectedClassification.toLowerCase() == 'vulnerabilidad') {
+                      // Marcar vulnerabilidad como completada
+                      context.read<HomeBloc>().add(
+                        MarkEvaluationCompleted(state.selectedRiskEvent, 'vulnerabilidad')
+                      );
+                      
                       // Navegar de vuelta al HomeScreen con RiskCategoriesScreen activo
                       final navigationData = {
                         'showRiskCategories': true,
