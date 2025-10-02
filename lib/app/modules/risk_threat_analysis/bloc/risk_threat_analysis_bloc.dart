@@ -737,76 +737,29 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     }
   }
 
-  // Método específico para calcular calificación de vulnerabilidad usando calificaciones ponderadas
+  // Método específico para calcular calificación de vulnerabilidad usando el nuevo cálculo ponderado
   String _calculateVulnerabilidadRating() {
-    final subClassifications = getCurrentSubClassifications();
+    final finalScore = _calculateVulnerabilidadFinalScore();
     
-    if (subClassifications.isEmpty) {
+    if (finalScore == 0.0) {
       return 'SIN CALIFICAR';
     }
     
-    // Calcular el promedio ponderado de todas las subclasificaciones de vulnerabilidad
-    double totalWeightedScore = 0.0;
-    double totalWeight = 0.0;
-    
-    for (final subClassification in subClassifications) {
-      final selections = state.dynamicSelections[subClassification.id] ?? {};
-      
-      if (selections.isNotEmpty) {
-        double subWeightedScore = 0.0;
-        double subWeight = 0.0;
-        
-        // Calcular score ponderado para cada categoría en esta subclasificación
-        for (final categoryTitle in selections.keys) {
-          // Obtener la categoría del modelo para acceder al peso wi
-          final selectedEvent = state.selectedRiskEvent;
-          final eventModel = RiskModelAdapter.getEventModel(selectedEvent);
-          
-          if (eventModel != null) {
-            final classification = eventModel.getClassificationById(state.selectedClassification);
-            if (classification != null) {
-              final subClass = classification.subClassifications
-                  .where((sub) => sub.id == subClassification.id)
-                  .firstOrNull;
-              
-              if (subClass != null) {
-                final riskCategory = subClass.categories
-                    .where((cat) => cat.title == categoryTitle)
-                    .firstOrNull;
-                
-                if (riskCategory != null) {
-                  final weightedScore = riskCategory.weightedScore;
-                  if (weightedScore > 0) {
-                    subWeightedScore += weightedScore;
-                    subWeight += riskCategory.wi;
-                  }
-                }
-              }
-            }
-          }
-        }
-        
-        if (subWeight > 0) {
-          totalWeightedScore += subWeightedScore;
-          totalWeight += subWeight;
-        }
-      }
-    }
-    
-    if (totalWeight == 0) {
-      return 'SIN CALIFICAR';
-    }
-    
-    final finalScore = totalWeightedScore / totalWeight;
-    
-    if (finalScore <= 1.5) {
+    // Rangos específicos para la clasificación de vulnerabilidad según especificaciones:
+    // Entre 1,0 y 1,75 → Bajo
+    // Mayor a 1,75 y hasta 2,5 → Medio - Bajo
+    // Mayor a 2,5 y hasta 3,25 → Medio - Alto
+    // Mayor a 3,25 y hasta 4 → Alto
+    if (finalScore >= 1.0 && finalScore <= 1.75) {
       return 'BAJO';
-    } else if (finalScore <= 2.5) {
-      return 'MEDIO';
-    } else if (finalScore <= 3.5) {
+    } else if (finalScore > 1.75 && finalScore <= 2.5) {
+      return 'MEDIO-BAJO';
+    } else if (finalScore > 2.5 && finalScore <= 3.25) {
       return 'MEDIO-ALTO';
-    } else {
+    } else if (finalScore > 3.25 && finalScore <= 4.0) {
       return 'ALTO';
+    } else {
+      return 'SIN CALIFICAR';
     }
   }
 
@@ -896,50 +849,29 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
   }
 
   double _calculateVulnerabilidadFinalScore() {
-    final subClassifications = getCurrentSubClassifications();
+    // Cálculo ponderado de vulnerabilidad según especificaciones:
+    // Fragilidad Física: 45%
+    // Fragilidad en Personas: 10%  
+    // Exposición: 45%
     
-    if (subClassifications.isEmpty) {
+    final fragilidadFisicaScore = state.subClassificationScores['fragilidad_fisica'] ?? 0.0;
+    final fragilidadPersonasScore = state.subClassificationScores['fragilidad_personas'] ?? 0.0;
+    final exposicionScore = state.subClassificationScores['exposicion'] ?? 0.0;
+    
+    // Si alguna subclasificación no tiene score, no se puede calcular vulnerabilidad
+    if (fragilidadFisicaScore == 0.0 || fragilidadPersonasScore == 0.0 || exposicionScore == 0.0) {
       return 0.0;
     }
     
-    // Calcular el promedio ponderado de todas las subclasificaciones de vulnerabilidad
-    double totalWeightedScore = 0.0;
-    double totalWeight = 0.0;
+    // Aplicar pesos específicos para Vulnerabilidad:
+    // Fragilidad Física: 45% (0.45)
+    // Fragilidad en Personas: 10% (0.10)
+    // Exposición: 45% (0.45)
+    final fragilidadFisicaPonderada = fragilidadFisicaScore * 0.45;
+    final fragilidadPersonasPonderada = fragilidadPersonasScore * 0.10;
+    final exposicionPonderada = exposicionScore * 0.45;
     
-    for (final subClassification in subClassifications) {
-      final selections = state.dynamicSelections[subClassification.id] ?? {};
-      
-      if (selections.isNotEmpty) {
-        // Calcular score ponderado para cada categoría en esta subclasificación
-        for (final categoryTitle in selections.keys) {
-          // Obtener la categoría del modelo para acceder al peso wi
-          final selectedEvent = state.selectedRiskEvent;
-          final eventModel = RiskModelAdapter.getEventModel(selectedEvent);
-          
-          if (eventModel != null) {
-            final classification = eventModel.getClassificationById(state.selectedClassification);
-            if (classification != null) {
-              final subClass = classification.subClassifications
-                  .where((sub) => sub.id == subClassification.id)
-                  .firstOrNull;
-              
-              if (subClass != null) {
-                final riskCategory = subClass.categories
-                    .where((cat) => cat.title == categoryTitle)
-                    .firstOrNull;
-                
-                if (riskCategory != null) {
-                  totalWeightedScore += riskCategory.weightedScore;
-                  totalWeight += riskCategory.wi;
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-    
-    return totalWeight > 0 ? totalWeightedScore / totalWeight : 0.0;
+    return fragilidadFisicaPonderada + fragilidadPersonasPonderada + exposicionPonderada;
   }
 
   // Método para obtener el color de fondo basado en la calificación

@@ -48,24 +48,40 @@ class RatingResultsScreen extends StatelessWidget {
               NavigationButtonsWidget(
                 currentIndex: state.currentBottomNavIndex,
                 onContinuePressed: () {
-                  // Si estamos en la última pestaña (índice 2) y en clasificación "amenaza"
-                  if (state.currentBottomNavIndex == 2 && 
-                      state.selectedClassification.toLowerCase() == 'amenaza') {
+                  // Si estamos en la última pestaña (índice 2)
+                  if (state.currentBottomNavIndex == 2) {
                     
-                    // Navegar de vuelta al HomeScreen con RiskCategoriesScreen activo
-                    final navigationData = {
-                      'showRiskCategories': true,
-                    };
-                    context.go('/home', extra: navigationData);
-                    
-                    // Mostrar mensaje de éxito
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Evaluación de Amenaza completada. Ahora puede continuar con Vulnerabilidad.'),
-                        backgroundColor: Colors.green,
-                        duration: Duration(seconds: 3),
-                      ),
-                    );
+                    if (state.selectedClassification.toLowerCase() == 'amenaza') {
+                      // Navegar de vuelta al HomeScreen con RiskCategoriesScreen activo
+                      final navigationData = {
+                        'showRiskCategories': true,
+                      };
+                      context.go('/home', extra: navigationData);
+                      
+                      // Mostrar mensaje de éxito para amenaza
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Evaluación de Amenaza completada. Ahora puede continuar con Vulnerabilidad.'),
+                          backgroundColor: Colors.green,
+                          duration: Duration(seconds: 3),
+                        ),
+                      );
+                    } else if (state.selectedClassification.toLowerCase() == 'vulnerabilidad') {
+                      // Navegar de vuelta al HomeScreen con RiskCategoriesScreen activo
+                      final navigationData = {
+                        'showRiskCategories': true,
+                      };
+                      context.go('/home', extra: navigationData);
+                      
+                      // Mostrar mensaje de éxito para vulnerabilidad
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Evaluación de Vulnerabilidad completada. ¡Evaluación de riesgo finalizada!'),
+                          backgroundColor: Colors.green,
+                          duration: Duration(seconds: 3),
+                        ),
+                      );
+                    }
                   }
                 },
               ),
@@ -295,13 +311,19 @@ class RatingResultsScreen extends StatelessWidget {
   }
 
   String _getRiskClassification(double score) {
-    if (score >= 1.00 && score <= 1.75) {
+    // Clasificación cualitativa según especificaciones:
+    // Entre 1,0 y 1,75 → Bajo
+    // Mayor a 1,75 y hasta 2,5 → Medio - Bajo
+    // Mayor a 2,5 y hasta 3,25 → Medio - Alto
+    // Mayor a 3,25 y hasta 4 → Alto
+    
+    if (score >= 1.0 && score <= 1.75) {
       return 'BAJO';
-    } else if (score > 1.75 && score <= 2.50) {
+    } else if (score > 1.75 && score <= 2.5) {
       return 'MEDIO - BAJO';
-    } else if (score > 2.50 && score <= 3.25) {
+    } else if (score > 2.5 && score <= 3.25) {
       return 'MEDIO - ALTO';
-    } else if (score > 3.25 && score <= 4.00) {
+    } else if (score > 3.25 && score <= 4.0) {
       return 'ALTO';
     } else {
       return 'SIN CALIFICAR';
