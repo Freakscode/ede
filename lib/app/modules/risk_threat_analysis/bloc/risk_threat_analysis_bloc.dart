@@ -245,6 +245,16 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     final eventName = state.selectedRiskEvent;
     final classification = state.selectedClassification;
     
+    // INUNDACIÓN - Amenaza - Probabilidad (con variable crítica)
+    if (eventName == 'Inundación' && classification == 'amenaza' && subClassificationId == 'probabilidad') {
+      return 'critical_variable';
+    }
+    
+    // INUNDACIÓN - Amenaza - Intensidad (con variable crítica)
+    if (eventName == 'Inundación' && classification == 'amenaza' && subClassificationId == 'intensidad') {
+      return 'critical_variable';
+    }
+    
     // Movimiento en Masa - Amenaza - Probabilidad (con variable crítica: Evidencias de Materialización)
     if (eventName == 'Movimiento en Masa' && classification == 'amenaza' && subClassificationId == 'probabilidad') {
       return 'critical_variable';
@@ -275,8 +285,118 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
       return 'weighted_average';
     }
     
-    // Inundación - todas las clasificaciones y subclasificaciones
+    // INUNDACIÓN - Vulnerabilidad - Fragilidad Física (con regla de tope especial)
+    if (eventName == 'Inundación' && classification == 'vulnerabilidad' && subClassificationId == 'fragilidad_fisica') {
+      return 'critical_variable';
+    }
+    
+    // INUNDACIÓN - Vulnerabilidad - Fragilidad en Personas (con regla de tope especial)
+    if (eventName == 'Inundación' && classification == 'vulnerabilidad' && subClassificationId == 'fragilidad_personas') {
+      return 'critical_variable';
+    }
+    
+    // INUNDACIÓN - Vulnerabilidad - Exposición (siempre promedio ponderado, sin tope)
+    if (eventName == 'Inundación' && classification == 'vulnerabilidad' && subClassificationId == 'exposicion') {
+      return 'weighted_average';
+    }
+    
+    // Inundación - Amenaza (ya manejado arriba)
+    if (eventName == 'Inundación' && classification == 'amenaza') {
+      return 'critical_variable';
+    }
+    
+    // Inundación - otras subclasificaciones
     if (eventName == 'Inundación') {
+      return 'weighted_average';
+    }
+    
+    // AVENIDA TORRENCIAL - Amenaza - Probabilidad (con variable crítica)
+    if (eventName == 'Avenida Torrencial' && classification == 'amenaza' && subClassificationId == 'probabilidad') {
+      return 'critical_variable';
+    }
+    
+    // AVENIDA TORRENCIAL - Amenaza - Intensidad (con variable crítica)
+    if (eventName == 'Avenida Torrencial' && classification == 'amenaza' && subClassificationId == 'intensidad') {
+      return 'critical_variable';
+    }
+    
+    // AVENIDA TORRENCIAL - Vulnerabilidad - Fragilidad Física (con regla de tope especial)
+    if (eventName == 'Avenida Torrencial' && classification == 'vulnerabilidad' && subClassificationId == 'fragilidad_fisica') {
+      return 'critical_variable';
+    }
+    
+    // AVENIDA TORRENCIAL - Vulnerabilidad - Fragilidad en Personas (con regla de tope especial)
+    if (eventName == 'Avenida Torrencial' && classification == 'vulnerabilidad' && subClassificationId == 'fragilidad_personas') {
+      return 'critical_variable';
+    }
+    
+    // AVENIDA TORRENCIAL - Vulnerabilidad - Exposición (siempre promedio ponderado, sin tope)
+    if (eventName == 'Avenida Torrencial' && classification == 'vulnerabilidad' && subClassificationId == 'exposicion') {
+      return 'weighted_average';
+    }
+    
+    // AVENIDA TORRENCIAL - Vulnerabilidad - Otras subclasificaciones (promedio ponderado)
+    if (eventName == 'Avenida Torrencial' && classification == 'vulnerabilidad') {
+      return 'weighted_average';
+    }
+    
+    // ESTRUCTURAL - Amenaza - Probabilidad (promedio ponderado simple)
+    if (eventName == 'Estructural' && classification == 'amenaza' && subClassificationId == 'probabilidad') {
+      return 'weighted_average';
+    }
+    
+    // ESTRUCTURAL - Amenaza - Intensidad (con variable crítica)
+    if (eventName == 'Estructural' && classification == 'amenaza' && subClassificationId == 'intensidad') {
+      return 'critical_variable';
+    }
+    
+    // ESTRUCTURAL - Vulnerabilidad - Fragilidad Física (con regla de tope por amenaza global)
+    if (eventName == 'Estructural' && classification == 'vulnerabilidad' && subClassificationId == 'fragilidad_fisica') {
+      return 'critical_variable';
+    }
+    
+    // ESTRUCTURAL - Vulnerabilidad - Fragilidad en Personas (con regla de tope por amenaza global)
+    if (eventName == 'Estructural' && classification == 'vulnerabilidad' && subClassificationId == 'fragilidad_personas') {
+      return 'critical_variable';
+    }
+    
+    // ESTRUCTURAL - Vulnerabilidad - Exposición (siempre promedio ponderado, sin tope)
+    if (eventName == 'Estructural' && classification == 'vulnerabilidad' && subClassificationId == 'exposicion') {
+      return 'weighted_average';
+    }
+    
+    // ESTRUCTURAL - Vulnerabilidad - Otras subclasificaciones (promedio ponderado)
+    if (eventName == 'Estructural' && classification == 'vulnerabilidad') {
+      return 'weighted_average';
+    }
+    
+    // OTROS - Amenaza - Probabilidad (promedio ponderado simple)
+    if (eventName == 'Otros' && classification == 'amenaza' && subClassificationId == 'probabilidad') {
+      return 'weighted_average';
+    }
+    
+    // OTROS - Amenaza - Intensidad (con variable crítica)
+    if (eventName == 'Otros' && classification == 'amenaza' && subClassificationId == 'intensidad') {
+      return 'critical_variable';
+    }
+    
+    // OTROS - Vulnerabilidad - Fragilidad Física (con regla de tope por severidad)
+    if (eventName == 'Otros' && classification == 'vulnerabilidad' && subClassificationId == 'fragilidad_fisica') {
+      return 'critical_variable';
+    }
+    
+    // OTROS - Vulnerabilidad - Fragilidad en Personas (con regla de tope por severidad)
+    if (eventName == 'Otros' && classification == 'vulnerabilidad' && subClassificationId == 'fragilidad_personas') {
+      return 'critical_variable';
+    }
+    
+    // OTROS - Vulnerabilidad - Exposición (siempre promedio ponderado, sin tope)
+    if (eventName == 'Otros' && classification == 'vulnerabilidad' && subClassificationId == 'exposicion') {
+      return 'weighted_average';
+    }
+    
+    // OTROS - Vulnerabilidad - Otras subclasificaciones (promedio ponderado)
+    if (eventName == 'Otros' && classification == 'vulnerabilidad') {
       return 'weighted_average';
     }
     
@@ -289,9 +409,21 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     return 'simple_average';
   }
 
-  // Calcula usando variable crítica para Movimiento en Masa (Probabilidad, Intensidad y Vulnerabilidad)
+  // Calcula usando variable crítica para eventos específicos (Inundación, Movimiento en Masa, etc.)
   double _calculateWithCriticalVariable(String subClassificationId, Map<String, String> selections) {
     final eventName = state.selectedRiskEvent;
+    
+    if (eventName == 'Inundación') {
+      if (subClassificationId == 'probabilidad') {
+        return _calculateInundacionProbabilidad(selections);
+      } else if (subClassificationId == 'intensidad') {
+        return _calculateInundacionIntensidad(selections);
+      } else if (subClassificationId == 'fragilidad_fisica') {
+        return _calculateInundacionFragilidadFisica(selections);
+      } else if (subClassificationId == 'fragilidad_personas') {
+        return _calculateInundacionFragilidadPersonas(selections);
+      }
+    }
     
     if (eventName == 'Movimiento en Masa') {
       if (subClassificationId == 'probabilidad') {
@@ -305,40 +437,76 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
       }
     }
     
+    if (eventName == 'Avenida Torrencial') {
+      if (subClassificationId == 'probabilidad') {
+        return _calculateAvenidaTorrencialProbabilidad(selections);
+      } else if (subClassificationId == 'intensidad') {
+        return _calculateAvenidaTorrencialIntensidad(selections);
+      } else if (subClassificationId == 'fragilidad_fisica') {
+        return _calculateAvenidaTorrencialFragilidadFisica(selections);
+      } else if (subClassificationId == 'fragilidad_personas') {
+        return _calculateAvenidaTorrencialFragilidadPersonas(selections);
+      }
+    }
+    
+    if (eventName == 'Estructural') {
+      if (subClassificationId == 'intensidad') {
+        return _calculateEstructuralIntensidad(selections);
+      } else if (subClassificationId == 'fragilidad_fisica') {
+        return _calculateEstructuralFragilidadFisica(selections);
+      } else if (subClassificationId == 'fragilidad_personas') {
+        return _calculateEstructuralFragilidadPersonas(selections);
+      }
+    }
+    
+    if (eventName == 'Otros') {
+      if (subClassificationId == 'intensidad') {
+        return _calculateOtrosIntensidad(selections);
+      } else if (subClassificationId == 'fragilidad_fisica') {
+        return _calculateOtrosFragilidadFisica(selections);
+      } else if (subClassificationId == 'fragilidad_personas') {
+        return _calculateOtrosFragilidadPersonas(selections);
+      }
+    }
+    
     // Fallback a cálculo ponderado para otros casos
     return _calculateWeightedAverage(subClassificationId, selections);
   }
 
   // Fórmula específica para Movimiento en Masa - Probabilidad
   double _calculateMovimientoEnMasaProbabilidad(Map<String, String> selections) {
-    // Variable crítica: "Evidencias de Materialización o Reactivación"
+    // PASO 1: Revisar la celda de control (I20) - Variable crítica: "Evidencias de Materialización o Reactivación"
     final evidenciasValue = _getSelectedLevelValue('Evidencias de Materialización o Reactivación', selections);
     
-    // Si la variable crítica tiene valor 4 (ALTO), devolver 4 directamente
+    // PASO 2: Si I20 es 4, fija la Probabilidad = 4 y termina
     if (evidenciasValue == 4) {
       return 4.0;
     }
     
-    // Si no, calcular usando promedio ponderado
+    // PASO 3: Si I20 no es 4, procede a promediar usando fórmula ponderada
+    // Suma las calificaciones de todas las variables de probabilidad (calificación = wi * valor)
+    // Suma los pesos (Wi) de esas mismas variables
+    // Divide la suma de calificaciones entre la suma de pesos
     return _calculateWeightedAverage('probabilidad', selections);
   }
 
   // Fórmula específica para Movimiento en Masa - Intensidad
   double _calculateMovimientoEnMasaIntensidad(Map<String, String> selections) {
-    // PASO 1: Revisar la condición - Variable crítica: "Potencial de Daño en Edificaciones"
-    // Si esta variable = 4 (ALTO), significa que el daño en edificaciones es crítico
+    // PASO 1: Revisar la celda de control (I31) - Variable crítica: "Potencial de Daño en Edificaciones"
     final potencialDanoValue = _getSelectedLevelValue('Potencial de Daño en Edificaciones', selections);
     
-    // CASO ESPECIAL: Si el daño en edificaciones es crítico (4) → intensidad = 4 directamente
+    // PASO 2: Si I31 es 4, fija la Intensidad = 4 y termina
     if (potencialDanoValue == 4) {
       return 4.0;
     }
     
-    // PASO 2-5: CASO NORMAL - Promedio ponderado de las tres variables:
-    // - Potencial de Daño en Edificaciones (Wi específico)
-    // - Capacidad de Generar Pérdida de Vidas Humanas (Wi específico)  
-    // - Alteración del Funcionamiento de Líneas Vitales y Espacio Público (Wi específico)
-    // Fórmula: SUM(calificaciones) / SUM(pesos Wi)
+    // PASO 3: Si I31 no es 4, procede a promediar usando fórmula ponderada:
+    // - Suma las calificaciones de las variables de intensidad (calificación = wi * valor)
+    // - Potencial de Daño en Edificaciones
+    // - Capacidad de Generar Pérdida de Vidas Humanas  
+    // - Alteración del Funcionamiento de Líneas Vitales y Espacio Público
+    // - Suma los pesos (Wi) de esas variables
+    // - Divide la suma de calificaciones entre la suma de pesos
     return _calculateWeightedAverage('intensidad', selections);
   }
 
@@ -372,6 +540,398 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     return _calculateWeightedAverage('fragilidad_personas', selections);
   }
 
+  // ============================================================================
+  // MÉTODOS ESPECÍFICOS PARA INUNDACIÓN
+  // ============================================================================
+
+  // Fórmula específica para Inundación - Probabilidad
+  double _calculateInundacionProbabilidad(Map<String, String> selections) {
+    // PASO 1: Revisar la celda de control (I20) - Variable crítica específica para Inundación
+    // Buscar la variable crítica en las selecciones (puede variar según el modelo)
+    
+    // Buscar variables que puedan ser críticas (basado en nombres comunes)
+    final criticalVariables = [
+      'Evidencias de Materialización o Reactivación',
+      'Evidencias de Materialización',
+      'Probabilidad de Ocurrencia',
+      'Registro Histórico',
+    ];
+    
+    for (final criticalVar in criticalVariables) {
+      final criticalValue = _getSelectedLevelValue(criticalVar, selections);
+      // PASO 2: Si la variable crítica es 4, fija la Probabilidad = 4 y termina
+      if (criticalValue == 4) {
+        return 4.0;
+      }
+    }
+    
+    // PASO 3: Si ninguna variable crítica es 4, procede a promediar usando fórmula ponderada
+    // Suma las calificaciones de todas las variables de probabilidad (calificación = wi * valor)
+    // Suma los pesos (Wi) de esas mismas variables
+    // Divide la suma de calificaciones entre la suma de pesos
+    return _calculateWeightedAverage('probabilidad', selections);
+  }
+
+  // Fórmula específica para Inundación - Intensidad
+  double _calculateInundacionIntensidad(Map<String, String> selections) {
+    // PASO 1: Revisar la celda de control (I31) - Variable crítica específica para Inundación
+    
+    // Buscar variables que puedan ser críticas para intensidad
+    final criticalVariables = [
+      'Potencial de Daño en Edificaciones',
+      'Daño en Edificaciones',
+      'Capacidad de Generar Pérdida de Vidas Humanas',
+      'Pérdida de Vidas Humanas',
+    ];
+    
+    for (final criticalVar in criticalVariables) {
+      final criticalValue = _getSelectedLevelValue(criticalVar, selections);
+      // PASO 2: Si la variable crítica es 4, fija la Intensidad = 4 y termina
+      if (criticalValue == 4) {
+        return 4.0;
+      }
+    }
+    
+    // PASO 3: Si ninguna variable crítica es 4, procede a promediar usando fórmula ponderada:
+    // - Suma las calificaciones de las variables de intensidad (calificación = wi * valor)
+    // - Suma los pesos (Wi) de esas variables
+    // - Divide la suma de calificaciones entre la suma de pesos
+    return _calculateWeightedAverage('intensidad', selections);
+  }
+
+  // Fórmula específica para Inundación - Fragilidad Física
+  double _calculateInundacionFragilidadFisica(Map<String, String> selections) {
+    // PASO 1: Verificar regla de tope por severidad
+    // Fórmula: =IF(AND(AMENAZA_INUNDACION!E7>=2,6; AMENAZA_INUNDACION!I30=4); 4; (promedio ponderado))
+    
+    final amenazaGlobal = _calculateAmenazaGlobalScore();
+    final potencialDanoEdificaciones = _getPotencialDanoEdificacionesFromAmenaza();
+    
+    // REGLA DE TOPE: Si amenaza global ≥ 2.6 Y potencial daño edificaciones = 4 → fragilidad = 4
+    if (amenazaGlobal >= 2.6 && potencialDanoEdificaciones == 4) {
+      return 4.0;
+    }
+    
+    // CASO NORMAL: Promedio ponderado de las variables de fragilidad física
+    // (materiales, estado de conservación, tipología estructural, etc.)
+    // J20:J22 = calificaciones; H20:H22 = pesos
+    // Resultado = suma de calificaciones ÷ suma de pesos
+    return _calculateWeightedAverage('fragilidad_fisica', selections);
+  }
+
+  // Fórmula específica para Inundación - Fragilidad en Personas
+  double _calculateInundacionFragilidadPersonas(Map<String, String> selections) {
+    // PASO 1: Verificar regla de tope por severidad
+    // Fórmula: =IF(AND(AMENAZA_INUNDACION!E7>=2,6; AMENAZA_INUNDACION!I30=4); 4; (promedio ponderado))
+    
+    final amenazaGlobal = _calculateAmenazaGlobalScore();
+    final potencialDanoEdificaciones = _getPotencialDanoEdificacionesFromAmenaza();
+    
+    // REGLA DE TOPE: Si amenaza global ≥ 2.6 Y potencial daño edificaciones = 4 → fragilidad = 4
+    if (amenazaGlobal >= 2.6 && potencialDanoEdificaciones == 4) {
+      return 4.0;
+    }
+    
+    // CASO NORMAL: Promedio ponderado de las variables de fragilidad en personas
+    // (nivel de organización, suficiencia económica, etc.)
+    // J27:J28 = calificaciones; H27:H28 = pesos
+    // Resultado = suma de calificaciones ÷ suma de pesos
+    return _calculateWeightedAverage('fragilidad_personas', selections);
+  }
+
+  // ============================================================================
+  // MÉTODOS ESPECÍFICOS PARA ESTRUCTURAL
+  // ============================================================================
+
+  // Fórmula específica para Estructural - Intensidad
+  double _calculateEstructuralIntensidad(Map<String, String> selections) {
+    // FÓRMULA: =+IF(I26=4;4;(SUM(J26:J28)/SUM(H26:H28)))
+    // PASO 1: Revisar la celda de control (I26) - Variable crítica
+    
+    // Buscar variables que puedan ser críticas para Estructural - Intensidad
+    final criticalVariables = [
+      'Potencial de Daño en Edificaciones Adyacentes',
+      'Potencial de Daño en Edificaciones',
+      'Daño en Edificaciones Adyacentes',
+      'Capacidad de Generar Pérdida de Vidas Humanas',
+      'Pérdida de Vidas Humanas',
+    ];
+    
+    for (final criticalVar in criticalVariables) {
+      final criticalValue = _getSelectedLevelValue(criticalVar, selections);
+      // PASO 2: Si I26 es 4, la intensidad se define como 4 automáticamente
+      // "Si algún criterio clave indica un nivel de impacto crítico, la intensidad no puede ser menor"
+      if (criticalValue == 4) {
+        return 4.0;
+      }
+    }
+    
+    // PASO 3: Si I26 no es 4, calcular promedio ponderado
+    // "Se calcula como promedio ponderado de las variables de intensidad"
+    // SUM(J26:J28) → suma de calificaciones de las variables de intensidad:
+    // - Potencial de daño en edificaciones adyacentes
+    // - Capacidad de generar pérdida de vidas humanas  
+    // - Alteración del funcionamiento de líneas vitales y espacio público
+    // SUM(H26:H28) → suma de los pesos
+    // Se divide para obtener la Intensidad
+    return _calculateWeightedAverage('intensidad', selections);
+  }
+
+  // Fórmula específica para Estructural - Fragilidad Física
+  double _calculateEstructuralFragilidadFisica(Map<String, String> selections) {
+    // FÓRMULA: =IF(AND(AMENAZA_ESTRUCTURAL!E7=4); 4; SUM(J20:J21)/SUM(H20:H21))
+    // PASO 1: Verificar regla de tope por amenaza global
+    
+    final amenazaGlobal = _calculateAmenazaGlobalScore();
+    
+    // REGLA DE TOPE: Si amenaza global = 4 → fragilidad física = 4
+    // "Si en la hoja AMENAZA_ESTRUCTURAL la calificación global de la amenaza (E7) es 4 (ALTO),
+    //  la Fragilidad física se fija directamente en 4"
+    if (amenazaGlobal == 4.0) {
+      return 4.0;
+    }
+    
+    // CASO NORMAL: Promedio ponderado de las variables de fragilidad física
+    // "Se calcula como promedio ponderado de las variables del bloque
+    //  (calidad de materiales y tipología estructural):
+    //  suma de calificaciones (J20:J21) ÷ suma de pesos (H20:H21)"
+    // SUM(J20:J21) = suma de calificaciones ponderadas
+    // SUM(H20:H21) = suma de pesos Wi
+    // Resultado = suma de calificaciones ÷ suma de pesos
+    return _calculateWeightedAverage('fragilidad_fisica', selections);
+  }
+
+  // Fórmula específica para Estructural - Fragilidad en Personas
+  double _calculateEstructuralFragilidadPersonas(Map<String, String> selections) {
+    // FÓRMULA: =IF(AND(AMENAZA_ESTRUCTURAL!E7=4); 4; SUM(J26:J27)/SUM(H26:H27))
+    // PASO 1: Verificar regla de tope por amenaza global
+    
+    final amenazaGlobal = _calculateAmenazaGlobalScore();
+    
+    // REGLA DE TOPE: Si amenaza global = 4 → fragilidad en personas = 4
+    // "Si la amenaza global = 4: la Fragilidad en personas se fija en 4"
+    if (amenazaGlobal == 4.0) {
+      return 4.0;
+    }
+    
+    // CASO NORMAL: Promedio ponderado de las variables de fragilidad en personas
+    // "En cualquier otro caso: se obtiene por promedio ponderado de sus variables
+    //  (nivel de organización y suficiencia económica):
+    //  (J26:J27) ÷ (H26:H27)"
+    // SUM(J26:J27) = suma de calificaciones ponderadas
+    // SUM(H26:H27) = suma de pesos Wi
+    // Resultado = suma de calificaciones ÷ suma de pesos
+    return _calculateWeightedAverage('fragilidad_personas', selections);
+  }
+
+  // ============================================================================
+  // MÉTODOS ESPECÍFICOS PARA OTROS
+  // ============================================================================
+
+  // Fórmula específica para Otros - Intensidad
+  double _calculateOtrosIntensidad(Map<String, String> selections) {
+    // FÓRMULA: =+IF(I27=4;4;(SUM(J27:J29)/SUM(H27:H29)))
+    // PASO 1: Revisar la celda de control (I27) - Variable crítica
+    
+    // Buscar variables que puedan ser críticas para Otros - Intensidad
+    final criticalVariables = [
+      'Potencial de Daño en Edificaciones',
+      'Potencial de Daño',
+      'Capacidad de Generar Pérdida de Vidas Humanas',
+      'Pérdida de Vidas Humanas',
+      'Alteración del Funcionamiento de Líneas Vitales',
+      'Alteración de Líneas Vitales',
+      'Impacto en Infraestructura',
+    ];
+    
+    for (final criticalVar in criticalVariables) {
+      final criticalValue = _getSelectedLevelValue(criticalVar, selections);
+      // PASO 2: Si I27 es 4, la intensidad se define como 4 automáticamente
+      // "Si alguna variable dentro de intensidad llega al nivel máximo (4),
+      //  entonces se devuelve directamente 4 como calificación final"
+      if (criticalValue == 4) {
+        return 4.0;
+      }
+    }
+    
+    // PASO 3: Si I27 no es 4, calcular promedio ponderado
+    // "Si no es 4, entonces calcula el promedio ponderado:"
+    // SUM(J27:J29) → suma de los valores de:
+    // - Potencial de Daño
+    // - Pérdida de Vidas Humanas
+    // - Alteración de Líneas Vitales
+    // SUM(H27:H29) → suma de los pesos de esas variables
+    // Se divide para obtener la calificación de intensidad
+    return _calculateWeightedAverage('intensidad', selections);
+  }
+
+  // Fórmula específica para Otros - Fragilidad Física
+  double _calculateOtrosFragilidadFisica(Map<String, String> selections) {
+    // FÓRMULA: =IF(AND(AMENAZA_OTROS!E7>=2,6; AMENAZA_OTROS!I30=4); 4; SUM(J20:J22)/SUM(H20:H22))
+    // PASO 1: Verificar regla de tope por severidad
+    
+    final amenazaGlobal = _calculateAmenazaGlobalScore();
+    final potencialDanoEdificaciones = _getPotencialDanoEdificacionesFromAmenaza();
+    
+    // REGLA DE TOPE: Si amenaza global ≥ 2.6 Y potencial daño edificaciones = 4 → fragilidad = 4
+    // "Si en AMENAZA_OTROS la calificación global (E7) es ≥ 2,6 y el Potencial de daño en edificaciones (I30) es 4,
+    //  entonces la Fragilidad física = 4 automáticamente (máxima fragilidad)"
+    if (amenazaGlobal >= 2.6 && potencialDanoEdificaciones == 4) {
+      return 4.0;
+    }
+    
+    // CASO NORMAL: Promedio ponderado de las variables de fragilidad física
+    // "Se calcula como promedio ponderado de sus variables (materiales, estado de conservación, tipología):
+    //  J20:J22 = calificaciones por variable
+    //  H20:H22 = pesos (Wi)
+    //  Resultado = suma de calificaciones ÷ suma de pesos"
+    // SUM(J20:J22) = suma de calificaciones ponderadas
+    // SUM(H20:H22) = suma de pesos Wi
+    // Resultado = suma de calificaciones ÷ suma de pesos
+    return _calculateWeightedAverage('fragilidad_fisica', selections);
+  }
+
+  // Fórmula específica para Otros - Fragilidad en Personas
+  double _calculateOtrosFragilidadPersonas(Map<String, String> selections) {
+    // FÓRMULA: =IF(AND(AMENAZA_OTROS!E7>=2,6; AMENAZA_OTROS!I30=4); 4; SUM(J27:J28)/SUM(H27:H28))
+    // PASO 1: Verificar regla de tope por severidad
+    
+    final amenazaGlobal = _calculateAmenazaGlobalScore();
+    final potencialDanoEdificaciones = _getPotencialDanoEdificacionesFromAmenaza();
+    
+    // REGLA DE TOPE: Si amenaza global ≥ 2.6 Y potencial daño edificaciones = 4 → fragilidad = 4
+    // "Mismo tope: si Amenaza ≥ 2,6 y I30 = 4, la Fragilidad en personas = 4"
+    if (amenazaGlobal >= 2.6 && potencialDanoEdificaciones == 4) {
+      return 4.0;
+    }
+    
+    // CASO NORMAL: Promedio ponderado de las variables de fragilidad en personas
+    // "Si no: promedio ponderado de nivel de organización y suficiencia económica:
+    //  J27:J28 (calificaciones) / H27:H28 (pesos)"
+    // SUM(J27:J28) = suma de calificaciones ponderadas
+    // SUM(H27:H28) = suma de pesos Wi
+    // Resultado = suma de calificaciones ÷ suma de pesos
+    return _calculateWeightedAverage('fragilidad_personas', selections);
+  }
+
+  // ============================================================================
+  // MÉTODOS ESPECÍFICOS PARA AVENIDA TORRENCIAL
+  // ============================================================================
+
+  // Fórmula específica para Avenida Torrencial - Probabilidad
+  double _calculateAvenidaTorrencialProbabilidad(Map<String, String> selections) {
+    // FÓRMULA: =IF(I24=4;4;(SUM(J20:J24)/SUM(H20:H24)))
+    // PASO 1: Revisar la celda de control (I24) - Variable crítica
+    // Buscar la variable crítica en la fila 24 (puede variar según el modelo)
+    
+    // Buscar variables que puedan ser críticas para Avenida Torrencial - Probabilidad
+    final criticalVariables = [
+      'Evidencias de Materialización o Reactivación',
+      'Evidencias de Materialización',
+      'Registro Histórico de Eventos',
+      'Registro Histórico',
+      'Probabilidad de Ocurrencia',
+      'Frecuencia de Eventos',
+    ];
+    
+    for (final criticalVar in criticalVariables) {
+      final criticalValue = _getSelectedLevelValue(criticalVar, selections);
+      // PASO 2: Si I24 es 4, fija la Probabilidad = 4 y termina
+      // "Si en la celda I24 aparece el valor 4, entonces la probabilidad se fuerza directamente a 4"
+      if (criticalValue == 4) {
+        return 4.0;
+      }
+    }
+    
+    // PASO 3: Si I24 no es 4, procede con promedio ponderado
+    // "Se hace el promedio ponderado de las calificaciones"
+    // SUM(J20:J24) → suma de las calificaciones (valor × peso)
+    // SUM(H20:H24) → suma de los pesos
+    // Se divide para obtener la calificación de Probabilidad
+    return _calculateWeightedAverage('probabilidad', selections);
+  }
+
+  // Fórmula específica para Avenida Torrencial - Intensidad
+  double _calculateAvenidaTorrencialIntensidad(Map<String, String> selections) {
+    // FÓRMULA: =IF(I29=4;4;(SUM(J29:J31)/SUM(H29:H31)))
+    // PASO 1: Revisar la celda de control (I29) - Variable crítica
+    
+    // Buscar variables que puedan ser críticas para Avenida Torrencial - Intensidad
+    final criticalVariables = [
+      'Potencial de Daño en Edificaciones',
+      'Daño en Edificaciones',
+      'Capacidad de Generar Pérdida de Vidas Humanas',
+      'Pérdida de Vidas Humanas',
+      'Alteración del Funcionamiento de Líneas Vitales',
+      'Impacto en Infraestructura',
+    ];
+    
+    for (final criticalVar in criticalVariables) {
+      final criticalValue = _getSelectedLevelValue(criticalVar, selections);
+      // PASO 2: Si I29 es 4, la intensidad se define como 4 automáticamente
+      // "Si algún criterio clave indica un nivel de impacto crítico, la intensidad no puede ser menor"
+      if (criticalValue == 4) {
+        return 4.0;
+      }
+    }
+    
+    // PASO 3: Si I29 no es 4, calcular promedio ponderado
+    // "Se calcula también como promedio ponderado"
+    // SUM(J29:J31) → suma de calificaciones de las variables de intensidad
+    // SUM(H29:H31) → suma de los pesos
+    // Se divide para obtener la Intensidad
+    return _calculateWeightedAverage('intensidad', selections);
+  }
+
+  // Fórmula específica para Avenida Torrencial - Fragilidad Física
+  double _calculateAvenidaTorrencialFragilidadFisica(Map<String, String> selections) {
+    // FÓRMULA: =IF(AND(AMENAZA_AVTORRENCIAL!E7>=2,6; AMENAZA_AVTORRENCIAL!I30=4); 4; SUM(J20:J22)/SUM(H20:H22))
+    // PASO 1: Verificar regla de tope por severidad
+    
+    final amenazaGlobal = _calculateAmenazaGlobalScore();
+    final potencialDanoEdificaciones = _getPotencialDanoEdificacionesFromAmenaza();
+    
+    // REGLA DE TOPE: Si amenaza global ≥ 2.6 Y potencial daño edificaciones = 4 → fragilidad = 4
+    // "Si en la hoja de amenaza la calificación global (E7) es ≥ 2,6 (al menos Medio-Alto) 
+    //  y el Potencial de daño en edificaciones (I30) es 4 (crítico), 
+    //  entonces la fragilidad física se fija en 4 automáticamente"
+    if (amenazaGlobal >= 2.6 && potencialDanoEdificaciones == 4) {
+      return 4.0;
+    }
+    
+    // CASO NORMAL: Promedio ponderado de las variables de fragilidad física
+    // "Se suman las calificaciones (J20:J22) y se dividen entre la suma de los pesos (H20:H22)"
+    // Variables: calidad de materiales, estado de conservación, tipología estructural
+    // SUM(J20:J22) = suma de calificaciones ponderadas
+    // SUM(H20:H22) = suma de pesos Wi
+    // Resultado = suma de calificaciones ÷ suma de pesos
+    return _calculateWeightedAverage('fragilidad_fisica', selections);
+  }
+
+  // Fórmula específica para Avenida Torrencial - Fragilidad en Personas
+  double _calculateAvenidaTorrencialFragilidadPersonas(Map<String, String> selections) {
+    // FÓRMULA: =IF(AND(AMENAZA_AVTORRENCIAL!E7>=2,6; AMENAZA_AVTORRENCIAL!I30=4); 4; SUM(J27:J28)/SUM(H27:H28))
+    // PASO 1: Verificar regla de tope por severidad
+    
+    final amenazaGlobal = _calculateAmenazaGlobalScore();
+    final potencialDanoEdificaciones = _getPotencialDanoEdificacionesFromAmenaza();
+    
+    // REGLA DE TOPE: Si amenaza global ≥ 2.6 Y potencial daño edificaciones = 4 → fragilidad = 4
+    // "Mismo tope: si Amenaza ≥ 2,6 y daño en edificaciones = 4, la fragilidad en personas = 4 (máxima)"
+    if (amenazaGlobal >= 2.6 && potencialDanoEdificaciones == 4) {
+      return 4.0;
+    }
+    
+    // CASO NORMAL: Promedio ponderado de las variables de fragilidad en personas
+    // "Se calcula como promedio ponderado de nivel de organización y suficiencia económica:
+    //  suma de calificaciones (J27:J28) / suma de pesos (H27:H28)"
+    // Variables: nivel de organización, suficiencia económica
+    // SUM(J27:J28) = suma de calificaciones ponderadas  
+    // SUM(H27:H28) = suma de pesos Wi
+    // Resultado = suma de calificaciones ÷ suma de pesos
+    return _calculateWeightedAverage('fragilidad_personas', selections);
+  }
+
   // Método para calcular la amenaza global (con pesos específicos para Movimiento en Masa)
   // Método público para acceso externo
   double calculateAmenazaGlobalScore() {
@@ -381,9 +941,29 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
   double _calculateAmenazaGlobalScore() {
     final eventName = state.selectedRiskEvent;
     
+    // Para Inundación: usar el cálculo ponderado específico
+    if (eventName == 'Inundación') {
+      return _calculateInundacionAmenazaFinal();
+    }
+    
     // Para Movimiento en Masa: usar el cálculo ponderado
     if (eventName == 'Movimiento en Masa') {
       return _calculateMovimientoEnMasaAmenazaFinal();
+    }
+    
+    // Para Avenida Torrencial: usar el cálculo ponderado específico
+    if (eventName == 'Avenida Torrencial') {
+      return _calculateAvenidaTorrencialAmenazaFinal();
+    }
+    
+    // Para Estructural: usar el cálculo ponderado específico
+    if (eventName == 'Estructural') {
+      return _calculateEstructuralAmenazaFinal();
+    }
+    
+    // Para Otros: usar el cálculo ponderado específico
+    if (eventName == 'Otros') {
+      return _calculateOtrosAmenazaFinal();
     }
     
     // Para otros eventos: promedio simple
@@ -806,9 +1386,29 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
   double _calculateAmenazaFinalScore() {
     final eventName = state.selectedRiskEvent;
     
+    // Para Inundación: usar cálculo ponderado específico
+    if (eventName == 'Inundación') {
+      return _calculateInundacionAmenazaFinal();
+    }
+    
     // Para Movimiento en Masa: usar cálculo ponderado específico
     if (eventName == 'Movimiento en Masa') {
       return _calculateMovimientoEnMasaAmenazaFinal();
+    }
+    
+    // Para Avenida Torrencial: usar cálculo ponderado específico
+    if (eventName == 'Avenida Torrencial') {
+      return _calculateAvenidaTorrencialAmenazaFinal();
+    }
+    
+    // Para Estructural: usar cálculo ponderado específico
+    if (eventName == 'Estructural') {
+      return _calculateEstructuralAmenazaFinal();
+    }
+    
+    // Para Otros: usar cálculo ponderado específico
+    if (eventName == 'Otros') {
+      return _calculateOtrosAmenazaFinal();
     }
     
     // Para otros eventos: promedio simple de probabilidad e intensidad
@@ -824,7 +1424,7 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
 
   // Cálculo específico para Movimiento en Masa - Amenaza (con pesos específicos)
   double _calculateMovimientoEnMasaAmenazaFinal() {
-    // Obtener los scores de probabilidad e intensidad desde el state
+    // PASO FINAL: Con Probabilidad e Intensidad calculadas, obtener la Calificación de la Amenaza
     final probabilidadScore = state.subClassificationScores['probabilidad'] ?? 0.0;
     final intensidadScore = state.subClassificationScores['intensidad'] ?? 0.0;
     
@@ -833,13 +1433,132 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
       return 0.0;
     }
     
-    // Aplicar pesos específicos para Movimiento en Masa:
+    // PONDERACIÓN: Aplicar pesos específicos para Movimiento en Masa:
     // Probabilidad: 40% (0.4)
     // Intensidad: 60% (0.6)
     final probabilidadPonderada = probabilidadScore * 0.4;
     final intensidadPonderada = intensidadScore * 0.6;
     
-    return probabilidadPonderada + intensidadPonderada;
+    final amenazaFinal = probabilidadPonderada + intensidadPonderada;
+    
+    // CLASIFICACIÓN con rangos:
+    // 1–1,75 → Bajo
+    // >1,75–2,5 → Medio-Bajo  
+    // >2,5–3,25 → Medio-Alto
+    // >3,25–4 → Alto
+    return amenazaFinal;
+  }
+
+  // Cálculo específico para Inundación - Amenaza (con pesos específicos)
+  double _calculateInundacionAmenazaFinal() {
+    // PASO FINAL: Con Probabilidad e Intensidad calculadas, obtener la Calificación de la Amenaza para Inundación
+    final probabilidadScore = state.subClassificationScores['probabilidad'] ?? 0.0;
+    final intensidadScore = state.subClassificationScores['intensidad'] ?? 0.0;
+    
+    // Si alguno es 0, no hay calificación calculable
+    if (probabilidadScore == 0.0 || intensidadScore == 0.0) {
+      return 0.0;
+    }
+    
+    // PONDERACIÓN: Aplicar pesos específicos para Inundación:
+    // Probabilidad: 40% (0.4)
+    // Intensidad: 60% (0.6)
+    final probabilidadPonderada = probabilidadScore * 0.4;
+    final intensidadPonderada = intensidadScore * 0.6;
+    
+    final amenazaFinal = probabilidadPonderada + intensidadPonderada;
+    
+    // CLASIFICACIÓN con rangos:
+    // 1–1,75 → Bajo
+    // >1,75–2,5 → Medio-Bajo  
+    // >2,5–3,25 → Medio-Alto
+    // >3,25–4 → Alto
+    return amenazaFinal;
+  }
+
+  // Cálculo específico para Avenida Torrencial - Amenaza (con pesos específicos)
+  double _calculateAvenidaTorrencialAmenazaFinal() {
+    // PASO FINAL: Con Probabilidad e Intensidad calculadas, obtener la Calificación de la Amenaza para Avenida Torrencial
+    final probabilidadScore = state.subClassificationScores['probabilidad'] ?? 0.0;
+    final intensidadScore = state.subClassificationScores['intensidad'] ?? 0.0;
+    
+    // Si alguno es 0, no hay calificación calculable
+    if (probabilidadScore == 0.0 || intensidadScore == 0.0) {
+      return 0.0;
+    }
+    
+    // PONDERACIÓN: Aplicar pesos específicos para Avenida Torrencial:
+    // Probabilidad: 40% (0.4)
+    // Intensidad: 60% (0.6)
+    // (Usando mismos pesos que Inundación y Movimiento en Masa)
+    final probabilidadPonderada = probabilidadScore * 0.4;
+    final intensidadPonderada = intensidadScore * 0.6;
+    
+    final amenazaFinal = probabilidadPonderada + intensidadPonderada;
+    
+    // CLASIFICACIÓN con rangos:
+    // 1–1,75 → Bajo
+    // >1,75–2,5 → Medio-Bajo  
+    // >2,5–3,25 → Medio-Alto
+    // >3,25–4 → Alto
+    return amenazaFinal;
+  }
+
+  // Cálculo específico para Estructural - Amenaza (con pesos específicos)
+  double _calculateEstructuralAmenazaFinal() {
+    // PASO FINAL: Con Probabilidad e Intensidad calculadas, obtener la Calificación de la Amenaza para Estructural
+    final probabilidadScore = state.subClassificationScores['probabilidad'] ?? 0.0;
+    final intensidadScore = state.subClassificationScores['intensidad'] ?? 0.0;
+    
+    // Si alguno es 0, no hay calificación calculable
+    if (probabilidadScore == 0.0 || intensidadScore == 0.0) {
+      return 0.0;
+    }
+    
+    // PONDERACIÓN: Aplicar pesos específicos para Estructural:
+    // Probabilidad: 40% (0.4) - promedio ponderado de estado de deterioro e incremento de carga
+    // Intensidad: 60% (0.6) - con variable crítica para casos críticos
+    final probabilidadPonderada = probabilidadScore * 0.4;
+    final intensidadPonderada = intensidadScore * 0.6;
+    
+    final amenazaFinal = probabilidadPonderada + intensidadPonderada;
+    
+    // CLASIFICACIÓN con rangos:
+    // 1–1,75 → Bajo
+    // >1,75–2,5 → Medio-Bajo  
+    // >2,5–3,25 → Medio-Alto
+    // >3,25–4 → Alto
+    return amenazaFinal;
+  }
+
+  // Cálculo específico para Otros - Amenaza (con pesos específicos)
+  double _calculateOtrosAmenazaFinal() {
+    // PASO FINAL: Con Probabilidad e Intensidad calculadas, obtener la Calificación de la Amenaza para Otros
+    final probabilidadScore = state.subClassificationScores['probabilidad'] ?? 0.0;
+    final intensidadScore = state.subClassificationScores['intensidad'] ?? 0.0;
+    
+    // Si alguno es 0, no hay calificación calculable
+    if (probabilidadScore == 0.0 || intensidadScore == 0.0) {
+      return 0.0;
+    }
+    
+    // PONDERACIÓN: Aplicar pesos específicos para Otros:
+    // Probabilidad: 40% (0.4) - promedio ponderado de frecuencia, evidencias y antecedentes
+    // Intensidad: 60% (0.6) - con variable crítica para casos críticos
+    // Fórmula: =+((E7*D7)+(E8*D8))
+    // E7*D7 → Probabilidad × su peso
+    // E8*D8 → Intensidad × su peso
+    final probabilidadPonderada = probabilidadScore * 0.4;
+    final intensidadPonderada = intensidadScore * 0.6;
+    
+    final amenazaFinal = probabilidadPonderada + intensidadPonderada;
+    
+    // CLASIFICACIÓN con rangos:
+    // 1–1,75 → Bajo
+    // >1,75–2,5 → Medio-Bajo  
+    // >2,5–3,25 → Medio-Alto
+    // >3,25–4 → Alto
+    return amenazaFinal;
   }
 
   // Método específico para calcular puntaje final de vulnerabilidad usando calificaciones ponderadas
@@ -849,24 +1568,164 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
   }
 
   double _calculateVulnerabilidadFinalScore() {
-    // Cálculo ponderado de vulnerabilidad según especificaciones:
-    // Fragilidad Física: 45%
-    // Fragilidad en Personas: 10%  
-    // Exposición: 45%
+    final eventName = state.selectedRiskEvent;
     
-    final fragilidadFisicaScore = state.subClassificationScores['fragilidad_fisica'] ?? 0.0;
-    final fragilidadPersonasScore = state.subClassificationScores['fragilidad_personas'] ?? 0.0;
-    final exposicionScore = state.subClassificationScores['exposicion'] ?? 0.0;
+    // Para Inundación: usar cálculo específico
+    if (eventName == 'Inundación') {
+      return _calculateInundacionVulnerabilidadFinal();
+    }
+    
+    // Para Movimiento en Masa: usar cálculo específico  
+    if (eventName == 'Movimiento en Masa') {
+      return _calculateMovimientoEnMasaVulnerabilidadFinal();
+    }
+    
+    // Para Avenida Torrencial: usar cálculo específico  
+    if (eventName == 'Avenida Torrencial') {
+      return _calculateAvenidaTorrencialVulnerabilidadFinal();
+    }
+    
+    // Para Estructural: usar cálculo específico  
+    if (eventName == 'Estructural') {
+      return _calculateEstructuralVulnerabilidadFinal();
+    }
+    
+    // Para Otros: usar cálculo específico  
+    if (eventName == 'Otros') {
+      return _calculateOtrosVulnerabilidadFinal();
+    }
+    
+    // Para otros eventos: cálculo ponderado genérico
+    return _calculateGenericVulnerabilidadFinal();
+  }
+
+  // Cálculo específico para Inundación - Vulnerabilidad
+  double _calculateInundacionVulnerabilidadFinal() {
+    // FÓRMULA ESPECÍFICA PARA INUNDACIÓN:
+    // E6 × D6 + E7 × D7 + E8 × D8
+    // Donde:
+    // E6 → Fragilidad Física,     D6 → 45% (0.45)
+    // E7 → Fragilidad en Personas, D7 → 10% (0.10)  
+    // E8 → Exposición,            D8 → 45% (0.45)
+    
+    final fragilidadFisicaScore = state.subClassificationScores['fragilidad_fisica'] ?? 0.0;      // E6
+    final fragilidadPersonasScore = state.subClassificationScores['fragilidad_personas'] ?? 0.0;  // E7
+    final exposicionScore = state.subClassificationScores['exposicion'] ?? 0.0;                   // E8
     
     // Si alguna subclasificación no tiene score, no se puede calcular vulnerabilidad
     if (fragilidadFisicaScore == 0.0 || fragilidadPersonasScore == 0.0 || exposicionScore == 0.0) {
       return 0.0;
     }
     
-    // Aplicar pesos específicos para Vulnerabilidad:
-    // Fragilidad Física: 45% (0.45)
-    // Fragilidad en Personas: 10% (0.10)
-    // Exposición: 45% (0.45)
+    // CÁLCULO PONDERADO:
+    // E6 × D6 = Fragilidad Física × 45%
+    final e6_x_d6 = fragilidadFisicaScore * 0.45;
+    
+    // E7 × D7 = Fragilidad en Personas × 10%
+    final e7_x_d7 = fragilidadPersonasScore * 0.10;
+    
+    // E8 × D8 = Exposición × 45%
+    final e8_x_d8 = exposicionScore * 0.45;
+    
+    // SUMA DE RESULTADOS: E6×D6 + E7×D7 + E8×D8
+    final vulnerabilidadFinal = e6_x_d6 + e7_x_d7 + e8_x_d8;
+    
+    return vulnerabilidadFinal;
+  }
+
+  // Cálculo específico para Movimiento en Masa - Vulnerabilidad
+  double _calculateMovimientoEnMasaVulnerabilidadFinal() {
+    // Mismo cálculo ponderado que Inundación:
+    // Fragilidad Física: 45%, Fragilidad en Personas: 10%, Exposición: 45%
+    
+    final fragilidadFisicaScore = state.subClassificationScores['fragilidad_fisica'] ?? 0.0;
+    final fragilidadPersonasScore = state.subClassificationScores['fragilidad_personas'] ?? 0.0;
+    final exposicionScore = state.subClassificationScores['exposicion'] ?? 0.0;
+    
+    if (fragilidadFisicaScore == 0.0 || fragilidadPersonasScore == 0.0 || exposicionScore == 0.0) {
+      return 0.0;
+    }
+    
+    final fragilidadFisicaPonderada = fragilidadFisicaScore * 0.45;
+    final fragilidadPersonasPonderada = fragilidadPersonasScore * 0.10;
+    final exposicionPonderada = exposicionScore * 0.45;
+    
+    return fragilidadFisicaPonderada + fragilidadPersonasPonderada + exposicionPonderada;
+  }
+
+  // Cálculo específico para Avenida Torrencial - Vulnerabilidad
+  double _calculateAvenidaTorrencialVulnerabilidadFinal() {
+    // Mismo cálculo ponderado que otros eventos:
+    // Fragilidad Física: 45%, Fragilidad en Personas: 10%, Exposición: 45%
+    
+    final fragilidadFisicaScore = state.subClassificationScores['fragilidad_fisica'] ?? 0.0;
+    final fragilidadPersonasScore = state.subClassificationScores['fragilidad_personas'] ?? 0.0;
+    final exposicionScore = state.subClassificationScores['exposicion'] ?? 0.0;
+    
+    if (fragilidadFisicaScore == 0.0 || fragilidadPersonasScore == 0.0 || exposicionScore == 0.0) {
+      return 0.0;
+    }
+    
+    final fragilidadFisicaPonderada = fragilidadFisicaScore * 0.45;
+    final fragilidadPersonasPonderada = fragilidadPersonasScore * 0.10;
+    final exposicionPonderada = exposicionScore * 0.45;
+    
+    return fragilidadFisicaPonderada + fragilidadPersonasPonderada + exposicionPonderada;
+  }
+
+  // Cálculo específico para Estructural - Vulnerabilidad
+  double _calculateEstructuralVulnerabilidadFinal() {
+    // Cálculo ponderado estándar para Estructural:
+    // Fragilidad Física: 45%, Fragilidad en Personas: 10%, Exposición: 45%
+    
+    final fragilidadFisicaScore = state.subClassificationScores['fragilidad_fisica'] ?? 0.0;
+    final fragilidadPersonasScore = state.subClassificationScores['fragilidad_personas'] ?? 0.0;
+    final exposicionScore = state.subClassificationScores['exposicion'] ?? 0.0;
+    
+    if (fragilidadFisicaScore == 0.0 || fragilidadPersonasScore == 0.0 || exposicionScore == 0.0) {
+      return 0.0;
+    }
+    
+    final fragilidadFisicaPonderada = fragilidadFisicaScore * 0.45;
+    final fragilidadPersonasPonderada = fragilidadPersonasScore * 0.10;
+    final exposicionPonderada = exposicionScore * 0.45;
+    
+    return fragilidadFisicaPonderada + fragilidadPersonasPonderada + exposicionPonderada;
+  }
+
+  // Cálculo específico para Otros - Vulnerabilidad
+  double _calculateOtrosVulnerabilidadFinal() {
+    // Cálculo ponderado estándar para Otros:
+    // Fragilidad Física: 45%, Fragilidad en Personas: 10%, Exposición: 45%
+    
+    final fragilidadFisicaScore = state.subClassificationScores['fragilidad_fisica'] ?? 0.0;
+    final fragilidadPersonasScore = state.subClassificationScores['fragilidad_personas'] ?? 0.0;
+    final exposicionScore = state.subClassificationScores['exposicion'] ?? 0.0;
+    
+    if (fragilidadFisicaScore == 0.0 || fragilidadPersonasScore == 0.0 || exposicionScore == 0.0) {
+      return 0.0;
+    }
+    
+    final fragilidadFisicaPonderada = fragilidadFisicaScore * 0.45;
+    final fragilidadPersonasPonderada = fragilidadPersonasScore * 0.10;
+    final exposicionPonderada = exposicionScore * 0.45;
+    
+    return fragilidadFisicaPonderada + fragilidadPersonasPonderada + exposicionPonderada;
+  }
+
+  // Cálculo genérico para otros eventos - Vulnerabilidad
+  double _calculateGenericVulnerabilidadFinal() {
+    // Cálculo ponderado genérico:
+    // Fragilidad Física: 45%, Fragilidad en Personas: 10%, Exposición: 45%
+    
+    final fragilidadFisicaScore = state.subClassificationScores['fragilidad_fisica'] ?? 0.0;
+    final fragilidadPersonasScore = state.subClassificationScores['fragilidad_personas'] ?? 0.0;
+    final exposicionScore = state.subClassificationScores['exposicion'] ?? 0.0;
+    
+    if (fragilidadFisicaScore == 0.0 || fragilidadPersonasScore == 0.0 || exposicionScore == 0.0) {
+      return 0.0;
+    }
+    
     final fragilidadFisicaPonderada = fragilidadFisicaScore * 0.45;
     final fragilidadPersonasPonderada = fragilidadPersonasScore * 0.10;
     final exposicionPonderada = exposicionScore * 0.45;
