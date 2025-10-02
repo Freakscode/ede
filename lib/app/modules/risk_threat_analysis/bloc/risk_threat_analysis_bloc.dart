@@ -493,14 +493,14 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
   Color _getScoreColor(double score) {
     if (score == 0) {
       return Colors.transparent; // No mostrar si no hay score
-    } else if (score <= 1.5) {
-      return const Color(0xFF22C55E); // Verde - BAJO
-    } else if (score <= 2.5) {
-      return const Color(0xFFFDE047); // Amarillo - MEDIO
-    } else if (score <= 3.5) {
-      return const Color(0xFFFB923C); // Naranja - MEDIO-ALTO  
+    } else if (score <= 1.75) {
+      return const Color(0xFF22C55E); // Verde - BAJO (1.00 a 1.75)
+    } else if (score <= 2.50) {
+      return const Color(0xFFFDE047); // Amarillo - MEDIO-BAJO (>1.75 a 2.50)
+    } else if (score <= 3.25) {
+      return const Color(0xFFFB923C); // Naranja - MEDIO-ALTO (>2.50 a 3.25)
     } else {
-      return const Color(0xFFDC2626); // Rojo - ALTO
+      return const Color(0xFFDC2626); // Rojo - ALTO (>3.25 a 4.00)
     }
   }
 
@@ -922,13 +922,13 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     
     switch (rating) {
       case 'BAJO':
-        return const Color(0xFF22C55E); // Verde
-      case 'MEDIO':
-        return const Color(0xFFFDE047); // Amarillo
+        return const Color(0xFF22C55E); // Verde (1.00 a 1.75)
+      case 'MEDIO-BAJO':
+        return const Color(0xFFFDE047); // Amarillo (>1.75 a 2.50)
       case 'MEDIO-ALTO':
-        return const Color(0xFFFB923C); // Naranja
+        return const Color(0xFFFB923C); // Naranja (>2.50 a 3.25)
       case 'ALTO':
-        return const Color(0xFFDC2626); // Rojo
+        return const Color(0xFFDC2626); // Rojo (>3.25 a 4.00)
       default:
         return const Color(0xFFD1D5DB); // Gris
     }
@@ -943,7 +943,7 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
       case 'MEDIO-ALTO':
       case 'ALTO':
         return const Color(0xFFFFFFFF); // Blanco
-      case 'MEDIO':
+      case 'MEDIO-BAJO':
       default:
         return const Color(0xFF1E1E1E); // Negro/Gris oscuro
     }
