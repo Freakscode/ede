@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 class ThreatRatingCardWidget extends StatelessWidget {
   final String score;
   final String ratingText;
+  final String title;
 
   const ThreatRatingCardWidget({
     super.key,
     required this.score,
     required this.ratingText,
+    this.title = 'Calificación Amenaza',
   });
 
   @override
@@ -37,11 +39,11 @@ class ThreatRatingCardWidget extends StatelessWidget {
                 topRight: Radius.circular(8),
               ),
             ),
-            child: const Center(
+            child: Center(
               child: Text(
-                'Calificación Amenaza',
+                title,
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   color: Color(0xFFFFFFFF),
                   fontFamily: 'Work Sans',
                   fontSize: 16,

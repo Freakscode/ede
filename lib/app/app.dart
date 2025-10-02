@@ -12,6 +12,7 @@ import 'modules/evaluacion/presentation/bloc/form/acciones/acciones_bloc.dart';
 import 'modules/evaluacion/presentation/bloc/form/evaluacionDanos/evaluacion_danos_bloc.dart';
 import 'modules/evaluacion/presentation/bloc/form/descripcionEdificacion/descripcion_edificacion_bloc.dart';
 import 'modules/evaluacion/presentation/bloc/evaluacion_global_bloc.dart';
+import 'modules/risk_threat_analysis/bloc/risk_threat_analysis_bloc.dart';
 import '../injection_container.dart' as di;
 import 'config/app_router.dart';
 
@@ -48,6 +49,10 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider<DescripcionEdificacionBloc>(
           create: (context) => di.sl<DescripcionEdificacionBloc>(),
+        ),
+        // Risk Threat Analysis BLoC
+        BlocProvider<RiskThreatAnalysisBloc>(
+          create: (context) => di.sl<RiskThreatAnalysisBloc>(),
         ),
         // EvaluacionGlobalBloc must be last as it depends on all other evaluacion BLoCs
         BlocProvider<EvaluacionGlobalBloc>(

@@ -13,30 +13,53 @@ import '../../bloc/risk_threat_analysis_event.dart';
 import '../../bloc/risk_threat_analysis_state.dart';
 import '../widgets/home_navigation_type.dart';
 
-class RiskThreatAnalysisScreen extends StatelessWidget {
+class RiskThreatAnalysisScreen extends StatefulWidget {
   final String? selectedEvent;
   final Map<String, dynamic>? navigationData;
   
   const RiskThreatAnalysisScreen({super.key, this.selectedEvent, this.navigationData});
 
   @override
+  State<RiskThreatAnalysisScreen> createState() => _RiskThreatAnalysisScreenState();
+}
+
+class _RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Usar el bloc global e inicializar con el evento seleccionado si existe
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final bloc = context.read<RiskThreatAnalysisBloc>();
+      
+      // Actualizar el evento seleccionado si es diferente
+      if (widget.selectedEvent != null && widget.selectedEvent!.isNotEmpty) {
+        bloc.add(UpdateSelectedRiskEvent(widget.selectedEvent!));
+      }
+      
+      // Si tenemos navigationData con clasificación, procesarla
+      if (widget.navigationData != null) {
+        final classificationName = widget.navigationData!['classification'] as String?;
+        
+        if (classificationName != null) {
+          // Resetear a índice 0 cuando se cambia de clasificación
+          bloc.add(ChangeBottomNavIndex(0));
+          
+          // Aplicar la nueva clasificación
+          bloc.add(SelectClassification(classificationName));
+        }
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final List<Widget> screens = [
-      RatingScreen(navigationData: navigationData),
+      RatingScreen(navigationData: widget.navigationData),
       const EvidenceScreen(),
       const RatingResultsScreen(),
     ];
 
-    return BlocProvider(
-      create: (context) {
-        final bloc = RiskThreatAnalysisBloc();
-        // Si hay un evento seleccionado, actualizarlo en el bloc
-        if (selectedEvent != null && selectedEvent!.isNotEmpty) {
-          bloc.add(UpdateSelectedRiskEvent(selectedEvent!));
-        }
-        return bloc;
-      },
-      child: BlocBuilder<RiskThreatAnalysisBloc, RiskThreatAnalysisState>(
+    return BlocBuilder<RiskThreatAnalysisBloc, RiskThreatAnalysisState>(
         builder: (context, state) {
           return Scaffold(
             appBar:  CustomAppBar(
@@ -84,7 +107,6 @@ class RiskThreatAnalysisScreen extends StatelessWidget {
             ),
           );
         },
-      ),
-    );
+      );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import '../../bloc/risk_threat_analysis_bloc.dart';
 import '../../bloc/risk_threat_analysis_state.dart';
 import '../widgets/widgets.dart';
@@ -33,11 +34,8 @@ class RatingResultsScreen extends StatelessWidget {
               _buildAllSections(context, state),
               const SizedBox(height: 24),
 
-              // Componente de Calificación de Amenaza
-              const ThreatRatingCardWidget(
-                score: '2,3',
-                ratingText: 'MEDIO - BAJO',
-              ),
+              // Componente de Calificación dinámico
+              _buildThreatRatingCard(context, state),
 
               const SizedBox(height: 14),
 
@@ -49,6 +47,27 @@ class RatingResultsScreen extends StatelessWidget {
               // Botones de navegación
               NavigationButtonsWidget(
                 currentIndex: state.currentBottomNavIndex,
+                onContinuePressed: () {
+                  // Si estamos en la última pestaña (índice 2) y en clasificación "amenaza"
+                  if (state.currentBottomNavIndex == 2 && 
+                      state.selectedClassification.toLowerCase() == 'amenaza') {
+                    
+                    // Navegar de vuelta al HomeScreen con RiskCategoriesScreen activo
+                    final navigationData = {
+                      'showRiskCategories': true,
+                    };
+                    context.go('/home', extra: navigationData);
+                    
+                    // Mostrar mensaje de éxito
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Evaluación de Amenaza completada. Ahora puede continuar con Vulnerabilidad.'),
+                        backgroundColor: Colors.green,
+                        duration: Duration(seconds: 3),
+                      ),
+                    );
+                  }
+                },
               ),
 
               const SizedBox(height: 50),
@@ -86,23 +105,28 @@ class RatingResultsScreen extends StatelessWidget {
   List<Map<String, dynamic>> _buildDynamicSections(RiskThreatAnalysisBloc bloc, RiskThreatAnalysisState state) {
     final sections = <Map<String, dynamic>>[];
     
-    // Sección Probabilidad
-    final probabilidadItems = _buildProbabilidadItems(bloc, state);
-    final probabilidadScore = _calculateSectionScore(probabilidadItems);
-    sections.add({
-      'title': 'Probabilidad',
-      'score': probabilidadScore,
-      'items': probabilidadItems,
-    });
-    
-    // Sección Intensidad
-    final intensidadItems = _buildIntensidadItems(bloc, state);
-    final intensidadScore = _calculateSectionScore(intensidadItems);
-    sections.add({
-      'title': 'Intensidad',
-      'score': intensidadScore,
-      'items': intensidadItems,
-    });
+    if (state.selectedClassification.toLowerCase() == 'amenaza') {
+      // Secciones para Amenaza
+      final probabilidadItems = _buildProbabilidadItems(bloc, state);
+      final probabilidadScore = _calculateSectionScore(probabilidadItems);
+      sections.add({
+        'title': 'Probabilidad',
+        'score': probabilidadScore,
+        'items': probabilidadItems,
+      });
+      
+      final intensidadItems = _buildIntensidadItems(bloc, state);
+      final intensidadScore = _calculateSectionScore(intensidadItems);
+      sections.add({
+        'title': 'Intensidad',
+        'score': intensidadScore,
+        'items': intensidadItems,
+      });
+    } else {
+      // Secciones para Vulnerabilidad
+      final vulnerabilidadSections = _buildVulnerabilidadSections(bloc, state);
+      sections.addAll(vulnerabilidadSections);
+    }
     
     return sections;
   }
@@ -236,6 +260,124 @@ class RatingResultsScreen extends StatelessWidget {
     
     final average = validRatings.reduce((a, b) => a + b) / validRatings.length;
     return average.toStringAsFixed(2).replaceAll('.', ',');
+  }
+
+  Widget _buildThreatRatingCard(BuildContext context, RiskThreatAnalysisState state) {
+    final bloc = context.read<RiskThreatAnalysisBloc>();
+    
+    // Determinar el título basado en la clasificación
+    final title = state.selectedClassification.toLowerCase() == 'amenaza' 
+        ? 'Calificación Amenaza' 
+        : 'Calificación Vulnerabilidad';
+    
+    // Calcular el score final
+    final finalScore = _calculateFinalScore(bloc, state);
+    final scoreText = finalScore.toStringAsFixed(2).replaceAll('.', ',');
+    
+    // Determinar la clasificación del riesgo
+    final ratingText = _getRiskClassification(finalScore);
+    
+    return ThreatRatingCardWidget(
+      title: title,
+      score: scoreText,
+      ratingText: ratingText,
+    );
+  }
+
+  double _calculateFinalScore(RiskThreatAnalysisBloc bloc, RiskThreatAnalysisState state) {
+    if (state.selectedClassification.toLowerCase() == 'amenaza') {
+      // Para amenaza, usar el cálculo global de amenaza
+      return bloc.calculateAmenazaGlobalScore();
+    } else {
+      // Para vulnerabilidad, usar el cálculo final de vulnerabilidad
+      return bloc.calculateVulnerabilidadFinalScore();
+    }
+  }
+
+  String _getRiskClassification(double score) {
+    if (score >= 1.00 && score <= 1.75) {
+      return 'BAJO';
+    } else if (score > 1.75 && score <= 2.50) {
+      return 'MEDIO - BAJO';
+    } else if (score > 2.50 && score <= 3.25) {
+      return 'MEDIO - ALTO';
+    } else if (score > 3.25 && score <= 4.00) {
+      return 'ALTO';
+    } else {
+      return 'SIN CALIFICAR';
+    }
+  }
+
+  List<Map<String, dynamic>> _buildVulnerabilidadSections(RiskThreatAnalysisBloc bloc, RiskThreatAnalysisState state) {
+    final sections = <Map<String, dynamic>>[];
+    final selectedEvent = state.selectedRiskEvent;
+    final selectedClassification = state.selectedClassification;
+    
+    // Buscar las subclasificaciones de vulnerabilidad para el evento actual
+    final riskEvent = _getRiskEventByName(selectedEvent);
+    if (riskEvent != null) {
+      final classification = riskEvent.classifications
+          .firstWhere((c) => c.id == selectedClassification, orElse: () => riskEvent.classifications.first);
+      
+      // Construir secciones para cada subclasificación de vulnerabilidad
+      for (final subClassification in classification.subClassifications) {
+        final items = _buildVulnerabilidadSubClassificationItems(bloc, state, subClassification.id);
+        final score = _calculateSectionScore(items);
+        
+        sections.add({
+          'title': subClassification.name,
+          'score': score,
+          'items': items,
+        });
+      }
+    }
+    
+    return sections;
+  }
+
+  List<Map<String, dynamic>> _buildVulnerabilidadSubClassificationItems(
+    RiskThreatAnalysisBloc bloc, 
+    RiskThreatAnalysisState state, 
+    String subClassificationId
+  ) {
+    final items = <Map<String, dynamic>>[];
+    final selectedEvent = state.selectedRiskEvent;
+    final selectedClassification = state.selectedClassification;
+    
+    // Buscar las categorías para esta subclasificación
+    final riskEvent = _getRiskEventByName(selectedEvent);
+    if (riskEvent != null) {
+      final classification = riskEvent.classifications
+          .firstWhere((c) => c.id == selectedClassification, orElse: () => riskEvent.classifications.first);
+
+      final subClass = classification.subClassifications
+          .firstWhere((s) => s.id == subClassificationId, orElse: () => classification.subClassifications.first);
+      
+      // Crear items basados en las categorías reales del evento
+      for (final category in subClass.categories) {
+        // Buscar la selección en las selecciones dinámicas
+        final selections = state.dynamicSelections[subClassificationId] ?? {};
+        final selection = selections[category.title];
+        
+        final rating = _getRatingFromSelection(selection);
+        final color = _getColorFromRating(rating);
+        
+        String title = category.title;
+        if (rating == -1) {
+          title = '${category.title} - No Aplica';
+        } else if (rating == 0) {
+          title = '${category.title} - Sin calificar';
+        }
+        
+        items.add({
+          'rating': rating,
+          'title': title,
+          'color': color,
+        });
+      }
+    }
+    
+    return items;
   }
 
   RiskEventModel? _getRiskEventByName(String eventName) {

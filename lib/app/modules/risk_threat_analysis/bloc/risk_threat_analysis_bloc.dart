@@ -122,13 +122,29 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
   ) {
     // Solo resetear las selecciones si la clasificación realmente cambió
     if (state.selectedClassification != event.classification) {
+      // Determinar qué selecciones resetear basado en la nueva clasificación
+      Map<String, String> newProbabilidadSelections = state.probabilidadSelections;
+      Map<String, String> newIntensidadSelections = state.intensidadSelections;
+      Map<String, Map<String, String>> newDynamicSelections = state.dynamicSelections;
+      
+      if (event.classification.toLowerCase() == 'amenaza') {
+        // Si cambiamos a amenaza, resetear solo las selecciones de amenaza
+        newProbabilidadSelections = {};
+        newIntensidadSelections = {};
+        // Mantener las selecciones dinámicas de vulnerabilidad
+      } else if (event.classification.toLowerCase() == 'vulnerabilidad') {
+        // Si cambiamos a vulnerabilidad, resetear solo las selecciones dinámicas de vulnerabilidad
+        // Mantener las selecciones de amenaza (probabilidad e intensidad)
+        newDynamicSelections = {};
+      }
+      
       emit(state.copyWith(
         selectedClassification: event.classification,
-        // Reset selections only when classification actually changes
-        probabilidadSelections: {},
-        intensidadSelections: {},
-        dropdownOpenStates: {}, // Reset dynamic dropdown states
-        dynamicSelections: {}, // Reset dynamic selections
+        probabilidadSelections: newProbabilidadSelections,
+        intensidadSelections: newIntensidadSelections,
+        dropdownOpenStates: {}, // Reset dropdown states
+        dynamicSelections: newDynamicSelections,
+        currentBottomNavIndex: 0, // Reset navigation to start from the beginning
       ));
     } else {
       // Si es la misma clasificación, solo actualizar el valor sin resetear
@@ -357,6 +373,11 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
   }
 
   // Método para calcular la amenaza global (con pesos específicos para Movimiento en Masa)
+  // Método público para acceso externo
+  double calculateAmenazaGlobalScore() {
+    return _calculateAmenazaGlobalScore();
+  }
+
   double _calculateAmenazaGlobalScore() {
     final eventName = state.selectedRiskEvent;
     
@@ -869,6 +890,11 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
   }
 
   // Método específico para calcular puntaje final de vulnerabilidad usando calificaciones ponderadas
+  // Método público para acceso externo
+  double calculateVulnerabilidadFinalScore() {
+    return _calculateVulnerabilidadFinalScore();
+  }
+
   double _calculateVulnerabilidadFinalScore() {
     final subClassifications = getCurrentSubClassifications();
     

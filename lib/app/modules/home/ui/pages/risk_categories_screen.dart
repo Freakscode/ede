@@ -4,6 +4,8 @@ import 'package:caja_herramientas/app/modules/home/ui/widgets/category_card.dart
 import 'package:caja_herramientas/app/modules/home/bloc/home_bloc.dart';
 import 'package:caja_herramientas/app/modules/home/bloc/home_state.dart';
 import 'package:caja_herramientas/app/modules/home/bloc/home_event.dart';
+import 'package:caja_herramientas/app/modules/risk_threat_analysis/bloc/risk_threat_analysis_bloc.dart';
+import 'package:caja_herramientas/app/modules/risk_threat_analysis/bloc/risk_threat_analysis_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -12,15 +14,147 @@ import 'package:go_router/go_router.dart';
 class RiskCategoriesScreen extends StatelessWidget {
   const RiskCategoriesScreen({super.key});
 
+  // Método helper para verificar si la amenaza está completa
+  bool _isAmenazaCompleted(RiskThreatAnalysisBloc bloc, RiskThreatAnalysisState state, String selectedEvent) {
+    // Verificar si el evento seleccionado coincide con el del bloc
+    if (state.selectedRiskEvent != selectedEvent) {
+      return false;
+    }
+    
+    // Verificar si hay selecciones de amenaza
+    final hasAmenazaSelections = state.probabilidadSelections.isNotEmpty && 
+                                 state.intensidadSelections.isNotEmpty;
+    
+    if (!hasAmenazaSelections) {
+      return false;
+    }
+    
+    // Para ser más estricto, podemos verificar que todas las categorías estén completas
+    // Obtener todas las subclasificaciones de amenaza
+    final amenazaSubClassifications = bloc.getAmenazaSubClassifications();
+    
+    for (final subClassification in amenazaSubClassifications) {
+      final categories = bloc.getCategoriesForSubClassification(subClassification.id);
+      Map<String, String> selections;
+      
+      if (subClassification.id == 'probabilidad') {
+        selections = state.probabilidadSelections;
+      } else if (subClassification.id == 'intensidad') {
+        selections = state.intensidadSelections;
+      } else {
+        selections = state.dynamicSelections[subClassification.id] ?? {};
+      }
+      
+      // Verificar que todas las categorías de esta subclasificación estén completadas
+      for (final category in categories) {
+        if (!selections.containsKey(category.title) || 
+            selections[category.title]?.isEmpty == true) {
+          return false;
+        }
+      }
+    }
+    
+    return true;
+  }
+
+  // Método helper para construir las CategoryCard personalizadas
+  Widget _buildCategoryCard(
+    BuildContext context,
+    dynamic classification,
+    String selectedEvent,
+    bool isAvailable,
+    bool isCompleted,
+    String? disabledMessage,
+  ) {
+    return Opacity(
+      opacity: isAvailable ? 1.0 : 0.6,
+      child: Stack(
+        children: [
+          CategoryCard(
+            title: '${classification.name} $selectedEvent',
+            onTap: isAvailable ? () {
+              // Guardar la categoría seleccionada
+              context.read<HomeBloc>().add(
+                SelectRiskCategory(classification.name, selectedEvent),
+              );
+              // Navegar a siguiente pantalla pasando tanto el evento como la clasificación
+              final navigationData = {
+                'event': selectedEvent,
+                'classification': classification.name.toLowerCase(),
+              };
+              context.go('/risk_threat_analysis', extra: navigationData);
+            } : () {
+              // Mostrar mensaje de que debe completar amenaza primero
+              if (disabledMessage != null) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(disabledMessage),
+                    backgroundColor: DAGRDColors.warning,
+                    duration: const Duration(seconds: 3),
+                  ),
+                );
+              }
+            },
+          ),
+          // Indicador de completitud
+          if (isCompleted)
+            Positioned(
+              top: 8,
+              right: 8,
+              child: Container(
+                width: 24,
+                height: 24,
+                decoration: BoxDecoration(
+                  color: DAGRDColors.success,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.check,
+                  color: Colors.white,
+                  size: 16,
+                ),
+              ),
+            ),
+          // Indicador de no disponible
+          if (!isAvailable)
+            Positioned(
+              top: 8,
+              right: 8,
+              child: Container(
+                width: 24,
+                height: 24,
+                decoration: BoxDecoration(
+                  color: DAGRDColors.warning,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.lock,
+                  color: Colors.white,
+                  size: 16,
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<HomeBloc, HomeState>(
-      builder: (context, state) {
-        final selectedEvent = state.selectedRiskEvent;
+      builder: (context, homeState) {
+        final selectedEvent = homeState.selectedRiskEvent;
         
         // Obtener las clasificaciones del evento seleccionado a través del Bloc
         final homeBloc = context.read<HomeBloc>();
         final classifications = homeBloc.getEventClassifications(selectedEvent);
+        
+        return BlocBuilder<RiskThreatAnalysisBloc, RiskThreatAnalysisState>(
+          builder: (context, riskState) {
+            final riskBloc = context.read<RiskThreatAnalysisBloc>();
+            
+            // Verificar si la amenaza está completa
+            final isAmenazaCompleted = _isAmenazaCompleted(riskBloc, riskState, selectedEvent);
         
         return SingleChildScrollView(
       child: Padding(
@@ -67,23 +201,37 @@ class RiskCategoriesScreen extends StatelessWidget {
                   ...classifications.asMap().entries.map((entry) {
                     final index = entry.key;
                     final classification = entry.value;
+                    final isAmenaza = classification.name.toLowerCase() == 'amenaza';
+                    final isVulnerabilidad = classification.name.toLowerCase() == 'vulnerabilidad';
+                    
+                    // Determinar si esta categoría está disponible
+                    bool isAvailable = true;
+                    bool isCompleted = false;
+                    String? disabledMessage;
+                    
+                    if (isAmenaza) {
+                      // Amenaza siempre está disponible
+                      isAvailable = true;
+                      isCompleted = isAmenazaCompleted;
+                    } else if (isVulnerabilidad) {
+                      // Vulnerabilidad solo está disponible si amenaza está completa
+                      isAvailable = isAmenazaCompleted;
+                      if (!isAvailable) {
+                        disabledMessage = 'Complete primero la sección de Amenaza';
+                      }
+                      // TODO: Verificar si vulnerabilidad está completa
+                      isCompleted = false;
+                    }
                     
                     return Column(
                       children: [
-                        CategoryCard(
-                          title: '${classification.name} $selectedEvent',
-                          onTap: () {
-                            // Guardar la categoría seleccionada
-                            context.read<HomeBloc>().add(
-                              SelectRiskCategory(classification.name, selectedEvent),
-                            );
-                            // Navegar a siguiente pantalla pasando tanto el evento como la clasificación
-                            final navigationData = {
-                              'event': selectedEvent,
-                              'classification': classification.name.toLowerCase(),
-                            };
-                            context.go('/risk_threat_analysis', extra: navigationData);
-                          },
+                        _buildCategoryCard(
+                          context,
+                          classification,
+                          selectedEvent,
+                          isAvailable,
+                          isCompleted,
+                          disabledMessage,
                         ),
                         // Agregar espaciado entre cards, excepto después del último
                         if (index < classifications.length - 1) 
@@ -94,7 +242,7 @@ class RiskCategoriesScreen extends StatelessWidget {
 
                   const SizedBox(height: 24),
 
-                  // Información
+                  // Información con progreso
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
@@ -104,20 +252,56 @@ class RiskCategoriesScreen extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          'Información',
-                          style: const TextStyle(
-                            color: DAGRDColors.azulSecundario,
-                            fontFamily: 'Work Sans',
-                            fontSize: 13,
-                            fontStyle: FontStyle.normal,
-                            fontWeight: FontWeight.w500,
-                            height: 18 / 13,
+                        Row(
+                          children: [
+                            Text(
+                              'Progreso de Evaluación',
+                              style: const TextStyle(
+                                color: DAGRDColors.azulSecundario,
+                                fontFamily: 'Work Sans',
+                                fontSize: 13,
+                                fontStyle: FontStyle.normal,
+                                fontWeight: FontWeight.w500,
+                                height: 18 / 13,
+                              ),
+                            ),
+                            const Spacer(),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: isAmenazaCompleted ? DAGRDColors.success : DAGRDColors.warning,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                isAmenazaCompleted ? '1/2 Completado' : '0/2 Completado',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontFamily: 'Work Sans',
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        // Barra de progreso visual
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(4),
+                          child: LinearProgressIndicator(
+                            value: isAmenazaCompleted ? 0.5 : 0.0,
+                            backgroundColor: Colors.grey[300],
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              isAmenazaCompleted ? DAGRDColors.success : DAGRDColors.warning,
+                            ),
+                            minHeight: 6,
                           ),
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 12),
                         Text(
-                          'Complete los formularios de Amenaza y Vulnerabilidad para visualizar la evaluación completa del riesgo.',
+                          isAmenazaCompleted 
+                            ? '✓ Amenaza completada. Puede continuar con Vulnerabilidad.'
+                            : '1. Complete primero la sección de Amenaza\n2. Luego podrá acceder a Vulnerabilidad',
                           style: const TextStyle(
                             color: DAGRDColors.azulSecundario,
                             fontFamily: 'Work Sans',
@@ -204,7 +388,7 @@ class RiskCategoriesScreen extends StatelessWidget {
               ),
             ),
             // Debug info - mostrar categoría seleccionada
-            if (state.selectedRiskCategory != null)
+            if (homeState.selectedRiskCategory != null)
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Container(
@@ -232,7 +416,7 @@ class RiskCategoriesScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        state.selectedRiskCategory!,
+                        homeState.selectedRiskCategory!,
                         style: const TextStyle(
                           color: DAGRDColors.azulSecundario,
                           fontFamily: 'Work Sans',
@@ -249,6 +433,8 @@ class RiskCategoriesScreen extends StatelessWidget {
         ),
       ),
     );
+          },
+        );
       },
     );
   }

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import '../../bloc/risk_threat_analysis_bloc.dart';
 import '../../bloc/risk_threat_analysis_event.dart';
+import '../../bloc/risk_threat_analysis_state.dart';
 import 'home_navigation_type.dart';
 
 class NavigationButtonsWidget extends StatelessWidget {
@@ -94,11 +95,30 @@ class NavigationButtonsWidget extends StatelessWidget {
             ),
           )
         else // Botón Finalizar para la última pestaña
-          InkWell(
-            onTap: onContinuePressed ?? () {
-              
-            },
-            child: Container(
+          BlocBuilder<RiskThreatAnalysisBloc, RiskThreatAnalysisState>(
+            builder: (context, state) {
+              return InkWell(
+                onTap: onContinuePressed ?? () {
+                  // Si estamos en amenaza, volver a RiskCategoriesScreen para continuar con vulnerabilidad
+                  if (state.selectedClassification.toLowerCase() == 'amenaza') {
+                    // Mostrar mensaje de éxito
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: const Text('¡Amenaza completada! Ahora puede continuar con Vulnerabilidad.'),
+                        backgroundColor: DAGRDColors.success,
+                        duration: const Duration(seconds: 3),
+                      ),
+                    );
+                    
+                    // Navegar de vuelta a RiskCategoriesScreen
+                    context.go('/risk_categories');
+                  } else {
+                    // Si estamos en vulnerabilidad, ir al home como antes
+                    final navigationData = homeNavigationType.toNavigationData(tabIndex: homeTabIndex);
+                    context.go('/home', extra: navigationData);
+                  }
+                },
+                child: Container(
               width: 185,
               height: 48,
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
@@ -130,6 +150,8 @@ class NavigationButtonsWidget extends StatelessWidget {
                 ],
               ),
             ),
+              );
+            },
           ),
       ],
     );
