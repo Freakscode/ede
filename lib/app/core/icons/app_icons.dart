@@ -69,6 +69,8 @@ class AppIcons {
   static const String clipboardText = 'assets/icons/caja_herramientas/ClipboardText.svg';
   static const String imagen = 'assets/icons/caja_herramientas/Imagen.svg';
   static const String images = 'assets/icons/caja_herramientas/Images.svg';
+  static const String checkCircle = 'assets/icons/caja_herramientas/CheckCircle.svg';
+  // assets/icons/caja_herramientas/CheckCircle.svg
 
   // SVG Icons - Advertencias y alertas
   static const String warning = 'assets/icons/caja_herramientas/Advertencia.svg';

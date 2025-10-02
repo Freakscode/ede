@@ -6,10 +6,12 @@ class CategoryCard extends StatelessWidget {
     super.key,
     required this.title,
     required this.onTap,
+    this.trailingIcon,
   });
 
   final String title;
   final VoidCallback onTap;
+  final Widget? trailingIcon;
 
   static const double _cardHeight = 50.0;
   static const double _horizontalPadding = 15.0;
@@ -38,6 +40,10 @@ class CategoryCard extends StatelessWidget {
                 style: _getTextStyle(),
               ),
             ),
+            if (trailingIcon != null) ...[
+              const SizedBox(width: 8),
+              trailingIcon!,
+            ],
           ],
         ),
       ),
