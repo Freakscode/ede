@@ -51,6 +51,7 @@ class RiskSubClassification {
   final String description;
   final List<RiskCategory> categories;
   final double weight; // Peso para cálculos
+  final bool hasCriticalVariable; // Indica si usa lógica de variable crítica
   final Map<String, dynamic>? metadata;
 
   const RiskSubClassification({
@@ -59,6 +60,7 @@ class RiskSubClassification {
     required this.description,
     required this.categories,
     this.weight = 1.0,
+    this.hasCriticalVariable = false,
     this.metadata,
   });
 
@@ -71,6 +73,7 @@ class RiskSubClassification {
           .map((e) => RiskCategory.fromMap(e as Map<String, dynamic>))
           .toList(),
       weight: (map['weight'] as num?)?.toDouble() ?? 1.0,
+      hasCriticalVariable: map['hasCriticalVariable'] as bool? ?? false,
       metadata: map['metadata'] as Map<String, dynamic>?,
     );
   }
@@ -82,12 +85,54 @@ class RiskSubClassification {
       'description': description,
       'categories': categories.map((e) => e.toMap()).toList(),
       'weight': weight,
+      'hasCriticalVariable': hasCriticalVariable,
       if (metadata != null) 'metadata': metadata,
     };
   }
 
+  RiskSubClassification copyWith({
+    String? id,
+    String? name,
+    String? description,
+    List<RiskCategory>? categories,
+    double? weight,
+    bool? hasCriticalVariable,
+    Map<String, dynamic>? metadata,
+  }) {
+    return RiskSubClassification(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      description: description ?? this.description,
+      categories: categories ?? this.categories,
+      weight: weight ?? this.weight,
+      hasCriticalVariable: hasCriticalVariable ?? this.hasCriticalVariable,
+      metadata: metadata ?? this.metadata,
+    );
+  }
+
   @override
-  String toString() => 'RiskSubClassification(id: $id, name: $name)';
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is RiskSubClassification &&
+        other.id == id &&
+        other.name == name &&
+        other.description == description &&
+        other.weight == weight &&
+        other.hasCriticalVariable == hasCriticalVariable;
+  }
+
+  @override
+  int get hashCode {
+    return id.hashCode ^
+        name.hashCode ^
+        description.hashCode ^
+        weight.hashCode ^
+        hasCriticalVariable.hashCode;
+  }
+
+  @override
+  String toString() => 'RiskSubClassification(id: $id, name: $name, hasCriticalVariable: $hasCriticalVariable)';
+
 }
 
 /// Representa una categoría específica a evaluar

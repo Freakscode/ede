@@ -24,6 +24,7 @@ class RiskEventFactory {
               name: 'Probabilidad',
               description: 'Factores que influyen en la probabilidad de ocurrencia',
               weight: 0.5,
+              hasCriticalVariable: true, // Variable crítica: Evidencias de Materialización
               categories: [
                 _createCaracteristicasGeotecnicas(),
                 _createIntervencionAntropica(),
@@ -39,6 +40,7 @@ class RiskEventFactory {
               name: 'Intensidad',
               description: 'Factores que determinan la magnitud e impacto del evento',
               weight: 0.5,
+              hasCriticalVariable: true, // Variable crítica: Potencial de Daño en Edificaciones
               categories: [
                 _createPotencialDanoEdificaciones(),
                 _createCapacidadGenerarPerdidaVidas(),
@@ -169,6 +171,7 @@ class RiskEventFactory {
               name: 'Intensidad',
               description: 'Factores que determinan la magnitud e impacto del evento',
               weight: 0.5,
+              hasCriticalVariable: true, // Variable crítica: Potencial Daño Edificaciones
               categories: [
                 _createInundacionPotencialDanoEdificaciones(),
                 _createInundacionCapacidadPerdidaVidas(),
@@ -243,6 +246,7 @@ class RiskEventFactory {
               name: 'Probabilidad',
               description: 'Factores que influyen en la probabilidad de ocurrencia',
               weight: 0.5,
+              hasCriticalVariable: true, // Variable crítica: Estabilidad de Taludes
               categories: [
                 _createAvenidaTorrencialCategorizacionMapas(),
                 _createAvenidaTorrencialTipoMaterialCauce(),
@@ -256,6 +260,7 @@ class RiskEventFactory {
               name: 'Intensidad',
               description: 'Factores que determinan la magnitud e impacto del evento',
               weight: 0.5,
+              hasCriticalVariable: true, // Variable crítica: Potencial Daño Edificaciones
               categories: [
                 _createAvenidaTorrencialPotencialDanoEdificaciones(),
                 _createAvenidaTorrencialCapacidadPerdidaVidas(),
@@ -330,6 +335,7 @@ class RiskEventFactory {
               name: 'Probabilidad',
               description: 'Factores que influyen en la probabilidad de falla estructural',
               weight: 0.5,
+              hasCriticalVariable: true, // Variable crítica: Estado de Deterioro
               categories: [
                 _createEstructuralEstadoDeterioro(),
                 _createEstructuralIncrementoCargaReduccionResistencia(),
@@ -340,6 +346,7 @@ class RiskEventFactory {
               name: 'Intensidad',
               description: 'Factores que determinan la magnitud e impacto de la falla',
               weight: 0.5,
+              hasCriticalVariable: true, // Variable crítica: Potencial Daño Edificaciones
               categories: [
                 _createEstructuralPotencialDanoEdificaciones(),
                 _createEstructuralCapacidadPerdidaVidas(),
@@ -413,6 +420,7 @@ class RiskEventFactory {
               name: 'Probabilidad',
               description: 'Factores que influyen en la probabilidad de ocurrencia del evento',
               weight: 0.5,
+              hasCriticalVariable: true, // Variable crítica: Evidencias de Materialización
               categories: [
                 _createOtrosFrecuencia(),
                 _createOtrosEvidenciasMaterializacion(),
@@ -424,6 +432,7 @@ class RiskEventFactory {
               name: 'Intensidad',
               description: 'Factores que determinan la magnitud e impacto del evento',
               weight: 0.5,
+              hasCriticalVariable: true, // Variable crítica: Potencial Daño Edificaciones
               categories: [
                 _createOtrosPotencialDanoEdificaciones(),
                 _createOtrosCapacidadPerdidaVidas(),

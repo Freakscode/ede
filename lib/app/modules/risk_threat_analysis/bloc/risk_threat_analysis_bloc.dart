@@ -240,168 +240,72 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     }
   }
 
-  // Determina qué tipo de cálculo aplicar según el contexto
+  // Determina qué tipo de cálculo aplicar según el contexto usando data-driven approach
   String _getCalculationType(String subClassificationId) {
     final eventName = state.selectedRiskEvent;
     final classification = state.selectedClassification;
     
-    // INUNDACIÓN - Amenaza - Probabilidad (con variable crítica)
-    if (eventName == 'Inundación' && classification == 'amenaza' && subClassificationId == 'probabilidad') {
-      return 'critical_variable';
+    // Obtener el evento actual usando RiskEventFactory
+    RiskEventModel? currentEvent;
+    switch (eventName) {
+      case 'Movimiento en Masa':
+        currentEvent = RiskEventFactory.createMovimientoEnMasa();
+        break;
+      case 'Inundación':
+        currentEvent = RiskEventFactory.createInundacion();
+        break;
+      case 'Avenida Torrencial':
+        currentEvent = RiskEventFactory.createAvenidaTorrencial();
+        break;
+      case 'Estructural':
+        currentEvent = RiskEventFactory.createEstructural();
+        break;
+      case 'Otros':
+        currentEvent = RiskEventFactory.createOtros();
+        break;
+      case 'Incendio Forestal':
+        currentEvent = RiskEventFactory.createIncendioForestal();
+        break;
+      default:
+        // Por defecto: promedio simple
+        return 'simple_average';
     }
     
-    // INUNDACIÓN - Amenaza - Intensidad (con variable crítica)
-    if (eventName == 'Inundación' && classification == 'amenaza' && subClassificationId == 'intensidad') {
-      return 'critical_variable';
+    try {
+      final currentClassification = currentEvent.classifications.firstWhere(
+        (cls) => cls.id == classification,
+      );
+      
+      final currentSubClassification = currentClassification.subClassifications.firstWhere(
+        (subCls) => subCls.id == subClassificationId,
+      );
+      
+      // Usar el campo hasCriticalVariable para determinar el tipo de cálculo
+      if (currentSubClassification.hasCriticalVariable) {
+        return 'critical_variable';
+      }
+    } catch (e) {
+      // Si no se encuentra la clasificación/subclasificación, usar reglas de fallback
     }
     
-    // Movimiento en Masa - Amenaza - Probabilidad (con variable crítica: Evidencias de Materialización)
-    if (eventName == 'Movimiento en Masa' && classification == 'amenaza' && subClassificationId == 'probabilidad') {
-      return 'critical_variable';
-    }
-    
-    // Movimiento en Masa - Amenaza - Intensidad (con variable crítica: Potencial de Daño en Edificaciones)
-    if (eventName == 'Movimiento en Masa' && classification == 'amenaza' && subClassificationId == 'intensidad') {
-      return 'critical_variable';
-    }
-    
-    // Movimiento en Masa - Vulnerabilidad - Fragilidad Física (con regla de tope especial)
-    if (eventName == 'Movimiento en Masa' && classification == 'vulnerabilidad' && subClassificationId == 'fragilidad_fisica') {
-      return 'critical_variable';
-    }
-    
-    // Movimiento en Masa - Vulnerabilidad - Fragilidad en Personas (con regla de tope especial)
-    if (eventName == 'Movimiento en Masa' && classification == 'vulnerabilidad' && subClassificationId == 'fragilidad_personas') {
-      return 'critical_variable';
-    }
-    
-    // Movimiento en Masa - Vulnerabilidad - Exposición (siempre promedio ponderado, sin tope)
-    if (eventName == 'Movimiento en Masa' && classification == 'vulnerabilidad' && subClassificationId == 'exposicion') {
+    // Reglas especiales para vulnerability con exposición (siempre weighted_average sin tope)
+    if (classification == 'vulnerabilidad' && subClassificationId == 'exposicion') {
       return 'weighted_average';
     }
     
-    // Movimiento en Masa - Vulnerabilidad - Otras subclasificaciones (promedio ponderado)
-    if (eventName == 'Movimiento en Masa' && classification == 'vulnerabilidad') {
-      return 'weighted_average';
-    }
-    
-    // INUNDACIÓN - Vulnerabilidad - Fragilidad Física (con regla de tope especial)
-    if (eventName == 'Inundación' && classification == 'vulnerabilidad' && subClassificationId == 'fragilidad_fisica') {
-      return 'critical_variable';
-    }
-    
-    // INUNDACIÓN - Vulnerabilidad - Fragilidad en Personas (con regla de tope especial)
-    if (eventName == 'Inundación' && classification == 'vulnerabilidad' && subClassificationId == 'fragilidad_personas') {
-      return 'critical_variable';
-    }
-    
-    // INUNDACIÓN - Vulnerabilidad - Exposición (siempre promedio ponderado, sin tope)
-    if (eventName == 'Inundación' && classification == 'vulnerabilidad' && subClassificationId == 'exposicion') {
-      return 'weighted_average';
-    }
-    
-    // Inundación - Amenaza (ya manejado arriba)
-    if (eventName == 'Inundación' && classification == 'amenaza') {
-      return 'critical_variable';
-    }
-    
-    // Inundación - otras subclasificaciones
-    if (eventName == 'Inundación') {
-      return 'weighted_average';
-    }
-    
-    // AVENIDA TORRENCIAL - Amenaza - Probabilidad (con variable crítica)
-    if (eventName == 'Avenida Torrencial' && classification == 'amenaza' && subClassificationId == 'probabilidad') {
-      return 'critical_variable';
-    }
-    
-    // AVENIDA TORRENCIAL - Amenaza - Intensidad (con variable crítica)
-    if (eventName == 'Avenida Torrencial' && classification == 'amenaza' && subClassificationId == 'intensidad') {
-      return 'critical_variable';
-    }
-    
-    // AVENIDA TORRENCIAL - Vulnerabilidad - Fragilidad Física (con regla de tope especial)
-    if (eventName == 'Avenida Torrencial' && classification == 'vulnerabilidad' && subClassificationId == 'fragilidad_fisica') {
-      return 'critical_variable';
-    }
-    
-    // AVENIDA TORRENCIAL - Vulnerabilidad - Fragilidad en Personas (con regla de tope especial)
-    if (eventName == 'Avenida Torrencial' && classification == 'vulnerabilidad' && subClassificationId == 'fragilidad_personas') {
-      return 'critical_variable';
-    }
-    
-    // AVENIDA TORRENCIAL - Vulnerabilidad - Exposición (siempre promedio ponderado, sin tope)
-    if (eventName == 'Avenida Torrencial' && classification == 'vulnerabilidad' && subClassificationId == 'exposicion') {
-      return 'weighted_average';
-    }
-    
-    // AVENIDA TORRENCIAL - Vulnerabilidad - Otras subclasificaciones (promedio ponderado)
-    if (eventName == 'Avenida Torrencial' && classification == 'vulnerabilidad') {
-      return 'weighted_average';
-    }
-    
-    // ESTRUCTURAL - Amenaza - Probabilidad (promedio ponderado simple)
-    if (eventName == 'Estructural' && classification == 'amenaza' && subClassificationId == 'probabilidad') {
-      return 'weighted_average';
-    }
-    
-    // ESTRUCTURAL - Amenaza - Intensidad (con variable crítica)
-    if (eventName == 'Estructural' && classification == 'amenaza' && subClassificationId == 'intensidad') {
-      return 'critical_variable';
-    }
-    
-    // ESTRUCTURAL - Vulnerabilidad - Fragilidad Física (con regla de tope por amenaza global)
-    if (eventName == 'Estructural' && classification == 'vulnerabilidad' && subClassificationId == 'fragilidad_fisica') {
-      return 'critical_variable';
-    }
-    
-    // ESTRUCTURAL - Vulnerabilidad - Fragilidad en Personas (con regla de tope por amenaza global)
-    if (eventName == 'Estructural' && classification == 'vulnerabilidad' && subClassificationId == 'fragilidad_personas') {
-      return 'critical_variable';
-    }
-    
-    // ESTRUCTURAL - Vulnerabilidad - Exposición (siempre promedio ponderado, sin tope)
-    if (eventName == 'Estructural' && classification == 'vulnerabilidad' && subClassificationId == 'exposicion') {
-      return 'weighted_average';
-    }
-    
-    // ESTRUCTURAL - Vulnerabilidad - Otras subclasificaciones (promedio ponderado)
-    if (eventName == 'Estructural' && classification == 'vulnerabilidad') {
-      return 'weighted_average';
-    }
-    
-    // OTROS - Amenaza - Probabilidad (promedio ponderado simple)
-    if (eventName == 'Otros' && classification == 'amenaza' && subClassificationId == 'probabilidad') {
-      return 'weighted_average';
-    }
-    
-    // OTROS - Amenaza - Intensidad (con variable crítica)
-    if (eventName == 'Otros' && classification == 'amenaza' && subClassificationId == 'intensidad') {
-      return 'critical_variable';
-    }
-    
-    // OTROS - Vulnerabilidad - Fragilidad Física (con regla de tope por severidad)
-    if (eventName == 'Otros' && classification == 'vulnerabilidad' && subClassificationId == 'fragilidad_fisica') {
-      return 'critical_variable';
-    }
-    
-    // OTROS - Vulnerabilidad - Fragilidad en Personas (con regla de tope por severidad)
-    if (eventName == 'Otros' && classification == 'vulnerabilidad' && subClassificationId == 'fragilidad_personas') {
-      return 'critical_variable';
-    }
-    
-    // OTROS - Vulnerabilidad - Exposición (siempre promedio ponderado, sin tope)
-    if (eventName == 'Otros' && classification == 'vulnerabilidad' && subClassificationId == 'exposicion') {
-      return 'weighted_average';
-    }
-    
-    // OTROS - Vulnerabilidad - Otras subclasificaciones (promedio ponderado)
-    if (eventName == 'Otros' && classification == 'vulnerabilidad') {
-      return 'weighted_average';
-    }
-    
-    // Incendio Forestal - todas las clasificaciones y subclasificaciones
+    // Reglas especiales para Incendio Forestal (siempre weighted_average)
     if (eventName == 'Incendio Forestal') {
+      return 'weighted_average';
+    }
+    
+    // Para Estructural probabilidad y Otros probabilidad (weighted_average, no critical)
+    if ((eventName == 'Estructural' || eventName == 'Otros') && 
+        classification == 'amenaza' && subClassificationId == 'probabilidad') {
+      return 'weighted_average';
+    }
+    
+    // Por defecto para vulnerabilidad: weighted_average
+    if (classification == 'vulnerabilidad') {
       return 'weighted_average';
     }
     
