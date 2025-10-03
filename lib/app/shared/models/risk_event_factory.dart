@@ -60,7 +60,7 @@ class RiskEventFactory {
               id: 'fragilidad_fisica',
               name: 'Fragilidad Física',
               description: 'Vulnerabilidad de infraestructura y edificaciones',
-              weight: 0.33,
+              weight: 0.45, // 45% según especificación Excel
               categories: [
                 _createCalidadMaterialesProcesos(),
                 _createEstadoConservacion(),
@@ -72,7 +72,7 @@ class RiskEventFactory {
               id: 'fragilidad_personas',
               name: 'Fragilidad en Personas',
               description: 'Vulnerabilidad de la población y capacidad de respuesta',
-              weight: 0.33,
+              weight: 0.10, // 10% según especificación Excel
               categories: [
                 _createNivelOrganizacion(),
                 _createSuficienciaEconomica(),
@@ -83,7 +83,7 @@ class RiskEventFactory {
               id: 'exposicion',
               name: 'Exposición',
               description: 'Elementos expuestos al riesgo',
-              weight: 0.34,
+              weight: 0.45, // 45% según especificación Excel
               categories: [
                 _createEdificacionesExpuestas(),
                 _createOtrosElementosExpuestos(),
@@ -191,7 +191,7 @@ class RiskEventFactory {
               id: 'fragilidad_fisica',
               name: 'Fragilidad Física',
               description: 'Vulnerabilidad de infraestructura y edificaciones ante inundación',
-              weight: 0.33,
+              weight: 0.45, // 45% según especificación Excel
               categories: [
                 _createInundacionCalidadMaterialesProcesos(),
                 _createInundacionEstadoConservacion(),
@@ -203,7 +203,7 @@ class RiskEventFactory {
               id: 'fragilidad_personas',
               name: 'Fragilidad en Personas',
               description: 'Vulnerabilidad de la población y capacidad de respuesta ante inundación',
-              weight: 0.33,
+              weight: 0.10, // 10% según especificación Excel
               categories: [
                 _createInundacionNivelOrganizacion(),
                 _createInundacionSuficienciaEconomica(),
@@ -214,7 +214,7 @@ class RiskEventFactory {
               id: 'exposicion',
               name: 'Exposición',
               description: 'Elementos expuestos al riesgo de inundación',
-              weight: 0.34,
+              weight: 0.45, // 45% según especificación Excel
               categories: [
                 _createInundacionEdificacionesExpuestas(),
                 _createInundacionOtrosElementosExpuestos(),
@@ -280,7 +280,7 @@ class RiskEventFactory {
               id: 'fragilidad_fisica',
               name: 'Fragilidad Física',
               description: 'Vulnerabilidad de infraestructura y edificaciones ante avenida torrencial',
-              weight: 0.33,
+              weight: 0.45, // 45% según especificación Excel
               categories: [
                 _createAvenidaTorrencialCalidadMaterialesProcesos(),
                 _createAvenidaTorrencialEstadoConservacion(),
@@ -292,7 +292,7 @@ class RiskEventFactory {
               id: 'fragilidad_personas',
               name: 'Fragilidad en Personas',
               description: 'Vulnerabilidad de la población y capacidad de respuesta ante avenida torrencial',
-              weight: 0.33,
+              weight: 0.10, // 10% según especificación Excel
               categories: [
                 _createAvenidaTorrencialNivelOrganizacion(),
                 _createAvenidaTorrencialSuficienciaEconomica(),
@@ -303,7 +303,7 @@ class RiskEventFactory {
               id: 'exposicion',
               name: 'Exposición',
               description: 'Elementos expuestos al riesgo de avenida torrencial',
-              weight: 0.34,
+              weight: 0.45, // 45% según especificación Excel
               categories: [
                 _createAvenidaTorrencialEdificacionesExpuestas(),
                 _createAvenidaTorrencialOtrosElementosExpuestos(),
@@ -366,7 +366,7 @@ class RiskEventFactory {
               id: 'fragilidad_fisica',
               name: 'Fragilidad Física',
               description: 'Vulnerabilidad de infraestructura y edificaciones ante eventos estructurales',
-              weight: 0.33,
+              weight: 0.45, // 45% según especificación Excel
               categories: [
                 _createEstructuralCalidadMaterialesProcesos(),
                 _createEstructuralTipologiaEstructural(),
@@ -377,7 +377,7 @@ class RiskEventFactory {
               id: 'fragilidad_personas',
               name: 'Fragilidad en Personas',
               description: 'Vulnerabilidad de la población y capacidad de respuesta ante eventos estructurales',
-              weight: 0.33,
+              weight: 0.10, // 10% según especificación Excel
               categories: [
                 _createEstructuralNivelOrganizacion(),
                 _createEstructuralSuficienciaEconomica(),
@@ -388,7 +388,7 @@ class RiskEventFactory {
               id: 'exposicion',
               name: 'Exposición',
               description: 'Elementos expuestos al riesgo de eventos estructurales',
-              weight: 0.34,
+              weight: 0.45, // 45% según especificación Excel
               categories: [
                 _createEstructuralEdificacionesExpuestas(),
                 _createEstructuralOtrosElementosExpuestos(),
@@ -419,7 +419,7 @@ class RiskEventFactory {
               id: 'probabilidad',
               name: 'Probabilidad',
               description: 'Factores que influyen en la probabilidad de ocurrencia del evento',
-              weight: 0.5,
+              weight: 0.4,
               // No hasCriticalVariable - usa promedio ponderado: SUMA(J20:J22)/SUMA(H20:H22)
               categories: [
                 _createOtrosFrecuencia(),
@@ -431,7 +431,7 @@ class RiskEventFactory {
               id: 'intensidad',
               name: 'Intensidad',
               description: 'Factores que determinan la magnitud e impacto del evento',
-              weight: 0.5,
+              weight: 0.6,
               hasCriticalVariable: true, // Variable crítica: Potencial Daño Edificaciones
               categories: [
                 _createOtrosPotencialDanoEdificaciones(),
@@ -452,7 +452,7 @@ class RiskEventFactory {
               id: 'fragilidad_fisica',
               name: 'Fragilidad Física',
               description: 'Vulnerabilidad de infraestructura y edificaciones ante eventos genéricos',
-              weight: 0.33,
+              weight: 0.45, // 45% según especificación Excel
               categories: [
                 _createOtrosCalidadMaterialesProcesos(),
                 _createOtrosEstadoConservacion(),
@@ -464,7 +464,7 @@ class RiskEventFactory {
               id: 'fragilidad_personas',
               name: 'Fragilidad en Personas',
               description: 'Vulnerabilidad de la población y capacidad de respuesta ante eventos genéricos',
-              weight: 0.33,
+              weight: 0.10, // 10% según especificación Excel
               categories: [
                 _createOtrosNivelOrganizacion(),
                 _createOtrosSuficienciaEconomica(),
@@ -475,7 +475,7 @@ class RiskEventFactory {
               id: 'exposicion',
               name: 'Exposición',
               description: 'Elementos expuestos al riesgo de eventos genéricos',
-              weight: 0.34,
+              weight: 0.45, // 45% según especificación Excel
               categories: [
                 _createOtrosEdificacionesExpuestas(),
                 _createOtrosOtrosElementosExpuestos(),
