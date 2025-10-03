@@ -233,7 +233,7 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     switch (calculationType) {
       case 'critical_variable':
         return _calculateWithCriticalVariable(subClassificationId, subSelections);
-      case ' ':
+      case 'weighted_average':
         return _calculateWeightedAverage(subClassificationId, subSelections);
       default:
         return _calculateSimpleAverage(subClassificationId, subSelections);
@@ -287,7 +287,6 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
       
       // Usar el campo hasCriticalVariable para determinar el tipo de cálculo
       if (currentSubClassification.hasCriticalVariable) {
-        print('DEBUG _getCalculationType - hasCriticalVariable: true, returning: critical_variable');
         return 'critical_variable';
       }
     } catch (e) {
@@ -312,6 +311,9 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     
     // Por defecto para vulnerabilidad: weighted_average
     if (classification == 'vulnerabilidad') {
+      if (subClassificationId == 'exposicion') {
+        print('DEBUG _getCalculationType - EXPOSICION: clasificación=vulnerabilidad, returning: weighted_average');
+      }
       return 'weighted_average';
     }
     
@@ -941,10 +943,32 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
         }
       }
       
-      return sumWi > 0 ? sumCalificacionPorWi / sumWi : 0.0;
+      final result = sumWi > 0 ? sumCalificacionPorWi / sumWi : 0.0;
+      
+      // Debug específico para exposición
+      if (subClassificationId == 'exposicion') {
+        print('DEBUG EXPOSICIÓN _calculateWeightedAverage:');
+        print('  sumCalificacionPorWi: $sumCalificacionPorWi');
+        print('  sumWi: $sumWi');
+        print('  result: $result');
+        
+        // Debug de cada categoría
+        for (final category in subClassification.categories) {
+          final selectedLevel = selections[category.title];
+          if (selectedLevel != null && selectedLevel.isNotEmpty && selectedLevel != 'NA') {
+            final calificacion = _getSelectedLevelValue(category.title, {category.title: selectedLevel});
+            print('  ${category.title}: Wi=${category.wi}, Valor=$calificacion, Calificación=${calificacion * category.wi}');
+          }
+        }
+      }
+      
+      return result;
       
     } catch (e) {
       // Fallback en caso de error
+      if (subClassificationId == 'exposicion') {
+        print('DEBUG EXPOSICIÓN - ERROR en _calculateWeightedAverage, fallback a simple_average: $e');
+      }
       return _calculateSimpleAverage(subClassificationId, selections);
     }
   }
