@@ -61,6 +61,7 @@ class RiskEventFactory {
               name: 'Fragilidad Física',
               description: 'Vulnerabilidad de infraestructura y edificaciones',
               weight: 0.45, // 45% según especificación Excel
+              hasCriticalVariable: true, // Usa la regla de tope condicional con amenaza global
               categories: [
                 _createCalidadMaterialesProcesos(),
                 _createEstadoConservacion(),
@@ -73,6 +74,7 @@ class RiskEventFactory {
               name: 'Fragilidad en Personas',
               description: 'Vulnerabilidad de la población y capacidad de respuesta',
               weight: 0.10, // 10% según especificación Excel
+              hasCriticalVariable: true, // Usa la regla de tope condicional con amenaza global
               categories: [
                 _createNivelOrganizacion(),
                 _createSuficienciaEconomica(),

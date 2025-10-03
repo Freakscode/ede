@@ -147,6 +147,13 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
                         final score = bloc.getSubClassificationScore(widget.subClassificationId);
                         final color = bloc.getSubClassificationColor(widget.subClassificationId);
                         
+                        // Debug temporal para ver qué score llega al widget
+                        if (widget.subClassificationId == 'fragilidad_fisica') {
+                          print('DEBUG WIDGET - subClassificationId: ${widget.subClassificationId}');
+                          print('DEBUG WIDGET - score recibido: $score');
+                          print('DEBUG WIDGET - score con 2 decimales: ${score.toStringAsFixed(2)}');
+                        }
+                        
                         return Container(
                           width: 50,
                           height: 32,

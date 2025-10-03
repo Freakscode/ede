@@ -245,6 +245,11 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     final eventName = state.selectedRiskEvent;
     final classification = state.selectedClassification;
     
+    print('DEBUG _getCalculationType:');
+    print('  eventName: $eventName');
+    print('  classification: $classification');
+    print('  subClassificationId: $subClassificationId');
+    
     // Obtener el evento actual usando RiskEventFactory
     RiskEventModel? currentEvent;
     switch (eventName) {
@@ -282,6 +287,7 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
       
       // Usar el campo hasCriticalVariable para determinar el tipo de cálculo
       if (currentSubClassification.hasCriticalVariable) {
+        print('DEBUG _getCalculationType - hasCriticalVariable: true, returning: critical_variable');
         return 'critical_variable';
       }
     } catch (e) {
@@ -310,7 +316,9 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     }
     
     // Por defecto: promedio simple
-    return 'simple_average';
+    final result = 'simple_average';
+    print('DEBUG _getCalculationType - returning: $result');
+    return result;
   }
 
   // Calcula usando variable crítica para eventos específicos (Inundación, Movimiento en Masa, etc.)
@@ -416,17 +424,26 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
 
   // Fórmula específica para Movimiento en Masa - Fragilidad Física
   double _calculateMovimientoEnMasaFragilidadFisica(Map<String, String> selections) {
+    print('DEBUG MM FRAGILIDAD FÍSICA - selections: $selections');
+    
     // PASO 1: Verificar regla de tope
     final amenazaGlobal = _calculateAmenazaGlobalScore();
     final potencialDanoEdificaciones = _getPotencialDanoEdificacionesFromAmenaza();
     
+    print('DEBUG MM FRAGILIDAD FÍSICA - amenazaGlobal: $amenazaGlobal');
+    print('DEBUG MM FRAGILIDAD FÍSICA - potencialDanoEdificaciones: $potencialDanoEdificaciones');
+    
     // REGLA DE TOPE: Si amenaza global ≥ 2.6 Y potencial daño edificaciones = 4 → fragilidad = 4
     if (amenazaGlobal >= 2.6 && potencialDanoEdificaciones == 4) {
+      print('DEBUG MM FRAGILIDAD FÍSICA - Aplicando regla de tope: 4.0');
       return 4.0;
     }
     
     // CASO NORMAL: Promedio ponderado de las variables de fragilidad física
-    return _calculateWeightedAverage('fragilidad_fisica', selections);
+    print('DEBUG MM FRAGILIDAD FÍSICA - Calculando promedio ponderado');
+    final result = _calculateWeightedAverage('fragilidad_fisica', selections);
+    print('DEBUG MM FRAGILIDAD FÍSICA - resultado final: $result');
+    return result;
   }
 
   // Fórmula específica para Movimiento en Masa - Fragilidad en Personas
