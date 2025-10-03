@@ -335,7 +335,7 @@ class RiskEventFactory {
               name: 'Probabilidad',
               description: 'Factores que influyen en la probabilidad de falla estructural',
               weight: 0.5,
-              hasCriticalVariable: true, // Variable crítica: Estado de Deterioro
+              // No hasCriticalVariable - usa promedio ponderado: SUMA(J20:J21)/SUMA(H20:H21)
               categories: [
                 _createEstructuralEstadoDeterioro(),
                 _createEstructuralIncrementoCargaReduccionResistencia(),
@@ -420,7 +420,7 @@ class RiskEventFactory {
               name: 'Probabilidad',
               description: 'Factores que influyen en la probabilidad de ocurrencia del evento',
               weight: 0.5,
-              hasCriticalVariable: true, // Variable crítica: Evidencias de Materialización
+              // No hasCriticalVariable - usa promedio ponderado: SUMA(J20:J22)/SUMA(H20:H22)
               categories: [
                 _createOtrosFrecuencia(),
                 _createOtrosEvidenciasMaterializacion(),

@@ -233,7 +233,7 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     switch (calculationType) {
       case 'critical_variable':
         return _calculateWithCriticalVariable(subClassificationId, subSelections);
-      case 'weighted_average':
+      case ' ':
         return _calculateWeightedAverage(subClassificationId, subSelections);
       default:
         return _calculateSimpleAverage(subClassificationId, subSelections);
@@ -1337,9 +1337,10 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
       return 0.0;
     }
     
-    // PONDERACIÓN: Aplicar pesos específicos para Movimiento en Masa:
+    // PONDERACIÓN: Aplicar pesos específicos para Movimiento en Masa según Excel:
     // Probabilidad: 40% (0.4)
     // Intensidad: 60% (0.6)
+    // Fórmula Excel: (Probabilidad*0.4) + (Intensidad*0.6)
     final probabilidadPonderada = probabilidadScore * 0.4;
     final intensidadPonderada = intensidadScore * 0.6;
     
@@ -1419,11 +1420,12 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
       return 0.0;
     }
     
-    // PONDERACIÓN: Aplicar pesos específicos para Estructural:
-    // Probabilidad: 40% (0.4) - promedio ponderado de estado de deterioro e incremento de carga
-    // Intensidad: 60% (0.6) - con variable crítica para casos críticos
-    final probabilidadPonderada = probabilidadScore * 0.4;
-    final intensidadPonderada = intensidadScore * 0.6;
+    // PONDERACIÓN: Aplicar pesos específicos para Estructural según Excel:
+    // Probabilidad: 60% (0.6) - promedio ponderado de estado de deterioro e incremento de carga
+    // Intensidad: 40% (0.4) - con variable crítica para casos críticos
+    // Fórmula Excel: (Probabilidad*0.6) + (Intensidad*0.4)
+    final probabilidadPonderada = probabilidadScore * 0.6;
+    final intensidadPonderada = intensidadScore * 0.4;
     
     final amenazaFinal = probabilidadPonderada + intensidadPonderada;
     
@@ -1446,14 +1448,12 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
       return 0.0;
     }
     
-    // PONDERACIÓN: Aplicar pesos específicos para Otros:
-    // Probabilidad: 40% (0.4) - promedio ponderado de frecuencia, evidencias y antecedentes
-    // Intensidad: 60% (0.6) - con variable crítica para casos críticos
-    // Fórmula: =+((E7*D7)+(E8*D8))
-    // E7*D7 → Probabilidad × su peso
-    // E8*D8 → Intensidad × su peso
-    final probabilidadPonderada = probabilidadScore * 0.4;
-    final intensidadPonderada = intensidadScore * 0.6;
+    // PONDERACIÓN: Aplicar pesos específicos para Otros según Excel:
+    // Probabilidad: 60% (0.6) - promedio ponderado de frecuencia, evidencias y antecedentes
+    // Intensidad: 40% (0.4) - con variable crítica para casos críticos
+    // Fórmula Excel: (Probabilidad*0.6) + (Intensidad*0.4)
+    final probabilidadPonderada = probabilidadScore * 0.6;
+    final intensidadPonderada = intensidadScore * 0.4;
     
     final amenazaFinal = probabilidadPonderada + intensidadPonderada;
     
