@@ -13,7 +13,7 @@ class FinalRiskResultsScreen extends StatelessWidget {
   
   const FinalRiskResultsScreen({
     super.key,
-    required this.eventName,
+    this.eventName = 'Evento de Prueba', // Valor por defecto para desarrollo
   });
 
   @override

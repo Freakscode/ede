@@ -72,7 +72,7 @@ class RiskMatrixWidget extends StatelessWidget {
                     // Área del heatmap con gradiente
                     Expanded(
                       child: SizedBox(
-                        height: 280,
+                        height: 200,
                         child: LayoutBuilder(
                           builder: (context, constraints) {
                             return Stack(
@@ -86,7 +86,7 @@ class RiskMatrixWidget extends StatelessWidget {
                                 // Punto de datos
                                 Positioned(
                                   left: (vulnerabilityScore / 4.0) * (constraints.maxWidth - 20) + 10,
-                                  top: 280 - (amenazaScore / 4.0) * 260 - 10,
+                                  top: 200 - (amenazaScore / 4.0) * 180 - 10,
                                   child: Container(
                                     width: 14,
                                     height: 14,
@@ -249,9 +249,9 @@ class HeatmapPainter extends CustomPainter {
       )
       ..lineTo(w, h) // 600, 280
       ..cubicTo(
-        w * 0.75, h * 0.714, // 450, 200
-        w * 0.583, h * 0.429, // 350, 120
-        w * 0.467, 0, // 280, 0
+        w * 0.45, h * 0.6, // 270, 170 - movido más a la izquierda
+        w * 0.25, h * 0.3, // 150, 85 - movido más a la izquierda
+        w * 0.2, 0, // 120, 0 - movido más a la izquierda
       )
       ..lineTo(0, 0)
       ..close();
@@ -260,17 +260,17 @@ class HeatmapPainter extends CustomPainter {
     
     // Naranja - banda superior
     final pathNaranja = Path()
-      ..moveTo(w * 0.467, 0) // 280, 0
+      ..moveTo(w * 0.2, 0) // 120, 0 - ajustado al nuevo límite amarillo
       ..cubicTo(
-        w * 0.583, h * 0.429, // 350, 120
-        w * 0.75, h * 0.714, // 450, 200
+        w * 0.25, h * 0.3, // 150, 85 - ajustado al nuevo límite amarillo
+        w * 0.45, h * 0.6, // 270, 170 - ajustado al nuevo límite amarillo
         w, h, // 600, 280
       )
-      ..lineTo(w, h * 0.536) // 600, 150
+      ..lineTo(w, h * 0.4) // 600, 113 - bajado para expandir área naranja
       ..cubicTo(
-        w * 0.867, h * 0.286, // 520, 80
-        w * 0.767, h * 0.143, // 460, 40
-        w * 0.7, 0, // 420, 0
+        w * 0.8, h * 0.2, // 480, 57 - movido hacia arriba
+        w * 0.7, h * 0.1, // 420, 28 - movido hacia arriba
+        w * 0.55, 0, // 330, 0 - expandido hacia la izquierda
       )
       ..close();
     
@@ -278,11 +278,11 @@ class HeatmapPainter extends CustomPainter {
     
     // Rojo - esquina superior derecha
     final pathRojo = Path()
-      ..moveTo(w * 0.7, 0) // 420, 0
+      ..moveTo(w * 0.55, 0) // 330, 0 - ajustado al nuevo límite naranja
       ..cubicTo(
-        w * 0.767, h * 0.143, // 460, 40
-        w * 0.867, h * 0.286, // 520, 80
-        w, h * 0.536, // 600, 150
+        w * 0.7, h * 0.1, // 420, 28 - ajustado al nuevo límite naranja
+        w * 0.8, h * 0.2, // 480, 57 - ajustado al nuevo límite naranja
+        w, h * 0.4, // 600, 113 - ajustado al nuevo límite naranja
       )
       ..lineTo(w, 0)
       ..close();
