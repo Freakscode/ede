@@ -6,6 +6,7 @@ import '../../bloc/risk_threat_analysis_bloc.dart';
 import '../../bloc/risk_threat_analysis_state.dart';
 import '../../../home/bloc/home_bloc.dart';
 import '../../../home/bloc/home_event.dart';
+import '../widgets/risk_matrix_widget.dart';
 
 class FinalRiskResultsScreen extends StatelessWidget {
   final String eventName;
@@ -86,7 +87,7 @@ class FinalRiskResultsScreen extends StatelessWidget {
                 const SizedBox(height: 24),
                 
                 // Matriz de riesgo
-                _buildRiskMatrix(state),
+                RiskMatrixWidget(state: state),
                 
                 const SizedBox(height: 40),
                 
@@ -354,125 +355,7 @@ class FinalRiskResultsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildRiskMatrix(RiskThreatAnalysisState state) {
-    // Obtener las coordenadas del punto en la matriz
-    double amenazaScore = _getAmenazaScore(state);
-    double vulnerabilityScore = _getVulnerabilityScore(state);
-    
-    return Container(
-      constraints: const BoxConstraints(maxWidth: 600),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Barra de colores superior
-          Container(
-            height: 4,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Color(0xFF10B981), // Verde
-                  Color(0xFFFBBF24), // Amarillo
-                  Color(0xFFFB923C), // Naranja
-                  Color(0xFFEF4444), // Rojo
-                ],
-              ),
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(12),
-                topRight: Radius.circular(12),
-              ),
-            ),
-          ),
-          
-          // Contenedor principal del heatmap
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: const BorderRadius.only(
-                bottomLeft: Radius.circular(12),
-                bottomRight: Radius.circular(12),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Column(
-              children: [
-                // Área del heatmap con gradiente
-                SizedBox(
-                  height: 280,
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      return Stack(
-                        children: [
-                          // Gradiente de fondo
-                          CustomPaint(
-                            size: Size.infinite,
-                            painter: HeatmapPainter(),
-                          ),
-                          
-                          // Punto de datos
-                          Positioned(
-                            left: (vulnerabilityScore / 4.0) * (constraints.maxWidth - 100) + 50,
-                            top: 280 - (amenazaScore / 4.0) * 240 - 20,
-                            child: Container(
-                              width: 14,
-                              height: 14,
-                              decoration: const BoxDecoration(
-                                color: Colors.black,
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                          ),
-                          
-                          // Label "Amenaza"
-                          Positioned(
-                            left: 16,
-                            top: 0,
-                            bottom: 0,
-                            child: Center(
-                              child: RotatedBox(
-                                quarterTurns: 3,
-                                child: Text(
-                                  'Amenaza',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.grey[900],
-                                    fontFamily: 'Work Sans',
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      );
-                    },
-                  ),
-                ),
-                
-                // Label "Vulnerabilidad"
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  child: Text(
-                    'Vulnerabilidad',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey[800],
-                      fontFamily: 'Work Sans',
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+
 
   Widget _buildBottomButtons(BuildContext context) {
     return Row(
@@ -634,78 +517,4 @@ class FinalRiskResultsScreen extends StatelessWidget {
     if (score < 3.5) return 'MEDIO - ALTO';
     return 'ALTO';
   }
-}
-
-class HeatmapPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final w = size.width;
-    final h = size.height;
-    
-    // Verde - esquina inferior izquierda
-    final pathVerde = Path()
-      ..moveTo(0, h)
-      ..lineTo(0, h * 0.286) // 80/280
-      ..cubicTo(
-        w * 0.133, h * 0.571, // 80, 160
-        w * 0.3, h * 0.857, // 180, 240
-        w * 0.6, h, // 360, 280
-      )
-      ..close();
-    
-    canvas.drawPath(pathVerde, Paint()..color = const Color(0xFF10B981));
-    
-    // Amarillo - banda central amplia
-    final pathAmarillo = Path()
-      ..moveTo(0, h * 0.286) // 0, 80
-      ..cubicTo(
-        w * 0.133, h * 0.571, // 80, 160
-        w * 0.3, h * 0.857, // 180, 240
-        w * 0.6, h, // 360, 280
-      )
-      ..lineTo(w, h) // 600, 280
-      ..cubicTo(
-        w * 0.75, h * 0.714, // 450, 200
-        w * 0.583, h * 0.429, // 350, 120
-        w * 0.467, 0, // 280, 0
-      )
-      ..lineTo(0, 0)
-      ..close();
-    
-    canvas.drawPath(pathAmarillo, Paint()..color = const Color(0xFFEAB308));
-    
-    // Naranja - banda superior
-    final pathNaranja = Path()
-      ..moveTo(w * 0.467, 0) // 280, 0
-      ..cubicTo(
-        w * 0.583, h * 0.429, // 350, 120
-        w * 0.75, h * 0.714, // 450, 200
-        w, h, // 600, 280
-      )
-      ..lineTo(w, h * 0.536) // 600, 150
-      ..cubicTo(
-        w * 0.867, h * 0.286, // 520, 80
-        w * 0.767, h * 0.143, // 460, 40
-        w * 0.7, 0, // 420, 0
-      )
-      ..close();
-    
-    canvas.drawPath(pathNaranja, Paint()..color = const Color(0xFFF97316));
-    
-    // Rojo - esquina superior derecha
-    final pathRojo = Path()
-      ..moveTo(w * 0.7, 0) // 420, 0
-      ..cubicTo(
-        w * 0.767, h * 0.143, // 460, 40
-        w * 0.867, h * 0.286, // 520, 80
-        w, h * 0.536, // 600, 150
-      )
-      ..lineTo(w, 0)
-      ..close();
-    
-    canvas.drawPath(pathRojo, Paint()..color = const Color(0xFFEF4444));
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
