@@ -71,16 +71,20 @@ class RiskMatrixWidget extends StatelessWidget {
                     
                     // Área del heatmap con gradiente
                     Expanded(
-                      child: SizedBox(
+                      child: Container(
                         height: 200,
+                        
                         child: LayoutBuilder(
                           builder: (context, constraints) {
                             return Stack(
                               children: [
                                 // Gradiente de fondo
-                                CustomPaint(
-                                  size: Size.infinite,
-                                  painter: HeatmapPainter(),
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: CustomPaint(
+                                    size: Size.infinite,
+                                    painter: HeatmapPainter(),
+                                  ),
                                 ),
                                 
                                 // Punto de datos
