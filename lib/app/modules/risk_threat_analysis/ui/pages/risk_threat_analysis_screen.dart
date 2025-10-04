@@ -55,14 +55,14 @@ class _RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final List<Widget> screens = [
-      RatingScreen(navigationData: widget.navigationData),
-      const EvidenceScreen(),
-      const RatingResultsScreen(),
-    ];
-
     return BlocBuilder<RiskThreatAnalysisBloc, RiskThreatAnalysisState>(
         builder: (context, state) {
+          final List<Widget> screens = [
+            RatingScreen(navigationData: widget.navigationData),
+            const EvidenceScreen(),
+            const RatingResultsScreen(),
+          ];
+          
           return Scaffold(
             appBar:  CustomAppBar(
               showBack: true,
