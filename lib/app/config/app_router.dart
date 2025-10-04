@@ -4,6 +4,7 @@
 import 'dart:async';
 
 import 'package:caja_herramientas/app/modules/risk_threat_analysis/ui/pages/risk_threat_analysis_screen.dart';
+import 'package:caja_herramientas/app/modules/risk_threat_analysis/ui/pages/final_risk_results_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -62,6 +63,14 @@ GoRouter getAppRouter(BuildContext context) {
           }
         },
       ),
+      GoRoute(
+        path: '/final_risk_results',
+        builder: (context, state) {
+          final eventName = state.extra as String;
+          return FinalRiskResultsScreen(eventName: eventName);
+        },
+      ),
+
 
 
 
