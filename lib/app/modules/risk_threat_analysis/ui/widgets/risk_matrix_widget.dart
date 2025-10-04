@@ -268,8 +268,8 @@ class HeatmapPainter extends CustomPainter {
       )
       ..lineTo(w, h * 0.4) // 600, 113 - bajado para expandir área naranja
       ..cubicTo(
-        w * 0.8, h * 0.2, // 480, 57 - movido hacia arriba
-        w * 0.7, h * 0.1, // 420, 28 - movido hacia arriba
+        w * 0.75, h * 0.35, // 450, 98 - curva convexa hacia afuera
+        w * 0.65, h * 0.15, // 390, 42 - curva convexa hacia afuera
         w * 0.55, 0, // 330, 0 - expandido hacia la izquierda
       )
       ..close();
@@ -280,8 +280,8 @@ class HeatmapPainter extends CustomPainter {
     final pathRojo = Path()
       ..moveTo(w * 0.55, 0) // 330, 0 - ajustado al nuevo límite naranja
       ..cubicTo(
-        w * 0.7, h * 0.1, // 420, 28 - ajustado al nuevo límite naranja
-        w * 0.8, h * 0.2, // 480, 57 - ajustado al nuevo límite naranja
+        w * 0.65, h * 0.15, // 390, 42 - curva convexa hacia afuera (coincide con naranja)
+        w * 0.75, h * 0.35, // 450, 98 - curva convexa hacia afuera (coincide con naranja)
         w, h * 0.4, // 600, 113 - ajustado al nuevo límite naranja
       )
       ..lineTo(w, 0)

@@ -61,30 +61,30 @@ class FinalRiskResultsScreen extends StatelessWidget {
                 
                 const SizedBox(height: 24),
                 
-                // Dropdown de escala de afectación
-                _buildScaleDropdown(),
+                // // Dropdown de escala de afectación
+                // _buildScaleDropdown(),
                 
-                const SizedBox(height: 24),
+                // const SizedBox(height: 24),
                 
-                // Sección de Calificación Vulnerabilidad
-                _buildVulnerabilitySection(state),
+                // // Sección de Calificación Vulnerabilidad
+                // _buildVulnerabilitySection(state),
                 
-                const SizedBox(height: 16),
+                // const SizedBox(height: 16),
                 
-                // Botón "Ir a Análisis de la Vulnerabilidad"
-                _buildVulnerabilityButton(context),
+                // // Botón "Ir a Análisis de la Vulnerabilidad"
+                // _buildVulnerabilityButton(context),
                 
-                const SizedBox(height: 24),
+                // const SizedBox(height: 24),
                 
-                // Sección de Nivel de Riesgo
-                _buildRiskLevelSection(state),
+                // // Sección de Nivel de Riesgo
+                // _buildRiskLevelSection(state),
                 
-                const SizedBox(height: 24),
+                // const SizedBox(height: 24),
                 
-                // Escala de colores
-                _buildColorScale(),
+                // // Escala de colores
+                // _buildColorScale(),
                 
-                const SizedBox(height: 24),
+                // const SizedBox(height: 24),
                 
                 // Matriz de riesgo
                 RiskMatrixWidget(state: state),
