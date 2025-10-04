@@ -237,7 +237,7 @@ class HeatmapPainter extends CustomPainter {
       )
       ..close();
     
-    canvas.drawPath(pathVerde, Paint()..color = const Color(0xFF10B981));
+    canvas.drawPath(pathVerde, Paint()..color = const Color(0xFF22C55E));
     
     // Amarillo - banda central amplia
     final pathAmarillo = Path()
@@ -257,7 +257,7 @@ class HeatmapPainter extends CustomPainter {
       ..lineTo(0, 0)
       ..close();
     
-    canvas.drawPath(pathAmarillo, Paint()..color = const Color(0xFFEAB308));
+    canvas.drawPath(pathAmarillo, Paint()..color = const Color(0xFFFDE047));
     
     // Naranja - banda superior
     final pathNaranja = Path()
@@ -275,7 +275,7 @@ class HeatmapPainter extends CustomPainter {
       )
       ..close();
     
-    canvas.drawPath(pathNaranja, Paint()..color = const Color(0xFFF97316));
+    canvas.drawPath(pathNaranja, Paint()..color = const Color(0xFFFB923C));
     
     // Rojo - esquina superior derecha
     final pathRojo = Path()
@@ -288,7 +288,7 @@ class HeatmapPainter extends CustomPainter {
       ..lineTo(w, 0)
       ..close();
     
-    canvas.drawPath(pathRojo, Paint()..color = const Color(0xFFEF4444));
+    canvas.drawPath(pathRojo, Paint()..color = const Color(0xFFDC2626));
   }
 
   @override
