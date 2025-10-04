@@ -247,7 +247,8 @@ class HeatmapPainter extends CustomPainter {
         w * 0.3, h * 0.857, // 180, 240
         w * 0.6, h, // 360, 280
       )
-      ..lineTo(w, h) // 600, 280
+      ..lineTo(w, h) // 600, 280 - ir a esquina inferior derecha
+      ..lineTo(w, 150) // 600, 150 - subir hasta línea naranja
       ..cubicTo(
         w * 0.45, h * 0.6, // 270, 170 - movido más a la izquierda
         w * 0.25, h * 0.3, // 150, 85 - movido más a la izquierda
@@ -264,7 +265,7 @@ class HeatmapPainter extends CustomPainter {
       ..cubicTo(
         w * 0.25, h * 0.3, // 150, 85 - ajustado al nuevo límite amarillo
         w * 0.45, h * 0.6, // 270, 170 - ajustado al nuevo límite amarillo
-        w, h, // 600, 280
+        w, 150, // 600, 280
       )
       ..lineTo(w, h * 0.4) // 600, 113 - bajado para expandir área naranja
       ..cubicTo(
