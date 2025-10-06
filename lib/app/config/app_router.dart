@@ -30,7 +30,7 @@ import 'routes.dart';
 /// Creates and configures the application router with clean architecture
 GoRouter getAppRouter(BuildContext context) {
   return GoRouter(
-    initialLocation: '/final_risk_results',
+    initialLocation: '/risk_threat_analysis',
     routes: [
       GoRoute(
         path: '/splash',
@@ -63,13 +63,7 @@ GoRouter getAppRouter(BuildContext context) {
           }
         },
       ),
-      GoRoute(
-        path: '/final_risk_results',
-        builder: (context, state) {
-          final eventName = state.extra as String?;
-          return FinalRiskResultsScreen(eventName: eventName ?? 'Evento de Prueba');
-        },
-      ),
+      
 
 
 
