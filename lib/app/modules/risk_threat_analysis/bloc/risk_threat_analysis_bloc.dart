@@ -44,9 +44,31 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     SelectProbabilidad event,
     Emitter<RiskThreatAnalysisState> emit,
   ) {
+    print('DEBUG Probabilidad: ${event.probabilidad}');
+    
+    // Actualizar las dynamicSelections para usar el sistema correcto
+    final currentSelections = Map<String, Map<String, String>>.from(state.dynamicSelections);
+    if (!currentSelections.containsKey('probabilidad')) {
+      currentSelections['probabilidad'] = <String, String>{};
+    }
+    currentSelections['probabilidad']!['Probabilidad'] = event.probabilidad;
+    
+    // Calcular score usando el sistema correcto
+    final probabilidadScore = _calculateSubClassificationScore('probabilidad', currentSelections);
+    print('DEBUG Probabilidad Score calculado: $probabilidadScore');
+    
+    final updatedScores = Map<String, double>.from(state.subClassificationScores);
+    updatedScores['probabilidad'] = probabilidadScore;
+    
+    final updatedColors = Map<String, Color>.from(state.subClassificationColors);
+    updatedColors['probabilidad'] = _getScoreColor(probabilidadScore);
+    
     emit(state.copyWith(
       selectedProbabilidad: event.probabilidad,
-      isProbabilidadDropdownOpen: false, 
+      isProbabilidadDropdownOpen: false,
+      dynamicSelections: currentSelections,
+      subClassificationScores: updatedScores,
+      subClassificationColors: updatedColors,
     ));
   }
 
@@ -54,9 +76,31 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     SelectIntensidad event,
     Emitter<RiskThreatAnalysisState> emit,
   ) {
+    print('DEBUG Intensidad: ${event.intensidad}');
+    
+    // Actualizar las dynamicSelections para usar el sistema correcto
+    final currentSelections = Map<String, Map<String, String>>.from(state.dynamicSelections);
+    if (!currentSelections.containsKey('intensidad')) {
+      currentSelections['intensidad'] = <String, String>{};
+    }
+    currentSelections['intensidad']!['Intensidad'] = event.intensidad;
+    
+    // Calcular score usando el sistema correcto
+    final intensidadScore = _calculateSubClassificationScore('intensidad', currentSelections);
+    print('DEBUG Intensidad Score calculado: $intensidadScore');
+    
+    final updatedScores = Map<String, double>.from(state.subClassificationScores);
+    updatedScores['intensidad'] = intensidadScore;
+    
+    final updatedColors = Map<String, Color>.from(state.subClassificationColors);
+    updatedColors['intensidad'] = _getScoreColor(intensidadScore);
+    
     emit(state.copyWith(
       selectedIntensidad: event.intensidad,
-      isIntensidadDropdownOpen: false, 
+      isIntensidadDropdownOpen: false,
+      dynamicSelections: currentSelections,
+      subClassificationScores: updatedScores,
+      subClassificationColors: updatedColors,
     ));
   }
 
@@ -127,13 +171,26 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
       Map<String, String> newIntensidadSelections = state.intensidadSelections;
       Map<String, Map<String, String>> newDynamicSelections = state.dynamicSelections;
       
+      // CRÍTICO: Preservar subClassificationScores existentes
+      Map<String, double> preservedScores = Map<String, double>.from(state.subClassificationScores);
+      Map<String, Color> preservedColors = Map<String, Color>.from(state.subClassificationColors);
+      
       if (event.classification.toLowerCase() == 'amenaza') {
+        // Al cambiar a amenaza, limpiar solo las selecciones de vulnerabilidad
+        // pero preservar los scores de amenaza (probabilidad, intensidad)
+        final vulnerabilidadKeys = newDynamicSelections.keys
+            .where((key) => key != 'probabilidad' && key != 'intensidad')
+            .toList();
         
-        newProbabilidadSelections = {};
-        newIntensidadSelections = {};
+        for (final key in vulnerabilidadKeys) {
+          newDynamicSelections.remove(key);
+          preservedScores.remove(key);
+          preservedColors.remove(key);
+        }
         
       } else if (event.classification.toLowerCase() == 'vulnerabilidad') {
-        newDynamicSelections = {};
+        // Al cambiar a vulnerabilidad, preservar los scores de amenaza
+        // No eliminar probabilidad e intensidad de dynamicSelections ni de scores
       }
       
       emit(state.copyWith(
@@ -142,6 +199,8 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
         intensidadSelections: newIntensidadSelections,
         dropdownOpenStates: {}, 
         dynamicSelections: newDynamicSelections,
+        subClassificationScores: preservedScores,
+        subClassificationColors: preservedColors,
         currentBottomNavIndex: 0, 
       ));
     } else {
@@ -584,7 +643,10 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
   }
   
   double calculateAmenazaGlobalScore() {
-    return _calculateAmenazaGlobalScore();
+    print('DEBUG calculateAmenazaGlobalScore called');
+    final result = _calculateAmenazaGlobalScore();
+    print('DEBUG calculateAmenazaGlobalScore result: $result');
+    return result;
   }
 
   double _calculateAmenazaGlobalScore() {
@@ -720,6 +782,8 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     }
     return 0;
   }
+
+
   Color _getScoreColor(double score) {
     if (score == 0) {
       return Colors.transparent; 
@@ -998,7 +1062,12 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     
     final probabilidadScore = state.subClassificationScores['probabilidad'] ?? 0.0;
     final intensidadScore = state.subClassificationScores['intensidad'] ?? 0.0;
+    print('DEBUG Amenaza Calc - Prob: $probabilidadScore, Int: $intensidadScore');
+    print('DEBUG subClassificationScores: ${state.subClassificationScores}');
+    print('DEBUG selectedClassification: ${state.selectedClassification}');
+    print('DEBUG dynamicSelections keys: ${state.dynamicSelections.keys.toList()}');
     if (probabilidadScore == 0.0 || intensidadScore == 0.0) {
+      print('DEBUG Amenaza Calc - Returning 0.0 because one score is 0');
       return 0.0;
     }
     
