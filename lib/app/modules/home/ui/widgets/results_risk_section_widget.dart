@@ -23,8 +23,13 @@ class ResultsRiskSectionWidget extends StatelessWidget {
     
     return GestureDetector(
       onTap: bothCompleted ? () {
-        // Navegar a la pantalla de resultados finales
-        context.go('/final_risk_results', extra: selectedEvent);
+        // Navegar a la pantalla de análisis de riesgo con navigationData
+        final navigationData = {
+          'event': selectedEvent,
+          'finalResults': true,
+          'targetIndex': 3,
+        };
+        context.go('/risk_threat_analysis', extra: navigationData);
       } : null,
       child: Container(
         padding: const EdgeInsets.symmetric(

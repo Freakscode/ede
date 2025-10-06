@@ -20,6 +20,19 @@ class RiskMatrixWidget extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          // Leyenda de colores
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _buildLegendItem('BAJO', const Color(0xFF22C55E)),
+              _buildLegendItem('MEDIO\nBAJO', const Color(0xFFFDE047)),
+              _buildLegendItem('MEDIO\nALTO', const Color(0xFFFB923C)),
+              _buildLegendItem('ALTO', const Color(0xFFDC2626)),
+            ],
+          ),
+          
+          const SizedBox(height: 16),
+          
           // Barra de colores superior
           Container(
             height: 4,
@@ -60,10 +73,13 @@ class RiskMatrixWidget extends StatelessWidget {
                         quarterTurns: 3,
                         child: Text(
                           'Amenaza',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.grey[800],
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            color: Color(0xFF000000),
                             fontFamily: 'Work Sans',
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            height: 16/14, // 114.286% line height
                           ),
                         ),
                       ),
@@ -114,10 +130,13 @@ class RiskMatrixWidget extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   child: Text(
                     'Vulnerabilidad',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey[800],
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      color: Color(0xFF000000),
                       fontFamily: 'Work Sans',
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      height: 16/14, // 114.286% line height
                     ),
                   ),
                 ),
@@ -221,6 +240,37 @@ class RiskMatrixWidget extends StatelessWidget {
         final parsed = double.tryParse(selection);
         return parsed ?? 0.0;
     }
+  }
+
+  Widget _buildLegendItem(String text, Color color) {
+    return Container(
+      width: 80,
+      height: 40,
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(8),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Center(
+        child: Text(
+          text,
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            color: Color(0xFF1E1E1E), // Textos
+            fontFamily: 'Work Sans',
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            height: 16/12, // 133.333% line height
+          ),
+        ),
+      ),
+    );
   }
 }
 

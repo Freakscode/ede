@@ -37,15 +37,26 @@ class _RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
         bloc.add(UpdateSelectedRiskEvent(widget.selectedEvent!));
       }
       
-      // Si tenemos navigationData con clasificación, procesarla
+      // Si tenemos navigationData, procesarla
       if (widget.navigationData != null) {
+        final eventFromNavData = widget.navigationData!['event'] as String?;
         final classificationName = widget.navigationData!['classification'] as String?;
         final directToResults = widget.navigationData!['directToResults'] as bool? ?? false;
+        final finalResults = widget.navigationData!['finalResults'] as bool? ?? false;
+        final targetIndex = widget.navigationData!['targetIndex'] as int?;
         
-        if (classificationName != null) {
-          // Si debe ir directo a resultados, ir al índice 2, sino al 0
-          final targetIndex = directToResults ? 2 : 0;
+        // Actualizar el evento si viene en navigationData
+        if (eventFromNavData != null && eventFromNavData.isNotEmpty) {
+          bloc.add(UpdateSelectedRiskEvent(eventFromNavData));
+        }
+        
+        if (finalResults && targetIndex != null) {
+          // Navegar directamente al índice específico (para resultados finales)
           bloc.add(ChangeBottomNavIndex(targetIndex));
+        } else if (classificationName != null) {
+          // Lógica original para clasificaciones
+          final navIndex = directToResults ? 2 : 0;
+          bloc.add(ChangeBottomNavIndex(navIndex));
           
           // Aplicar la nueva clasificación
           bloc.add(SelectClassification(classificationName));

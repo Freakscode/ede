@@ -24,7 +24,7 @@ class RiskThreatAnalysisState {
     this.isIntensidadDropdownOpen = false,
     this.selectedProbabilidad,
     this.selectedIntensidad,
-    this.currentBottomNavIndex = 0,
+    this.currentBottomNavIndex = 3,
     this.probabilidadSelections = const {},
     this.intensidadSelections = const {},
     this.selectedRiskEvent = 'Movimiento en Masa', // Default
