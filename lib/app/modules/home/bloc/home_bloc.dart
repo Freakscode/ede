@@ -2,6 +2,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:caja_herramientas/app/core/icons/app_icons.dart';
 import 'package:caja_herramientas/app/shared/models/risk_event_factory.dart';
 import 'package:caja_herramientas/app/shared/models/risk_event_model.dart';
+import 'package:caja_herramientas/app/shared/models/form_data_model.dart';
+import 'package:caja_herramientas/app/shared/services/form_persistence_service.dart';
 import '../../home/services/tutorial_overlay_service.dart';
 import 'home_event.dart';
 import 'home_state.dart';
@@ -92,6 +94,131 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       
       emit(state.copyWith(completedEvaluations: updatedCompletedEvaluations));
     });
+
+    // ======= NUEVOS HANDLERS PARA GESTIÓN DE FORMULARIOS =======
+    
+    on<LoadForms>(_onLoadForms);
+    on<SaveForm>(_onSaveForm);
+    on<DeleteForm>(_onDeleteForm);
+    on<LoadFormForEditing>(_onLoadFormForEditing);
+    on<CompleteForm>(_onCompleteForm);
+  }
+
+  // ======= HANDLERS PARA GESTIÓN DE FORMULARIOS =======
+  
+  Future<void> _onLoadForms(LoadForms event, Emitter<HomeState> emit) async {
+    emit(state.copyWith(isLoadingForms: true));
+    
+    try {
+      final formService = FormPersistenceService();
+      final forms = await formService.getAllForms();
+      
+      emit(state.copyWith(
+        savedForms: forms,
+        isLoadingForms: false,
+      ));
+    } catch (e) {
+      print('Error loading forms: $e');
+      emit(state.copyWith(isLoadingForms: false));
+    }
+  }
+
+  Future<void> _onSaveForm(SaveForm event, Emitter<HomeState> emit) async {
+    try {
+      final formService = FormPersistenceService();
+      
+      // Buscar formulario existente o crear uno nuevo
+      FormDataModel? existingForm;
+      final activeFormId = await formService.getActiveFormId();
+      
+      if (activeFormId != null) {
+        existingForm = await formService.getFormById(activeFormId);
+      }
+
+      // Calcular progreso
+      final progress = formService.calculateProgress(event.formData);
+      final threatProgress = formService.calculateThreatProgress(event.formData);
+      final vulnerabilityProgress = formService.calculateVulnerabilityProgress(event.formData);
+
+      FormDataModel formToSave;
+      if (existingForm != null) {
+        // Actualizar formulario existente
+        formToSave = existingForm.copyWith(
+          riskAnalysisData: event.formData,
+          progressPercentage: progress,
+          threatProgress: threatProgress,
+          vulnerabilityProgress: vulnerabilityProgress,
+          lastModified: DateTime.now(),
+        );
+      } else {
+        // Crear nuevo formulario
+        final formId = formService.generateFormId();
+        formToSave = FormDataModel(
+          id: formId,
+          title: 'Análisis de Riesgo - ${event.eventName}',
+          eventType: event.eventName,
+          formType: FormType.riskAnalysis,
+          status: FormStatus.inProgress,
+          createdAt: DateTime.now(),
+          lastModified: DateTime.now(),
+          progressPercentage: progress,
+          threatProgress: threatProgress,
+          vulnerabilityProgress: vulnerabilityProgress,
+          riskAnalysisData: event.formData,
+        );
+        
+        // Establecer como formulario activo
+        await formService.setActiveForm(formId);
+      }
+
+      // Guardar formulario
+      await formService.saveForm(formToSave);
+      
+      // Recargar formularios
+      add(LoadForms());
+      
+    } catch (e) {
+      print('Error saving form: $e');
+    }
+  }
+
+  Future<void> _onDeleteForm(DeleteForm event, Emitter<HomeState> emit) async {
+    try {
+      final formService = FormPersistenceService();
+      await formService.deleteForm(event.formId);
+      
+      // Recargar formularios
+      add(LoadForms());
+      
+    } catch (e) {
+      print('Error deleting form: $e');
+    }
+  }
+
+  Future<void> _onLoadFormForEditing(LoadFormForEditing event, Emitter<HomeState> emit) async {
+    try {
+      final formService = FormPersistenceService();
+      await formService.setActiveForm(event.formId);
+      
+      emit(state.copyWith(activeFormId: event.formId));
+      
+    } catch (e) {
+      print('Error loading form for editing: $e');
+    }
+  }
+
+  Future<void> _onCompleteForm(CompleteForm event, Emitter<HomeState> emit) async {
+    try {
+      final formService = FormPersistenceService();
+      await formService.markFormAsCompleted(event.formId);
+      await formService.clearActiveForm();
+      
+      // Recargar formularios
+      add(LoadForms());
+      
+    } catch (e) {
+      print('Error completing form: $e');
+    }
   }
 
   /// Mapea los nombres de eventos a sus iconos correspondientes

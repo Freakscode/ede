@@ -10,6 +10,7 @@ class FormCardInProgress extends StatelessWidget {
   final double progress;
   final double threat;
   final double vulnerability;
+  final VoidCallback? onDelete;
 
   const FormCardInProgress({
     super.key,
@@ -19,6 +20,7 @@ class FormCardInProgress extends StatelessWidget {
     required this.progress,
     required this.threat,
     required this.vulnerability,
+    this.onDelete,
   });
 
   @override
@@ -76,7 +78,7 @@ class FormCardInProgress extends StatelessWidget {
                           BlendMode.srcIn,
                         ),
                       ),
-                      onPressed: () {},
+                      onPressed: onDelete,
                     ),
                   ),
                 ],

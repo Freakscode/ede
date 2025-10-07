@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import '../../../shared/models/form_data_model.dart';
 
 class HomeState extends Equatable {
   final int selectedIndex;
@@ -12,6 +13,11 @@ class HomeState extends Equatable {
   final String selectedRiskEvent;
   final String? selectedRiskCategory;
   final Map<String, bool> completedEvaluations; // Track de evaluaciones completadas por evento
+  
+  // ======= NUEVOS CAMPOS PARA GESTIÓN DE FORMULARIOS =======
+  final List<FormDataModel> savedForms;
+  final bool isLoadingForms;
+  final String? activeFormId;
 
   const HomeState({
     required this.selectedIndex,
@@ -25,6 +31,9 @@ class HomeState extends Equatable {
     this.selectedRiskEvent = 'Movimiento en Masa',
     this.selectedRiskCategory,
     this.completedEvaluations = const {},
+    this.savedForms = const [],
+    this.isLoadingForms = false,
+    this.activeFormId,
   });
 
   HomeState copyWith({
@@ -39,6 +48,9 @@ class HomeState extends Equatable {
     String? selectedRiskEvent,
     String? selectedRiskCategory,
     Map<String, bool>? completedEvaluations,
+    List<FormDataModel>? savedForms,
+    bool? isLoadingForms,
+    String? activeFormId,
   }) {
     return HomeState(
       selectedIndex: selectedIndex ?? this.selectedIndex,
@@ -52,9 +64,37 @@ class HomeState extends Equatable {
       selectedRiskEvent: selectedRiskEvent ?? this.selectedRiskEvent,
       selectedRiskCategory: selectedRiskCategory ?? this.selectedRiskCategory,
       completedEvaluations: completedEvaluations ?? this.completedEvaluations,
+      savedForms: savedForms ?? this.savedForms,
+      isLoadingForms: isLoadingForms ?? this.isLoadingForms,
+      activeFormId: activeFormId ?? this.activeFormId,
     );
   }
 
   @override
-  List<Object?> get props => [selectedIndex, mostrarEventosRiesgo, mostrarCategoriasRiesgo, tutorialShown, showTutorial, notificationsEnabled, darkModeEnabled, selectedLanguage, selectedRiskEvent, selectedRiskCategory, completedEvaluations];
+  List<Object?> get props => [
+        selectedIndex,
+        mostrarEventosRiesgo,
+        mostrarCategoriasRiesgo,
+        tutorialShown,
+        showTutorial,
+        notificationsEnabled,
+        darkModeEnabled,
+        selectedLanguage,
+        selectedRiskEvent,
+        selectedRiskCategory,
+        completedEvaluations,
+        savedForms,
+        isLoadingForms,
+        activeFormId,
+      ];
+
+  // Métodos de conveniencia para filtrar formularios
+  List<FormDataModel> get inProgressForms => 
+      savedForms.where((form) => form.status == FormStatus.inProgress).toList();
+
+  List<FormDataModel> get completedForms => 
+      savedForms.where((form) => form.status == FormStatus.completed).toList();
+
+  List<FormDataModel> get riskAnalysisForms => 
+      savedForms.where((form) => form.formType == FormType.riskAnalysis).toList();
 }

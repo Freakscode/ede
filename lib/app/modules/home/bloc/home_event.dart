@@ -83,3 +83,44 @@ class MarkEvaluationCompleted extends HomeEvent {
   @override
   List<Object?> get props => [eventName, classificationType];
 }
+
+// ======= NUEVOS EVENTOS PARA GESTIÓN DE FORMULARIOS =======
+
+class LoadForms extends HomeEvent {}
+
+class SaveForm extends HomeEvent {
+  final String eventName;
+  final Map<String, dynamic> formData;
+  
+  const SaveForm(this.eventName, this.formData);
+
+  @override
+  List<Object?> get props => [eventName, formData];
+}
+
+class DeleteForm extends HomeEvent {
+  final String formId;
+  
+  const DeleteForm(this.formId);
+
+  @override
+  List<Object?> get props => [formId];
+}
+
+class LoadFormForEditing extends HomeEvent {
+  final String formId;
+  
+  const LoadFormForEditing(this.formId);
+
+  @override
+  List<Object?> get props => [formId];
+}
+
+class CompleteForm extends HomeEvent {
+  final String formId;
+  
+  const CompleteForm(this.formId);
+
+  @override
+  List<Object?> get props => [formId];
+}

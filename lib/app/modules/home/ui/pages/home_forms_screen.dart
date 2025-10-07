@@ -4,6 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import 'package:caja_herramientas/app/modules/home/ui/widgets/form_card_in_progress.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import '../../bloc/home_bloc.dart';
+import '../../bloc/home_event.dart';
+import '../../bloc/home_state.dart';
+import '../../../../shared/models/form_data_model.dart';
 
 class HomeFormsScreen extends StatefulWidget {
   const HomeFormsScreen({super.key});
@@ -16,10 +22,38 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
   int _tabIndex = 0;
 
   @override
+  void initState() {
+    super.initState();
+    _loadForms();
+  }
+
+  void _loadForms() {
+    // Cargar formularios
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<HomeBloc>().add(LoadForms());
+    });
+  }
+
+  @override
+  void didUpdateWidget(HomeFormsScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Recargar formularios cuando el widget se actualiza
+    _loadForms();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return ListView(
-      padding: const EdgeInsets.symmetric(horizontal: 10),
-      children: [
+    return BlocBuilder<HomeBloc, HomeState>(
+      builder: (context, state) {
+        return RefreshIndicator(
+          onRefresh: () async {
+            context.read<HomeBloc>().add(LoadForms());
+            // Esperar un poco para que se complete la carga
+            await Future.delayed(const Duration(milliseconds: 500));
+          },
+          child: ListView(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            children: [
         const SizedBox(height: 28),
         const Center(
           child: Text(
@@ -147,8 +181,8 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Text(
             _tabIndex == 0
-                ? '2 formularios en proceso'
-                : '0 formularios finalizados',
+                ? '${state.inProgressForms.length} formularios en proceso'
+                : '${state.completedForms.length} formularios finalizados',
             style: const TextStyle(
               color: Colors.black,
               fontFamily: 'Work Sans',
@@ -159,39 +193,150 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
           ),
         ),
         const SizedBox(height: 16),
-        if (_tabIndex == 0) ...[
-          FormCardInProgress(
-            title: 'Análisis de Riesgo - Avenidas torrenciales',
-            lastEdit: '19-08-25',
-            tag: 'Avenidas torrenciales',
-            progress: 0.15,
-            threat: 0.10,
-            vulnerability: 0.20,
+        if (state.isLoadingForms) ...[
+          const Center(
+            child: Padding(
+              padding: EdgeInsets.all(32.0),
+              child: CircularProgressIndicator(),
+            ),
           ),
-          const SizedBox(height: 16),
-          FormCardInProgress(
-            title: 'Análisis de Riesgo - Movimientos en masa',
-            lastEdit: '19-08-25',
-            tag: 'Movimientos en masa',
-            progress: 0.485,
-            threat: 0.32,
-            vulnerability: 0.65,
-          ),
+        ] else if (_tabIndex == 0) ...[
+          // Formularios en proceso
+          ...state.inProgressForms.asMap().entries.map((entry) {
+            final index = entry.key;
+            final form = entry.value;
+            return Column(
+              children: [
+                if (index > 0) const SizedBox(height: 16),
+                GestureDetector(
+                  onTap: () => _navigateToForm(context, form),
+                  child: FormCardInProgress(
+                    title: form.title,
+                    lastEdit: form.formattedLastModified,
+                    tag: form.eventType,
+                    progress: form.progressPercentage,
+                    threat: form.threatProgress,
+                    vulnerability: form.vulnerabilityProgress,
+                    onDelete: () => _deleteForm(context, form.id, form.title),
+                  ),
+                ),
+              ],
+            );
+          }).toList(),
         ] else ...[
-          FormCardCompleted(
-            title: 'Análisis de Riesgo - Estructural',
-            lastEdit: '19-08-25',
-            tag: 'Estructural',
-          ),
-          const SizedBox(height: 16),
-          FormCardCompleted(
-            title: 'Análisis de Riesgo - Inundación',
-            lastEdit: '19-08-25',
-            tag: 'Inundación',
-          ),
+          // Formularios completados
+          ...state.completedForms.asMap().entries.map((entry) {
+            final index = entry.key;
+            final form = entry.value;
+            return Column(
+              children: [
+                if (index > 0) const SizedBox(height: 16),
+                GestureDetector(
+                  onTap: () => _viewCompletedForm(context, form),
+                  child: FormCardCompleted(
+                    title: form.title,
+                    lastEdit: form.formattedLastModified,
+                    tag: form.eventType,
+                  ),
+                ),
+              ],
+            );
+          }).toList(),
         ],
         const SizedBox(height: 24),
       ],
+          ),
+        );
+      },
+    );
+  }
+
+  // Métodos de navegación y acciones
+  void _navigateToForm(BuildContext context, FormDataModel form) {
+    // Cargar formulario para edición
+    context.read<HomeBloc>().add(LoadFormForEditing(form.id));
+    
+    // Navegar a la pantalla de análisis de riesgo
+    final navigationData = {
+      'event': form.eventType,
+      'loadExisting': true,
+      'formId': form.id,
+    };
+    context.go('/risk_threat_analysis', extra: navigationData);
+  }
+
+  void _viewCompletedForm(BuildContext context, FormDataModel form) {
+    // Para formularios completados, navegar directamente a resultados finales
+    final navigationData = {
+      'event': form.eventType,
+      'finalResults': true,
+      'targetIndex': 3,
+      'readOnly': true,
+      'formId': form.id,
+    };
+    context.go('/risk_threat_analysis', extra: navigationData);
+  }
+
+  void _deleteForm(BuildContext context, String formId, String formTitle) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text(
+            'Eliminar formulario',
+            style: TextStyle(
+              color: DAGRDColors.azulDAGRD,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          content: Text(
+            '¿Estás seguro de que deseas eliminar el formulario "$formTitle"?\n\nEsta acción no se puede deshacer.',
+            style: const TextStyle(
+              fontSize: 16,
+              height: 1.4,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.grey[600],
+              ),
+              child: const Text('Cancelar'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                context.read<HomeBloc>().add(DeleteForm(formId));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Formulario "$formTitle" eliminado'),
+                    backgroundColor: Colors.red,
+                    action: SnackBarAction(
+                      label: 'Deshacer',
+                      textColor: Colors.white,
+                      onPressed: () {
+                        // TODO: Implementar deshacer eliminación
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Función de deshacer no disponible'),
+                            backgroundColor: Colors.orange,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+              ),
+              child: const Text('Eliminar'),
+            ),
+          ],
+        );
+      },
     );
   }
 }
