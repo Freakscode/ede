@@ -18,6 +18,12 @@ class RiskThreatAnalysisState {
   // Cálculos dinámicos por subclasificación
   final Map<String, double> subClassificationScores;
   final Map<String, Color> subClassificationColors;
+  
+  // Persistencia de formularios
+  final String? activeFormId;
+  final bool isSaving;
+  final bool isLoading;
+  final DateTime? lastSaved;
 
   const RiskThreatAnalysisState({
     this.isProbabilidadDropdownOpen = false,
@@ -33,6 +39,10 @@ class RiskThreatAnalysisState {
     this.dynamicSelections = const {},
     this.subClassificationScores = const {},
     this.subClassificationColors = const {},
+    this.activeFormId,
+    this.isSaving = false,
+    this.isLoading = false,
+    this.lastSaved,
   });
 
   RiskThreatAnalysisState copyWith({
@@ -49,6 +59,10 @@ class RiskThreatAnalysisState {
     Map<String, Map<String, String>>? dynamicSelections,
     Map<String, double>? subClassificationScores,
     Map<String, Color>? subClassificationColors,
+    String? activeFormId,
+    bool? isSaving,
+    bool? isLoading,
+    DateTime? lastSaved,
   }) {
     return RiskThreatAnalysisState(
       isProbabilidadDropdownOpen: isProbabilidadDropdownOpen ?? this.isProbabilidadDropdownOpen,
@@ -64,6 +78,10 @@ class RiskThreatAnalysisState {
       dynamicSelections: dynamicSelections ?? this.dynamicSelections,
       subClassificationScores: subClassificationScores ?? this.subClassificationScores,
       subClassificationColors: subClassificationColors ?? this.subClassificationColors,
+      activeFormId: activeFormId ?? this.activeFormId,
+      isSaving: isSaving ?? this.isSaving,
+      isLoading: isLoading ?? this.isLoading,
+      lastSaved: lastSaved ?? this.lastSaved,
     );
   }
 }

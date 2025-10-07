@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:caja_herramientas/app/shared/models/models.dart';
+import 'package:caja_herramientas/app/shared/models/form_data_model.dart';
+import 'package:caja_herramientas/app/shared/services/form_persistence_service.dart';
 import 'risk_threat_analysis_event.dart';
 import 'risk_threat_analysis_state.dart';
 
@@ -18,6 +20,11 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     on<SelectClassification>(_onSelectClassification);
     on<ToggleDynamicDropdown>(_onToggleDynamicDropdown);
     on<UpdateDynamicSelection>(_onUpdateDynamicSelection);
+    on<SaveCurrentFormData>(_onSaveCurrentFormData);
+    on<LoadFormData>(_onLoadFormData);
+    on<ResetToNewForm>(_onResetToNewForm);
+    on<CompleteForm>(_onCompleteForm);
+    on<AutoSaveProgress>(_onAutoSaveProgress);
   }
 
   void _onToggleProbabilidadDropdown(
@@ -126,6 +133,9 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     updatedSelections[event.category] = event.level;
     
     emit(state.copyWith(probabilidadSelections: updatedSelections));
+    
+    // Auto-guardar progreso
+    add(AutoSaveProgress());
   }
 
   void _onUpdateIntensidadSelection(
@@ -136,6 +146,9 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     updatedSelections[event.category] = event.level;
     
     emit(state.copyWith(intensidadSelections: updatedSelections));
+    
+    // Auto-guardar progreso
+    add(AutoSaveProgress());
   }
 
   void _onUpdateSelectedRiskEvent(
@@ -144,16 +157,43 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
   ) {
     
     if (state.selectedRiskEvent != event.riskEvent) {
+      print('🔄 Nuevo evento seleccionado: ${event.riskEvent}. Limpiando TODO el estado para nuevo formulario');
+      
+      // Nuevo evento seleccionado - RESETEAR COMPLETAMENTE TODO EL ESTADO
       emit(state.copyWith(
+        // Evento nuevo
         selectedRiskEvent: event.riskEvent,
         
+        // Limpiar clasificación - volver al default
+        selectedClassification: 'amenaza', // Volver a amenaza por defecto
+        
+        // Resetear formulario
+        activeFormId: null, // Resetear para crear un nuevo formulario
+        lastSaved: null,
+        isSaving: false,
+        isLoading: false,
+        
+        // Limpiar TODAS las selecciones
         probabilidadSelections: {},
         intensidadSelections: {},
-        dropdownOpenStates: {}, 
-        dynamicSelections: {}, 
+        dynamicSelections: {},
+        
+        // Limpiar estados de UI
+        dropdownOpenStates: {},
+        isProbabilidadDropdownOpen: false,
+        isIntensidadDropdownOpen: false,
+        selectedProbabilidad: null,
+        selectedIntensidad: null,
+        
+        // Limpiar cálculos y scores
+        subClassificationScores: {},
+        subClassificationColors: {},
+        
+        // Resetear navegación a la primera pestaña
+        currentBottomNavIndex: 0,
       ));
     } else {
-      
+      // Mismo evento - solo actualizar sin cambios
       emit(state.copyWith(
         selectedRiskEvent: event.riskEvent,
       ));
@@ -247,6 +287,9 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
       subClassificationScores: updatedScores,
       subClassificationColors: updatedColors,
     ));
+    
+    // Auto-guardar progreso
+    add(AutoSaveProgress());
   }
   Map<String, double> _calculateAllSubClassificationScores(Map<String, Map<String, String>> selections) {
     final scores = <String, double>{};
@@ -1479,6 +1522,261 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
         return state.intensidadSelections;
       default:
         return state.dynamicSelections[subClassificationId] ?? {};
+    }
+  }
+
+  // Métodos de persistencia de formularios
+  Future<void> _onSaveCurrentFormData(
+    SaveCurrentFormData event,
+    Emitter<RiskThreatAnalysisState> emit,
+  ) async {
+    emit(state.copyWith(isSaving: true));
+    
+    try {
+      final formData = _createFormDataFromCurrentState();
+      
+      // Generar ID único basado en evento y timestamp para evitar sobrescritura
+      String formId;
+      if (state.activeFormId != null) {
+        // Si ya existe un activeFormId, usarlo (para actualizar formulario existente)
+        formId = state.activeFormId!;
+        print('📝 Actualizando formulario existente: $formId');
+      } else {
+        // Nuevo formulario: generar ID único con evento y timestamp
+        final timestamp = DateTime.now().millisecondsSinceEpoch;
+        final eventSafe = state.selectedRiskEvent.replaceAll(' ', '_').toLowerCase();
+        formId = '${eventSafe}_$timestamp';
+        print('✨ Creando NUEVO formulario: $formId para evento: ${state.selectedRiskEvent}');
+      }
+      
+      // Actualizar el formData con el ID correcto
+      final FormDataModel updatedFormData = formData.copyWith(id: formId);
+      
+      await FormPersistenceService().saveForm(updatedFormData);
+      
+      emit(state.copyWith(
+        isSaving: false,
+        activeFormId: formId,
+        lastSaved: DateTime.now(),
+      ));
+    } catch (e) {
+      print('Error saving form data: $e');
+      emit(state.copyWith(isSaving: false));
+    }
+  }
+
+  Future<void> _onLoadFormData(
+    LoadFormData event,
+    Emitter<RiskThreatAnalysisState> emit,
+  ) async {
+    emit(state.copyWith(isLoading: true));
+    
+    try {
+      final formData = await FormPersistenceService().getFormById(event.formId);
+      if (formData != null) {
+        emit(_createStateFromFormData(formData).copyWith(
+          isLoading: false,
+          activeFormId: event.formId,
+        ));
+      } else {
+        emit(state.copyWith(isLoading: false));
+      }
+    } catch (e) {
+      emit(state.copyWith(isLoading: false));
+    }
+  }
+
+  Future<void> _onResetToNewForm(
+    ResetToNewForm event,
+    Emitter<RiskThreatAnalysisState> emit,
+  ) async {
+    print('🆕 RESET COMPLETO - Nuevo formulario para: ${event.eventType}');
+    print('   ✨ Limpiando TODO: selecciones, scores, formularios previos');
+    print('   📋 Estado inicial: Amenaza, primera pestaña, sin datos');
+    
+    // Resetear COMPLETAMENTE todo el estado para un formulario nuevo
+    emit(RiskThreatAnalysisState(
+      selectedRiskEvent: event.eventType,
+      selectedClassification: 'amenaza', // Siempre empezar con amenaza
+      currentBottomNavIndex: 0, // Ir a la primera pestaña
+      // Todos los demás valores toman los defaults del constructor
+    ));
+  }
+
+  Future<void> _onCompleteForm(
+    CompleteForm event,
+    Emitter<RiskThreatAnalysisState> emit,
+  ) async {
+    if (state.activeFormId == null) return;
+    
+    emit(state.copyWith(isSaving: true));
+    
+    try {
+      final formData = _createFormDataFromCurrentState();
+      final completedFormData = formData.copyWith(
+        status: FormStatus.completed,
+        lastModified: DateTime.now(),
+        progressPercentage: 100.0,
+      );
+      
+      await FormPersistenceService().saveForm(completedFormData);
+      
+      emit(state.copyWith(
+        isSaving: false,
+        lastSaved: DateTime.now(),
+      ));
+    } catch (e) {
+      emit(state.copyWith(isSaving: false));
+    }
+  }
+
+  Future<void> _onAutoSaveProgress(
+    AutoSaveProgress event,
+    Emitter<RiskThreatAnalysisState> emit,
+  ) async {
+    if (state.activeFormId != null) {
+      add(SaveCurrentFormData());
+    }
+  }
+
+  // Método para crear FormDataModel desde el estado actual
+  FormDataModel _createFormDataFromCurrentState() {
+    final now = DateTime.now();
+    return FormDataModel(
+      id: state.activeFormId ?? now.millisecondsSinceEpoch.toString(),
+      title: 'Análisis de Riesgo - ${state.selectedRiskEvent}',
+      eventType: state.selectedRiskEvent,
+      formType: FormType.riskAnalysis,
+      status: FormStatus.inProgress,
+      createdAt: now,
+      lastModified: now,
+      progressPercentage: _calculateProgressPercentage(),
+      threatProgress: _calculateThreatProgress(),
+      vulnerabilityProgress: _calculateVulnerabilityProgress(),
+      riskAnalysisData: {
+        'selectedRiskEvent': state.selectedRiskEvent,
+        'selectedClassification': state.selectedClassification,
+        'probabilidadSelections': state.probabilidadSelections,
+        'intensidadSelections': state.intensidadSelections,
+        'dynamicSelections': state.dynamicSelections,
+        'subClassificationScores': state.subClassificationScores.map(
+          (key, value) => MapEntry(key, value.toString()),
+        ),
+      },
+      edeData: const {},
+    );
+  }
+
+  // Método para crear estado desde FormDataModel
+  RiskThreatAnalysisState _createStateFromFormData(FormDataModel formData) {
+    final riskData = formData.riskAnalysisData;
+    
+    return state.copyWith(
+      selectedRiskEvent: riskData['selectedRiskEvent'] as String? ?? state.selectedRiskEvent,
+      selectedClassification: riskData['selectedClassification'] as String? ?? state.selectedClassification,
+      probabilidadSelections: Map<String, String>.from(
+        riskData['probabilidadSelections'] as Map? ?? {},
+      ),
+      intensidadSelections: Map<String, String>.from(
+        riskData['intensidadSelections'] as Map? ?? {},
+      ),
+      dynamicSelections: (riskData['dynamicSelections'] as Map?)?.map(
+        (key, value) => MapEntry(
+          key.toString(),
+          Map<String, String>.from(value as Map),
+        ),
+      ) ?? {},
+      subClassificationScores: (riskData['subClassificationScores'] as Map?)?.map(
+        (key, value) => MapEntry(
+          key.toString(),
+          double.tryParse(value.toString()) ?? 0.0,
+        ),
+      ) ?? {},
+    );
+  }
+
+  // Métodos de cálculo de progreso
+  double _calculateProgressPercentage() {
+    // Calcular progreso basado en las selecciones realizadas
+    double total = 0.0;
+    double completed = 0.0;
+    
+    // Si tenemos clasificación seleccionada, eso cuenta como progreso inicial
+    if (state.selectedClassification.isNotEmpty) {
+      completed += 0.5; // Progreso base por tener clasificación
+    }
+    
+    // Contar probabilidad y intensidad como base
+    total += 2;
+    if (state.probabilidadSelections.isNotEmpty) completed += 1;
+    if (state.intensidadSelections.isNotEmpty) completed += 1;
+    
+    // Agregar selecciones dinámicas
+    final expectedSelections = _getExpectedSelectionsForRiskEvent();
+    total += expectedSelections.length;
+    for (final selection in expectedSelections) {
+      if (state.dynamicSelections[selection]?.isNotEmpty == true) {
+        completed += 1;
+      }
+    }
+    
+    // Asegurar que siempre haya al menos un mínimo de progreso cuando se inicia
+    final progress = total > 0 ? (completed / (total + 0.5)) * 100.0 : 0.0;
+    
+    // Si hay alguna selección pero el progreso es muy bajo, garantizar un mínimo del 5%
+    if (progress > 0 && progress < 5.0) {
+      return 5.0;
+    }
+    
+    return progress;
+  }
+
+  double _calculateThreatProgress() {
+    if (state.selectedClassification != 'amenaza') return 0.0;
+    
+    double total = 2.0; // probabilidad + intensidad
+    double completed = 0.0;
+    
+    if (state.probabilidadSelections.isNotEmpty) completed += 1;
+    if (state.intensidadSelections.isNotEmpty) completed += 1;
+    
+    return total > 0 ? (completed / total) * 100.0 : 0.0;
+  }
+
+  double _calculateVulnerabilityProgress() {
+    if (state.selectedClassification != 'vulnerabilidad') return 0.0;
+    
+    final expectedSelections = _getExpectedSelectionsForRiskEvent();
+    if (expectedSelections.isEmpty) return 0.0;
+    
+    double completed = 0.0;
+    for (final selection in expectedSelections) {
+      if (state.dynamicSelections[selection]?.isNotEmpty == true) {
+        completed += 1;
+      }
+    }
+    
+    return (completed / expectedSelections.length) * 100.0;
+  }
+
+  List<String> _getExpectedSelectionsForRiskEvent() {
+    switch (state.selectedRiskEvent) {
+      case 'Movimiento en Masa':
+        return ['social', 'economico', 'ambiental', 'fisico'];
+      case 'Inundación':
+        return ['social', 'economico', 'ambiental', 'fisico'];
+      case 'Avenida Torrencial':
+        return ['social', 'economico', 'ambiental', 'fisico'];
+      case 'Incendio de Cobertura Vegetal':
+        return ['social', 'economico', 'ambiental', 'fisico'];
+      case 'Sismo':
+        return ['social', 'economico', 'ambiental', 'fisico'];
+      case 'Vendaval':
+        return ['social', 'economico', 'ambiental', 'fisico'];
+      case 'Granizada':
+        return ['social', 'economico', 'ambiental', 'fisico'];
+      default:
+        return [];
     }
   }
 

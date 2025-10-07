@@ -68,3 +68,22 @@ class UpdateDynamicSelection extends RiskThreatAnalysisEvent {
   
   UpdateDynamicSelection(this.subClassificationId, this.category, this.level);
 }
+
+// Eventos para persistencia de formularios
+class SaveCurrentFormData extends RiskThreatAnalysisEvent {}
+
+class LoadFormData extends RiskThreatAnalysisEvent {
+  final String formId;
+  
+  LoadFormData(this.formId);
+}
+
+class ResetToNewForm extends RiskThreatAnalysisEvent {
+  final String eventType;
+  
+  ResetToNewForm(this.eventType);
+}
+
+class CompleteForm extends RiskThreatAnalysisEvent {}
+
+class AutoSaveProgress extends RiskThreatAnalysisEvent {}

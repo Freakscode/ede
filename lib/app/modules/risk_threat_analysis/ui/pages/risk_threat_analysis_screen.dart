@@ -37,6 +37,21 @@ class _RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
         bloc.add(UpdateSelectedRiskEvent(widget.selectedEvent!));
       }
       
+      // Manejar carga o creación de formulario
+      if (widget.navigationData != null) {
+        final formId = widget.navigationData!['formId'] as String?;
+        final isNewForm = widget.navigationData!['isNewForm'] as bool? ?? false;
+        final eventFromNavData = widget.navigationData!['event'] as String?;
+        
+        if (formId != null) {
+          // Cargar formulario existente
+          bloc.add(LoadFormData(formId));
+        } else if (isNewForm && eventFromNavData != null) {
+          // NUEVO FORMULARIO - Resetear completamente todo el estado
+          bloc.add(ResetToNewForm(eventFromNavData));
+        }
+      }
+      
       // Si tenemos navigationData, procesarla
       if (widget.navigationData != null) {
         final eventFromNavData = widget.navigationData!['event'] as String?;
@@ -94,6 +109,22 @@ class _RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
               showProfile: true,
             ),
             body: SingleChildScrollView(child: screens[state.currentBottomNavIndex]),
+            floatingActionButton: state.currentBottomNavIndex == 2 // Solo en resultados
+                ? FloatingActionButton.extended(
+                    onPressed: () {
+                      context.read<RiskThreatAnalysisBloc>().add(CompleteForm());
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Formulario completado y guardado'),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+                    },
+                    label: const Text('Completar'),
+                    icon: const Icon(Icons.check),
+                    backgroundColor: DAGRDColors.azulDAGRD,
+                  )
+                : null,
             bottomNavigationBar: CustomBottomNavBar(
               currentIndex: state.currentBottomNavIndex,
               onTap: (index) {

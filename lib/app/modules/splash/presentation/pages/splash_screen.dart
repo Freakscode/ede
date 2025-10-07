@@ -17,6 +17,9 @@ class _SplashScreenState extends State<SplashScreen>
   late AnimationController _fadeController;
   late Animation<double> _logoAnimation;
   late Animation<double> _fadeAnimation;
+  
+  Timer? _fadeTimer;
+  Timer? _navigationTimer;
 
   @override
   void initState() {
@@ -42,33 +45,54 @@ class _SplashScreenState extends State<SplashScreen>
       end: 1.0,
     ).animate(CurvedAnimation(parent: _fadeController, curve: Curves.easeIn));
 
+    // Configurar listener para secuencia de animación
+    _logoController.addStatusListener((status) {
+      if (status == AnimationStatus.completed && mounted) {
+        // Cuando termine la animación del logo, iniciar fade después de un delay
+        _fadeTimer = Timer(const Duration(milliseconds: 500), () {
+          if (mounted) {
+            _fadeController.forward();
+          }
+        });
+      }
+    });
+
+    _fadeController.addStatusListener((status) {
+      if (status == AnimationStatus.completed && mounted) {
+        // Cuando termine el fade, navegar después de un delay
+        _navigationTimer = Timer(const Duration(milliseconds: 2000), () {
+          if (mounted) {
+            context.go('/home');
+          }
+        });
+      }
+    });
+
     // Iniciar secuencia de animación
     _startAnimationSequence();
   }
 
-  void _startAnimationSequence() async {
-    // Iniciar animación del logo
-    await _logoController.forward();
-
-    // Esperar un momento
-    await Future.delayed(const Duration(milliseconds: 500));
-
-    // Iniciar fade de texto
-    await _fadeController.forward();
-
-    // Esperar antes de navegar
-    await Future.delayed(const Duration(milliseconds: 2000));
-
-    // Navegar a home
+  void _startAnimationSequence() {
+    // Solo iniciar la primera animación, los listeners manejan el resto
     if (mounted) {
-      context.go('/home');
+      _logoController.forward();
     }
   }
 
   @override
   void dispose() {
+    // Cancelar timers si están activos
+    _fadeTimer?.cancel();
+    _navigationTimer?.cancel();
+    
+    // Detener las animaciones antes de hacer dispose
+    _logoController.stop();
+    _fadeController.stop();
+    
+    // Hacer dispose de los controllers
     _logoController.dispose();
     _fadeController.dispose();
+    
     super.dispose();
   }
 

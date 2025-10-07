@@ -10,6 +10,7 @@ import '../../bloc/risk_threat_analysis_event.dart';
 import '../../bloc/risk_threat_analysis_state.dart';
 import '../widgets/progress_bar_widget.dart';
 import '../widgets/navigation_buttons_widget.dart';
+import '../widgets/save_progress_button.dart';
 
 class RatingScreen extends StatefulWidget {
   final Map<String, dynamic>? navigationData;
@@ -295,42 +296,7 @@ class _RatingScreenState extends State<RatingScreen> {
               ),
               const SizedBox(height: 24),
               // Botón Guardar avance
-              SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    // Acción para guardar avance
-                  },
-                  icon: SvgPicture.asset(
-                    AppIcons.save,
-                    width: 20,
-                    height: 20,
-                    colorFilter: const ColorFilter.mode(
-                      DAGRDColors.blancoDAGRD,
-                      BlendMode.srcIn,
-                    ),
-                  ),
-                  label: const Text(
-                    'Guardar avance',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Color(0xFFFFFFFF), // #FFF
-                      fontFamily: 'Work Sans',
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      height: 24 / 14, // line-height: 171.429%
-                    ),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF2563EB),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    elevation: 0,
-                  ),
-                ),
-              ),
+              const SaveProgressButton(),
               const SizedBox(height: 40),
               // Botones de navegación
               BlocBuilder<RiskThreatAnalysisBloc, RiskThreatAnalysisState>(

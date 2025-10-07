@@ -11,6 +11,7 @@ import '../../bloc/risk_threat_analysis_bloc.dart';
 import '../../bloc/risk_threat_analysis_state.dart';
 import '../widgets/info_note_widget.dart';
 import '../widgets/image_upload_area_widget.dart';
+import '../widgets/save_progress_button.dart';
 
 class EvidenceScreen extends StatefulWidget {
   const EvidenceScreen({super.key});
@@ -132,40 +133,7 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
               const SizedBox(height: 14),
               const ProgressBarWidget(),
               const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: ElevatedButton.icon(
-                  onPressed: () {},
-                  icon: SvgPicture.asset(
-                    AppIcons.save,
-                    width: 20,
-                    height: 20,
-                    colorFilter: const ColorFilter.mode(
-                      DAGRDColors.blancoDAGRD,
-                      BlendMode.srcIn,
-                    ),
-                  ),
-                  label: const Text(
-                    'Guardar avance',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Color(0xFFFFFFFF),
-                      fontFamily: 'Work Sans',
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      height: 24 / 14,
-                    ),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF2563EB),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    elevation: 0,
-                  ),
-                ),
-              ),
+              const SaveProgressButton(),
               const SizedBox(height: 40),
               NavigationButtonsWidget(
                 currentIndex: state.currentBottomNavIndex,
