@@ -27,11 +27,7 @@ class FormCardInProgress extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('DEBUG FormCardInProgress BUILD:');
-    print('  - title: $title');
-    print('  - progress: $progress (${(progress * 100).toStringAsFixed(1)}%)');
-    print('  - threat: $threat (${(threat * 100).toStringAsFixed(1)}%)');
-    print('  - vulnerability: $vulnerability (${(vulnerability * 100).toStringAsFixed(1)}%)');
+   
     
     return Container(
       padding: const EdgeInsets.all(16),

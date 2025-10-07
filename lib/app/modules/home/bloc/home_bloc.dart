@@ -119,7 +119,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         isLoadingForms: false,
       ));
     } catch (e) {
-      print('Error loading forms: $e');
       emit(state.copyWith(isLoadingForms: false));
     }
   }
@@ -141,10 +140,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       final threatProgress = formService.calculateThreatProgress(event.formData);
       final vulnerabilityProgress = formService.calculateVulnerabilityProgress(event.formData);
       
-      print('DEBUG HOME BLOC PROGRESS:');
-      print('  - Progress: $progress (${(progress * 100).toStringAsFixed(1)}%)');
-      print('  - Threat: $threatProgress (${(threatProgress * 100).toStringAsFixed(1)}%)');
-      print('  - Vulnerability: $vulnerabilityProgress (${(vulnerabilityProgress * 100).toStringAsFixed(1)}%)');
 
       FormDataModel formToSave;
       if (existingForm != null) {
@@ -184,7 +179,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       add(LoadForms());
       
     } catch (e) {
-      print('Error saving form: $e');
     }
   }
 
@@ -197,7 +191,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       add(LoadForms());
       
     } catch (e) {
-      print('Error deleting form: $e');
     }
   }
 
@@ -209,7 +202,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       emit(state.copyWith(activeFormId: event.formId));
       
     } catch (e) {
-      print('Error loading form for editing: $e');
     }
   }
 
@@ -223,7 +215,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       add(LoadForms());
       
     } catch (e) {
-      print('Error completing form: $e');
     }
   }
 

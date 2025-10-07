@@ -51,7 +51,6 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     SelectProbabilidad event,
     Emitter<RiskThreatAnalysisState> emit,
   ) {
-    print('DEBUG Probabilidad: ${event.probabilidad}');
     
     // Actualizar las dynamicSelections para usar el sistema correcto
     final currentSelections = Map<String, Map<String, String>>.from(state.dynamicSelections);
@@ -62,7 +61,6 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     
     // Calcular score usando el sistema correcto
     final probabilidadScore = _calculateSubClassificationScore('probabilidad', currentSelections);
-    print('DEBUG Probabilidad Score calculado: $probabilidadScore');
     
     final updatedScores = Map<String, double>.from(state.subClassificationScores);
     updatedScores['probabilidad'] = probabilidadScore;
@@ -83,7 +81,6 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     SelectIntensidad event,
     Emitter<RiskThreatAnalysisState> emit,
   ) {
-    print('DEBUG Intensidad: ${event.intensidad}');
     
     // Actualizar las dynamicSelections para usar el sistema correcto
     final currentSelections = Map<String, Map<String, String>>.from(state.dynamicSelections);
@@ -94,7 +91,6 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     
     // Calcular score usando el sistema correcto
     final intensidadScore = _calculateSubClassificationScore('intensidad', currentSelections);
-    print('DEBUG Intensidad Score calculado: $intensidadScore');
     
     final updatedScores = Map<String, double>.from(state.subClassificationScores);
     updatedScores['intensidad'] = intensidadScore;
@@ -157,7 +153,6 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
   ) {
     
     if (state.selectedRiskEvent != event.riskEvent) {
-      print('🔄 Nuevo evento seleccionado: ${event.riskEvent}. Limpiando TODO el estado para nuevo formulario');
       
       // Nuevo evento seleccionado - RESETEAR COMPLETAMENTE TODO EL ESTADO
       emit(state.copyWith(
@@ -327,10 +322,6 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     final eventName = state.selectedRiskEvent;
     final classification = state.selectedClassification;
     
-    print('DEBUG _getCalculationType:');
-    print('  eventName: $eventName');
-    print('  classification: $classification');
-    print('  subClassificationId: $subClassificationId');
     RiskEventModel? currentEvent;
     switch (eventName) {
       case 'Movimiento en Masa':
@@ -382,12 +373,10 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     }
     if (classification == 'vulnerabilidad') {
       if (subClassificationId == 'exposicion') {
-        print('DEBUG _getCalculationType - EXPOSICION: clasificación=vulnerabilidad, returning: weighted_average');
       }
       return 'weighted_average';
     }
     final result = 'simple_average';
-    print('DEBUG _getCalculationType - returning: $result');
     return result;
   }
   double _calculateWithCriticalVariable(String subClassificationId, Map<String, String> selections) {
@@ -468,19 +457,13 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     return _calculateWeightedAverage('intensidad', selections);
   }
   double _calculateMovimientoEnMasaFragilidadFisica(Map<String, String> selections) {
-    print('DEBUG MM FRAGILIDAD FÍSICA - selections: $selections');
     final amenazaGlobal = _calculateAmenazaGlobalScore();
     final potencialDanoEdificaciones = _getPotencialDanoEdificacionesFromAmenaza();
     
-    print('DEBUG MM FRAGILIDAD FÍSICA - amenazaGlobal: $amenazaGlobal');
-    print('DEBUG MM FRAGILIDAD FÍSICA - potencialDanoEdificaciones: $potencialDanoEdificaciones');
     if (amenazaGlobal >= 2.6 && potencialDanoEdificaciones == 4) {
-      print('DEBUG MM FRAGILIDAD FÍSICA - Aplicando regla de tope: 4.0');
       return 4.0;
     }
-    print('DEBUG MM FRAGILIDAD FÍSICA - Calculando promedio ponderado');
     final result = _calculateWeightedAverage('fragilidad_fisica', selections);
-    print('DEBUG MM FRAGILIDAD FÍSICA - resultado final: $result');
     return result;
   }
   double _calculateMovimientoEnMasaFragilidadPersonas(Map<String, String> selections) {
@@ -686,9 +669,7 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
   }
   
   double calculateAmenazaGlobalScore() {
-    print('DEBUG calculateAmenazaGlobalScore called');
     final result = _calculateAmenazaGlobalScore();
-    print('DEBUG calculateAmenazaGlobalScore result: $result');
     return result;
   }
 
@@ -750,15 +731,10 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
       
       final result = sumWi > 0 ? sumCalificacionPorWi / sumWi : 0.0;
       if (subClassificationId == 'exposicion') {
-        print('DEBUG EXPOSICIÓN _calculateWeightedAverage:');
-        print('  sumCalificacionPorWi: $sumCalificacionPorWi');
-        print('  sumWi: $sumWi');
-        print('  result: $result');
         for (final category in subClassification.categories) {
           final selectedLevel = selections[category.title];
           if (selectedLevel != null && selectedLevel.isNotEmpty && selectedLevel != 'NA') {
             final calificacion = _getSelectedLevelValue(category.title, {category.title: selectedLevel});
-            print('  ${category.title}: Wi=${category.wi}, Valor=$calificacion, Calificación=${calificacion * category.wi}');
           }
         }
       }
@@ -768,7 +744,6 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     } catch (e) {
       
       if (subClassificationId == 'exposicion') {
-        print('DEBUG EXPOSICIÓN - ERROR en _calculateWeightedAverage, fallback a simple_average: $e');
       }
       return _calculateSimpleAverage(subClassificationId, selections);
     }
@@ -1536,13 +1511,11 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
       if (state.activeFormId != null) {
         // Si ya existe un activeFormId, usarlo (para actualizar formulario existente)
         formId = state.activeFormId!;
-        print('📝 Actualizando formulario existente: $formId');
       } else {
         // Nuevo formulario: generar ID único con evento y timestamp
         final timestamp = DateTime.now().millisecondsSinceEpoch;
         final eventSafe = state.selectedRiskEvent.replaceAll(' ', '_').toLowerCase();
         formId = '${eventSafe}_$timestamp';
-        print('✨ Creando NUEVO formulario: $formId para evento: ${state.selectedRiskEvent}');
       }
       
       // Actualizar el formData con el ID correcto
@@ -1556,7 +1529,6 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
         lastSaved: DateTime.now(),
       ));
     } catch (e) {
-      print('Error saving form data: $e');
       emit(state.copyWith(isSaving: false));
     }
   }
@@ -1641,12 +1613,6 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     final threatProgress = _calculateThreatProgress();
     final vulnerabilityProgress = _calculateVulnerabilityProgress();
     
-    print('DEBUG _createFormDataFromCurrentState:');
-    print('  - progressPercentage: $progressPercentage');
-    print('  - threatProgress: $threatProgress');
-    print('  - vulnerabilityProgress: $vulnerabilityProgress');
-    print('  - selectedRiskEvent: ${state.selectedRiskEvent}');
-    print('  - selectedClassification: ${state.selectedClassification}');
     
     return FormDataModel(
       id: state.activeFormId ?? now.millisecondsSinceEpoch.toString(),
@@ -1703,111 +1669,72 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
 
   // Métodos de cálculo de progreso
   double _calculateProgressPercentage() {
-    print('DEBUG RiskThreatAnalysisBloc _calculateProgressPercentage:');
     
-    // Calcular progreso basado en las selecciones realizadas
-    double total = 0.0;
-    double completed = 0.0;
+    // Calcular progreso basado en componentes ponderados
+    double progress = 0.0;
     
-    // Si tenemos clasificación seleccionada, eso cuenta como progreso inicial
-    if (state.selectedClassification.isNotEmpty) {
-      completed += 0.5; // Progreso base por tener clasificación
-      print('  - Classification selected: ${state.selectedClassification} (+0.5)');
+    // 1. Selección de evento (15% del total)
+    if (state.selectedRiskEvent.isNotEmpty && state.selectedRiskEvent != 'No seleccionado') {
+      progress += 15.0;
     }
     
-    // Contar probabilidad y intensidad como base
-    total += 2;
-    if (state.probabilidadSelections.isNotEmpty) {
-      completed += 1;
-      print('  - Probabilidad selections: ${state.probabilidadSelections.length} (+1)');
-    }
-    if (state.intensidadSelections.isNotEmpty) {
-      completed += 1;
-      print('  - Intensidad selections: ${state.intensidadSelections.length} (+1)');
+    // 2. Selección de clasificación (15% del total)
+    if (state.selectedClassification.isNotEmpty && state.selectedClassification != 'No seleccionada') {
+      progress += 15.0;
     }
     
-    // Agregar selecciones dinámicas
-    final expectedSelections = _getExpectedSelectionsForRiskEvent();
-    total += expectedSelections.length;
-    print('  - Expected dynamic selections: $expectedSelections');
-    for (final selection in expectedSelections) {
-      if (state.dynamicSelections[selection]?.isNotEmpty == true) {
-        completed += 1;
-        print('  - Dynamic selection $selection: ${state.dynamicSelections[selection]?.length} items (+1)');
-      }
-    }
+    // 3. Progreso de amenaza (35% del total)
+    final threatProgress = _calculateThreatProgress();
+    final threatContribution = (threatProgress / 100.0) * 35.0;
+    progress += threatContribution;
     
-    // Asegurar que siempre haya al menos un mínimo de progreso cuando se inicia
-    final progress = total > 0 ? (completed / (total + 0.5)) * 100.0 : 0.0;
+    // 4. Progreso de vulnerabilidad (35% del total)
+    final vulnerabilityProgress = _calculateVulnerabilityProgress();
+    final vulnerabilityContribution = (vulnerabilityProgress / 100.0) * 35.0;
+    progress += vulnerabilityContribution;
     
-    print('  - Total: $total, Completed: $completed');
-    print('  - Raw progress: $progress%');
+    // Aplicar límite mínimo y máximo
+    progress = progress.clamp(0.0, 100.0);
     
-    // Si hay alguna selección pero el progreso es muy bajo, garantizar un mínimo del 5%
-    if (progress > 0 && progress < 5.0) {
-      print('  - Applying minimum 5% progress');
-      return 5.0;
-    }
-    
-    print('  - Final progress: $progress%');
     return progress;
   }
 
   double _calculateThreatProgress() {
-    print('DEBUG RiskThreatAnalysisBloc _calculateThreatProgress:');
     
-    if (state.selectedClassification != 'amenaza') {
-      print('  - Not amenaza classification: ${state.selectedClassification}, returning 0.0');
-      return 0.0;
-    }
-    
+    // Calcular progreso de amenaza independientemente de la clasificación actual
     double total = 2.0; // probabilidad + intensidad
     double completed = 0.0;
     
     if (state.probabilidadSelections.isNotEmpty) {
       completed += 1;
-      print('  - Probabilidad completed: ${state.probabilidadSelections.length} items');
     }
     if (state.intensidadSelections.isNotEmpty) {
       completed += 1;
-      print('  - Intensidad completed: ${state.intensidadSelections.length} items');
     }
     
     final progress = total > 0 ? (completed / total) * 100.0 : 0.0;
-    print('  - Threat progress: $completed/$total = $progress%');
     
     return progress;
   }
 
   double _calculateVulnerabilityProgress() {
-    print('DEBUG RiskThreatAnalysisBloc _calculateVulnerabilityProgress:');
     
-    if (state.selectedClassification != 'vulnerabilidad') {
-      print('  - Not vulnerabilidad classification: ${state.selectedClassification}, returning 0.0');
-      return 0.0;
-    }
-    
+    // Calcular progreso de vulnerabilidad independientemente de la clasificación actual
     final expectedSelections = _getExpectedSelectionsForRiskEvent();
     if (expectedSelections.isEmpty) {
-      print('  - No expected selections for event: ${state.selectedRiskEvent}, returning 0.0');
       return 0.0;
     }
     
-    print('  - Expected selections: $expectedSelections');
-    print('  - Current dynamic selections keys: ${state.dynamicSelections.keys.toList()}');
     
     double completed = 0.0;
     for (final selection in expectedSelections) {
       if (state.dynamicSelections[selection]?.isNotEmpty == true) {
         completed += 1;
-        print('  - Selection $selection completed: ${state.dynamicSelections[selection]?.length} items');
       } else {
-        print('  - Selection $selection NOT completed');
       }
     }
     
     final progress = (completed / expectedSelections.length) * 100.0;
-    print('  - Vulnerability progress: $completed/${expectedSelections.length} = $progress%');
     
     return progress;
   }
