@@ -11,6 +11,7 @@ class FormCardInProgress extends StatelessWidget {
   final double threat;
   final double vulnerability;
   final VoidCallback? onDelete;
+  final VoidCallback? onTap;
 
   const FormCardInProgress({
     super.key,
@@ -21,6 +22,7 @@ class FormCardInProgress extends StatelessWidget {
     required this.threat,
     required this.vulnerability,
     this.onDelete,
+    this.onTap,
   });
 
   @override
@@ -231,7 +233,7 @@ class FormCardInProgress extends StatelessWidget {
                 ),
                 padding: const EdgeInsets.symmetric(vertical: 14),
               ),
-              onPressed: () {},
+              onPressed: onTap,
               icon: const Icon(Icons.edit_outlined, color: Colors.white),
               label: const Text(
                 'Continuar',

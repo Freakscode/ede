@@ -102,6 +102,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<DeleteForm>(_onDeleteForm);
     on<LoadFormForEditing>(_onLoadFormForEditing);
     on<CompleteForm>(_onCompleteForm);
+    on<SetActiveFormId>(_onSetActiveFormId);
   }
 
   // ======= HANDLERS PARA GESTIÓN DE FORMULARIOS =======
@@ -219,6 +220,10 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     } catch (e) {
       print('Error completing form: $e');
     }
+  }
+
+  void _onSetActiveFormId(SetActiveFormId event, Emitter<HomeState> emit) {
+    emit(state.copyWith(activeFormId: event.formId));
   }
 
   /// Mapea los nombres de eventos a sus iconos correspondientes

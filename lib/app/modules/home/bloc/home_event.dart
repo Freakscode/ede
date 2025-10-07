@@ -124,3 +124,12 @@ class CompleteForm extends HomeEvent {
   @override
   List<Object?> get props => [formId];
 }
+  
+class SetActiveFormId extends HomeEvent {
+  final String formId;
+  
+  const SetActiveFormId(this.formId);
+
+  @override
+  List<Object?> get props => [formId];
+}

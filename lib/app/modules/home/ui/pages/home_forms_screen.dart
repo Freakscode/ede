@@ -208,17 +208,15 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
             return Column(
               children: [
                 if (index > 0) const SizedBox(height: 16),
-                GestureDetector(
+                FormCardInProgress(
+                  title: form.title,
+                  lastEdit: form.formattedLastModified,
+                  tag: form.eventType,
+                  progress: form.progressPercentage,
+                  threat: form.threatProgress,
+                  vulnerability: form.vulnerabilityProgress,
+                  onDelete: () => _deleteForm(context, form.id, form.title),
                   onTap: () => _navigateToForm(context, form),
-                  child: FormCardInProgress(
-                    title: form.title,
-                    lastEdit: form.formattedLastModified,
-                    tag: form.eventType,
-                    progress: form.progressPercentage,
-                    threat: form.threatProgress,
-                    vulnerability: form.vulnerabilityProgress,
-                    onDelete: () => _deleteForm(context, form.id, form.title),
-                  ),
                 ),
               ],
             );
@@ -253,16 +251,13 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
 
   // Métodos de navegación y acciones
   void _navigateToForm(BuildContext context, FormDataModel form) {
-    // Cargar formulario para edición
-    context.read<HomeBloc>().add(LoadFormForEditing(form.id));
+    final homeBloc = context.read<HomeBloc>();
     
-    // Navegar a la pantalla de análisis de riesgo
-    final navigationData = {
-      'event': form.eventType,
-      'loadExisting': true,
-      'formId': form.id,
-    };
-    context.go('/risk_threat_analysis', extra: navigationData);
+    // Seleccionar el evento para ir a RiskCategoriesScreen
+    homeBloc.add(SelectRiskEvent(form.eventType));
+    
+    // Guardar el ID del formulario en el HomeBloc para cargarlo después
+    homeBloc.add(SetActiveFormId(form.id));
   }
 
   void _viewCompletedForm(BuildContext context, FormDataModel form) {

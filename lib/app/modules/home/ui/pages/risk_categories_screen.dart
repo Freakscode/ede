@@ -47,14 +47,25 @@ class RiskCategoriesScreen extends StatelessWidget {
         onTap: isAvailable
             ? () {
                 // Guardar la categoría seleccionada
-                context.read<HomeBloc>().add(
+                final homeBloc = context.read<HomeBloc>();
+                homeBloc.add(
                   SelectRiskCategory(classification.name, selectedEvent),
                 );
-                final navigationData = {
+                
+                // Crear navigationData y añadir formId si existe
+                final navigationData = <String, dynamic>{
                   'event': selectedEvent,
                   'classification': classification.name.toLowerCase(),
                   'directToResults': isCompleted,
                 };
+                
+                // Si hay un formulario activo, agregarlo para carga
+                final homeState = homeBloc.state;
+                if (homeState.activeFormId != null) {
+                  navigationData['loadExisting'] = true;
+                  navigationData['formId'] = homeState.activeFormId;
+                }
+                
                 print('RiskCategoriesScreen: $navigationData');
                 context.go('/risk_threat_analysis', extra: navigationData);
               }
