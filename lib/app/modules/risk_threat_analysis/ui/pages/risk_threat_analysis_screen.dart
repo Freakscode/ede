@@ -109,22 +109,7 @@ class _RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
               showProfile: true,
             ),
             body: SingleChildScrollView(child: screens[state.currentBottomNavIndex]),
-            floatingActionButton: state.currentBottomNavIndex == 2 // Solo en resultados
-                ? FloatingActionButton.extended(
-                    onPressed: () {
-                      context.read<RiskThreatAnalysisBloc>().add(CompleteForm());
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Formulario completado y guardado'),
-                          backgroundColor: Colors.green,
-                        ),
-                      );
-                    },
-                    label: const Text('Completar'),
-                    icon: const Icon(Icons.check),
-                    backgroundColor: DAGRDColors.azulDAGRD,
-                  )
-                : null,
+           
             bottomNavigationBar: CustomBottomNavBar(
               currentIndex: state.currentBottomNavIndex,
               onTap: (index) {
