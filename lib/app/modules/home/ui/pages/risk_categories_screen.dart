@@ -56,6 +56,7 @@ class RiskCategoriesScreen extends StatelessWidget {
                   'directToResults': isCompleted,
                   'isNewForm': true,
                 };
+                print('RiskCategoriesScreen: $navigationData');
                 context.go('/risk_threat_analysis', extra: navigationData);
               }
             : () {

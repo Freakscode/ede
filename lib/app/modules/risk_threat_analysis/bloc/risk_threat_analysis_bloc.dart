@@ -1105,12 +1105,8 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     
     final probabilidadScore = state.subClassificationScores['probabilidad'] ?? 0.0;
     final intensidadScore = state.subClassificationScores['intensidad'] ?? 0.0;
-    print('DEBUG Amenaza Calc - Prob: $probabilidadScore, Int: $intensidadScore');
-    print('DEBUG subClassificationScores: ${state.subClassificationScores}');
-    print('DEBUG selectedClassification: ${state.selectedClassification}');
-    print('DEBUG dynamicSelections keys: ${state.dynamicSelections.keys.toList()}');
+    
     if (probabilidadScore == 0.0 || intensidadScore == 0.0) {
-      print('DEBUG Amenaza Calc - Returning 0.0 because one score is 0');
       return 0.0;
     }
     
@@ -1590,9 +1586,7 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     ResetToNewForm event,
     Emitter<RiskThreatAnalysisState> emit,
   ) async {
-    print('🆕 RESET COMPLETO - Nuevo formulario para: ${event.eventType}');
-    print('   ✨ Limpiando TODO: selecciones, scores, formularios previos');
-    print('   📋 Estado inicial: Amenaza, primera pestaña, sin datos');
+
     
     // Resetear COMPLETAMENTE todo el estado para un formulario nuevo
     emit(RiskThreatAnalysisState(
