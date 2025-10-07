@@ -160,28 +160,47 @@ class FormPersistenceService {
 
   /// Calcular progreso basado en datos del formulario
   double calculateProgress(Map<String, dynamic> riskAnalysisData) {
-    if (riskAnalysisData.isEmpty) return 0.0;
+    print('DEBUG CALCULATE PROGRESS - Input data keys: ${riskAnalysisData.keys.toList()}');
+    
+    if (riskAnalysisData.isEmpty) {
+      print('DEBUG CALCULATE PROGRESS - Data is empty, returning 0.0');
+      return 0.0;
+    }
 
     int totalFields = 0;
     int completedFields = 0;
 
     // Contar campos completados en dynamicSelections
     final dynamicSelections = riskAnalysisData['dynamicSelections'] as Map<String, dynamic>?;
+    print('DEBUG CALCULATE PROGRESS - dynamicSelections: $dynamicSelections');
+    
     if (dynamicSelections != null) {
-      for (final subClassification in dynamicSelections.values) {
+      for (final entry in dynamicSelections.entries) {
+        final key = entry.key;
+        final subClassification = entry.value;
         if (subClassification is Map<String, dynamic>) {
           totalFields += 10; // Estimación de campos por subclasificación
-          completedFields += (subClassification as Map).length;
+          final subFields = (subClassification as Map).length;
+          completedFields += subFields;
+          print('DEBUG CALCULATE PROGRESS - $key: $subFields fields completed');
         }
       }
     }
 
     // Contar probabilidad e intensidad
-    if (riskAnalysisData['selectedProbabilidad'] != null) completedFields += 5;
-    if (riskAnalysisData['selectedIntensidad'] != null) completedFields += 5;
+    final hasProbabilidad = riskAnalysisData['selectedProbabilidad'] != null;
+    final hasIntensidad = riskAnalysisData['selectedIntensidad'] != null;
+    
+    if (hasProbabilidad) completedFields += 5;
+    if (hasIntensidad) completedFields += 5;
     totalFields += 10;
 
-    return totalFields > 0 ? completedFields / totalFields : 0.0;
+    print('DEBUG CALCULATE PROGRESS - probabilidad: $hasProbabilidad, intensidad: $hasIntensidad');
+
+    final progress = totalFields > 0 ? completedFields / totalFields : 0.0;
+    print('DEBUG CALCULATE PROGRESS FINAL: $completedFields/$totalFields = $progress (${(progress * 100).toStringAsFixed(1)}%)');
+    
+    return progress;
   }
 
   /// Calcular progreso de amenaza
@@ -197,7 +216,9 @@ class FormPersistenceService {
     }
     threatFields = 2;
 
-    return threatFields > 0 ? completedThreatFields / threatFields : 0.0;
+    final progress = threatFields > 0 ? completedThreatFields / threatFields : 0.0;
+    print('DEBUG THREAT PROGRESS: $completedThreatFields/$threatFields = $progress');
+    return progress;
   }
 
   /// Calcular progreso de vulnerabilidad
@@ -205,7 +226,11 @@ class FormPersistenceService {
     int vulnerabilityFields = 0;
     int completedVulnerabilityFields = 0;
 
+    print('DEBUG VULN PROGRESS - riskAnalysisData keys: ${riskAnalysisData.keys.toList()}');
+    
     final dynamicSelections = riskAnalysisData['dynamicSelections'] as Map<String, dynamic>?;
+    print('DEBUG VULN PROGRESS - dynamicSelections: $dynamicSelections');
+    
     if (dynamicSelections != null) {
       final vulnerabilityKeys = ['fragilidad_fisica', 'fragilidad_personas', 'exposicion'];
       
@@ -213,6 +238,7 @@ class FormPersistenceService {
         vulnerabilityFields += 1;
         if (dynamicSelections[key] != null) {
           final selections = dynamicSelections[key] as Map<String, dynamic>?;
+          print('DEBUG VULN PROGRESS - $key: $selections');
           if (selections != null && selections.isNotEmpty) {
             completedVulnerabilityFields += 1;
           }
@@ -220,7 +246,9 @@ class FormPersistenceService {
       }
     }
 
-    return vulnerabilityFields > 0 ? completedVulnerabilityFields / vulnerabilityFields : 0.0;
+    final progress = vulnerabilityFields > 0 ? completedVulnerabilityFields / vulnerabilityFields : 0.0;
+    print('DEBUG VULN PROGRESS: $completedVulnerabilityFields/$vulnerabilityFields = $progress');
+    return progress;
   }
 
   /// Limpiar cache (útil para testing o forzar recarga)

@@ -140,6 +140,11 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       final progress = formService.calculateProgress(event.formData);
       final threatProgress = formService.calculateThreatProgress(event.formData);
       final vulnerabilityProgress = formService.calculateVulnerabilityProgress(event.formData);
+      
+      print('DEBUG HOME BLOC PROGRESS:');
+      print('  - Progress: $progress (${(progress * 100).toStringAsFixed(1)}%)');
+      print('  - Threat: $threatProgress (${(threatProgress * 100).toStringAsFixed(1)}%)');
+      print('  - Vulnerability: $vulnerabilityProgress (${(vulnerabilityProgress * 100).toStringAsFixed(1)}%)');
 
       FormDataModel formToSave;
       if (existingForm != null) {

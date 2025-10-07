@@ -1636,6 +1636,18 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
   // Método para crear FormDataModel desde el estado actual
   FormDataModel _createFormDataFromCurrentState() {
     final now = DateTime.now();
+    
+    final progressPercentage = _calculateProgressPercentage();
+    final threatProgress = _calculateThreatProgress();
+    final vulnerabilityProgress = _calculateVulnerabilityProgress();
+    
+    print('DEBUG _createFormDataFromCurrentState:');
+    print('  - progressPercentage: $progressPercentage');
+    print('  - threatProgress: $threatProgress');
+    print('  - vulnerabilityProgress: $vulnerabilityProgress');
+    print('  - selectedRiskEvent: ${state.selectedRiskEvent}');
+    print('  - selectedClassification: ${state.selectedClassification}');
+    
     return FormDataModel(
       id: state.activeFormId ?? now.millisecondsSinceEpoch.toString(),
       title: 'Análisis de Riesgo - ${state.selectedRiskEvent}',
@@ -1644,9 +1656,9 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
       status: FormStatus.inProgress,
       createdAt: now,
       lastModified: now,
-      progressPercentage: _calculateProgressPercentage(),
-      threatProgress: _calculateThreatProgress(),
-      vulnerabilityProgress: _calculateVulnerabilityProgress(),
+      progressPercentage: progressPercentage / 100.0, // Convertir a 0.0-1.0
+      threatProgress: threatProgress / 100.0, // Convertir a 0.0-1.0
+      vulnerabilityProgress: vulnerabilityProgress / 100.0, // Convertir a 0.0-1.0
       riskAnalysisData: {
         'selectedRiskEvent': state.selectedRiskEvent,
         'selectedClassification': state.selectedClassification,
@@ -1691,6 +1703,8 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
 
   // Métodos de cálculo de progreso
   double _calculateProgressPercentage() {
+    print('DEBUG RiskThreatAnalysisBloc _calculateProgressPercentage:');
+    
     // Calcular progreso basado en las selecciones realizadas
     double total = 0.0;
     double completed = 0.0;
@@ -1698,59 +1712,104 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     // Si tenemos clasificación seleccionada, eso cuenta como progreso inicial
     if (state.selectedClassification.isNotEmpty) {
       completed += 0.5; // Progreso base por tener clasificación
+      print('  - Classification selected: ${state.selectedClassification} (+0.5)');
     }
     
     // Contar probabilidad y intensidad como base
     total += 2;
-    if (state.probabilidadSelections.isNotEmpty) completed += 1;
-    if (state.intensidadSelections.isNotEmpty) completed += 1;
+    if (state.probabilidadSelections.isNotEmpty) {
+      completed += 1;
+      print('  - Probabilidad selections: ${state.probabilidadSelections.length} (+1)');
+    }
+    if (state.intensidadSelections.isNotEmpty) {
+      completed += 1;
+      print('  - Intensidad selections: ${state.intensidadSelections.length} (+1)');
+    }
     
     // Agregar selecciones dinámicas
     final expectedSelections = _getExpectedSelectionsForRiskEvent();
     total += expectedSelections.length;
+    print('  - Expected dynamic selections: $expectedSelections');
     for (final selection in expectedSelections) {
       if (state.dynamicSelections[selection]?.isNotEmpty == true) {
         completed += 1;
+        print('  - Dynamic selection $selection: ${state.dynamicSelections[selection]?.length} items (+1)');
       }
     }
     
     // Asegurar que siempre haya al menos un mínimo de progreso cuando se inicia
     final progress = total > 0 ? (completed / (total + 0.5)) * 100.0 : 0.0;
     
+    print('  - Total: $total, Completed: $completed');
+    print('  - Raw progress: $progress%');
+    
     // Si hay alguna selección pero el progreso es muy bajo, garantizar un mínimo del 5%
     if (progress > 0 && progress < 5.0) {
+      print('  - Applying minimum 5% progress');
       return 5.0;
     }
     
+    print('  - Final progress: $progress%');
     return progress;
   }
 
   double _calculateThreatProgress() {
-    if (state.selectedClassification != 'amenaza') return 0.0;
+    print('DEBUG RiskThreatAnalysisBloc _calculateThreatProgress:');
+    
+    if (state.selectedClassification != 'amenaza') {
+      print('  - Not amenaza classification: ${state.selectedClassification}, returning 0.0');
+      return 0.0;
+    }
     
     double total = 2.0; // probabilidad + intensidad
     double completed = 0.0;
     
-    if (state.probabilidadSelections.isNotEmpty) completed += 1;
-    if (state.intensidadSelections.isNotEmpty) completed += 1;
+    if (state.probabilidadSelections.isNotEmpty) {
+      completed += 1;
+      print('  - Probabilidad completed: ${state.probabilidadSelections.length} items');
+    }
+    if (state.intensidadSelections.isNotEmpty) {
+      completed += 1;
+      print('  - Intensidad completed: ${state.intensidadSelections.length} items');
+    }
     
-    return total > 0 ? (completed / total) * 100.0 : 0.0;
+    final progress = total > 0 ? (completed / total) * 100.0 : 0.0;
+    print('  - Threat progress: $completed/$total = $progress%');
+    
+    return progress;
   }
 
   double _calculateVulnerabilityProgress() {
-    if (state.selectedClassification != 'vulnerabilidad') return 0.0;
+    print('DEBUG RiskThreatAnalysisBloc _calculateVulnerabilityProgress:');
+    
+    if (state.selectedClassification != 'vulnerabilidad') {
+      print('  - Not vulnerabilidad classification: ${state.selectedClassification}, returning 0.0');
+      return 0.0;
+    }
     
     final expectedSelections = _getExpectedSelectionsForRiskEvent();
-    if (expectedSelections.isEmpty) return 0.0;
+    if (expectedSelections.isEmpty) {
+      print('  - No expected selections for event: ${state.selectedRiskEvent}, returning 0.0');
+      return 0.0;
+    }
+    
+    print('  - Expected selections: $expectedSelections');
+    print('  - Current dynamic selections keys: ${state.dynamicSelections.keys.toList()}');
     
     double completed = 0.0;
     for (final selection in expectedSelections) {
       if (state.dynamicSelections[selection]?.isNotEmpty == true) {
         completed += 1;
+        print('  - Selection $selection completed: ${state.dynamicSelections[selection]?.length} items');
+      } else {
+        print('  - Selection $selection NOT completed');
       }
     }
     
-    return (completed / expectedSelections.length) * 100.0;
+    final progress = (completed / expectedSelections.length) * 100.0;
+    print('  - Vulnerability progress: $completed/${expectedSelections.length} = $progress%');
+    
+    return progress;
   }
 
   List<String> _getExpectedSelectionsForRiskEvent() {

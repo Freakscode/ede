@@ -27,6 +27,12 @@ class FormCardInProgress extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print('DEBUG FormCardInProgress BUILD:');
+    print('  - title: $title');
+    print('  - progress: $progress (${(progress * 100).toStringAsFixed(1)}%)');
+    print('  - threat: $threat (${(threat * 100).toStringAsFixed(1)}%)');
+    print('  - vulnerability: $vulnerability (${(vulnerability * 100).toStringAsFixed(1)}%)');
+    
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -149,6 +155,16 @@ class FormCardInProgress extends StatelessWidget {
               ),
             ],
           ),
+          const SizedBox(height: 4),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(99),
+            child: LinearProgressIndicator(
+              value: progress,
+              minHeight: 9,
+              backgroundColor: const Color(0xFFE5E5E5),
+              valueColor: const AlwaysStoppedAnimation(DAGRDColors.azulDAGRD),
+            ),
+          ),
           const SizedBox(height: 8),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -179,7 +195,7 @@ class FormCardInProgress extends StatelessWidget {
           ClipRRect(
             borderRadius: BorderRadius.circular(99),
             child: LinearProgressIndicator(
-              value: vulnerability,
+              value: threat,
               minHeight: 9,
               backgroundColor: const Color(0xFFE5E5E5),
               valueColor: const AlwaysStoppedAnimation(Color(0xFF2563EB)),
