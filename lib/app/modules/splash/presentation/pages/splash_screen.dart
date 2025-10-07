@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'package:caja_herramientas/app/core/constants/app_assets.dart';
+import 'package:caja_herramientas/app/core/icons/app_icons.dart';
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -119,17 +121,12 @@ class _SplashScreenState extends State<SplashScreen>
                             width: 140, // width: 140px según Figma
                             height: 140, // height: 140px según Figma
                             decoration: BoxDecoration(
-                              color: Color(0xFFD9D9D9), // background: #D9D9D9
                               borderRadius: BorderRadius.circular(
                                 12,
                               ), // border-radius: 12px
                             ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(20.0),
-                              // child: Image.asset(
-                              //   AppAssets.logoDagrd,
-                              //   fit: BoxFit.contain,
-                              // ),
+                            child: SvgPicture.asset(
+                              AppIcons.logo,
                             ),
                           ),
                         );
