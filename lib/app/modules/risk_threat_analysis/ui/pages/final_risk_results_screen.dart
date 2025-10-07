@@ -51,28 +51,26 @@ class FinalRiskResultsScreen extends StatelessWidget {
                   height: 28 / 18, // 155.556%
                 ),
               ),
-              
+
               const SizedBox(height: 24),
-              
+
               // Secciones de Amenaza
               _buildAmenazaSections(context, state),
-              
+
               const SizedBox(height: 24),
-              
+
               // Calificación de Amenaza
               _buildAmenazaRatingCard(context, state),
-              
+
               const SizedBox(height: 32),
-              
+
               // Botón Ir a Análisis de la Amenaza
               _buildAnalysisButton(
                 context,
                 'Ir a Análisis de la Amenaza',
-                () {
-                  
-                },
+                () {},
               ),
-              
+
               const SizedBox(height: 24),
               Text(
                 'Vulnerabilidad',
@@ -86,12 +84,12 @@ class FinalRiskResultsScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 24),
-              
-              // Secciones de Vulnerabilidad 
+
+              // Secciones de Vulnerabilidad
               _buildVulnerabilidadSections(context, state),
-              
+
               const SizedBox(height: 24),
-              
+
               // Calificación de Vulnerabilidad
               _buildVulnerabilidadRatingCard(context, state),
               const SizedBox(height: 24),
@@ -99,15 +97,34 @@ class FinalRiskResultsScreen extends StatelessWidget {
               _buildAnalysisButton(
                 context,
                 'Ir a Análisis de la Vulnerabilidad',
-                () {
-                 
-                },
+                () {},
               ),
-              
+
               const SizedBox(height: 24),
-              
+
               // Matriz de Riesgo Final
               RiskMatrixWidget(state: state),
+              const SizedBox(height: 24),
+
+              NavigationButtonsWidget(
+                currentIndex: state.currentBottomNavIndex,
+                onContinuePressed: () {
+                  // Si estamos en la última pestaña (índice 2)
+                  if (state.currentBottomNavIndex == 3) {
+                    // Navegar a la pantalla de inicio
+                    context.go('/home');
+                  } else {
+                    // Avanzar a la siguiente pestaña
+                    // context.read<RiskThreatAnalysisBloc>().add(
+                    //       UpdateBottomNavIndex(
+                    //           state.currentBottomNavIndex + 1),
+                    //     );
+                    
+                  }
+                },
+              ),
+
+              const SizedBox(height: 50),
             ],
           ),
         );
@@ -116,16 +133,19 @@ class FinalRiskResultsScreen extends StatelessWidget {
   }
 
   // Métodos para construir secciones de Amenaza
-  Widget _buildAmenazaSections(BuildContext context, RiskThreatAnalysisState state) {
+  Widget _buildAmenazaSections(
+    BuildContext context,
+    RiskThreatAnalysisState state,
+  ) {
     final bloc = context.read<RiskThreatAnalysisBloc>();
-    
+
     // Construir secciones de probabilidad e intensidad para amenaza
     final probabilidadItems = _buildProbabilidadItems(bloc, state);
     final probabilidadScore = _calculateSectionScore(probabilidadItems);
-    
+
     final intensidadItems = _buildIntensidadItems(bloc, state);
     final intensidadScore = _calculateSectionScore(intensidadItems);
-    
+
     return Column(
       children: [
         RatingSectionWidget(
@@ -143,12 +163,15 @@ class FinalRiskResultsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildAmenazaRatingCard(BuildContext context, RiskThreatAnalysisState state) {
+  Widget _buildAmenazaRatingCard(
+    BuildContext context,
+    RiskThreatAnalysisState state,
+  ) {
     final bloc = context.read<RiskThreatAnalysisBloc>();
     final finalScore = bloc.calculateAmenazaGlobalScore();
     final scoreText = finalScore.toStringAsFixed(2).replaceAll('.', ',');
     final ratingText = _getRiskClassification(finalScore);
-    
+
     return ThreatRatingCardWidget(
       title: 'Calificación Amenaza',
       score: scoreText,
@@ -157,10 +180,13 @@ class FinalRiskResultsScreen extends StatelessWidget {
   }
 
   // Métodos para construir secciones de Vulnerabilidad
-  Widget _buildVulnerabilidadSections(BuildContext context, RiskThreatAnalysisState state) {
+  Widget _buildVulnerabilidadSections(
+    BuildContext context,
+    RiskThreatAnalysisState state,
+  ) {
     final bloc = context.read<RiskThreatAnalysisBloc>();
     final sections = _buildVulnerabilidadSectionsList(bloc, state);
-    
+
     return Column(
       children: sections.asMap().entries.map((entry) {
         final index = entry.key;
@@ -179,12 +205,15 @@ class FinalRiskResultsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildVulnerabilidadRatingCard(BuildContext context, RiskThreatAnalysisState state) {
+  Widget _buildVulnerabilidadRatingCard(
+    BuildContext context,
+    RiskThreatAnalysisState state,
+  ) {
     final bloc = context.read<RiskThreatAnalysisBloc>();
     final finalScore = bloc.calculateVulnerabilidadFinalScore();
     final scoreText = finalScore.toStringAsFixed(2).replaceAll('.', ',');
     final ratingText = _getRiskClassification(finalScore);
-    
+
     return ThreatRatingCardWidget(
       title: 'Calificación Vulnerabilidad',
       score: scoreText,
@@ -193,89 +222,104 @@ class FinalRiskResultsScreen extends StatelessWidget {
   }
 
   // Métodos auxiliares adaptados de RatingResultsScreen
-  List<Map<String, dynamic>> _buildProbabilidadItems(RiskThreatAnalysisBloc bloc, RiskThreatAnalysisState state) {
+  List<Map<String, dynamic>> _buildProbabilidadItems(
+    RiskThreatAnalysisBloc bloc,
+    RiskThreatAnalysisState state,
+  ) {
     final items = <Map<String, dynamic>>[];
     final selectedEvent = state.selectedRiskEvent;
-    
+
     final riskEvent = _getRiskEventByName(selectedEvent);
     if (riskEvent != null) {
-      final classification = riskEvent.classifications
-          .firstWhere((c) => c.id == 'amenaza', orElse: () => riskEvent.classifications.first);
-      
-      final probabilidadSubClass = classification.subClassifications
-          .firstWhere((s) => s.id == 'probabilidad', orElse: () => classification.subClassifications.first);
-      
+      final classification = riskEvent.classifications.firstWhere(
+        (c) => c.id == 'amenaza',
+        orElse: () => riskEvent.classifications.first,
+      );
+
+      final probabilidadSubClass = classification.subClassifications.firstWhere(
+        (s) => s.id == 'probabilidad',
+        orElse: () => classification.subClassifications.first,
+      );
+
       for (final category in probabilidadSubClass.categories) {
         final selection = state.probabilidadSelections[category.title];
         final rating = _getRatingFromSelection(selection);
         final color = _getColorFromRating(rating);
-        
+
         String title = category.title;
         if (rating == -1) {
           title = '${category.title} - No Aplica';
         } else if (rating == 0) {
           title = '${category.title} - Sin calificar';
         }
-        
-        items.add({
-          'rating': rating,
-          'title': title,
-          'color': color,
-        });
+
+        items.add({'rating': rating, 'title': title, 'color': color});
       }
     }
-    
+
     return items;
   }
 
-  List<Map<String, dynamic>> _buildIntensidadItems(RiskThreatAnalysisBloc bloc, RiskThreatAnalysisState state) {
+  List<Map<String, dynamic>> _buildIntensidadItems(
+    RiskThreatAnalysisBloc bloc,
+    RiskThreatAnalysisState state,
+  ) {
     final items = <Map<String, dynamic>>[];
     final selectedEvent = state.selectedRiskEvent;
-    
+
     final riskEvent = _getRiskEventByName(selectedEvent);
     if (riskEvent != null) {
-      final classification = riskEvent.classifications
-          .firstWhere((c) => c.id == 'amenaza', orElse: () => riskEvent.classifications.first);
-      
-      final intensidadSubClass = classification.subClassifications
-          .firstWhere((s) => s.id == 'intensidad', orElse: () => classification.subClassifications.first);
-      
+      final classification = riskEvent.classifications.firstWhere(
+        (c) => c.id == 'amenaza',
+        orElse: () => riskEvent.classifications.first,
+      );
+
+      final intensidadSubClass = classification.subClassifications.firstWhere(
+        (s) => s.id == 'intensidad',
+        orElse: () => classification.subClassifications.first,
+      );
+
       for (final category in intensidadSubClass.categories) {
         final selection = state.intensidadSelections[category.title];
         final rating = _getRatingFromSelection(selection);
         final color = _getColorFromRating(rating);
-        
+
         String title = category.title;
         if (rating == -1) {
           title = '${category.title} - No Aplica';
         } else if (rating == 0) {
           title = '${category.title} - Sin calificar';
         }
-        
-        items.add({
-          'rating': rating,
-          'title': title,
-          'color': color,
-        });
+
+        items.add({'rating': rating, 'title': title, 'color': color});
       }
     }
-    
+
     return items;
   }
 
-  List<Map<String, dynamic>> _buildVulnerabilidadSectionsList(RiskThreatAnalysisBloc bloc, RiskThreatAnalysisState state) {
+  List<Map<String, dynamic>> _buildVulnerabilidadSectionsList(
+    RiskThreatAnalysisBloc bloc,
+    RiskThreatAnalysisState state,
+  ) {
     final sections = <Map<String, dynamic>>[];
     final selectedEvent = state.selectedRiskEvent;
-    
+
     final riskEvent = _getRiskEventByName(selectedEvent);
     if (riskEvent != null) {
-      final classification = riskEvent.classifications
-          .firstWhere((c) => c.id == 'vulnerabilidad', orElse: () => riskEvent.classifications.first);
-      
+      final classification = riskEvent.classifications.firstWhere(
+        (c) => c.id == 'vulnerabilidad',
+        orElse: () => riskEvent.classifications.first,
+      );
+
       for (final subClassification in classification.subClassifications) {
-        final items = _buildVulnerabilidadSubClassificationItems(bloc, state, subClassification.id);
+        final items = _buildVulnerabilidadSubClassificationItems(
+          bloc,
+          state,
+          subClassification.id,
+        );
         final score = _calculateSectionScore(items);
-        
+
         sections.add({
           'title': subClassification.name,
           'score': score,
@@ -283,48 +327,48 @@ class FinalRiskResultsScreen extends StatelessWidget {
         });
       }
     }
-    
+
     return sections;
   }
 
   List<Map<String, dynamic>> _buildVulnerabilidadSubClassificationItems(
-    RiskThreatAnalysisBloc bloc, 
-    RiskThreatAnalysisState state, 
-    String subClassificationId
+    RiskThreatAnalysisBloc bloc,
+    RiskThreatAnalysisState state,
+    String subClassificationId,
   ) {
     final items = <Map<String, dynamic>>[];
     final selectedEvent = state.selectedRiskEvent;
-    
+
     final riskEvent = _getRiskEventByName(selectedEvent);
     if (riskEvent != null) {
-      final classification = riskEvent.classifications
-          .firstWhere((c) => c.id == 'vulnerabilidad', orElse: () => riskEvent.classifications.first);
+      final classification = riskEvent.classifications.firstWhere(
+        (c) => c.id == 'vulnerabilidad',
+        orElse: () => riskEvent.classifications.first,
+      );
 
-      final subClass = classification.subClassifications
-          .firstWhere((s) => s.id == subClassificationId, orElse: () => classification.subClassifications.first);
-      
+      final subClass = classification.subClassifications.firstWhere(
+        (s) => s.id == subClassificationId,
+        orElse: () => classification.subClassifications.first,
+      );
+
       for (final category in subClass.categories) {
         final selections = state.dynamicSelections[subClassificationId] ?? {};
         final selection = selections[category.title];
-        
+
         final rating = _getRatingFromSelection(selection);
         final color = _getColorFromRating(rating);
-        
+
         String title = category.title;
         if (rating == -1) {
           title = '${category.title} - No Aplica';
         } else if (rating == 0) {
           title = '${category.title} - Sin calificar';
         }
-        
-        items.add({
-          'rating': rating,
-          'title': title,
-          'color': color,
-        });
+
+        items.add({'rating': rating, 'title': title, 'color': color});
       }
     }
-    
+
     return items;
   }
 
@@ -332,10 +376,11 @@ class FinalRiskResultsScreen extends StatelessWidget {
   int _getRatingFromSelection(String? selectedLevel) {
     if (selectedLevel == null || selectedLevel.isEmpty) return 0;
     if (selectedLevel == 'NA') return -1;
-    
+
     if (selectedLevel.contains('BAJO') && !selectedLevel.contains('MEDIO')) {
       return 1;
-    } else if (selectedLevel.contains('MEDIO') && selectedLevel.contains('ALTO')) {
+    } else if (selectedLevel.contains('MEDIO') &&
+        selectedLevel.contains('ALTO')) {
       return 3;
     } else if (selectedLevel.contains('MEDIO')) {
       return 2;
@@ -367,9 +412,9 @@ class FinalRiskResultsScreen extends StatelessWidget {
         .where((item) => item['rating'] != 0 && item['rating'] != -1)
         .map((item) => item['rating'] as int)
         .toList();
-    
+
     if (validRatings.isEmpty) return '0,00';
-    
+
     final average = validRatings.reduce((a, b) => a + b) / validRatings.length;
     return average.toStringAsFixed(2).replaceAll('.', ',');
   }
@@ -392,7 +437,11 @@ class FinalRiskResultsScreen extends StatelessWidget {
     return RiskEventFactory.getEventByName(eventName);
   }
 
-  Widget _buildAnalysisButton(BuildContext context, String text, VoidCallback onPressed) {
+  Widget _buildAnalysisButton(
+    BuildContext context,
+    String text,
+    VoidCallback onPressed,
+  ) {
     return SizedBox(
       width: double.infinity,
       child: TextButton(
