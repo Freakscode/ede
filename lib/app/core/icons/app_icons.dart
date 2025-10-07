@@ -71,6 +71,7 @@ class AppIcons {
   static const String images = 'assets/icons/caja_herramientas/Images.svg';
   static const String checkCircle = 'assets/icons/caja_herramientas/CheckCircle.svg';
   static const String logo = 'assets/icons/caja_herramientas/Logo.svg';
+  static const String checkCirclev2 = 'assets/icons/caja_herramientas/Check-1.svg';
   // assets/icons/caja_herramientas/CheckCircle.svg
 
   // SVG Icons - Advertencias y alertas
