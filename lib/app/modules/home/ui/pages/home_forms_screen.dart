@@ -10,6 +10,7 @@ import '../../bloc/home_bloc.dart';
 import '../../bloc/home_event.dart';
 import '../../bloc/home_state.dart';
 import '../../../../shared/models/form_data_model.dart';
+import '../../../../shared/services/form_persistence_service.dart';
 
 class HomeFormsScreen extends StatefulWidget {
   const HomeFormsScreen({super.key});
@@ -250,33 +251,88 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
   }
 
   // Métodos de navegación y acciones
-  void _navigateToForm(BuildContext context, FormDataModel form) {
-    final homeBloc = context.read<HomeBloc>();
-    
-    // Seleccionar el evento para ir a RiskCategoriesScreen
-    homeBloc.add(SelectRiskEvent("Movimiento en Masa")); // Valor temporal
-    
-    // Establecer el formulario activo para EDICIÓN
-    homeBloc.add(SetActiveFormId(form.id));
-    
-    // Navegar a HomeScreen con RiskCategoriesScreen activo para seguir el flujo normal
-    final navigationData = {
-      'showRiskCategories': true,
-    };
-    
-    context.go('/home', extra: navigationData);
+  void _navigateToForm(BuildContext context, FormDataModel form) async {
+    try {
+      // Obtener datos reales del formulario completo desde SQLite
+      final persistenceService = FormPersistenceService();
+      final completeForm = await persistenceService.getCompleteForm(form.id);
+      
+      if (completeForm != null) {
+        // Determinar qué sección mostrar primero (amenaza o vulnerabilidad)
+        String initialClassification;
+        if (!completeForm.isAmenazaCompleted) {
+          initialClassification = 'amenaza';
+        } else if (!completeForm.isVulnerabilidadCompleted) {
+          initialClassification = 'vulnerabilidad';
+        } else {
+          // Si ambas están completas, mostrar amenaza por defecto
+          initialClassification = 'amenaza';
+        }
+        
+        // Navegar al RiskThreatAnalysisScreen con el formulario completo cargado
+        final navigationData = {
+          'event': completeForm.eventName,
+          'classification': initialClassification,
+          'loadSavedCompleteForm': true,
+          'formId': completeForm.id,
+        };
+        
+        context.go('/risk_threat_analysis', extra: navigationData);
+      } else {
+        // Si no se encuentra el formulario, mostrar error
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('No se pudo cargar el formulario'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      print('Error al navegar al formulario: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error al cargar el formulario: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
-  void _viewCompletedForm(BuildContext context, FormDataModel form) {
-    // Para formularios completados, navegar directamente a resultados finales
-    final navigationData = {
-      'event': "Movimiento en Masa", // Valor temporal
-      'finalResults': true,
-      'targetIndex': 3,
-      'readOnly': true,
-      'formId': form.id,
-    };
-    context.go('/risk_threat_analysis', extra: navigationData);
+  void _viewCompletedForm(BuildContext context, FormDataModel form) async {
+    try {
+      // Obtener datos reales del formulario completo desde SQLite
+      final persistenceService = FormPersistenceService();
+      final completeForm = await persistenceService.getCompleteForm(form.id);
+      
+      if (completeForm != null) {
+        // Para formularios completados, navegar directamente a resultados finales
+        final navigationData = {
+          'event': completeForm.eventName,
+          'classification': 'amenaza', // Mostrar amenaza por defecto para resultados
+          'finalResults': true,
+          'targetIndex': 3,
+          'readOnly': true,
+          'loadSavedCompleteForm': true,
+          'formId': completeForm.id,
+        };
+        context.go('/risk_threat_analysis', extra: navigationData);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('No se pudo cargar el formulario'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      print('Error al cargar formulario completado: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error al cargar el formulario: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   void _deleteForm(BuildContext context, String formId, String formTitle) {
@@ -307,28 +363,32 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
               child: const Text('Cancelar'),
             ),
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 Navigator.of(context).pop();
-                context.read<HomeBloc>().add(DeleteForm(formId));
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Formulario "$formTitle" eliminado'),
-                    backgroundColor: Colors.red,
-                    action: SnackBarAction(
-                      label: 'Deshacer',
-                      textColor: Colors.white,
-                      onPressed: () {
-                        // TODO: Implementar deshacer eliminación
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Función de deshacer no disponible'),
-                            backgroundColor: Colors.orange,
-                          ),
-                        );
-                      },
+                try {
+                  // Eliminar formulario completo desde SQLite
+                  final persistenceService = FormPersistenceService();
+                  await persistenceService.deleteForm(formId);
+                  
+                  // Recargar la lista de formularios
+                  context.read<HomeBloc>().add(LoadForms());
+                  
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Formulario "$formTitle" eliminado'),
+                      backgroundColor: Colors.red,
+                      duration: const Duration(seconds: 2),
                     ),
-                  ),
-                );
+                  );
+                } catch (e) {
+                  print('Error al eliminar formulario completo: $e');
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Error al eliminar formulario: $e'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,

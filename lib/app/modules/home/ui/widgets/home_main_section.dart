@@ -6,7 +6,6 @@ import 'package:caja_herramientas/app/core/icons/app_icons.dart';
 import 'package:caja_herramientas/app/modules/home/ui/widgets/home_tool_card.dart';
 import 'package:caja_herramientas/app/modules/home/bloc/home_bloc.dart';
 import 'package:caja_herramientas/app/modules/home/bloc/home_event.dart';
-import 'package:caja_herramientas/app/modules/home/bloc/home_state.dart';
 import 'package:caja_herramientas/app/shared/widgets/dialogs/forms_in_progress_dialog.dart';
 import 'package:go_router/go_router.dart';
 
@@ -130,8 +129,8 @@ class _HomeMainSectionState extends State<HomeMainSection> {
         return FormsInProgressDialog(
           pendingFormsCount: pendingFormsCount,
           onViewForms: () {
-            // Navegar a la sección de categorías de riesgo para ver formularios
-            context.read<HomeBloc>().add(HomeNavBarTapped(2));
+            // Navegar a la pantalla de formularios en proceso y finalizados
+            context.go('/home_forms');
           },
           onCreateNew: () {
             // Navegar a eventos de riesgo para crear nuevo

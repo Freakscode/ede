@@ -11,6 +11,7 @@ import 'package:go_router/go_router.dart';
 import '../modules/auth/presentation/pages/login_screen.dart';
 import '../modules/splash/presentation/pages/splash_screen.dart';
 import '../modules/home/ui/pages/home_screen.dart' as home;
+import '../modules/home/ui/pages/home_forms_screen.dart';
 
 import '../modules/evaluacion/presentation/pages/home_screen.dart'
     as evaluacion;
@@ -46,6 +47,12 @@ GoRouter getAppRouter(BuildContext context) {
           final extra = state.extra as Map<String, dynamic>?;
           return home.HomeScreen(navigationData: extra);
         },
+      ),
+      
+      // Home Forms - Formularios en proceso y finalizados
+      GoRoute(
+        path: '/home_forms',
+        builder: (context, state) => const HomeFormsScreen(),
       ),
       GoRoute(
         path: '/risk_threat_analysis',

@@ -2,6 +2,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:caja_herramientas/app/core/icons/app_icons.dart';
 import 'package:caja_herramientas/app/shared/models/risk_event_factory.dart';
 import 'package:caja_herramientas/app/shared/models/risk_event_model.dart';
+import 'package:caja_herramientas/app/shared/services/form_persistence_service.dart';
+import 'package:caja_herramientas/app/shared/models/complete_form_data_model.dart';
+import 'package:caja_herramientas/app/shared/models/form_data_model.dart';
 import '../../home/services/tutorial_overlay_service.dart';
 import 'home_event.dart';
 import 'home_state.dart';
@@ -35,7 +38,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         mostrarCategoriasRiesgo: true,
       ));
     });
-    on<SelectRiskEvent>((event, emit) {
+    on<SelectRiskEvent>((event, emit) async {
       emit(state.copyWith(
         selectedRiskEvent: event.eventName,
         mostrarEventosRiesgo: false,
@@ -46,6 +49,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         savedForms: const [], // Limpiar formularios guardados
         isLoadingForms: false, // Resetear estado de carga
       ));
+      
+      // Crear formulario inicial para el evento seleccionado
+      await _createInitialForm(event.eventName);
     });
     on<SelectRiskCategory>((event, emit) {
       emit(state.copyWith(
@@ -135,14 +141,44 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     emit(state.copyWith(isLoadingForms: true));
     
     try {
-            // Simulamos que carga la configuración global de formularios
+      // Cargar formularios completos desde SQLite
+      final persistenceService = FormPersistenceService();
+      final completeForms = await persistenceService.getAllCompleteForms();
+      
+      // Convertir CompleteFormDataModel a FormDataModel para compatibilidad
+      final convertedForms = completeForms.map((completeForm) {
+        // Determinar el estado del formulario
+        FormStatus status;
+        if (completeForm.isComplete) {
+          status = FormStatus.completed;
+        } else if (completeForm.isAmenazaCompleted || completeForm.isVulnerabilidadCompleted) {
+          status = FormStatus.inProgress;
+        } else {
+          status = FormStatus.inProgress;
+        }
+        
+        return FormDataModel(
+          id: completeForm.id,
+          title: '${completeForm.eventName} - Análisis Completo',
+          status: status,
+          createdAt: completeForm.createdAt,
+          lastModified: completeForm.updatedAt,
+          riskEvent: null, // Se puede agregar si es necesario
+        );
+      }).toList();
       
       emit(state.copyWith(
-        savedForms: [], // Lista vacía temporalmente
+        savedForms: convertedForms,
         isLoadingForms: false,
       ));
+      
+      print('HomeBloc: ${convertedForms.length} formularios completos cargados desde SQLite');
     } catch (e) {
-      emit(state.copyWith(isLoadingForms: false));
+      print('HomeBloc: Error al cargar formularios completos desde SQLite - $e');
+      emit(state.copyWith(
+        savedForms: [],
+        isLoadingForms: false,
+      ));
     }
   }
 
@@ -265,5 +301,50 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     final amenazaSaved = getSavedRiskEventModel(eventName, 'amenaza') != null;
     final vulnerabilidadSaved = getSavedRiskEventModel(eventName, 'vulnerabilidad') != null;
     return amenazaSaved && vulnerabilidadSaved;
+  }
+
+  /// Crea un formulario inicial vacío cuando se selecciona un evento
+  Future<void> _createInitialForm(String eventName) async {
+    try {
+      final persistenceService = FormPersistenceService();
+      
+      // Crear formulario completo inicial (evento + amenaza + vulnerabilidad)
+      final now = DateTime.now();
+      final formId = '${eventName}_complete_${now.millisecondsSinceEpoch}';
+      final completeForm = CompleteFormDataModel(
+        id: formId,
+        eventName: eventName,
+        // Datos iniciales de amenaza
+        amenazaSelections: {},
+        amenazaScores: {},
+        amenazaColors: {},
+        amenazaProbabilidadSelections: {},
+        amenazaIntensidadSelections: {},
+        amenazaSelectedProbabilidad: null,
+        amenazaSelectedIntensidad: null,
+        // Datos iniciales de vulnerabilidad
+        vulnerabilidadSelections: {},
+        vulnerabilidadScores: {},
+        vulnerabilidadColors: {},
+        vulnerabilidadProbabilidadSelections: {},
+        vulnerabilidadIntensidadSelections: {},
+        vulnerabilidadSelectedProbabilidad: null,
+        vulnerabilidadSelectedIntensidad: null,
+        createdAt: now,
+        updatedAt: now,
+      );
+      
+      // Guardar formulario completo
+      await persistenceService.saveCompleteForm(completeForm);
+      
+      // Establecer el formulario como activo
+      await persistenceService.setActiveFormId(formId);
+      
+      print('HomeBloc: Formulario completo inicial creado para evento $eventName');
+      print('HomeBloc: Form ID: $formId');
+      
+    } catch (e) {
+      print('HomeBloc: Error al crear formulario inicial completo - $e');
+    }
   }
 }

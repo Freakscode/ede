@@ -3,6 +3,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:caja_herramientas/app/core/icons/app_icons.dart';
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
+import 'package:caja_herramientas/app/shared/services/form_persistence_service.dart';
+import 'package:caja_herramientas/app/shared/models/persistent_form_data_model.dart';
 import '../../bloc/risk_threat_analysis_bloc.dart';
 import '../../bloc/risk_threat_analysis_state.dart';
 
@@ -54,14 +56,62 @@ class SaveProgressButton extends StatelessWidget {
     );
   }
 
-  void _showProgressInfo(BuildContext context) {
-    // Mostrar información sobre el progreso actual
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('El progreso se mantiene activo mientras uses la app'),
-        duration: Duration(seconds: 2),
-        backgroundColor: Colors.blue,
-      ),
-    );
+  void _showProgressInfo(BuildContext context) async {
+    final bloc = context.read<RiskThreatAnalysisBloc>();
+    final state = bloc.state;
+    
+    try {
+      // Obtener datos actuales del formulario
+      final formData = bloc.getCurrentFormData();
+      
+      // Crear PersistentFormDataModel
+      final now = DateTime.now();
+      final formModel = PersistentFormDataModel(
+        id: '${state.selectedRiskEvent}_${state.selectedClassification}_${now.millisecondsSinceEpoch}',
+        eventName: state.selectedRiskEvent,
+        classificationType: state.selectedClassification,
+        dynamicSelections: formData['dynamicSelections'] ?? {},
+        subClassificationScores: formData['subClassificationScores'] ?? {},
+        subClassificationColors: formData['subClassificationColors'] ?? {},
+        probabilidadSelections: formData['probabilidadSelections'] ?? {},
+        intensidadSelections: formData['intensidadSelections'] ?? {},
+        selectedProbabilidad: formData['selectedProbabilidad'],
+        selectedIntensidad: formData['selectedIntensidad'],
+        createdAt: now,
+        updatedAt: now,
+      );
+      
+      // Guardar en SQLite
+      final persistenceService = FormPersistenceService();
+      await persistenceService.saveForm(formModel);
+      
+      // Establecer como formulario activo
+      await persistenceService.setActiveFormId(formModel.id);
+      
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Progreso guardado exitosamente'),
+            duration: Duration(seconds: 2),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+      
+      print('SaveProgressButton: Formulario guardado en SQLite - ${formModel.id}');
+      
+    } catch (e) {
+      print('SaveProgressButton: Error al guardar progreso - $e');
+      
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error al guardar progreso: $e'),
+            duration: const Duration(seconds: 3),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 }

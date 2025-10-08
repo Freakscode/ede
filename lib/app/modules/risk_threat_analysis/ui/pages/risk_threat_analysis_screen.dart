@@ -15,6 +15,7 @@ import '../../bloc/risk_threat_analysis_event.dart';
 import '../../bloc/risk_threat_analysis_state.dart';
 import '../widgets/home_navigation_type.dart';
 import '../../../home/bloc/home_bloc.dart';
+import 'package:caja_herramientas/app/shared/services/form_persistence_service.dart';
 
 class RiskThreatAnalysisScreen extends StatefulWidget {
   final String? selectedEvent;
@@ -97,10 +98,19 @@ class RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
         bloc.add(ChangeBottomNavIndex(navIndex));
         bloc.add(SelectClassification(classificationName));
         
-        // Cargar datos existentes si los hay
-        final homeBloc = context.read<HomeBloc>();
-        final savedData = homeBloc.getSavedRiskEventModel(eventFromNavData ?? '', classificationName);
-        bloc.loadExistingFormData(eventFromNavData ?? '', classificationName, savedData);
+        // Verificar si necesitamos cargar un formulario guardado desde SQLite
+        final loadSavedForm = widget.navigationData!['loadSavedForm'] as bool? ?? false;
+        final formId = widget.navigationData!['formId'] as String?;
+        
+        if (loadSavedForm && formId != null) {
+          // Cargar formulario desde SQLite
+          _loadFormFromSQLite(formId, bloc);
+        } else {
+          // Cargar datos existentes desde HomeBloc (comportamiento anterior)
+          final homeBloc = context.read<HomeBloc>();
+          final savedData = homeBloc.getSavedRiskEventModel(eventFromNavData ?? '', classificationName);
+          bloc.loadExistingFormData(eventFromNavData ?? '', classificationName, savedData);
+        }
       }
     }
   }
@@ -174,5 +184,37 @@ class RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
           );
         },
       );
+  }
+
+  /// Carga un formulario guardado desde SQLite
+  Future<void> _loadFormFromSQLite(String formId, RiskThreatAnalysisBloc bloc) async {
+    try {
+      final persistenceService = FormPersistenceService();
+      final savedForm = await persistenceService.getForm(formId);
+      
+      if (savedForm != null) {
+        // Convertir PersistentFormDataModel a formato compatible con loadExistingFormData
+        final formData = {
+          'dynamicSelections': savedForm.dynamicSelections,
+          'subClassificationScores': savedForm.subClassificationScores,
+          'subClassificationColors': savedForm.subClassificationColors,
+          'probabilidadSelections': savedForm.probabilidadSelections,
+          'intensidadSelections': savedForm.intensidadSelections,
+          'selectedProbabilidad': savedForm.selectedProbabilidad,
+          'selectedIntensidad': savedForm.selectedIntensidad,
+        };
+        
+        // Cargar datos en el bloc
+        bloc.loadExistingFormData(savedForm.eventName, savedForm.classificationType, formData);
+        
+        print('Formulario cargado desde SQLite: $formId');
+        print('Evento: ${savedForm.eventName}');
+        print('Clasificación: ${savedForm.classificationType}');
+      } else {
+        print('No se encontró el formulario con ID: $formId');
+      }
+    } catch (e) {
+      print('Error al cargar formulario desde SQLite: $e');
+    }
   }
 }
