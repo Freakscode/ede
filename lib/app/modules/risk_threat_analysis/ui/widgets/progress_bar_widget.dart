@@ -64,41 +64,27 @@ class ProgressBarWidget extends StatelessWidget {
     double total = 0.0;
     double completed = 0.0;
     
-    print('🔍 PROGRESS DEBUG:');
-    print('   Clasificación: ${state.selectedClassification}');
-    print('   Dynamic Selections: ${state.dynamicSelections}');
-    
     if (state.selectedClassification == 'amenaza') {
       // Para amenaza: probabilidad e intensidad
       total += 2;
       if (state.probabilidadSelections.isNotEmpty) completed += 1;
       if (state.intensidadSelections.isNotEmpty) completed += 1;
-      print('   Amenaza - Total: $total, Completed: $completed');
     } else if (state.selectedClassification == 'vulnerabilidad') {
       // Para vulnerabilidad: obtener dinámicamente las subclasificaciones
       return _calculateVulnerabilidadProgress(context, state);
     }
     
     final progress = total > 0 ? completed / total : 0.0;
-    print('   Progress final: $progress');
     return progress;
   }
   
   double _calculateVulnerabilidadProgress(BuildContext context, RiskThreatAnalysisState state) {
-    print('🔍 VULNERABILIDAD DEBUG DETALLADO:');
-    print('   subClassificationScores.keys: ${state.subClassificationScores.keys.toList()}');
-    print('   dynamicSelections.keys: ${state.dynamicSelections.keys.toList()}');
-    
     // Obtener todas las subclasificaciones esperadas desde el BLoC
     final bloc = context.read<RiskThreatAnalysisBloc>();
     final allExpectedSubClassifications = bloc.getVulnerabilidadSubClassifications();
     final expectedIds = allExpectedSubClassifications.map((sub) => sub.id).toList();
     
-    print('   📋 Subclasificaciones ESPERADAS desde BLoC: $expectedIds');
-    print('   📊 Subclasificaciones CON DATOS en estado: ${state.dynamicSelections.keys.where((id) => id != 'probabilidad' && id != 'intensidad').toList()}');
-    
     if (expectedIds.isEmpty) {
-      print('   ❌ Sin subclasificaciones de vulnerabilidad definidas en el modelo');
       return 0.0;
     }
     
@@ -109,21 +95,12 @@ class ProgressBarWidget extends StatelessWidget {
       final selections = state.dynamicSelections[subClassId];
       final hasSelections = selections?.isNotEmpty == true;
       
-      print('   [$subClassId]:');
-      print('     - Selections: $selections');
-      print('     - isEmpty: ${selections?.isEmpty}');
-      print('     - Has selections: $hasSelections');
-      
       if (hasSelections) {
         completed += 1;
-        print('     ✅ COMPLETADA');
-      } else {
-        print('     ❌ PENDIENTE');
       }
     }
     
     final progress = total > 0 ? completed / total : 0.0;
-    print('   📊 FINAL: $completed completadas de $total total = ${(progress * 100).toInt()}%');
     return progress;
   }
 }
