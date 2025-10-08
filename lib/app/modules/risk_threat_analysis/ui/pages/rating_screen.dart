@@ -26,30 +26,23 @@ class _RatingScreenState extends State<RatingScreen> {
   @override
   void initState() {
     super.initState();
-    // Configuración inicial simple sin lógica de persistencia
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // Valores por defecto
-      String eventToSet = 'Movimiento en Masa';
-      String classificationToSet = 'amenaza';
-      
-      // Extraer datos de navegación si existen
       if (widget.navigationData != null) {
         final data = widget.navigationData!;
-        eventToSet = data['event'] as String? ?? eventToSet;
-        classificationToSet = data['classification'] as String? ?? classificationToSet;
+        final eventToSet = data['event'] as String?;
+        final classificationToSet = data['classification'] as String?;
         
-      }
-      
-      // Configurar evento de riesgo
-      context.read<RiskThreatAnalysisBloc>().add(
-        UpdateSelectedRiskEvent(eventToSet)
-      );
-      
-      // Configurar clasificación si no es la por defecto
-      if (classificationToSet != 'amenaza') {
-        context.read<RiskThreatAnalysisBloc>().add(
-          SelectClassification(classificationToSet)
-        );
+        if (eventToSet != null) {
+          context.read<RiskThreatAnalysisBloc>().add(
+            UpdateSelectedRiskEvent(eventToSet)
+          );
+        }
+        
+        if (classificationToSet != null) {
+          context.read<RiskThreatAnalysisBloc>().add(
+            SelectClassification(classificationToSet)
+          );
+        }
       }
     });
   }
