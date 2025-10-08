@@ -26,81 +26,31 @@ class _RatingScreenState extends State<RatingScreen> {
   @override
   void initState() {
     super.initState();
-    // Manejar la inicialización según el origen de navegación
+    // Configuración inicial simple sin lógica de persistencia
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      String eventToSet = 'Movimiento en Masa'; // Evento por defecto
-      String classificationToSet = 'amenaza'; // Clasificación por defecto
-      bool shouldReset = true; // Por defecto, siempre resetear
+      // Valores por defecto
+      String eventToSet = 'Movimiento en Masa';
+      String classificationToSet = 'amenaza';
       
-      // Analizar datos de navegación
+      // Extraer datos de navegación si existen
       if (widget.navigationData != null) {
         final data = widget.navigationData!;
-        final eventName = data['event'] as String?;
-        final classificationName = data['classification'] as String?;
-        final forceReset = data['forceReset'] as bool? ?? true;
-        final isNewForm = data['isNewForm'] as bool? ?? true;
-        final loadExisting = data['loadExisting'] as bool? ?? false;
-        final source = data['source'] as String? ?? 'unknown';
+        eventToSet = data['event'] as String? ?? eventToSet;
+        classificationToSet = data['classification'] as String? ?? classificationToSet;
         
-        print('📱 RATING SCREEN - Datos de navegación:');
-        print('   Evento: $eventName');
-        print('   Clasificación: $classificationName');
-        print('   Forzar Reset: $forceReset');
-        print('   Nuevo Formulario: $isNewForm');
-        print('   Cargar Existente: $loadExisting');
-        print('   Origen: $source');
-        
-        if (eventName != null) {
-          eventToSet = eventName;
-        }
-        if (classificationName != null) {
-          classificationToSet = classificationName;
-        }
-        
-        // Determinar si necesita reset basado en los flags
-        shouldReset = forceReset || isNewForm;
-        
-        // Casos especiales donde NO se debe resetear
-        if (loadExisting || (!isNewForm && !forceReset)) {
-          shouldReset = false;
-          print('   ⚠️ NO RESET: Cargando formulario existente o continuando actual');
-        }
+        print('📱 RATING SCREEN - Configurando: $eventToSet, $classificationToSet');
       }
       
-      if (shouldReset) {
-        print('🔄 EJECUTANDO RESET COMPLETO');
-        // Configurar evento y clasificación para nuevo formulario
+      // Configurar evento de riesgo
+      context.read<RiskThreatAnalysisBloc>().add(
+        UpdateSelectedRiskEvent(eventToSet)
+      );
+      
+      // Configurar clasificación si no es la por defecto
+      if (classificationToSet != 'amenaza') {
         context.read<RiskThreatAnalysisBloc>().add(
-          UpdateSelectedRiskEvent(eventToSet)
+          SelectClassification(classificationToSet)
         );
-        
-        // Después del reset, establecer la clasificación correcta si es necesario
-        if (classificationToSet != 'amenaza') {
-          Future.delayed(const Duration(milliseconds: 50), () {
-            if (mounted) {
-              print('🎯 Cambiando a clasificación: $classificationToSet');
-              context.read<RiskThreatAnalysisBloc>().add(
-                SelectClassification(classificationToSet)
-              );
-            }
-          });
-        }
-      } else {
-        print('⏭️ MANTENIENDO ESTADO ACTUAL - No hay reset');
-        // Solo actualizar evento y clasificación sin reset
-        final currentState = context.read<RiskThreatAnalysisBloc>().state;
-        
-        if (currentState.selectedRiskEvent != eventToSet) {
-          context.read<RiskThreatAnalysisBloc>().add(
-            UpdateSelectedRiskEvent(eventToSet)
-          );
-        }
-        
-        if (currentState.selectedClassification != classificationToSet) {
-          context.read<RiskThreatAnalysisBloc>().add(
-            SelectClassification(classificationToSet)
-          );
-        }
       }
     });
   }
