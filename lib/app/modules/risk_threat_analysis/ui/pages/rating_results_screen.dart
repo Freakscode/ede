@@ -54,6 +54,13 @@ class RatingResultsScreen extends StatelessWidget {
                   if (state.currentBottomNavIndex == 2) {
                     
                     if (state.selectedClassification.toLowerCase() == 'amenaza') {
+                      // Guardar datos del formulario antes de marcar como completada
+                      final riskBloc = context.read<RiskThreatAnalysisBloc>();
+                      final formData = riskBloc.getCurrentFormData();
+                      context.read<HomeBloc>().add(
+                        SaveRiskEventModel(state.selectedRiskEvent, 'amenaza', formData)
+                      );
+                      
                       // Marcar amenaza como completada
                       context.read<HomeBloc>().add(
                         MarkEvaluationCompleted(state.selectedRiskEvent, 'amenaza')
@@ -74,6 +81,13 @@ class RatingResultsScreen extends StatelessWidget {
                         ),
                       );
                     } else if (state.selectedClassification.toLowerCase() == 'vulnerabilidad') {
+                      // Guardar datos del formulario antes de marcar como completada
+                      final riskBloc = context.read<RiskThreatAnalysisBloc>();
+                      final formData = riskBloc.getCurrentFormData();
+                      context.read<HomeBloc>().add(
+                        SaveRiskEventModel(state.selectedRiskEvent, 'vulnerabilidad', formData)
+                      );
+                      
                       // Marcar vulnerabilidad como completada
                       context.read<HomeBloc>().add(
                         MarkEvaluationCompleted(state.selectedRiskEvent, 'vulnerabilidad')

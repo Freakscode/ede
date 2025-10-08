@@ -14,6 +14,7 @@ import '../../bloc/risk_threat_analysis_bloc.dart';
 import '../../bloc/risk_threat_analysis_event.dart';
 import '../../bloc/risk_threat_analysis_state.dart';
 import '../widgets/home_navigation_type.dart';
+import '../../../home/bloc/home_bloc.dart';
 
 class RiskThreatAnalysisScreen extends StatefulWidget {
   final String? selectedEvent;
@@ -87,6 +88,11 @@ class _RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
         final navIndex = directToResults ? 2 : 0;
         bloc.add(ChangeBottomNavIndex(navIndex));
         bloc.add(SelectClassification(classificationName));
+        
+        // Cargar datos existentes si los hay
+        final homeBloc = context.read<HomeBloc>();
+        final savedData = homeBloc.getSavedRiskEventModel(eventFromNavData ?? '', classificationName);
+        bloc.loadExistingFormData(eventFromNavData ?? '', classificationName, savedData);
       }
     }
   }

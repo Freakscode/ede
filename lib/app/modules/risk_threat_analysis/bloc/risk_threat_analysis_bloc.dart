@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:caja_herramientas/app/shared/models/models.dart';
-
+import 'package:caja_herramientas/app/modules/home/bloc/home_bloc.dart';
+import 'package:caja_herramientas/app/modules/home/bloc/home_event.dart';
 
 import 'risk_threat_analysis_event.dart';
 import 'risk_threat_analysis_state.dart';
@@ -21,6 +22,8 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     on<ToggleDynamicDropdown>(_onToggleDynamicDropdown);
     on<UpdateDynamicSelection>(_onUpdateDynamicSelection);
     on<ShowFinalResults>(_onShowFinalResults);
+    on<LoadFormData>(_onLoadFormData);
+    on<SaveFormData>(_onSaveFormData);
   }
 
   void _onToggleProbabilidadDropdown(
@@ -1487,7 +1490,90 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     emit(state.copyWith(showFinalResults: event.show));
   }
 
+  /// Carga datos existentes de un formulario
+  void _onLoadFormData(
+    LoadFormData event,
+    Emitter<RiskThreatAnalysisState> emit,
+  ) {
+    // Cargar las selecciones dinámicas
+    final dynamicSelections = Map<String, Map<String, String>>.from(event.formData['dynamicSelections'] ?? {});
+    
+    // Cargar scores
+    final subClassificationScores = Map<String, double>.from(event.formData['subClassificationScores'] ?? {});
+    
+    // Cargar colores de scores
+    final colorsData = Map<String, dynamic>.from(event.formData['subClassificationColors'] ?? {});
+    final subClassificationColors = <String, Color>{};
+    colorsData.forEach((key, value) {
+      if (value is Color) {
+        subClassificationColors[key] = value;
+      }
+    });
+    
+    // Cargar selecciones específicas de probabilidad e intensidad
+    final probabilidadSelections = Map<String, String>.from(event.formData['probabilidadSelections'] ?? {});
+    final intensidadSelections = Map<String, String>.from(event.formData['intensidadSelections'] ?? {});
+    
+    // Cargar valores seleccionados para mostrar en dropdowns
+    final selectedProbabilidad = event.formData['selectedProbabilidad'] as String?;
+    final selectedIntensidad = event.formData['selectedIntensidad'] as String?;
+    
+    emit(state.copyWith(
+      dynamicSelections: dynamicSelections,
+      subClassificationScores: subClassificationScores,
+      subClassificationColors: subClassificationColors,
+      probabilidadSelections: probabilidadSelections,
+      intensidadSelections: intensidadSelections,
+      selectedProbabilidad: selectedProbabilidad,
+      selectedIntensidad: selectedIntensidad,
+      isLoading: false,
+    ));
+    
+    print('Datos del formulario cargados para: ${event.eventName}_${event.classificationType}');
+    print('selectedProbabilidad: $selectedProbabilidad');
+    print('selectedIntensidad: $selectedIntensidad');
+    print('subClassificationScores: $subClassificationScores');
+    print('subClassificationColors: $subClassificationColors');
+  }
 
+  /// Guarda datos actuales del formulario
+  void _onSaveFormData(
+    SaveFormData event,
+    Emitter<RiskThreatAnalysisState> emit,
+  ) {
+    // Los datos se guardan a través del HomeBloc
+    // Este evento solo notifica que se deben guardar los datos
+    print('Datos del formulario guardados para: ${event.eventName}_${event.classificationType}');
+  }
+
+
+
+  /// Método para cargar datos existentes de una evaluación específica
+  void loadExistingFormData(String eventName, String classificationType, Map<String, dynamic>? savedData) {
+    if (savedData != null && savedData['evaluationData'] != null) {
+      final evaluationData = savedData['evaluationData'] as Map<String, dynamic>;
+      
+      // Cargar los datos existentes
+      add(LoadFormData(eventName, classificationType, evaluationData));
+      
+      print('Cargando datos existentes para: $eventName - $classificationType');
+    } else {
+      print('No hay datos existentes para: $eventName - $classificationType');
+    }
+  }
+
+  /// Método para obtener datos actuales del formulario para guardar
+  Map<String, dynamic> getCurrentFormData() {
+    return {
+      'dynamicSelections': state.dynamicSelections,
+      'subClassificationScores': state.subClassificationScores,
+      'subClassificationColors': state.subClassificationColors,
+      'probabilidadSelections': state.probabilidadSelections,
+      'intensidadSelections': state.intensidadSelections,
+      'selectedProbabilidad': state.selectedProbabilidad,
+      'selectedIntensidad': state.selectedIntensidad,
+    };
+  }
 
   @override
   Future<void> close() {

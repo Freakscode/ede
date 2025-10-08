@@ -40,7 +40,11 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         selectedRiskEvent: event.eventName,
         mostrarEventosRiesgo: false,
         mostrarCategoriasRiesgo: true,
-        activeFormId: null, // Limpiar activeFormId para nuevo formulario
+        selectedRiskCategory: null, // Resetear la categoría seleccionada
+        activeFormId: null, // Limpiar formulario activo
+        // NO resetear completedEvaluations para permitir progreso acumulativo
+        savedForms: const [], // Limpiar formularios guardados
+        isLoadingForms: false, // Resetear estado de carga
       ));
     });
     on<SelectRiskCategory>((event, emit) {
@@ -122,6 +126,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<LoadFormForEditing>(_onLoadFormForEditing);
     on<CompleteForm>(_onCompleteForm);
     on<SetActiveFormId>(_onSetActiveFormId);
+    on<SaveRiskEventModel>(_onSaveRiskEventModel);
   }
 
   // ======= HANDLERS PARA GESTIÓN DE FORMULARIOS =======
@@ -161,6 +166,23 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   void _onSetActiveFormId(SetActiveFormId event, Emitter<HomeState> emit) {
     // TODO: Actualizar según nueva estructura del estado
     print('SetActiveFormId recibido para ID: ${event.formId}');
+  }
+
+  /// Guarda un RiskEventModel completo cuando se completa una evaluación
+  void _onSaveRiskEventModel(SaveRiskEventModel event, Emitter<HomeState> emit) {
+    final key = '${event.eventName}_${event.classificationType}';
+    final updatedSavedModels = Map<String, Map<String, dynamic>>.from(state.savedRiskEventModels);
+    
+    // Guardar los datos de evaluación
+    updatedSavedModels[key] = {
+      'eventName': event.eventName,
+      'classificationType': event.classificationType,
+      'evaluationData': event.evaluationData,
+      'savedAt': DateTime.now().toIso8601String(),
+    };
+    
+    emit(state.copyWith(savedRiskEventModels: updatedSavedModels));
+    print('RiskEventModel guardado para: $key');
   }
 
   /// Mapea los nombres de eventos a sus iconos correspondientes
@@ -214,5 +236,26 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   /// Obtiene el estado de completitud para vulnerabilidad
   bool isVulnerabilidadCompleted(String eventName) {
     return isEvaluationCompleted(eventName, 'vulnerabilidad');
+  }
+
+  /// Obtiene los datos guardados de un RiskEventModel para una evaluación específica
+  Map<String, dynamic>? getSavedRiskEventModel(String eventName, String classificationType) {
+    final key = '${eventName}_${classificationType}';
+    return state.savedRiskEventModels[key];
+  }
+
+  /// Obtiene todos los datos guardados para un evento específico
+  Map<String, Map<String, dynamic>> getSavedModelsForEvent(String eventName) {
+    return Map.fromEntries(
+      state.savedRiskEventModels.entries
+          .where((entry) => entry.key.startsWith('${eventName}_'))
+    );
+  }
+
+  /// Verifica si un evento tiene ambas evaluaciones guardadas (Amenaza y Vulnerabilidad)
+  bool hasCompleteRiskEventModel(String eventName) {
+    final amenazaSaved = getSavedRiskEventModel(eventName, 'amenaza') != null;
+    final vulnerabilidadSaved = getSavedRiskEventModel(eventName, 'vulnerabilidad') != null;
+    return amenazaSaved && vulnerabilidadSaved;
   }
 }

@@ -74,3 +74,21 @@ class ShowFinalResults extends RiskThreatAnalysisEvent {
   
   ShowFinalResults(this.show);
 }
+
+/// Evento para cargar datos existentes de un formulario
+class LoadFormData extends RiskThreatAnalysisEvent {
+  final String eventName;
+  final String classificationType;
+  final Map<String, dynamic> formData;
+  
+  LoadFormData(this.eventName, this.classificationType, this.formData);
+}
+
+/// Evento para guardar datos del formulario actual
+class SaveFormData extends RiskThreatAnalysisEvent {
+  final String eventName;
+  final String classificationType;
+  final Map<String, dynamic> formData;
+  
+  SaveFormData(this.eventName, this.classificationType, this.formData);
+}

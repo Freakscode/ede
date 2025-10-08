@@ -18,6 +18,9 @@ class HomeState extends Equatable {
   final List<FormDataModel> savedForms;
   final bool isLoadingForms;
   final String? activeFormId;
+  
+  // ======= CAMPOS PARA GUARDAR RISKEVENTMODEL =======
+  final Map<String, Map<String, dynamic>> savedRiskEventModels; // Guardar RiskEventModel por evento y clasificación
 
   const HomeState({
     required this.selectedIndex,
@@ -34,6 +37,7 @@ class HomeState extends Equatable {
     this.savedForms = const [],
     this.isLoadingForms = false,
     this.activeFormId,
+    this.savedRiskEventModels = const {},
   });
 
   HomeState copyWith({
@@ -51,6 +55,7 @@ class HomeState extends Equatable {
     List<FormDataModel>? savedForms,
     bool? isLoadingForms,
     String? activeFormId,
+    Map<String, Map<String, dynamic>>? savedRiskEventModels,
   }) {
     return HomeState(
       selectedIndex: selectedIndex ?? this.selectedIndex,
@@ -67,6 +72,7 @@ class HomeState extends Equatable {
       savedForms: savedForms ?? this.savedForms,
       isLoadingForms: isLoadingForms ?? this.isLoadingForms,
       activeFormId: activeFormId ?? this.activeFormId,
+      savedRiskEventModels: savedRiskEventModels ?? this.savedRiskEventModels,
     );
   }
 
@@ -86,6 +92,7 @@ class HomeState extends Equatable {
         savedForms,
         isLoadingForms,
         activeFormId,
+        savedRiskEventModels,
       ];
 
   // Métodos de conveniencia para filtrar formularios

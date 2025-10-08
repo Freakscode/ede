@@ -48,7 +48,6 @@ class RiskCategoriesScreen extends StatelessWidget {
             ? () {
                 // Obtener el estado actual del HomeBloc
                 final homeBloc = context.read<HomeBloc>();
-                final currentHomeState = homeBloc.state;
                 
                 // Guardar la categoría seleccionada
                 homeBloc.add(
@@ -56,17 +55,18 @@ class RiskCategoriesScreen extends StatelessWidget {
                 );
                 
                 // DETECTAR SI ES UNA NUEVA EVALUACIÓN
-                // Si es Amenaza y no está marcada como completada, es nueva evaluación
-                // Si es Vulnerabilidad y Amenaza ya está completada pero Vulnerabilidad no, es continuación
+                // Verificar el estado actual de las evaluaciones para este evento
+                final currentHomeState = homeBloc.state;
                 final isAmenaza = classification.name.toLowerCase() == 'amenaza';
                 final amenazaCompleted = currentHomeState.completedEvaluations['${selectedEvent}_amenaza'] ?? false;
                 final vulnerabilidadCompleted = currentHomeState.completedEvaluations['${selectedEvent}_vulnerabilidad'] ?? false;
                 
+                // Determinar si es nueva evaluación basado en el estado actual
                 final isNewEvaluation = (isAmenaza && !amenazaCompleted) || 
                                        (!isAmenaza && !vulnerabilidadCompleted && amenazaCompleted);
                 
-                // Si es una nueva evaluación de Amenaza, resetear todo el progreso del evento
-                if (isAmenaza && !amenazaCompleted) {
+                // Si es Amenaza y es nueva evaluación, resetear todo el progreso del evento
+                if (isAmenaza) {
                   homeBloc.add(ResetEvaluationsForEvent(selectedEvent));
                 }
                 

@@ -144,3 +144,15 @@ class SetActiveFormId extends HomeEvent {
   @override
   List<Object?> get props => [formId];
 }
+
+/// Guardar un RiskEventModel completo cuando se completa una evaluación
+class SaveRiskEventModel extends HomeEvent {
+  final String eventName;
+  final String classificationType; // 'amenaza' o 'vulnerabilidad'
+  final Map<String, dynamic> evaluationData; // Datos de la evaluación
+  
+  const SaveRiskEventModel(this.eventName, this.classificationType, this.evaluationData);
+
+  @override
+  List<Object?> get props => [eventName, classificationType, evaluationData];
+}
