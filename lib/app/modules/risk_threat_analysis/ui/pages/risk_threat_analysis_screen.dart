@@ -139,9 +139,7 @@ class RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
               builder: (context) {
                 return SingleChildScrollView(
                   controller: scrollController,
-                  physics: state.dropdownOpenStates.values.any((isOpen) => isOpen) 
-                      ? const NeverScrollableScrollPhysics() 
-                      : const AlwaysScrollableScrollPhysics(),
+                  physics: const AlwaysScrollableScrollPhysics(),
                   child: screens[state.currentBottomNavIndex],
                 );
               },

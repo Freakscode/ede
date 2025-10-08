@@ -11,6 +11,7 @@ import '../../bloc/risk_threat_analysis_state.dart';
 import '../widgets/progress_bar_widget.dart';
 import '../widgets/navigation_buttons_widget.dart';
 import '../widgets/save_progress_button.dart';
+import 'risk_threat_analysis_screen.dart';
 
 class RatingScreen extends StatefulWidget {
   final Map<String, dynamic>? navigationData;
@@ -22,6 +23,18 @@ class RatingScreen extends StatefulWidget {
 }
 
 class _RatingScreenState extends State<RatingScreen> {
+  
+  // Función para hacer scroll al inicio de la pantalla
+  void _scrollToTop(BuildContext context) {
+    final parentState = context.findAncestorStateOfType<RiskThreatAnalysisScreenState>();
+    if (parentState != null && parentState.scrollController.hasClients) {
+      parentState.scrollController.animateTo(
+        0.0, // Scroll hasta arriba
+        duration: const Duration(milliseconds: 150),
+        curve: Curves.easeOut,
+      );
+    }
+  }
   
   @override
   void initState() {
@@ -143,6 +156,7 @@ class _RatingScreenState extends State<RatingScreen> {
                             subClassificationId: subClassification.id,
                             onTap: () {
                               bloc.handleDropdownTap(subClassification.id);
+                              _scrollToTop(context);
                             },
                             onSelectionChanged: (category, level) {
                               bloc.handleSelectionChanged(subClassification.id, category, level);
