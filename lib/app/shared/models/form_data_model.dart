@@ -25,6 +25,10 @@ class FormDataModel extends Equatable {
   // Datos específicos del formulario de análisis de riesgo
   final Map<String, dynamic> riskAnalysisData;
   
+  // Datos separados por clasificación de riesgo
+  final Map<String, dynamic> amenazaData; // Datos de Amenaza (probabilidad + intensidad)
+  final Map<String, dynamic> vulnerabilidadData; // Datos de Vulnerabilidad (fragilidad física + personas + exposición)
+  
   // Datos específicos del formulario EDE
   final Map<String, dynamic> edeData;
 
@@ -40,6 +44,8 @@ class FormDataModel extends Equatable {
     this.threatProgress = 0.0,
     this.vulnerabilityProgress = 0.0,
     this.riskAnalysisData = const {},
+    this.amenazaData = const {},
+    this.vulnerabilidadData = const {},
     this.edeData = const {},
   });
 
@@ -55,6 +61,8 @@ class FormDataModel extends Equatable {
     double? threatProgress,
     double? vulnerabilityProgress,
     Map<String, dynamic>? riskAnalysisData,
+    Map<String, dynamic>? amenazaData,
+    Map<String, dynamic>? vulnerabilidadData,
     Map<String, dynamic>? edeData,
   }) {
     return FormDataModel(
@@ -69,6 +77,8 @@ class FormDataModel extends Equatable {
       threatProgress: threatProgress ?? this.threatProgress,
       vulnerabilityProgress: vulnerabilityProgress ?? this.vulnerabilityProgress,
       riskAnalysisData: riskAnalysisData ?? this.riskAnalysisData,
+      amenazaData: amenazaData ?? this.amenazaData,
+      vulnerabilidadData: vulnerabilidadData ?? this.vulnerabilidadData,
       edeData: edeData ?? this.edeData,
     );
   }
@@ -86,6 +96,8 @@ class FormDataModel extends Equatable {
       'threatProgress': threatProgress,
       'vulnerabilityProgress': vulnerabilityProgress,
       'riskAnalysisData': riskAnalysisData,
+      'amenazaData': amenazaData,
+      'vulnerabilidadData': vulnerabilidadData,
       'edeData': edeData,
     };
   }
@@ -109,6 +121,8 @@ class FormDataModel extends Equatable {
       threatProgress: (json['threatProgress'] as num?)?.toDouble() ?? 0.0,
       vulnerabilityProgress: (json['vulnerabilityProgress'] as num?)?.toDouble() ?? 0.0,
       riskAnalysisData: json['riskAnalysisData'] as Map<String, dynamic>? ?? {},
+      amenazaData: json['amenazaData'] as Map<String, dynamic>? ?? {},
+      vulnerabilidadData: json['vulnerabilidadData'] as Map<String, dynamic>? ?? {},
       edeData: json['edeData'] as Map<String, dynamic>? ?? {},
     );
   }
@@ -141,6 +155,8 @@ class FormDataModel extends Equatable {
         threatProgress,
         vulnerabilityProgress,
         riskAnalysisData,
+        amenazaData,
+        vulnerabilidadData,
         edeData,
       ];
 }

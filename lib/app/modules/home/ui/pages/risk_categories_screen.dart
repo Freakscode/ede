@@ -5,6 +5,7 @@ import 'package:caja_herramientas/app/modules/home/ui/widgets/results_risk_secti
 import 'package:caja_herramientas/app/modules/home/bloc/home_bloc.dart';
 import 'package:caja_herramientas/app/modules/home/bloc/home_state.dart';
 import 'package:caja_herramientas/app/modules/home/bloc/home_event.dart';
+import 'package:caja_herramientas/app/modules/risk_threat_analysis/bloc/risk_threat_analysis_bloc.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -61,13 +62,24 @@ class RiskCategoriesScreen extends StatelessWidget {
                 
                 // Verificar el origen de la navegación
                 final homeState = homeBloc.state;
+                
+                // CRÍTICO: También verificar si ya hay un formulario en curso en RiskThreatAnalysisBloc
+                final riskBloc = context.read<RiskThreatAnalysisBloc>();
+                final riskState = riskBloc.state;
+                
                 if (homeState.activeFormId != null && homeState.activeFormId!.isNotEmpty) {
                   // CASO 1: Entrando desde "Mis Formularios" - EDITAR formulario existente
                   navigationData['formId'] = homeState.activeFormId;
                   navigationData['loadExisting'] = true;
                   navigationData['isNewForm'] = false;
+                } else if (riskState.activeFormId != null && riskState.activeFormId!.isNotEmpty) {
+                  // CASO 2: Ya hay un formulario en curso en RiskThreatAnalysisBloc - CONTINUAR
+                  navigationData['formId'] = riskState.activeFormId;
+                  navigationData['loadExisting'] = false; // No cargar desde BD, mantener estado actual
+                  navigationData['isNewForm'] = false; // NO es nuevo, ya existe
+                  navigationData['continueExisting'] = true; // Flag para mantener datos existentes
                 } else {
-                  // CASO 2: Entrando desde selección de evento - NUEVO formulario
+                  // CASO 3: Entrando desde selección de evento - NUEVO formulario
                   navigationData['isNewForm'] = true;
                   navigationData['loadExisting'] = false;
                 }

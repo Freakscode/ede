@@ -93,3 +93,23 @@ class ShowFinalResults extends RiskThreatAnalysisEvent {
   
   ShowFinalResults(this.show);
 }
+
+// Eventos para cargar datos específicos por clasificación
+class LoadAmenazaData extends RiskThreatAnalysisEvent {
+  final String formId;
+  
+  LoadAmenazaData(this.formId);
+}
+
+class LoadVulnerabilidadData extends RiskThreatAnalysisEvent {
+  final String formId;
+  
+  LoadVulnerabilidadData(this.formId);
+}
+
+class LoadFormWithClassificationData extends RiskThreatAnalysisEvent {
+  final String formId;
+  final String? targetClassification; // 'amenaza' or 'vulnerabilidad'
+  
+  LoadFormWithClassificationData(this.formId, {this.targetClassification});
+}

@@ -7,7 +7,7 @@ import '../models/form_data_model.dart';
 class FormPersistenceService {
   static const String _activeFormKey = 'active_form_id';
   static const String _dbName = 'risk_analysis_forms.db';
-  static const int _dbVersion = 1;
+  static const int _dbVersion = 2;
 
   // Singleton pattern
   static final FormPersistenceService _instance = FormPersistenceService._internal();
@@ -62,6 +62,8 @@ class FormPersistenceService {
         intensidad_selections TEXT,
         dynamic_selections TEXT,
         sub_classification_scores TEXT,
+        amenaza_data TEXT,
+        vulnerabilidad_data TEXT,
         FOREIGN KEY (form_id) REFERENCES forms (id) ON DELETE CASCADE
       )
     ''');
@@ -84,8 +86,9 @@ class FormPersistenceService {
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
     // Manejar actualizaciones de esquema en futuras versiones
     if (oldVersion < 2) {
-      // Ejemplo de migración futura
-      // await db.execute('ALTER TABLE forms ADD COLUMN new_column TEXT');
+      // Agregar campos para amenaza y vulnerabilidad separados
+      await db.execute('ALTER TABLE risk_analysis_data ADD COLUMN amenaza_data TEXT DEFAULT "{}"');
+      await db.execute('ALTER TABLE risk_analysis_data ADD COLUMN vulnerabilidad_data TEXT DEFAULT "{}"');
     }
   }
 
@@ -116,7 +119,9 @@ class FormPersistenceService {
       );
 
       // Guardar datos de análisis de riesgo si existen
-      if (updatedForm.riskAnalysisData.isNotEmpty) {
+      if (updatedForm.riskAnalysisData.isNotEmpty || 
+          updatedForm.amenazaData.isNotEmpty || 
+          updatedForm.vulnerabilidadData.isNotEmpty) {
         await db.insert(
           'risk_analysis_data',
           {
@@ -127,6 +132,8 @@ class FormPersistenceService {
             'intensidad_selections': jsonEncode(updatedForm.riskAnalysisData['intensidadSelections'] ?? {}),
             'dynamic_selections': jsonEncode(updatedForm.riskAnalysisData['dynamicSelections'] ?? {}),
             'sub_classification_scores': jsonEncode(updatedForm.riskAnalysisData['subClassificationScores'] ?? {}),
+            'amenaza_data': jsonEncode(updatedForm.amenazaData),
+            'vulnerabilidad_data': jsonEncode(updatedForm.vulnerabilidadData),
           },
           conflictAlgorithm: ConflictAlgorithm.replace,
         );
@@ -165,6 +172,8 @@ class FormPersistenceService {
           r.intensidad_selections,
           r.dynamic_selections,
           r.sub_classification_scores,
+          r.amenaza_data,
+          r.vulnerabilidad_data,
           e.data as ede_data
         FROM forms f
         LEFT JOIN risk_analysis_data r ON f.id = r.form_id
@@ -196,6 +205,16 @@ class FormPersistenceService {
           riskAnalysisData['subClassificationScores'] = jsonDecode(row['sub_classification_scores'] as String);
         }
 
+        // Construir amenazaData
+        final amenazaData = row['amenaza_data'] != null 
+          ? jsonDecode(row['amenaza_data'] as String) as Map<String, dynamic>
+          : <String, dynamic>{};
+
+        // Construir vulnerabilidadData
+        final vulnerabilidadData = row['vulnerabilidad_data'] != null 
+          ? jsonDecode(row['vulnerabilidad_data'] as String) as Map<String, dynamic>
+          : <String, dynamic>{};
+
         // Construir edeData
         final edeData = row['ede_data'] != null 
           ? jsonDecode(row['ede_data'] as String) as Map<String, dynamic>
@@ -220,6 +239,8 @@ class FormPersistenceService {
           threatProgress: (row['threat_progress'] as num).toDouble(),
           vulnerabilityProgress: (row['vulnerability_progress'] as num).toDouble(),
           riskAnalysisData: riskAnalysisData,
+          amenazaData: amenazaData,
+          vulnerabilidadData: vulnerabilidadData,
           edeData: edeData,
         );
         

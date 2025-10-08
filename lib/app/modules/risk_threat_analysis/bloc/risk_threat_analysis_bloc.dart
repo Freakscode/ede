@@ -26,6 +26,9 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     on<CompleteForm>(_onCompleteForm);
     on<AutoSaveProgress>(_onAutoSaveProgress);
     on<ShowFinalResults>(_onShowFinalResults);
+    on<LoadAmenazaData>(_onLoadAmenazaData);
+    on<LoadVulnerabilidadData>(_onLoadVulnerabilidadData);
+    on<LoadFormWithClassificationData>(_onLoadFormWithClassificationData);
   }
 
   void _onToggleProbabilidadDropdown(
@@ -237,7 +240,9 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
         dynamicSelections: newDynamicSelections,
         subClassificationScores: preservedScores,
         subClassificationColors: preservedColors,
-        currentBottomNavIndex: 0, 
+        currentBottomNavIndex: 0,
+        // CRÍTICO: Preservar activeFormId para mantener la continuidad del formulario
+        activeFormId: state.activeFormId, 
       ));
     } else {
       
@@ -1539,7 +1544,14 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
         );
       }
       
-      await FormPersistenceService().saveForm(updatedFormData);
+      // Uso seguro del servicio con try-catch
+      try {
+        await FormPersistenceService().saveForm(updatedFormData);
+        print('✅ Form saved successfully: $formId');
+      } catch (persistenceError) {
+        print('⚠️  FormPersistenceService error (continuing anyway): $persistenceError');
+        // Continuamos con el proceso aunque falle la persistencia
+      }
       
       emit(state.copyWith(
         isSaving: false,
@@ -1547,6 +1559,7 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
         lastSaved: DateTime.now(),
       ));
     } catch (e) {
+      print('❌ Error in SaveCurrentFormData: $e');
       emit(state.copyWith(isSaving: false));
     }
   }
@@ -1558,15 +1571,9 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     emit(state.copyWith(isLoading: true));
     
     try {
-      final formData = await FormPersistenceService().getFormById(event.formId);
-      if (formData != null) {
-        emit(_createStateFromFormData(formData).copyWith(
-          isLoading: false,
-          activeFormId: event.formId,
-        ));
-      } else {
-        emit(state.copyWith(isLoading: false));
-      }
+      // final formData = await FormPersistenceService().getFormById(event.formId); // TEMPORAL
+      // TEMPORAL: Deshabilitado
+      emit(state.copyWith(isLoading: false));
     } catch (e) {
       emit(state.copyWith(isLoading: false));
     }
@@ -1578,7 +1585,7 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
   ) async {
 
     // Limpiar el formulario activo del FormPersistenceService
-    await FormPersistenceService().clearActiveForm();
+    // await FormPersistenceService().clearActiveForm(); // TEMPORAL
     
     // Resetear COMPLETAMENTE todo el estado para un formulario nuevo
     emit(RiskThreatAnalysisState(
@@ -1599,15 +1606,7 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     emit(state.copyWith(isSaving: true));
     
     try {
-      final formData = _createFormDataFromCurrentState();
-      final completedFormData = formData.copyWith(
-        status: FormStatus.completed,
-        lastModified: DateTime.now(),
-        progressPercentage: 100.0,
-      );
-      
-      await FormPersistenceService().saveForm(completedFormData);
-      
+      // TEMPORAL: Deshabilitado
       emit(state.copyWith(
         isSaving: false,
         lastSaved: DateTime.now(),
@@ -1621,8 +1620,33 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     AutoSaveProgress event,
     Emitter<RiskThreatAnalysisState> emit,
   ) async {
-    if (state.activeFormId != null) {
-      add(SaveCurrentFormData());
+    try {
+      print('🔄 AutoSaveProgress triggered');
+      print('   activeFormId: ${state.activeFormId}');
+      print('   selectedRiskEvent: ${state.selectedRiskEvent}');
+      print('   probabilidadSelections: ${state.probabilidadSelections}');
+      print('   intensidadSelections: ${state.intensidadSelections}');
+      
+      if (state.activeFormId != null) {
+        print('✅ Calling SaveCurrentFormData (existing form)');
+        add(SaveCurrentFormData());
+      } else {
+        print('❌ No activeFormId - AutoSave SKIPPED for new form');
+        
+        // SOLUCIÓN: Crear un nuevo formulario automáticamente si hay datos
+        if (state.probabilidadSelections.isNotEmpty || 
+            state.intensidadSelections.isNotEmpty || 
+            state.dynamicSelections.isNotEmpty) {
+          print('📝 Creating new form automatically for AutoSave');
+          
+          final newFormId = 'form_${DateTime.now().millisecondsSinceEpoch}';
+          
+          emit(state.copyWith(activeFormId: newFormId));
+          add(SaveCurrentFormData());
+        }
+      }
+    } catch (e) {
+      print('❌ Error in AutoSaveProgress: $e');
     }
   }
 
@@ -1634,6 +1658,13 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     final threatProgress = _calculateThreatProgress();
     final vulnerabilityProgress = _calculateVulnerabilityProgress();
     
+    // Separar datos de amenaza y vulnerabilidad
+    final amenazaData = _extractAmenazaData();
+    final vulnerabilidadData = _extractVulnerabilidadData();
+    
+    print('🔄 Creating FormData with separated classification data:');
+    print('   amenazaData: ${amenazaData.keys}');
+    print('   vulnerabilidadData: ${vulnerabilidadData.keys}');
     
     return FormDataModel(
       id: state.activeFormId ?? now.millisecondsSinceEpoch.toString(),
@@ -1656,36 +1687,212 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
           (key, value) => MapEntry(key, value.toString()),
         ),
       },
+      amenazaData: amenazaData,
+      vulnerabilidadData: vulnerabilidadData,
       edeData: const {},
     );
+  }
+
+  /// Extrae los datos específicos de amenaza (probabilidad + intensidad)
+  Map<String, dynamic> _extractAmenazaData() {
+    final amenazaSelections = <String, Map<String, String>>{};
+    final amenazaScores = <String, double>{};
+    final amenazaColors = <String, String>{};
+    
+    // Incluir probabilidad e intensidad
+    if (state.probabilidadSelections.isNotEmpty) {
+      amenazaSelections['probabilidad'] = Map<String, String>.from(state.probabilidadSelections);
+    }
+    if (state.intensidadSelections.isNotEmpty) {
+      amenazaSelections['intensidad'] = Map<String, String>.from(state.intensidadSelections);
+    }
+    
+    // Incluir scores y colores de amenaza
+    for (final entry in state.subClassificationScores.entries) {
+      if (entry.key == 'probabilidad' || entry.key == 'intensidad') {
+        amenazaScores[entry.key] = entry.value;
+      }
+    }
+    
+    for (final entry in state.subClassificationColors.entries) {
+      if (entry.key == 'probabilidad' || entry.key == 'intensidad') {
+        amenazaColors[entry.key] = entry.value.toString();
+      }
+    }
+    
+    return {
+      'selectedRiskEvent': state.selectedRiskEvent,
+      'selections': amenazaSelections,
+      'scores': amenazaScores,
+      'colors': amenazaColors,
+      'finalScore': _calculateAmenazaFinalScore(),
+      'rating': _calculateAmenazaRating(),
+      'lastUpdated': DateTime.now().toIso8601String(),
+    };
+  }
+
+  /// Extrae los datos específicos de vulnerabilidad (fragilidad física + personas + exposición)
+  Map<String, dynamic> _extractVulnerabilidadData() {
+    final vulnerabilidadSelections = <String, Map<String, String>>{};
+    final vulnerabilidadScores = <String, double>{};
+    final vulnerabilidadColors = <String, String>{};
+    
+    // Incluir todas las subclasificaciones de vulnerabilidad
+    final vulnerabilidadSubIds = ['fragilidad_fisica', 'fragilidad_personas', 'exposicion'];
+    
+    for (final subId in vulnerabilidadSubIds) {
+      final selections = state.dynamicSelections[subId];
+      if (selections != null && selections.isNotEmpty) {
+        vulnerabilidadSelections[subId] = Map<String, String>.from(selections);
+      }
+      
+      // Incluir scores y colores
+      final score = state.subClassificationScores[subId];
+      if (score != null) {
+        vulnerabilidadScores[subId] = score;
+      }
+      
+      final color = state.subClassificationColors[subId];
+      if (color != null) {
+        vulnerabilidadColors[subId] = color.toString();
+      }
+    }
+    
+    return {
+      'selectedRiskEvent': state.selectedRiskEvent,
+      'selections': vulnerabilidadSelections,
+      'scores': vulnerabilidadScores,
+      'colors': vulnerabilidadColors,
+      'finalScore': _calculateVulnerabilidadFinalScore(),
+      'rating': _calculateVulnerabilidadRating(),
+      'lastUpdated': DateTime.now().toIso8601String(),
+    };
   }
 
   // Método para crear estado desde FormDataModel
   RiskThreatAnalysisState _createStateFromFormData(FormDataModel formData) {
     final riskData = formData.riskAnalysisData;
+    final amenazaData = formData.amenazaData;
+    final vulnerabilidadData = formData.vulnerabilidadData;
+    
+    print('🔄 Restoring FormData with separated classification data:');
+    print('   amenazaData available: ${amenazaData.isNotEmpty}');
+    print('   vulnerabilidadData available: ${vulnerabilidadData.isNotEmpty}');
+    
+    // Combinar datos de amenaza y vulnerabilidad para restaurar el estado completo
+    final restoredProbabilidadSelections = _restoreProbabilidadSelections(amenazaData, riskData);
+    final restoredIntensidadSelections = _restoreIntensidadSelections(amenazaData, riskData);
+    final restoredDynamicSelections = _restoreDynamicSelections(amenazaData, vulnerabilidadData, riskData);
+    final restoredScores = _restoreSubClassificationScores(amenazaData, vulnerabilidadData, riskData);
     
     return state.copyWith(
-      selectedRiskEvent: riskData['selectedRiskEvent'] as String? ?? state.selectedRiskEvent,
+      selectedRiskEvent: riskData['selectedRiskEvent'] as String? ?? amenazaData['selectedRiskEvent'] as String? ?? state.selectedRiskEvent,
       selectedClassification: riskData['selectedClassification'] as String? ?? state.selectedClassification,
-      probabilidadSelections: Map<String, String>.from(
-        riskData['probabilidadSelections'] as Map? ?? {},
-      ),
-      intensidadSelections: Map<String, String>.from(
-        riskData['intensidadSelections'] as Map? ?? {},
-      ),
-      dynamicSelections: (riskData['dynamicSelections'] as Map?)?.map(
-        (key, value) => MapEntry(
-          key.toString(),
-          Map<String, String>.from(value as Map),
-        ),
-      ) ?? {},
-      subClassificationScores: (riskData['subClassificationScores'] as Map?)?.map(
-        (key, value) => MapEntry(
-          key.toString(),
-          double.tryParse(value.toString()) ?? 0.0,
-        ),
-      ) ?? {},
+      probabilidadSelections: restoredProbabilidadSelections,
+      intensidadSelections: restoredIntensidadSelections,
+      dynamicSelections: restoredDynamicSelections,
+      subClassificationScores: restoredScores,
+      activeFormId: formData.id,
+      lastSaved: formData.lastModified,
     );
+  }
+
+  /// Restaura las selecciones de probabilidad desde los datos separados
+  Map<String, String> _restoreProbabilidadSelections(Map<String, dynamic> amenazaData, Map<String, dynamic> riskData) {
+    if (amenazaData.isNotEmpty) {
+      final selections = amenazaData['selections'] as Map<String, dynamic>?;
+      if (selections != null && selections['probabilidad'] != null) {
+        return Map<String, String>.from(selections['probabilidad'] as Map);
+      }
+    }
+    
+    // Fallback a datos legacy
+    return Map<String, String>.from(riskData['probabilidadSelections'] as Map? ?? {});
+  }
+
+  /// Restaura las selecciones de intensidad desde los datos separados
+  Map<String, String> _restoreIntensidadSelections(Map<String, dynamic> amenazaData, Map<String, dynamic> riskData) {
+    if (amenazaData.isNotEmpty) {
+      final selections = amenazaData['selections'] as Map<String, dynamic>?;
+      if (selections != null && selections['intensidad'] != null) {
+        return Map<String, String>.from(selections['intensidad'] as Map);
+      }
+    }
+    
+    // Fallback a datos legacy
+    return Map<String, String>.from(riskData['intensidadSelections'] as Map? ?? {});
+  }
+
+  /// Restaura las selecciones dinámicas desde los datos separados
+  Map<String, Map<String, String>> _restoreDynamicSelections(
+    Map<String, dynamic> amenazaData, 
+    Map<String, dynamic> vulnerabilidadData, 
+    Map<String, dynamic> riskData
+  ) {
+    final restored = <String, Map<String, String>>{};
+    
+    // Restaurar datos de vulnerabilidad
+    if (vulnerabilidadData.isNotEmpty) {
+      final vulnerabilidadSelections = vulnerabilidadData['selections'] as Map<String, dynamic>?;
+      if (vulnerabilidadSelections != null) {
+        for (final entry in vulnerabilidadSelections.entries) {
+          restored[entry.key] = Map<String, String>.from(entry.value as Map);
+        }
+      }
+    }
+    
+    // Fallback a datos legacy si no hay datos separados
+    if (restored.isEmpty) {
+      final legacyDynamicSelections = riskData['dynamicSelections'] as Map?;
+      if (legacyDynamicSelections != null) {
+        for (final entry in legacyDynamicSelections.entries) {
+          restored[entry.key.toString()] = Map<String, String>.from(entry.value as Map);
+        }
+      }
+    }
+    
+    return restored;
+  }
+
+  /// Restaura los scores desde los datos separados
+  Map<String, double> _restoreSubClassificationScores(
+    Map<String, dynamic> amenazaData, 
+    Map<String, dynamic> vulnerabilidadData, 
+    Map<String, dynamic> riskData
+  ) {
+    final restored = <String, double>{};
+    
+    // Restaurar scores de amenaza
+    if (amenazaData.isNotEmpty) {
+      final amenazaScores = amenazaData['scores'] as Map<String, dynamic>?;
+      if (amenazaScores != null) {
+        for (final entry in amenazaScores.entries) {
+          restored[entry.key] = (entry.value as num).toDouble();
+        }
+      }
+    }
+    
+    // Restaurar scores de vulnerabilidad
+    if (vulnerabilidadData.isNotEmpty) {
+      final vulnerabilidadScores = vulnerabilidadData['scores'] as Map<String, dynamic>?;
+      if (vulnerabilidadScores != null) {
+        for (final entry in vulnerabilidadScores.entries) {
+          restored[entry.key] = (entry.value as num).toDouble();
+        }
+      }
+    }
+    
+    // Fallback a datos legacy si no hay datos separados
+    if (restored.isEmpty) {
+      final legacyScores = riskData['subClassificationScores'] as Map?;
+      if (legacyScores != null) {
+        for (final entry in legacyScores.entries) {
+          restored[entry.key.toString()] = double.tryParse(entry.value.toString()) ?? 0.0;
+        }
+      }
+    }
+    
+    return restored;
   }
 
   // Métodos de cálculo de progreso
@@ -1786,5 +1993,213 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     Emitter<RiskThreatAnalysisState> emit,
   ) {
     emit(state.copyWith(showFinalResults: event.show));
+  }
+
+  // Nuevos manejadores para cargar datos específicos por clasificación
+
+  Future<void> _onLoadAmenazaData(
+    LoadAmenazaData event,
+    Emitter<RiskThreatAnalysisState> emit,
+  ) async {
+    emit(state.copyWith(isLoading: true));
+    
+    try {
+      final formService = FormPersistenceService();
+      final formData = await formService.getFormById(event.formId);
+      
+      if (formData != null && formData.amenazaData.isNotEmpty) {
+        print('📥 Loading amenaza data from form: ${event.formId}');
+        
+        final amenazaData = formData.amenazaData;
+        final selections = amenazaData['selections'] as Map<String, dynamic>? ?? {};
+        final scores = amenazaData['scores'] as Map<String, dynamic>? ?? {};
+        
+        // Restaurar selecciones de amenaza
+        final probabilidadSelections = selections['probabilidad'] != null 
+          ? Map<String, String>.from(selections['probabilidad'] as Map)
+          : <String, String>{};
+        
+        final intensidadSelections = selections['intensidad'] != null 
+          ? Map<String, String>.from(selections['intensidad'] as Map)
+          : <String, String>{};
+        
+        // Restaurar scores de amenaza
+        final restoredScores = <String, double>{};
+        for (final entry in scores.entries) {
+          restoredScores[entry.key] = (entry.value as num).toDouble();
+        }
+        
+        emit(state.copyWith(
+          selectedRiskEvent: amenazaData['selectedRiskEvent'] as String? ?? state.selectedRiskEvent,
+          selectedClassification: 'amenaza',
+          probabilidadSelections: probabilidadSelections,
+          intensidadSelections: intensidadSelections,
+          subClassificationScores: {...state.subClassificationScores, ...restoredScores},
+          activeFormId: formData.id,
+          lastSaved: formData.lastModified,
+          isLoading: false,
+        ));
+        
+        print('✅ Amenaza data loaded successfully');
+      } else {
+        print('⚠️ No amenaza data found in form: ${event.formId}');
+        emit(state.copyWith(isLoading: false));
+      }
+    } catch (e) {
+      print('❌ Error loading amenaza data: $e');
+      emit(state.copyWith(isLoading: false));
+    }
+  }
+
+  Future<void> _onLoadVulnerabilidadData(
+    LoadVulnerabilidadData event,
+    Emitter<RiskThreatAnalysisState> emit,
+  ) async {
+    emit(state.copyWith(isLoading: true));
+    
+    try {
+      final formService = FormPersistenceService();
+      final formData = await formService.getFormById(event.formId);
+      
+      if (formData != null && formData.vulnerabilidadData.isNotEmpty) {
+        print('📥 Loading vulnerabilidad data from form: ${event.formId}');
+        
+        final vulnerabilidadData = formData.vulnerabilidadData;
+        final selections = vulnerabilidadData['selections'] as Map<String, dynamic>? ?? {};
+        final scores = vulnerabilidadData['scores'] as Map<String, dynamic>? ?? {};
+        
+        // Restaurar selecciones dinámicas de vulnerabilidad
+        final restoredDynamicSelections = <String, Map<String, String>>{};
+        for (final entry in selections.entries) {
+          restoredDynamicSelections[entry.key] = Map<String, String>.from(entry.value as Map);
+        }
+        
+        // Restaurar scores de vulnerabilidad
+        final restoredScores = <String, double>{};
+        for (final entry in scores.entries) {
+          restoredScores[entry.key] = (entry.value as num).toDouble();
+        }
+        
+        emit(state.copyWith(
+          selectedRiskEvent: vulnerabilidadData['selectedRiskEvent'] as String? ?? state.selectedRiskEvent,
+          selectedClassification: 'vulnerabilidad',
+          dynamicSelections: {...state.dynamicSelections, ...restoredDynamicSelections},
+          subClassificationScores: {...state.subClassificationScores, ...restoredScores},
+          activeFormId: formData.id,
+          lastSaved: formData.lastModified,
+          isLoading: false,
+        ));
+        
+        print('✅ Vulnerabilidad data loaded successfully');
+      } else {
+        print('⚠️ No vulnerabilidad data found in form: ${event.formId}');
+        emit(state.copyWith(isLoading: false));
+      }
+    } catch (e) {
+      print('❌ Error loading vulnerabilidad data: $e');
+      emit(state.copyWith(isLoading: false));
+    }
+  }
+
+  Future<void> _onLoadFormWithClassificationData(
+    LoadFormWithClassificationData event,
+    Emitter<RiskThreatAnalysisState> emit,
+  ) async {
+    emit(state.copyWith(isLoading: true));
+    
+    try {
+      final formService = FormPersistenceService();
+      final formData = await formService.getFormById(event.formId);
+      
+      if (formData != null) {
+        print('📥 Loading complete form data: ${event.formId}');
+        print('   Target classification: ${event.targetClassification}');
+        
+        // Usar el método existente para restaurar el estado completo
+        final restoredState = _createStateFromFormData(formData);
+        
+        // Si se especifica una clasificación objetivo, cambiar a ella
+        final targetClassification = event.targetClassification ?? restoredState.selectedClassification;
+        
+        emit(restoredState.copyWith(
+          selectedClassification: targetClassification,
+          isLoading: false,
+        ));
+        
+        print('✅ Complete form data loaded successfully');
+        print('   Active classification: $targetClassification');
+        print('   Has amenaza data: ${formData.amenazaData.isNotEmpty}');
+        print('   Has vulnerabilidad data: ${formData.vulnerabilidadData.isNotEmpty}');
+      } else {
+        print('⚠️ Form not found: ${event.formId}');
+        emit(state.copyWith(isLoading: false));
+      }
+    } catch (e) {
+      print('❌ Error loading form with classification data: $e');
+      emit(state.copyWith(isLoading: false));
+    }
+  }
+
+  // Métodos de conveniencia para obtener datos guardados
+
+  /// Obtiene los datos de amenaza guardados para el formulario actual
+  Map<String, dynamic> getSavedAmenazaData() {
+    if (state.activeFormId == null) return {};
+    
+    return _extractAmenazaData();
+  }
+
+  /// Obtiene los datos de vulnerabilidad guardados para el formulario actual
+  Map<String, dynamic> getSavedVulnerabilidadData() {
+    if (state.activeFormId == null) return {};
+    
+    return _extractVulnerabilidadData();
+  }
+
+  /// Verifica si hay datos de amenaza guardados
+  bool hasAmenazaData() {
+    final amenazaData = getSavedAmenazaData();
+    final selections = amenazaData['selections'] as Map<String, Map<String, String>>? ?? {};
+    return selections.isNotEmpty;
+  }
+
+  /// Verifica si hay datos de vulnerabilidad guardados
+  bool hasVulnerabilidadData() {
+    final vulnerabilidadData = getSavedVulnerabilidadData();
+    final selections = vulnerabilidadData['selections'] as Map<String, Map<String, String>>? ?? {};
+    return selections.isNotEmpty;
+  }
+
+  /// Obtiene un resumen del estado de completitud de los datos
+  Map<String, dynamic> getDataCompletionStatus() {
+    return {
+      'hasAmenaza': hasAmenazaData(),
+      'hasVulnerabilidad': hasVulnerabilidadData(),
+      'amenazaScore': _calculateAmenazaFinalScore(),
+      'vulnerabilidadScore': _calculateVulnerabilidadFinalScore(),
+      'amenazaRating': _calculateAmenazaRating(),
+      'vulnerabilidadRating': _calculateVulnerabilidadRating(),
+      'activeFormId': state.activeFormId,
+      'selectedRiskEvent': state.selectedRiskEvent,
+      'selectedClassification': state.selectedClassification,
+      'lastSaved': state.lastSaved?.toIso8601String(),
+    };
+  }
+
+  /// Carga datos específicos según la clasificación actual
+  void loadDataForCurrentClassification() {
+    if (state.activeFormId == null) return;
+    
+    switch (state.selectedClassification) {
+      case 'amenaza':
+        add(LoadAmenazaData(state.activeFormId!));
+        break;
+      case 'vulnerabilidad':
+        add(LoadVulnerabilidadData(state.activeFormId!));
+        break;
+      default:
+        // Cargar datos completos por defecto
+        add(LoadFormWithClassificationData(state.activeFormId!));
+    }
   }
 }
