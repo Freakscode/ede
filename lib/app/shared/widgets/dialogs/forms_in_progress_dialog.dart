@@ -45,32 +45,25 @@ class FormsInProgressDialog extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const SizedBox(width: 40), // Espacio para centrar el título
-                  const Expanded(
-                    child: Text(
-                      'Formularios en proceso',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Color(0xFF1E1E1E),
-                        fontFamily: 'Work Sans',
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                      ),
+                  Text(
+                    'Formularios en proceso',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Color(0xFF1E1E1E),
+                      fontFamily: 'Work Sans',
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                   GestureDetector(
                     onTap: () => Navigator.of(context).pop(),
-                    child: Container(
-                      width: 32,
-                      height: 32,
-                      decoration: BoxDecoration(
-                        color: Colors.grey.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: const Icon(
-                        Icons.close,
-                        color: Color(0xFF1E1E1E),
-                        size: 20,
+                    child: SvgPicture.asset(
+                      AppIcons.closev2,
+                      width: 26,
+                      height: 26,
+                      colorFilter: const ColorFilter.mode(
+                        Colors.black,
+                        BlendMode.srcIn,
                       ),
                     ),
                   ),

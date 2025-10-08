@@ -33,6 +33,7 @@ class AppIcons {
   static const String chartBar = 'assets/icons/caja_herramientas/ChartBar.svg';
   static const String check = 'assets/icons/caja_herramientas/Check.svg';
   static const String close = 'assets/icons/caja_herramientas/Close.svg';
+  static const String closev2 = 'assets/icons/caja_herramientas/Closev2.svg';
   static const String cursor = 'assets/icons/caja_herramientas/Cursor.svg';
   static const String dashboard = 'assets/icons/caja_herramientas/Dashboard.svg';
   static const String download = 'assets/icons/caja_herramientas/Download.svg';

@@ -23,10 +23,12 @@ class RiskThreatAnalysisScreen extends StatefulWidget {
   const RiskThreatAnalysisScreen({super.key, this.selectedEvent, this.navigationData});
 
   @override
-  State<RiskThreatAnalysisScreen> createState() => _RiskThreatAnalysisScreenState();
+  State<RiskThreatAnalysisScreen> createState() => RiskThreatAnalysisScreenState();
 }
 
-class _RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
+class RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
+  final ScrollController scrollController = ScrollController();
+  
   @override
   void initState() {
     super.initState();
@@ -40,6 +42,12 @@ class _RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
     if (widget.navigationData != oldWidget.navigationData) {
       _processNavigationData();
     }
+  }
+
+  @override
+  void dispose() {
+    scrollController.dispose();
+    super.dispose();
   }
 
   void _processNavigationData() {
@@ -127,7 +135,17 @@ class _RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
               showInfo: true,
               showProfile: true,
             ),
-            body: SingleChildScrollView(child: screens[state.currentBottomNavIndex]),
+            body: Builder(
+              builder: (context) {
+                return SingleChildScrollView(
+                  controller: scrollController,
+                  physics: state.dropdownOpenStates.values.any((isOpen) => isOpen) 
+                      ? const NeverScrollableScrollPhysics() 
+                      : const AlwaysScrollableScrollPhysics(),
+                  child: screens[state.currentBottomNavIndex],
+                );
+              },
+            ),
            
             bottomNavigationBar: state.currentBottomNavIndex == 3 ? null : CustomBottomNavBar(
               currentIndex: state.currentBottomNavIndex,
