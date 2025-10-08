@@ -28,68 +28,74 @@ class _RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
   @override
   void initState() {
     super.initState();
-    // Usar el bloc global e inicializar con el evento seleccionado si existe
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final bloc = context.read<RiskThreatAnalysisBloc>();
+    _processNavigationData();
+  }
+
+  @override
+  void didUpdateWidget(covariant RiskThreatAnalysisScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Procesar navigationData si cambió
+    if (widget.navigationData != oldWidget.navigationData) {
+      _processNavigationData();
+    }
+  }
+
+  void _processNavigationData() {
+    print('DEBUG: _processNavigationData llamado con navigationData: ${widget.navigationData}');
+    
+    final bloc = context.read<RiskThreatAnalysisBloc>();
+    
+    // Actualizar el evento seleccionado si es diferente
+    if (widget.selectedEvent != null && widget.selectedEvent!.isNotEmpty) {
+      bloc.add(UpdateSelectedRiskEvent(widget.selectedEvent!));
+    }
+
+    // Si tenemos navigationData, procesarla INMEDIATAMENTE
+    if (widget.navigationData != null) {
+      final eventFromNavData = widget.navigationData!['event'] as String?;
+      final finalResults = widget.navigationData!['finalResults'] as bool? ?? false;
+      final targetIndex = widget.navigationData!['targetIndex'] as int?;
+      final classificationName = widget.navigationData!['classification'] as String?;
+      final directToResults = widget.navigationData!['directToResults'] as bool? ?? false;
+      final formId = widget.navigationData!['formId'] as String?;
+      final isNewForm = widget.navigationData!['isNewForm'] as bool? ?? false;
+      final loadExisting = widget.navigationData!['loadExisting'] as bool? ?? false;
       
-      // Actualizar el evento seleccionado si es diferente
-      if (widget.selectedEvent != null && widget.selectedEvent!.isNotEmpty) {
-        bloc.add(UpdateSelectedRiskEvent(widget.selectedEvent!));
+      // Actualizar el evento si viene en navigationData
+      if (eventFromNavData != null && eventFromNavData.isNotEmpty) {
+        bloc.add(UpdateSelectedRiskEvent(eventFromNavData));
       }
       
-      // Manejar carga o creación de formulario con lógica mejorada
-      if (widget.navigationData != null) {
-        final formId = widget.navigationData!['formId'] as String?;
-        final isNewForm = widget.navigationData!['isNewForm'] as bool? ?? false;
-        final loadExisting = widget.navigationData!['loadExisting'] as bool? ?? false;
-        final eventFromNavData = widget.navigationData!['event'] as String?;
-        
-        if (formId != null && loadExisting) {
-          // CASO 1: EDITAR formulario existente (desde "Mis Formularios")
-          bloc.add(LoadFormData(formId));
-        } else if (isNewForm && eventFromNavData != null) {
-          // CASO 2: NUEVO formulario (desde selección de evento)
-          bloc.add(ResetToNewForm(eventFromNavData));
-        } else if (eventFromNavData != null) {
-          // CASO 3: Fallback - crear nuevo formulario
-          bloc.add(ResetToNewForm(eventFromNavData));
-        }
+      // PRIORIDAD 1: Navegación a FinalRiskResultsScreen
+      if (finalResults && targetIndex != null) {
+        print('DEBUG: Navegando INMEDIATAMENTE a targetIndex: $targetIndex con finalResults: $finalResults');
+        bloc.add(ChangeBottomNavIndex(targetIndex));
+        return; // Salir inmediatamente sin procesar otras opciones
       }
       
-      // Si tenemos navigationData, procesarla
-      if (widget.navigationData != null) {
-        final eventFromNavData = widget.navigationData!['event'] as String?;
-        final classificationName = widget.navigationData!['classification'] as String?;
-        final directToResults = widget.navigationData!['directToResults'] as bool? ?? false;
-        final finalResults = widget.navigationData!['finalResults'] as bool? ?? false;
-        final targetIndex = widget.navigationData!['targetIndex'] as int?;
-        
-        // Actualizar el evento si viene en navigationData
-        if (eventFromNavData != null && eventFromNavData.isNotEmpty) {
-          bloc.add(UpdateSelectedRiskEvent(eventFromNavData));
-        }
-        
-        if (finalResults && targetIndex != null) {
-          // Activar modo de resultados finales y ir al índice de resultados (2)
-          bloc.add(ChangeBottomNavIndex(2)); // Siempre ir a "Resultados" (índice 2)
-          // Activar el flag para mostrar FinalRiskResultsScreen
-          bloc.add(ShowFinalResults(true));
-        } else if (classificationName != null) {
-          // Lógica original para clasificaciones
-          final navIndex = directToResults ? 2 : 0;
-          bloc.add(ChangeBottomNavIndex(navIndex));
-          
-          // Aplicar la nueva clasificación
-          bloc.add(SelectClassification(classificationName));
-        }
+      // PRIORIDAD 2: Manejar carga de formularios existentes
+      if (formId != null && loadExisting) {
+        bloc.add(LoadFormData(formId));
+      } else if (isNewForm && eventFromNavData != null) {
+        bloc.add(ResetToNewForm(eventFromNavData));
+      } else if (eventFromNavData != null) {
+        bloc.add(ResetToNewForm(eventFromNavData));
       }
-    });
+      
+      // PRIORIDAD 3: Navegación por clasificaciones
+      if (classificationName != null) {
+        final navIndex = directToResults ? 2 : 0;
+        bloc.add(ChangeBottomNavIndex(navIndex));
+        bloc.add(SelectClassification(classificationName));
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<RiskThreatAnalysisBloc, RiskThreatAnalysisState>(
         builder: (context, state) {
+          print('DEBUG: currentBottomNavIndex = ${state.currentBottomNavIndex}');
           final List<Widget> screens = [
             RatingScreen(navigationData: widget.navigationData),
             const EvidenceScreen(),
@@ -116,7 +122,7 @@ class _RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
             ),
             body: SingleChildScrollView(child: screens[state.currentBottomNavIndex]),
            
-            bottomNavigationBar: CustomBottomNavBar(
+            bottomNavigationBar: state.currentBottomNavIndex == 3 ? null : CustomBottomNavBar(
               currentIndex: state.currentBottomNavIndex,
               onTap: (index) {
                 context.read<RiskThreatAnalysisBloc>().add(
