@@ -2202,4 +2202,26 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
         add(LoadFormWithClassificationData(state.activeFormId!));
     }
   }
+
+  // Métodos públicos para obtener el progreso específico de cada clasificación
+  double getAmenazaProgress() {
+    return _calculateThreatProgress();
+  }
+
+  double getVulnerabilidadProgress() {
+    return _calculateVulnerabilityProgress();
+  }
+
+  // Método para obtener el progreso de la clasificación actual
+  double getCurrentClassificationProgress() {
+    switch (state.selectedClassification) {
+      case 'amenaza':
+        return getAmenazaProgress();
+      case 'vulnerabilidad':
+        return getVulnerabilidadProgress();
+      default:
+        // Usar el método general como fallback
+        return calculateCompletionPercentage() * 100;
+    }
+  }
 }

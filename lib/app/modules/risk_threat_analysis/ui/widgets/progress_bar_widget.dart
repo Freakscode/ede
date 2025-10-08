@@ -12,8 +12,16 @@ class ProgressBarWidget extends StatelessWidget {
     return BlocBuilder<RiskThreatAnalysisBloc, RiskThreatAnalysisState>(
       builder: (context, state) {
         final bloc = context.read<RiskThreatAnalysisBloc>();
-        final progress = bloc.calculateCompletionPercentage();
-        final progressText = '${(progress * 100).toInt()}% completado';
+        
+        // Obtener progreso específico de la clasificación actual
+        final currentProgress = bloc.getCurrentClassificationProgress();
+        final progress = currentProgress / 100.0; // Convertir a decimal para LinearProgressIndicator
+        
+        // Texto dinámico según la clasificación
+        final classificationName = state.selectedClassification == 'amenaza' 
+          ? 'Amenaza' 
+          : 'Vulnerabilidad';
+        final progressText = '${currentProgress.toInt()}% $classificationName completada';
         
         return Column(
           children: [
@@ -28,8 +36,11 @@ class ProgressBarWidget extends StatelessWidget {
                 child: LinearProgressIndicator(
                   value: progress,
                   backgroundColor: Colors.transparent,
-                  valueColor: const AlwaysStoppedAnimation<Color>(
-                    Color(0xFFFFCC00),
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    // Color dinámico según la clasificación
+                    state.selectedClassification == 'amenaza' 
+                      ? const Color(0xFF10B981) // Verde para amenaza
+                      : const Color(0xFF6366F1), // Morado para vulnerabilidad
                   ),
                 ),
               ),
