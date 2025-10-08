@@ -52,21 +52,26 @@ class RiskCategoriesScreen extends StatelessWidget {
                   SelectRiskCategory(classification.name, selectedEvent),
                 );
                 
-                // Crear navigationData y añadir formId si existe
+                // Crear navigationData con lógica mejorada
                 final navigationData = <String, dynamic>{
                   'event': selectedEvent,
                   'classification': classification.name.toLowerCase(),
                   'directToResults': isCompleted,
                 };
                 
-                // Si hay un formulario activo, agregarlo para carga
+                // Verificar el origen de la navegación
                 final homeState = homeBloc.state;
-                if (homeState.activeFormId != null) {
-                  navigationData['loadExisting'] = true;
+                if (homeState.activeFormId != null && homeState.activeFormId!.isNotEmpty) {
+                  // CASO 1: Entrando desde "Mis Formularios" - EDITAR formulario existente
                   navigationData['formId'] = homeState.activeFormId;
+                  navigationData['loadExisting'] = true;
+                  navigationData['isNewForm'] = false;
+                } else {
+                  // CASO 2: Entrando desde selección de evento - NUEVO formulario
+                  navigationData['isNewForm'] = true;
+                  navigationData['loadExisting'] = false;
                 }
                 
-                print('RiskCategoriesScreen: $navigationData');
                 context.go('/risk_threat_analysis', extra: navigationData);
               }
             : () {

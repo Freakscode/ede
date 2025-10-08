@@ -71,7 +71,6 @@ class RiskEventsScreen extends StatelessWidget {
                       homeBloc.add(
                         SelectRiskEvent(riskEvent.name),
                       );
-                      print('Selected risk event: ${riskEvent.name}');
                     },
                   );
                 },

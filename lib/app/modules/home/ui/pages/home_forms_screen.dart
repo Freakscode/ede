@@ -256,8 +256,15 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
     // Seleccionar el evento para ir a RiskCategoriesScreen
     homeBloc.add(SelectRiskEvent(form.eventType));
     
-    // Guardar el ID del formulario en el HomeBloc para cargarlo después
+    // Establecer el formulario activo para EDICIÓN
     homeBloc.add(SetActiveFormId(form.id));
+    
+    // Navegar a HomeScreen con RiskCategoriesScreen activo para seguir el flujo normal
+    final navigationData = {
+      'showRiskCategories': true,
+    };
+    
+    context.go('/home', extra: navigationData);
   }
 
   void _viewCompletedForm(BuildContext context, FormDataModel form) {

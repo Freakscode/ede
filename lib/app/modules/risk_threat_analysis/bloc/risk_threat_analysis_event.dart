@@ -87,3 +87,9 @@ class ResetToNewForm extends RiskThreatAnalysisEvent {
 class CompleteForm extends RiskThreatAnalysisEvent {}
 
 class AutoSaveProgress extends RiskThreatAnalysisEvent {}
+
+class ShowFinalResults extends RiskThreatAnalysisEvent {
+  final bool show;
+  
+  ShowFinalResults(this.show);
+}

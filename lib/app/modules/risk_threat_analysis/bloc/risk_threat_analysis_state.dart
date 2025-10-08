@@ -24,6 +24,9 @@ class RiskThreatAnalysisState {
   final bool isSaving;
   final bool isLoading;
   final DateTime? lastSaved;
+  
+  // Control para mostrar FinalRiskResultsScreen
+  final bool showFinalResults;
 
   const RiskThreatAnalysisState({
     this.isProbabilidadDropdownOpen = false,
@@ -43,6 +46,7 @@ class RiskThreatAnalysisState {
     this.isSaving = false,
     this.isLoading = false,
     this.lastSaved,
+    this.showFinalResults = false,
   });
 
   RiskThreatAnalysisState copyWith({
@@ -63,6 +67,7 @@ class RiskThreatAnalysisState {
     bool? isSaving,
     bool? isLoading,
     DateTime? lastSaved,
+    bool? showFinalResults,
   }) {
     return RiskThreatAnalysisState(
       isProbabilidadDropdownOpen: isProbabilidadDropdownOpen ?? this.isProbabilidadDropdownOpen,
@@ -82,6 +87,7 @@ class RiskThreatAnalysisState {
       isSaving: isSaving ?? this.isSaving,
       isLoading: isLoading ?? this.isLoading,
       lastSaved: lastSaved ?? this.lastSaved,
+      showFinalResults: showFinalResults ?? this.showFinalResults,
     );
   }
 }

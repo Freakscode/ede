@@ -37,17 +37,21 @@ class _RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
         bloc.add(UpdateSelectedRiskEvent(widget.selectedEvent!));
       }
       
-      // Manejar carga o creación de formulario
+      // Manejar carga o creación de formulario con lógica mejorada
       if (widget.navigationData != null) {
         final formId = widget.navigationData!['formId'] as String?;
         final isNewForm = widget.navigationData!['isNewForm'] as bool? ?? false;
+        final loadExisting = widget.navigationData!['loadExisting'] as bool? ?? false;
         final eventFromNavData = widget.navigationData!['event'] as String?;
         
-        if (formId != null) {
-          // Cargar formulario existente
+        if (formId != null && loadExisting) {
+          // CASO 1: EDITAR formulario existente (desde "Mis Formularios")
           bloc.add(LoadFormData(formId));
         } else if (isNewForm && eventFromNavData != null) {
-          // NUEVO FORMULARIO - Resetear completamente todo el estado
+          // CASO 2: NUEVO formulario (desde selección de evento)
+          bloc.add(ResetToNewForm(eventFromNavData));
+        } else if (eventFromNavData != null) {
+          // CASO 3: Fallback - crear nuevo formulario
           bloc.add(ResetToNewForm(eventFromNavData));
         }
       }
@@ -66,8 +70,10 @@ class _RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
         }
         
         if (finalResults && targetIndex != null) {
-          // Navegar directamente al índice específico (para resultados finales)
-          bloc.add(ChangeBottomNavIndex(targetIndex));
+          // Activar modo de resultados finales y ir al índice de resultados (2)
+          bloc.add(ChangeBottomNavIndex(2)); // Siempre ir a "Resultados" (índice 2)
+          // Activar el flag para mostrar FinalRiskResultsScreen
+          bloc.add(ShowFinalResults(true));
         } else if (classificationName != null) {
           // Lógica original para clasificaciones
           final navIndex = directToResults ? 2 : 0;

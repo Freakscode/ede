@@ -42,6 +42,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         selectedRiskEvent: event.eventName,
         mostrarEventosRiesgo: false,
         mostrarCategoriasRiesgo: true,
+        activeFormId: null, // Limpiar activeFormId para nuevo formulario
       ));
     });
     on<SelectRiskCategory>((event, emit) {

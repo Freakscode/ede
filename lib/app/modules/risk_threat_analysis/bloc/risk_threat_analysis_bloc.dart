@@ -25,6 +25,7 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     on<ResetToNewForm>(_onResetToNewForm);
     on<CompleteForm>(_onCompleteForm);
     on<AutoSaveProgress>(_onAutoSaveProgress);
+    on<ShowFinalResults>(_onShowFinalResults);
   }
 
   void _onToggleProbabilidadDropdown(
@@ -1506,20 +1507,37 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     try {
       final formData = _createFormDataFromCurrentState();
       
-      // Generar ID único basado en evento y timestamp para evitar sobrescritura
       String formId;
-      if (state.activeFormId != null) {
-        // Si ya existe un activeFormId, usarlo (para actualizar formulario existente)
+      bool isUpdatingExisting = false;
+      
+      if (state.activeFormId != null && state.activeFormId!.isNotEmpty) {
+        // CASO 1: Formulario existente - ACTUALIZAR (mantener ID original)
         formId = state.activeFormId!;
+        isUpdatingExisting = true;
       } else {
-        // Nuevo formulario: generar ID único con evento y timestamp
+        // CASO 2: Formulario nuevo - CREAR (generar nuevo ID único)
         final timestamp = DateTime.now().millisecondsSinceEpoch;
         final eventSafe = state.selectedRiskEvent.replaceAll(' ', '_').toLowerCase();
         formId = '${eventSafe}_$timestamp';
+        isUpdatingExisting = false;
       }
       
-      // Actualizar el formData con el ID correcto
-      final FormDataModel updatedFormData = formData.copyWith(id: formId);
+      // Crear FormDataModel con el ID correcto
+      final FormDataModel updatedFormData;
+      if (isUpdatingExisting) {
+        // Actualizar formulario existente manteniendo fechas apropiadas
+        updatedFormData = formData.copyWith(
+          id: formId,
+          lastModified: DateTime.now(), // Solo actualizar lastModified
+        );
+      } else {
+        // Nuevo formulario con fecha de creación actual
+        updatedFormData = formData.copyWith(
+          id: formId,
+          createdAt: DateTime.now(),
+          lastModified: DateTime.now(),
+        );
+      }
       
       await FormPersistenceService().saveForm(updatedFormData);
       
@@ -1559,11 +1577,14 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     Emitter<RiskThreatAnalysisState> emit,
   ) async {
 
+    // Limpiar el formulario activo del FormPersistenceService
+    await FormPersistenceService().clearActiveForm();
     
     // Resetear COMPLETAMENTE todo el estado para un formulario nuevo
     emit(RiskThreatAnalysisState(
       selectedRiskEvent: event.eventType,
       selectedClassification: 'amenaza', // Siempre empezar con amenaza
+      activeFormId: null, // IMPORTANTE: Null para nuevo formulario
       currentBottomNavIndex: 0, // Ir a la primera pestaña
       // Todos los demás valores toman los defaults del constructor
     ));
@@ -1760,4 +1781,10 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     }
   }
 
+  void _onShowFinalResults(
+    ShowFinalResults event,
+    Emitter<RiskThreatAnalysisState> emit,
+  ) {
+    emit(state.copyWith(showFinalResults: event.show));
+  }
 }

@@ -109,17 +109,10 @@ class FinalRiskResultsScreen extends StatelessWidget {
               NavigationButtonsWidget(
                 currentIndex: state.currentBottomNavIndex,
                 onContinuePressed: () {
-                  // Si estamos en la última pestaña (índice 2)
-                  if (state.currentBottomNavIndex == 3) {
+                  // Si estamos en la pestaña de resultados (índice 2) con FinalResults
+                  if (state.currentBottomNavIndex == 2 && state.showFinalResults) {
                     // Navegar a la pantalla de inicio
                     context.go('/home');
-                  } else {
-                    // Avanzar a la siguiente pestaña
-                    // context.read<RiskThreatAnalysisBloc>().add(
-                    //       UpdateBottomNavIndex(
-                    //           state.currentBottomNavIndex + 1),
-                    //     );
-                    
                   }
                 },
               ),

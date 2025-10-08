@@ -1,46 +1,151 @@
 import 'dart:convert';
+import 'package:sqflite/sqflite.dart';
+import 'package:path/path.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/form_data_model.dart';
 
 class FormPersistenceService {
-  static const String _formsKey = 'saved_forms';
   static const String _activeFormKey = 'active_form_id';
+  static const String _dbName = 'risk_analysis_forms.db';
+  static const int _dbVersion = 1;
 
   // Singleton pattern
   static final FormPersistenceService _instance = FormPersistenceService._internal();
   factory FormPersistenceService() => _instance;
   FormPersistenceService._internal();
 
-  // Cache para mejorar rendimiento
-  List<FormDataModel>? _cachedForms;
+  Database? _database;
+
+  // Inicializar la base de datos
+  Future<Database> get database async {
+    if (_database != null) return _database!;
+    _database = await _initDatabase();
+    return _database!;
+  }
+
+  Future<Database> _initDatabase() async {
+    final dbPath = await getDatabasesPath();
+    final path = join(dbPath, _dbName);
+
+    return await openDatabase(
+      path,
+      version: _dbVersion,
+      onCreate: _createTables,
+      onUpgrade: _onUpgrade,
+    );
+  }
+
+  Future<void> _createTables(Database db, int version) async {
+    // Tabla principal de formularios
+    await db.execute('''
+      CREATE TABLE forms (
+        id TEXT PRIMARY KEY,
+        title TEXT NOT NULL,
+        event_type TEXT NOT NULL,
+        form_type TEXT NOT NULL,
+        status TEXT NOT NULL,
+        created_at INTEGER NOT NULL,
+        last_modified INTEGER NOT NULL,
+        progress_percentage REAL NOT NULL DEFAULT 0.0,
+        threat_progress REAL NOT NULL DEFAULT 0.0,
+        vulnerability_progress REAL NOT NULL DEFAULT 0.0
+      )
+    ''');
+
+    // Tabla de datos de análisis de riesgo (JSON)
+    await db.execute('''
+      CREATE TABLE risk_analysis_data (
+        form_id TEXT PRIMARY KEY,
+        selected_risk_event TEXT,
+        selected_classification TEXT,
+        probabilidad_selections TEXT,
+        intensidad_selections TEXT,
+        dynamic_selections TEXT,
+        sub_classification_scores TEXT,
+        FOREIGN KEY (form_id) REFERENCES forms (id) ON DELETE CASCADE
+      )
+    ''');
+
+    // Tabla de datos EDE (JSON)
+    await db.execute('''
+      CREATE TABLE ede_data (
+        form_id TEXT PRIMARY KEY,
+        data TEXT,
+        FOREIGN KEY (form_id) REFERENCES forms (id) ON DELETE CASCADE
+      )
+    ''');
+
+    // Índices para mejorar rendimiento
+    await db.execute('CREATE INDEX idx_forms_status ON forms (status)');
+    await db.execute('CREATE INDEX idx_forms_event_type ON forms (event_type)');
+    await db.execute('CREATE INDEX idx_forms_last_modified ON forms (last_modified DESC)');
+  }
+
+  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    // Manejar actualizaciones de esquema en futuras versiones
+    if (oldVersion < 2) {
+      // Ejemplo de migración futura
+      // await db.execute('ALTER TABLE forms ADD COLUMN new_column TEXT');
+    }
+  }
+
+
 
   /// Guardar un formulario
   Future<bool> saveForm(FormDataModel form) async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final forms = await getAllForms();
+      final db = await database;
+      final updatedForm = form.copyWith(lastModified: DateTime.now());
       
-      // Buscar si el formulario ya existe
-      final existingIndex = forms.indexWhere((f) => f.id == form.id);
-      
-      if (existingIndex != -1) {
-        // Actualizar formulario existente
-        forms[existingIndex] = form.copyWith(lastModified: DateTime.now());
-      } else {
-        // Agregar nuevo formulario
-        forms.add(form);
+      // Insertar o actualizar en la tabla principal de formularios
+      await db.insert(
+        'forms',
+        {
+          'id': updatedForm.id,
+          'title': updatedForm.title,
+          'event_type': updatedForm.eventType,
+          'form_type': updatedForm.formType.toString(),
+          'status': updatedForm.status.toString(),
+          'created_at': updatedForm.createdAt.millisecondsSinceEpoch,
+          'last_modified': updatedForm.lastModified.millisecondsSinceEpoch,
+          'progress_percentage': updatedForm.progressPercentage,
+          'threat_progress': updatedForm.threatProgress,
+          'vulnerability_progress': updatedForm.vulnerabilityProgress,
+        },
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+
+      // Guardar datos de análisis de riesgo si existen
+      if (updatedForm.riskAnalysisData.isNotEmpty) {
+        await db.insert(
+          'risk_analysis_data',
+          {
+            'form_id': updatedForm.id,
+            'selected_risk_event': updatedForm.riskAnalysisData['selectedRiskEvent'],
+            'selected_classification': updatedForm.riskAnalysisData['selectedClassification'],
+            'probabilidad_selections': jsonEncode(updatedForm.riskAnalysisData['probabilidadSelections'] ?? {}),
+            'intensidad_selections': jsonEncode(updatedForm.riskAnalysisData['intensidadSelections'] ?? {}),
+            'dynamic_selections': jsonEncode(updatedForm.riskAnalysisData['dynamicSelections'] ?? {}),
+            'sub_classification_scores': jsonEncode(updatedForm.riskAnalysisData['subClassificationScores'] ?? {}),
+          },
+          conflictAlgorithm: ConflictAlgorithm.replace,
+        );
       }
-      
-      // Guardar lista actualizada
-      final formsJson = forms.map((f) => f.toJson()).toList();
-      final success = await prefs.setString(_formsKey, jsonEncode(formsJson));
-      
-      // Limpiar cache para forzar recarga
-      _cachedForms = null;
-      
-      return success;
+
+      // Guardar datos EDE si existen
+      if (updatedForm.edeData.isNotEmpty) {
+        await db.insert(
+          'ede_data',
+          {
+            'form_id': updatedForm.id,
+            'data': jsonEncode(updatedForm.edeData),
+          },
+          conflictAlgorithm: ConflictAlgorithm.replace,
+        );
+      }
+
+      return true;
     } catch (e) {
-      print('Error saving form: $e');
       return false;
     }
   }
@@ -48,32 +153,81 @@ class FormPersistenceService {
   /// Obtener todos los formularios
   Future<List<FormDataModel>> getAllForms() async {
     try {
-      // Usar cache si está disponible
-      if (_cachedForms != null) {
-        return List.from(_cachedForms!);
+      final db = await database;
+      
+      // Consulta principal con JOIN para obtener datos relacionados
+      final List<Map<String, dynamic>> formsData = await db.rawQuery('''
+        SELECT 
+          f.*,
+          r.selected_risk_event,
+          r.selected_classification,
+          r.probabilidad_selections,
+          r.intensidad_selections,
+          r.dynamic_selections,
+          r.sub_classification_scores,
+          e.data as ede_data
+        FROM forms f
+        LEFT JOIN risk_analysis_data r ON f.id = r.form_id
+        LEFT JOIN ede_data e ON f.id = e.form_id
+        ORDER BY f.last_modified DESC
+      ''');
+
+      final forms = <FormDataModel>[];
+      
+      for (final row in formsData) {
+        // Construir riskAnalysisData
+        final riskAnalysisData = <String, dynamic>{};
+        if (row['selected_risk_event'] != null) {
+          riskAnalysisData['selectedRiskEvent'] = row['selected_risk_event'];
+        }
+        if (row['selected_classification'] != null) {
+          riskAnalysisData['selectedClassification'] = row['selected_classification'];
+        }
+        if (row['probabilidad_selections'] != null) {
+          riskAnalysisData['probabilidadSelections'] = jsonDecode(row['probabilidad_selections'] as String);
+        }
+        if (row['intensidad_selections'] != null) {
+          riskAnalysisData['intensidadSelections'] = jsonDecode(row['intensidad_selections'] as String);
+        }
+        if (row['dynamic_selections'] != null) {
+          riskAnalysisData['dynamicSelections'] = jsonDecode(row['dynamic_selections'] as String);
+        }
+        if (row['sub_classification_scores'] != null) {
+          riskAnalysisData['subClassificationScores'] = jsonDecode(row['sub_classification_scores'] as String);
+        }
+
+        // Construir edeData
+        final edeData = row['ede_data'] != null 
+          ? jsonDecode(row['ede_data'] as String) as Map<String, dynamic>
+          : <String, dynamic>{};
+
+        // Crear FormDataModel
+        final form = FormDataModel(
+          id: row['id'] as String,
+          title: row['title'] as String,
+          eventType: row['event_type'] as String,
+          formType: FormType.values.firstWhere(
+            (e) => e.toString() == row['form_type'],
+            orElse: () => FormType.riskAnalysis,
+          ),
+          status: FormStatus.values.firstWhere(
+            (e) => e.toString() == row['status'],
+            orElse: () => FormStatus.inProgress,
+          ),
+          createdAt: DateTime.fromMillisecondsSinceEpoch(row['created_at'] as int),
+          lastModified: DateTime.fromMillisecondsSinceEpoch(row['last_modified'] as int),
+          progressPercentage: (row['progress_percentage'] as num).toDouble(),
+          threatProgress: (row['threat_progress'] as num).toDouble(),
+          vulnerabilityProgress: (row['vulnerability_progress'] as num).toDouble(),
+          riskAnalysisData: riskAnalysisData,
+          edeData: edeData,
+        );
+        
+        forms.add(form);
       }
 
-      final prefs = await SharedPreferences.getInstance();
-      final formsString = prefs.getString(_formsKey);
-      
-      if (formsString == null) {
-        _cachedForms = [];
-        return [];
-      }
-
-      final formsJson = jsonDecode(formsString) as List<dynamic>;
-      final forms = formsJson
-          .map((json) => FormDataModel.fromJson(json as Map<String, dynamic>))
-          .toList();
-      
-      // Ordenar por fecha de modificación (más recientes primero)
-      forms.sort((a, b) => b.lastModified.compareTo(a.lastModified));
-      
-      _cachedForms = forms;
-      return List.from(forms);
+      return forms;
     } catch (e) {
-      print('Error loading forms: $e');
-      _cachedForms = [];
       return [];
     }
   }
@@ -103,20 +257,17 @@ class FormPersistenceService {
   /// Eliminar un formulario
   Future<bool> deleteForm(String id) async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final forms = await getAllForms();
+      final db = await database;
       
-      forms.removeWhere((form) => form.id == id);
+      // Eliminar de la tabla principal (CASCADE eliminará las relacionadas)
+      final deletedRows = await db.delete(
+        'forms',
+        where: 'id = ?',
+        whereArgs: [id],
+      );
       
-      final formsJson = forms.map((f) => f.toJson()).toList();
-      final success = await prefs.setString(_formsKey, jsonEncode(formsJson));
-      
-      // Limpiar cache
-      _cachedForms = null;
-      
-      return success;
+      return deletedRows > 0;
     } catch (e) {
-      print('Error deleting form: $e');
       return false;
     }
   }
@@ -160,10 +311,7 @@ class FormPersistenceService {
 
   /// Calcular progreso basado en datos del formulario
   double calculateProgress(Map<String, dynamic> riskAnalysisData) {
-    print('DEBUG CALCULATE PROGRESS - Input data keys: ${riskAnalysisData.keys.toList()}');
-    
     if (riskAnalysisData.isEmpty) {
-      print('DEBUG CALCULATE PROGRESS - Data is empty, returning 0.0');
       return 0.0;
     }
 
@@ -172,52 +320,50 @@ class FormPersistenceService {
 
     // Contar campos completados en dynamicSelections
     final dynamicSelections = riskAnalysisData['dynamicSelections'] as Map<String, dynamic>?;
-    print('DEBUG CALCULATE PROGRESS - dynamicSelections: $dynamicSelections');
     
     if (dynamicSelections != null) {
       for (final entry in dynamicSelections.entries) {
-        final key = entry.key;
         final subClassification = entry.value;
         if (subClassification is Map<String, dynamic>) {
           totalFields += 10; // Estimación de campos por subclasificación
           final subFields = (subClassification as Map).length;
           completedFields += subFields;
-          print('DEBUG CALCULATE PROGRESS - $key: $subFields fields completed');
         }
       }
     }
 
     // Contar probabilidad e intensidad
-    final hasProbabilidad = riskAnalysisData['selectedProbabilidad'] != null;
-    final hasIntensidad = riskAnalysisData['selectedIntensidad'] != null;
+    final probabilidadSelections = riskAnalysisData['probabilidadSelections'] as Map?;
+    final intensidadSelections = riskAnalysisData['intensidadSelections'] as Map?;
     
-    if (hasProbabilidad) completedFields += 5;
-    if (hasIntensidad) completedFields += 5;
+    if (probabilidadSelections != null && probabilidadSelections.isNotEmpty) {
+      completedFields += 5;
+    }
+    if (intensidadSelections != null && intensidadSelections.isNotEmpty) {
+      completedFields += 5;
+    }
     totalFields += 10;
 
-    print('DEBUG CALCULATE PROGRESS - probabilidad: $hasProbabilidad, intensidad: $hasIntensidad');
-
     final progress = totalFields > 0 ? completedFields / totalFields : 0.0;
-    print('DEBUG CALCULATE PROGRESS FINAL: $completedFields/$totalFields = $progress (${(progress * 100).toStringAsFixed(1)}%)');
-    
     return progress;
   }
 
   /// Calcular progreso de amenaza
   double calculateThreatProgress(Map<String, dynamic> riskAnalysisData) {
-    int threatFields = 0;
+    int threatFields = 2;
     int completedThreatFields = 0;
 
-    if (riskAnalysisData['selectedProbabilidad'] != null) {
+    final probabilidadSelections = riskAnalysisData['probabilidadSelections'] as Map?;
+    final intensidadSelections = riskAnalysisData['intensidadSelections'] as Map?;
+
+    if (probabilidadSelections != null && probabilidadSelections.isNotEmpty) {
       completedThreatFields += 1;
     }
-    if (riskAnalysisData['selectedIntensidad'] != null) {
+    if (intensidadSelections != null && intensidadSelections.isNotEmpty) {
       completedThreatFields += 1;
     }
-    threatFields = 2;
 
     final progress = threatFields > 0 ? completedThreatFields / threatFields : 0.0;
-    print('DEBUG THREAT PROGRESS: $completedThreatFields/$threatFields = $progress');
     return progress;
   }
 
@@ -226,10 +372,7 @@ class FormPersistenceService {
     int vulnerabilityFields = 0;
     int completedVulnerabilityFields = 0;
 
-    print('DEBUG VULN PROGRESS - riskAnalysisData keys: ${riskAnalysisData.keys.toList()}');
-    
     final dynamicSelections = riskAnalysisData['dynamicSelections'] as Map<String, dynamic>?;
-    print('DEBUG VULN PROGRESS - dynamicSelections: $dynamicSelections');
     
     if (dynamicSelections != null) {
       final vulnerabilityKeys = ['fragilidad_fisica', 'fragilidad_personas', 'exposicion'];
@@ -238,7 +381,6 @@ class FormPersistenceService {
         vulnerabilityFields += 1;
         if (dynamicSelections[key] != null) {
           final selections = dynamicSelections[key] as Map<String, dynamic>?;
-          print('DEBUG VULN PROGRESS - $key: $selections');
           if (selections != null && selections.isNotEmpty) {
             completedVulnerabilityFields += 1;
           }
@@ -247,12 +389,69 @@ class FormPersistenceService {
     }
 
     final progress = vulnerabilityFields > 0 ? completedVulnerabilityFields / vulnerabilityFields : 0.0;
-    print('DEBUG VULN PROGRESS: $completedVulnerabilityFields/$vulnerabilityFields = $progress');
     return progress;
   }
 
-  /// Limpiar cache (útil para testing o forzar recarga)
-  void clearCache() {
-    _cachedForms = null;
+  /// Cerrar la base de datos (útil para testing o limpieza)
+  Future<void> close() async {
+    if (_database != null) {
+      await _database!.close();
+      _database = null;
+    }
+  }
+
+  /// Limpiar todas las tablas (útil para testing)
+  Future<void> clearAllData() async {
+    final db = await database;
+    await db.delete('forms');
+    await db.delete('risk_analysis_data');
+    await db.delete('ede_data');
+  }
+
+  /// Obtener estadísticas de la base de datos
+  Future<Map<String, int>> getDatabaseStats() async {
+    final db = await database;
+    
+    final formsCount = Sqflite.firstIntValue(
+      await db.rawQuery('SELECT COUNT(*) FROM forms')
+    ) ?? 0;
+    
+    final riskDataCount = Sqflite.firstIntValue(
+      await db.rawQuery('SELECT COUNT(*) FROM risk_analysis_data')
+    ) ?? 0;
+    
+    final edeDataCount = Sqflite.firstIntValue(
+      await db.rawQuery('SELECT COUNT(*) FROM ede_data')
+    ) ?? 0;
+    
+    return {
+      'total_forms': formsCount,
+      'forms_with_risk_data': riskDataCount,
+      'forms_with_ede_data': edeDataCount,
+    };
+  }
+
+
+
+  /// Crear backup manual de la base de datos
+  Future<String?> createBackup() async {
+    try {
+      final forms = await getAllForms();
+      final backupData = {
+        'timestamp': DateTime.now().toIso8601String(),
+        'version': '1.0',
+        'forms': forms.map((f) => f.toJson()).toList(),
+      };
+      
+      final backupJson = jsonEncode(backupData);
+      final prefs = await SharedPreferences.getInstance();
+      final backupKey = 'backup_${DateTime.now().millisecondsSinceEpoch}';
+      
+      await prefs.setString(backupKey, backupJson);
+      
+      return backupKey;
+    } catch (e) {
+      return null;
+    }
   }
 }
