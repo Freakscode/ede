@@ -57,6 +57,15 @@ class RatingResultsScreen extends StatelessWidget {
                       // Guardar datos del formulario antes de marcar como completada
                       final riskBloc = context.read<RiskThreatAnalysisBloc>();
                       final formData = riskBloc.getCurrentFormData();
+                      
+                      // PRINT COMPLETO DEL OBJETO DILIGENCIADO
+                      print('=== OBJETO COMPLETO AMENAZA DILIGENCIADO ===');
+                      print('Evento: ${state.selectedRiskEvent}');
+                      print('Clasificación: amenaza');
+                      print('Datos completos del formulario:');
+                      print(formData.toString());
+                      print('=== FIN DEL OBJETO ===');
+                      
                       context.read<HomeBloc>().add(
                         SaveRiskEventModel(state.selectedRiskEvent, 'amenaza', formData)
                       );
@@ -84,6 +93,15 @@ class RatingResultsScreen extends StatelessWidget {
                       // Guardar datos del formulario antes de marcar como completada
                       final riskBloc = context.read<RiskThreatAnalysisBloc>();
                       final formData = riskBloc.getCurrentFormData();
+                      
+                      // PRINT COMPLETO DEL OBJETO DILIGENCIADO
+                      print('=== OBJETO COMPLETO VULNERABILIDAD DILIGENCIADO ===');
+                      print('Evento: ${state.selectedRiskEvent}');
+                      print('Clasificación: vulnerabilidad');
+                      print('Datos completos del formulario:');
+                      print(formData.toString());
+                      print('=== FIN DEL OBJETO ===');
+                      
                       context.read<HomeBloc>().add(
                         SaveRiskEventModel(state.selectedRiskEvent, 'vulnerabilidad', formData)
                       );

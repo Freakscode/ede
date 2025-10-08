@@ -6,11 +6,18 @@ import 'package:caja_herramientas/app/core/icons/app_icons.dart';
 import 'package:caja_herramientas/app/modules/home/ui/widgets/home_tool_card.dart';
 import 'package:caja_herramientas/app/modules/home/bloc/home_bloc.dart';
 import 'package:caja_herramientas/app/modules/home/bloc/home_event.dart';
+import 'package:caja_herramientas/app/modules/home/bloc/home_state.dart';
+import 'package:caja_herramientas/app/shared/widgets/dialogs/forms_in_progress_dialog.dart';
 import 'package:go_router/go_router.dart';
 
-class HomeMainSection extends StatelessWidget {
+class HomeMainSection extends StatefulWidget {
   const HomeMainSection({super.key});
 
+  @override
+  State<HomeMainSection> createState() => _HomeMainSectionState();
+}
+
+class _HomeMainSectionState extends State<HomeMainSection> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -38,8 +45,7 @@ class HomeMainSection extends StatelessWidget {
             iconAsset: AppIcons.analisisRiesgo,
             backgroundColor: DAGRDColors.azulDAGRD,
             onTap: () {
-              // Usar HomeBloc para navegar a eventos de riesgo
-              context.read<HomeBloc>().add(HomeShowRiskEventsSection());
+              _handleRiskAnalysisTap(context);
             },
           ),
           const SizedBox(height: 23),
@@ -103,6 +109,36 @@ class HomeMainSection extends StatelessWidget {
           const SizedBox(height: 20),
         ],
       ),
+    );
+  }
+
+  void _handleRiskAnalysisTap(BuildContext context) {
+    final homeBloc = context.read<HomeBloc>();
+    final homeState = homeBloc.state;
+    
+    // Contar formularios pendientes (evaluaciones completadas parcialmente)
+    int pendingFormsCount = 0;
+    homeState.completedEvaluations.forEach((key, value) {
+      if (value) pendingFormsCount++;
+    });
+    
+    // Siempre mostrar el dialog
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext dialogContext) {
+        return FormsInProgressDialog(
+          pendingFormsCount: pendingFormsCount,
+          onViewForms: () {
+            // Navegar a la sección de categorías de riesgo para ver formularios
+            context.read<HomeBloc>().add(HomeNavBarTapped(2));
+          },
+          onCreateNew: () {
+            // Navegar a eventos de riesgo para crear nuevo
+            context.read<HomeBloc>().add(HomeShowRiskEventsSection());
+          },
+        );
+      },
     );
   }
 }

@@ -174,15 +174,23 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     final updatedSavedModels = Map<String, Map<String, dynamic>>.from(state.savedRiskEventModels);
     
     // Guardar los datos de evaluación
-    updatedSavedModels[key] = {
+    final savedObject = {
       'eventName': event.eventName,
       'classificationType': event.classificationType,
       'evaluationData': event.evaluationData,
       'savedAt': DateTime.now().toIso8601String(),
     };
     
+    updatedSavedModels[key] = savedObject;
+    
     emit(state.copyWith(savedRiskEventModels: updatedSavedModels));
-    print('RiskEventModel guardado para: $key');
+    
+    // PRINT COMPLETO DEL OBJETO GUARDADO EN HOMEBLOC
+    print('=== OBJETO GUARDADO EN HOMEBLOC ===');
+    print('Key: $key');
+    print('Objeto completo guardado:');
+    print(savedObject.toString());
+    print('=== FIN DEL OBJETO GUARDADO ===');
   }
 
   /// Mapea los nombres de eventos a sus iconos correspondientes
