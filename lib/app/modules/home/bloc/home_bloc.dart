@@ -2,8 +2,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:caja_herramientas/app/core/icons/app_icons.dart';
 import 'package:caja_herramientas/app/shared/models/risk_event_factory.dart';
 import 'package:caja_herramientas/app/shared/models/risk_event_model.dart';
-import 'package:caja_herramientas/app/shared/models/form_data_model.dart';
-import 'package:caja_herramientas/app/shared/services/form_persistence_service.dart';
 import '../../home/services/tutorial_overlay_service.dart';
 import 'home_event.dart';
 import 'home_state.dart';
@@ -56,8 +54,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         mostrarCategoriasRiesgo: false,
       ));
     });
-    on<HomeCheckAndShowTutorial>((event, emit) async {
-      final showTutorial = await TutorialOverlayService.getShowTutorial();
+    on<HomeCheckAndShowTutorial>((event, emit) {
+      final showTutorial = TutorialOverlayService.getShowTutorial();
       if (showTutorial && !state.tutorialShown) {
         emit(state.copyWith(tutorialShown: true, showTutorial: showTutorial));
       } else {
@@ -96,10 +94,31 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       emit(state.copyWith(completedEvaluations: updatedCompletedEvaluations));
     });
 
+    on<ResetEvaluationsForEvent>((event, emit) async {
+      // Resetear las evaluaciones completadas para el evento específico
+      final updatedCompletedEvaluations = Map<String, bool>.from(state.completedEvaluations);
+      
+      // Remover las claves relacionadas con este evento
+      final keysToRemove = updatedCompletedEvaluations.keys
+          .where((key) => key.startsWith('${event.eventName}_'))
+          .toList();
+      
+      for (final key in keysToRemove) {
+        updatedCompletedEvaluations.remove(key);
+      }
+      
+      // Placeholder: No persistence service available
+      print('📋 Formulario activo limpiado para nueva evaluación de ${event.eventName}');
+      
+      emit(state.copyWith(
+        completedEvaluations: updatedCompletedEvaluations,
+        activeFormId: null, // También limpiar el formulario activo del estado
+      ));
+    });
+
     // ======= NUEVOS HANDLERS PARA GESTIÓN DE FORMULARIOS =======
     
     on<LoadForms>(_onLoadForms);
-    on<SaveForm>(_onSaveForm);
     on<DeleteForm>(_onDeleteForm);
     on<LoadFormForEditing>(_onLoadFormForEditing);
     on<CompleteForm>(_onCompleteForm);
@@ -112,11 +131,12 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     emit(state.copyWith(isLoadingForms: true));
     
     try {
-      final formService = FormPersistenceService();
-      final forms = await formService.getAllForms();
+            // Simulamos que carga la configuración global de formularios
+      // TODO: Implementar nueva lógica sin persistencia
+      print('LoadGlobalFormConfiguration: Cargando configuración sin persistencia');
       
       emit(state.copyWith(
-        savedForms: forms,
+        savedForms: [], // Lista vacía temporalmente
         isLoadingForms: false,
       ));
     } catch (e) {
@@ -124,103 +144,26 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     }
   }
 
-  Future<void> _onSaveForm(SaveForm event, Emitter<HomeState> emit) async {
-    try {
-      final formService = FormPersistenceService();
-      
-      // Buscar formulario existente o crear uno nuevo
-      FormDataModel? existingForm;
-      final activeFormId = await formService.getActiveFormId();
-      
-      if (activeFormId != null) {
-        existingForm = await formService.getFormById(activeFormId);
-      }
-
-      // Calcular progreso
-      final progress = formService.calculateProgress(event.formData);
-      final threatProgress = formService.calculateThreatProgress(event.formData);
-      final vulnerabilityProgress = formService.calculateVulnerabilityProgress(event.formData);
-      
-
-      FormDataModel formToSave;
-      if (existingForm != null) {
-        // Actualizar formulario existente
-        formToSave = existingForm.copyWith(
-          riskAnalysisData: event.formData,
-          progressPercentage: progress,
-          threatProgress: threatProgress,
-          vulnerabilityProgress: vulnerabilityProgress,
-          lastModified: DateTime.now(),
-        );
-      } else {
-        // Crear nuevo formulario
-        final formId = formService.generateFormId();
-        formToSave = FormDataModel(
-          id: formId,
-          title: 'Análisis de Riesgo - ${event.eventName}',
-          eventType: event.eventName,
-          formType: FormType.riskAnalysis,
-          status: FormStatus.inProgress,
-          createdAt: DateTime.now(),
-          lastModified: DateTime.now(),
-          progressPercentage: progress,
-          threatProgress: threatProgress,
-          vulnerabilityProgress: vulnerabilityProgress,
-          riskAnalysisData: event.formData,
-        );
-        
-        // Establecer como formulario activo
-        await formService.setActiveForm(formId);
-      }
-
-      // Guardar formulario
-      await formService.saveForm(formToSave);
-      
-      // Recargar formularios
-      add(LoadForms());
-      
-    } catch (e) {
-    }
-  }
+  // Removido: _onSaveRiskAnalysisData ya no es necesario
 
   Future<void> _onDeleteForm(DeleteForm event, Emitter<HomeState> emit) async {
-    try {
-      final formService = FormPersistenceService();
-      await formService.deleteForm(event.formId);
-      
-      // Recargar formularios
-      add(LoadForms());
-      
-    } catch (e) {
-    }
+    // TODO: Implementar nueva lógica sin persistencia si es necesario
+    print('DeleteForm recibido para ID: ${event.formId}');
   }
 
   Future<void> _onLoadFormForEditing(LoadFormForEditing event, Emitter<HomeState> emit) async {
-    try {
-      final formService = FormPersistenceService();
-      await formService.setActiveForm(event.formId);
-      
-      emit(state.copyWith(activeFormId: event.formId));
-      
-    } catch (e) {
-    }
+    // TODO: Implementar nueva lógica sin persistencia si es necesario
+    print('LoadFormForEditing recibido para ID: ${event.formId}');
   }
 
   Future<void> _onCompleteForm(CompleteForm event, Emitter<HomeState> emit) async {
-    try {
-      final formService = FormPersistenceService();
-      await formService.markFormAsCompleted(event.formId);
-      await formService.clearActiveForm();
-      
-      // Recargar formularios
-      add(LoadForms());
-      
-    } catch (e) {
-    }
+    // TODO: Implementar nueva lógica sin persistencia si es necesario
+    print('CompleteForm recibido para ID: ${event.formId}');
   }
 
   void _onSetActiveFormId(SetActiveFormId event, Emitter<HomeState> emit) {
-    emit(state.copyWith(activeFormId: event.formId));
+    // TODO: Actualizar según nueva estructura del estado
+    print('SetActiveFormId recibido para ID: ${event.formId}');
   }
 
   /// Mapea los nombres de eventos a sus iconos correspondientes

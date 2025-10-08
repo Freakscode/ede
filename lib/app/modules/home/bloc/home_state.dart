@@ -96,5 +96,5 @@ class HomeState extends Equatable {
       savedForms.where((form) => form.status == FormStatus.completed).toList();
 
   List<FormDataModel> get riskAnalysisForms => 
-      savedForms.where((form) => form.formType == FormType.riskAnalysis).toList();
+      savedForms; // Temporal: retornar todos los formularios
 }

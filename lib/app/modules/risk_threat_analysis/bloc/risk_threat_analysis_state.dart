@@ -19,11 +19,8 @@ class RiskThreatAnalysisState {
   final Map<String, double> subClassificationScores;
   final Map<String, Color> subClassificationColors;
   
-  // Persistencia de formularios
-  final String? activeFormId;
-  final bool isSaving;
+  // Estado de carga
   final bool isLoading;
-  final DateTime? lastSaved;
   
   // Control para mostrar FinalRiskResultsScreen
   final bool showFinalResults;
@@ -42,10 +39,7 @@ class RiskThreatAnalysisState {
     this.dynamicSelections = const {},
     this.subClassificationScores = const {},
     this.subClassificationColors = const {},
-    this.activeFormId,
-    this.isSaving = false,
     this.isLoading = false,
-    this.lastSaved,
     this.showFinalResults = false,
   });
 
@@ -63,10 +57,7 @@ class RiskThreatAnalysisState {
     Map<String, Map<String, String>>? dynamicSelections,
     Map<String, double>? subClassificationScores,
     Map<String, Color>? subClassificationColors,
-    String? activeFormId,
-    bool? isSaving,
     bool? isLoading,
-    DateTime? lastSaved,
     bool? showFinalResults,
   }) {
     return RiskThreatAnalysisState(
@@ -83,10 +74,7 @@ class RiskThreatAnalysisState {
       dynamicSelections: dynamicSelections ?? this.dynamicSelections,
       subClassificationScores: subClassificationScores ?? this.subClassificationScores,
       subClassificationColors: subClassificationColors ?? this.subClassificationColors,
-      activeFormId: activeFormId ?? this.activeFormId,
-      isSaving: isSaving ?? this.isSaving,
       isLoading: isLoading ?? this.isLoading,
-      lastSaved: lastSaved ?? this.lastSaved,
       showFinalResults: showFinalResults ?? this.showFinalResults,
     );
   }

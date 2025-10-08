@@ -211,10 +211,10 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
                 FormCardInProgress(
                   title: form.title,
                   lastEdit: form.formattedLastModified,
-                  tag: form.eventType,
-                  progress: form.progressPercentage,
-                  threat: form.threatProgress,
-                  vulnerability: form.vulnerabilityProgress,
+                  tag: "Análisis de Riesgo", // Valor fijo temporal
+                  progress: 0.0, // Valor fijo temporal
+                  threat: 0.0, // Valor fijo temporal
+                  vulnerability: 0.0, // Valor fijo temporal
                   onDelete: () => _deleteForm(context, form.id, form.title),
                   onTap: () => _navigateToForm(context, form),
                 ),
@@ -234,7 +234,7 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
                   child: FormCardCompleted(
                     title: form.title,
                     lastEdit: form.formattedLastModified,
-                    tag: form.eventType,
+                    tag: "Análisis de Riesgo",
                   ),
                 ),
               ],
@@ -254,7 +254,7 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
     final homeBloc = context.read<HomeBloc>();
     
     // Seleccionar el evento para ir a RiskCategoriesScreen
-    homeBloc.add(SelectRiskEvent(form.eventType));
+    homeBloc.add(SelectRiskEvent("Movimiento en Masa")); // Valor temporal
     
     // Establecer el formulario activo para EDICIÓN
     homeBloc.add(SetActiveFormId(form.id));
@@ -270,7 +270,7 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
   void _viewCompletedForm(BuildContext context, FormDataModel form) {
     // Para formularios completados, navegar directamente a resultados finales
     final navigationData = {
-      'event': form.eventType,
+      'event': "Movimiento en Masa", // Valor temporal
       'finalResults': true,
       'targetIndex': 3,
       'readOnly': true,

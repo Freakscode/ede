@@ -84,6 +84,17 @@ class MarkEvaluationCompleted extends HomeEvent {
   List<Object?> get props => [eventName, classificationType];
 }
 
+/// Resetear las evaluaciones completadas para un evento específico
+/// Esto permite empezar una nueva evaluación limpia del mismo tipo de evento
+class ResetEvaluationsForEvent extends HomeEvent {
+  final String eventName;
+  
+  const ResetEvaluationsForEvent(this.eventName);
+
+  @override
+  List<Object?> get props => [eventName];
+}
+
 // ======= NUEVOS EVENTOS PARA GESTIÓN DE FORMULARIOS =======
 
 class LoadForms extends HomeEvent {}

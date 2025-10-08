@@ -6,7 +6,7 @@ import 'package:caja_herramientas/app/modules/risk_threat_analysis/ui/pages/fina
 import 'package:caja_herramientas/app/shared/widgets/layouts/custom_app_bar.dart';
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import 'package:caja_herramientas/app/shared/widgets/layouts/custom_bottom_nav_bar.dart';
-import 'package:caja_herramientas/app/shared/services/form_persistence_service.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -58,9 +58,7 @@ class _RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
       final targetIndex = widget.navigationData!['targetIndex'] as int?;
       final classificationName = widget.navigationData!['classification'] as String?;
       final directToResults = widget.navigationData!['directToResults'] as bool? ?? false;
-      final formId = widget.navigationData!['formId'] as String?;
-      final isNewForm = widget.navigationData!['isNewForm'] as bool? ?? false;
-      final loadExisting = widget.navigationData!['loadExisting'] as bool? ?? false;
+
       
       // Actualizar el evento si viene en navigationData
       if (eventFromNavData != null && eventFromNavData.isNotEmpty) {
@@ -71,36 +69,21 @@ class _RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
       if (finalResults && targetIndex != null) {
         print('DEBUG: Navegando INMEDIATAMENTE a targetIndex: $targetIndex con finalResults: $finalResults');
         
-        // Si tenemos un formId específico, cargarlo
-        if (formId != null && formId.isNotEmpty) {
-          print('DEBUG: Cargando formulario con ID: $formId');
-          bloc.add(LoadFormData(formId));
-        } else if (eventFromNavData != null && eventFromNavData.isNotEmpty) {
-          // Buscar el formulario completado más reciente para este evento
-          print('DEBUG: Buscando formulario completado para evento: $eventFromNavData');
-          _loadLatestFormForEvent(bloc, eventFromNavData);
+        // Configurar el evento de riesgo si viene de navegación
+        if (eventFromNavData != null && eventFromNavData.isNotEmpty) {
+          print('DEBUG: Configurando evento desde navegación: $eventFromNavData');
+          bloc.add(UpdateSelectedRiskEvent(eventFromNavData));
         }
         
         bloc.add(ChangeBottomNavIndex(targetIndex));
         return; // Salir inmediatamente sin procesar otras opciones
       }
       
-      // PRIORIDAD 2: Manejar carga de formularios existentes
-      final continueExisting = widget.navigationData!['continueExisting'] as bool? ?? false;
-      
-      if (formId != null && loadExisting) {
-        bloc.add(LoadFormData(formId));
-      } else if (continueExisting && eventFromNavData != null) {
-        // CASO NUEVO: Continuar con formulario existente SIN resetear
-        print('DEBUG: Continuando con formulario existente, NO reseteando datos');
-        // Solo actualizar el evento si es necesario, pero mantener todos los datos
-        if (eventFromNavData != bloc.state.selectedRiskEvent) {
-          bloc.add(UpdateSelectedRiskEvent(eventFromNavData));
-        }
-      } else if (isNewForm && eventFromNavData != null) {
-        bloc.add(ResetToNewForm(eventFromNavData));
-      } else if (eventFromNavData != null) {
-        bloc.add(ResetToNewForm(eventFromNavData));
+      // PRIORIDAD 2: Configurar evento de riesgo
+      if (eventFromNavData != null) {
+        // Configurar el evento seleccionado
+        print('DEBUG: Configurando evento desde navegación: $eventFromNavData');
+        bloc.add(UpdateSelectedRiskEvent(eventFromNavData));
       }
       
       // PRIORIDAD 3: Navegación por clasificaciones
@@ -112,31 +95,7 @@ class _RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
     }
   }
 
-  Future<void> _loadLatestFormForEvent(RiskThreatAnalysisBloc bloc, String eventName) async {
-    try {
-      print('DEBUG: Buscando formularios para evento: $eventName');
-      
-      // Acceder al servicio de persistencia para buscar formularios del evento
-      final formService = FormPersistenceService();
-      final allForms = await formService.getAllForms();
-      
-      // Filtrar formularios por tipo de evento
-      final eventForms = allForms.where((form) => form.eventType == eventName).toList();
-      
-      if (eventForms.isNotEmpty) {
-        // Ordenar por fecha de modificación (más reciente primero)
-        eventForms.sort((a, b) => b.lastModified.compareTo(a.lastModified));
-        final latestForm = eventForms.first;
-        
-        print('DEBUG: Cargando formulario más reciente: ${latestForm.id}');
-        bloc.add(LoadFormData(latestForm.id));
-      } else {
-        print('DEBUG: No se encontraron formularios para evento: $eventName');
-      }
-    } catch (e) {
-      print('DEBUG: Error buscando formularios: $e');
-    }
-  }
+
 
   @override
   Widget build(BuildContext context) {

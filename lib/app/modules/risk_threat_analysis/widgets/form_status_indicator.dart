@@ -26,8 +26,8 @@ class FormStatusIndicator extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Indicador de guardado
-              if (state.isSaving) ...[
+              // Indicador de estado
+              if (state.isLoading) ...[
                 const SizedBox(
                   width: 12,
                   height: 12,
@@ -35,21 +35,10 @@ class FormStatusIndicator extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 const Text(
-                  'Guardando...',
+                  'Cargando...',
                   style: TextStyle(fontSize: 12, color: Colors.orange),
                 ),
-              ] else if (state.lastSaved != null) ...[
-                const Icon(
-                  Icons.check_circle,
-                  size: 12,
-                  color: Colors.green,
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  'Guardado ${_formatLastSaved(state.lastSaved!)}',
-                  style: const TextStyle(fontSize: 12, color: Colors.green),
-                ),
-              ] else if (state.activeFormId != null) ...[
+              ] else ...[
                 const Icon(
                   Icons.edit,
                   size: 12,
@@ -57,21 +46,19 @@ class FormStatusIndicator extends StatelessWidget {
                 ),
                 const SizedBox(width: 4),
                 const Text(
-                  'Editando',
+                  'Formulario Activo',
                   style: TextStyle(fontSize: 12, color: Colors.blue),
                 ),
               ],
               
               // Separador
-              if ((state.isSaving || state.lastSaved != null || state.activeFormId != null)) ...[
-                const SizedBox(width: 12),
-                Container(
-                  width: 1,
-                  height: 16,
-                  color: Colors.grey[300],
-                ),
-                const SizedBox(width: 12),
-              ],
+              const SizedBox(width: 12),
+              Container(
+                width: 1,
+                height: 16,
+                color: Colors.grey[300],
+              ),
+              const SizedBox(width: 12),
               
               // Indicador de progreso
               Icon(
@@ -93,21 +80,6 @@ class FormStatusIndicator extends StatelessWidget {
         );
       },
     );
-  }
-
-  String _formatLastSaved(DateTime lastSaved) {
-    final now = DateTime.now();
-    final difference = now.difference(lastSaved);
-    
-    if (difference.inMinutes < 1) {
-      return 'ahora';
-    } else if (difference.inMinutes < 60) {
-      return 'hace ${difference.inMinutes}m';
-    } else if (difference.inHours < 24) {
-      return 'hace ${difference.inHours}h';
-    } else {
-      return 'hace ${difference.inDays}d';
-    }
   }
 
   double _getProgressPercentage(RiskThreatAnalysisState state) {

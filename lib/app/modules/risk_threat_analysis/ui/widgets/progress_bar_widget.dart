@@ -11,17 +11,14 @@ class ProgressBarWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<RiskThreatAnalysisBloc, RiskThreatAnalysisState>(
       builder: (context, state) {
-        final bloc = context.read<RiskThreatAnalysisBloc>();
-        
-        // Obtener progreso específico de la clasificación actual
-        final currentProgress = bloc.getCurrentClassificationProgress();
-        final progress = currentProgress / 100.0; // Convertir a decimal para LinearProgressIndicator
+        // Calcular progreso basado en las selecciones realizadas
+        final progress = _calculateProgress(state);
         
         // Texto dinámico según la clasificación
         final classificationName = state.selectedClassification == 'amenaza' 
           ? 'Amenaza' 
           : 'Vulnerabilidad';
-        final progressText = '${currentProgress.toInt()}% $classificationName completada';
+        final progressText = '${(progress * 100).toInt()}% $classificationName completada';
         
         return Column(
           children: [
@@ -61,5 +58,28 @@ class ProgressBarWidget extends StatelessWidget {
         );
       },
     );
+  }
+  
+  double _calculateProgress(RiskThreatAnalysisState state) {
+    double total = 0.0;
+    double completed = 0.0;
+    
+    if (state.selectedClassification == 'amenaza') {
+      // Para amenaza: probabilidad e intensidad
+      total += 2;
+      if (state.probabilidadSelections.isNotEmpty) completed += 1;
+      if (state.intensidadSelections.isNotEmpty) completed += 1;
+    } else if (state.selectedClassification == 'vulnerabilidad') {
+      // Para vulnerabilidad: selecciones dinámicas
+      final expectedSelections = ['social', 'economico', 'ambiental', 'fisico'];
+      total += expectedSelections.length;
+      for (final selection in expectedSelections) {
+        if (state.dynamicSelections[selection]?.isNotEmpty == true) {
+          completed += 1;
+        }
+      }
+    }
+    
+    return total > 0 ? completed / total : 0.0;
   }
 }

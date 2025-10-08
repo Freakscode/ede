@@ -26,34 +26,81 @@ class _RatingScreenState extends State<RatingScreen> {
   @override
   void initState() {
     super.initState();
-    // Inicializar el Bloc SOLO SI no ha sido inicializado antes
+    // Manejar la inicialización según el origen de navegación
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final currentState = context.read<RiskThreatAnalysisBloc>().state;
+      String eventToSet = 'Movimiento en Masa'; // Evento por defecto
+      String classificationToSet = 'amenaza'; // Clasificación por defecto
+      bool shouldReset = true; // Por defecto, siempre resetear
       
-      // Solo inicializar si el estado está vacío o es el primer uso
-      
+      // Analizar datos de navegación
       if (widget.navigationData != null) {
-        final classificationName = widget.navigationData!['classification'] as String?;
-        final eventName = widget.navigationData!['event'] as String?;
+        final data = widget.navigationData!;
+        final eventName = data['event'] as String?;
+        final classificationName = data['classification'] as String?;
+        final forceReset = data['forceReset'] as bool? ?? true;
+        final isNewForm = data['isNewForm'] as bool? ?? true;
+        final loadExisting = data['loadExisting'] as bool? ?? false;
+        final source = data['source'] as String? ?? 'unknown';
         
-        // Solo actualizar el evento si es diferente al actual
-        if (eventName != null && currentState.selectedRiskEvent != eventName) {
-          context.read<RiskThreatAnalysisBloc>().add(
-            UpdateSelectedRiskEvent(eventName)
-          );
+        print('📱 RATING SCREEN - Datos de navegación:');
+        print('   Evento: $eventName');
+        print('   Clasificación: $classificationName');
+        print('   Forzar Reset: $forceReset');
+        print('   Nuevo Formulario: $isNewForm');
+        print('   Cargar Existente: $loadExisting');
+        print('   Origen: $source');
+        
+        if (eventName != null) {
+          eventToSet = eventName;
+        }
+        if (classificationName != null) {
+          classificationToSet = classificationName;
         }
         
-        // Solo actualizar la clasificación si es diferente a la actual
-        if (classificationName != null && currentState.selectedClassification != classificationName) {
-          context.read<RiskThreatAnalysisBloc>().add(
-            SelectClassification(classificationName)
-          );
+        // Determinar si necesita reset basado en los flags
+        shouldReset = forceReset || isNewForm;
+        
+        // Casos especiales donde NO se debe resetear
+        if (loadExisting || (!isNewForm && !forceReset)) {
+          shouldReset = false;
+          print('   ⚠️ NO RESET: Cargando formulario existente o continuando actual');
         }
-      } else if (currentState.selectedClassification.isEmpty) {
-        // Fallback: usar valores por defecto SOLO si no hay clasificación
+      }
+      
+      if (shouldReset) {
+        print('🔄 EJECUTANDO RESET COMPLETO');
+        // Configurar evento y clasificación para nuevo formulario
         context.read<RiskThreatAnalysisBloc>().add(
-          SelectClassification('amenaza')
+          UpdateSelectedRiskEvent(eventToSet)
         );
+        
+        // Después del reset, establecer la clasificación correcta si es necesario
+        if (classificationToSet != 'amenaza') {
+          Future.delayed(const Duration(milliseconds: 50), () {
+            if (mounted) {
+              print('🎯 Cambiando a clasificación: $classificationToSet');
+              context.read<RiskThreatAnalysisBloc>().add(
+                SelectClassification(classificationToSet)
+              );
+            }
+          });
+        }
+      } else {
+        print('⏭️ MANTENIENDO ESTADO ACTUAL - No hay reset');
+        // Solo actualizar evento y clasificación sin reset
+        final currentState = context.read<RiskThreatAnalysisBloc>().state;
+        
+        if (currentState.selectedRiskEvent != eventToSet) {
+          context.read<RiskThreatAnalysisBloc>().add(
+            UpdateSelectedRiskEvent(eventToSet)
+          );
+        }
+        
+        if (currentState.selectedClassification != classificationToSet) {
+          context.read<RiskThreatAnalysisBloc>().add(
+            SelectClassification(classificationToSet)
+          );
+        }
       }
     });
   }

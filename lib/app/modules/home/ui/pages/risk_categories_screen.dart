@@ -5,7 +5,6 @@ import 'package:caja_herramientas/app/modules/home/ui/widgets/results_risk_secti
 import 'package:caja_herramientas/app/modules/home/bloc/home_bloc.dart';
 import 'package:caja_herramientas/app/modules/home/bloc/home_state.dart';
 import 'package:caja_herramientas/app/modules/home/bloc/home_event.dart';
-import 'package:caja_herramientas/app/modules/risk_threat_analysis/bloc/risk_threat_analysis_bloc.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -47,42 +46,46 @@ class RiskCategoriesScreen extends StatelessWidget {
         trailingIcon: trailingIcon,
         onTap: isAvailable
             ? () {
-                // Guardar la categoría seleccionada
+                // Obtener el estado actual del HomeBloc
                 final homeBloc = context.read<HomeBloc>();
+                final currentHomeState = homeBloc.state;
+                
+                // Guardar la categoría seleccionada
                 homeBloc.add(
                   SelectRiskCategory(classification.name, selectedEvent),
                 );
                 
-                // Crear navigationData con lógica mejorada
+                // DETECTAR SI ES UNA NUEVA EVALUACIÓN
+                // Si es Amenaza y no está marcada como completada, es nueva evaluación
+                // Si es Vulnerabilidad y Amenaza ya está completada pero Vulnerabilidad no, es continuación
+                final isAmenaza = classification.name.toLowerCase() == 'amenaza';
+                final amenazaCompleted = currentHomeState.completedEvaluations['${selectedEvent}_amenaza'] ?? false;
+                final vulnerabilidadCompleted = currentHomeState.completedEvaluations['${selectedEvent}_vulnerabilidad'] ?? false;
+                
+                final isNewEvaluation = (isAmenaza && !amenazaCompleted) || 
+                                       (!isAmenaza && !vulnerabilidadCompleted && amenazaCompleted);
+                
+                // Si es una nueva evaluación de Amenaza, resetear todo el progreso del evento
+                if (isAmenaza && !amenazaCompleted) {
+                  homeBloc.add(ResetEvaluationsForEvent(selectedEvent));
+                  print('🔄 RESET COMPLETO: Nueva evaluación de $selectedEvent');
+                }
+                
                 final navigationData = <String, dynamic>{
                   'event': selectedEvent,
                   'classification': classification.name.toLowerCase(),
-                  'directToResults': isCompleted,
+                  'directToResults': isCompleted && !isNewEvaluation,
+                  'forceReset': true, // FORZAR reset del formulario
+                  'isNewForm': true,   // SIEMPRE nuevo formulario desde categories
+                  'loadExisting': false, // NO cargar datos existentes
+                  'source': 'RiskCategoriesScreen', // Para debugging
                 };
                 
-                // Verificar el origen de la navegación
-                final homeState = homeBloc.state;
-                
-                // CRÍTICO: También verificar si ya hay un formulario en curso en RiskThreatAnalysisBloc
-                final riskBloc = context.read<RiskThreatAnalysisBloc>();
-                final riskState = riskBloc.state;
-                
-                if (homeState.activeFormId != null && homeState.activeFormId!.isNotEmpty) {
-                  // CASO 1: Entrando desde "Mis Formularios" - EDITAR formulario existente
-                  navigationData['formId'] = homeState.activeFormId;
-                  navigationData['loadExisting'] = true;
-                  navigationData['isNewForm'] = false;
-                } else if (riskState.activeFormId != null && riskState.activeFormId!.isNotEmpty) {
-                  // CASO 2: Ya hay un formulario en curso en RiskThreatAnalysisBloc - CONTINUAR
-                  navigationData['formId'] = riskState.activeFormId;
-                  navigationData['loadExisting'] = false; // No cargar desde BD, mantener estado actual
-                  navigationData['isNewForm'] = false; // NO es nuevo, ya existe
-                  navigationData['continueExisting'] = true; // Flag para mantener datos existentes
-                } else {
-                  // CASO 3: Entrando desde selección de evento - NUEVO formulario
-                  navigationData['isNewForm'] = true;
-                  navigationData['loadExisting'] = false;
-                }
+                print('🎯 NAVEGACIÓN desde RiskCategoriesScreen:');
+                print('   Evento: $selectedEvent');
+                print('   Clasificación: ${classification.name.toLowerCase()}');
+                print('   Nueva evaluación: $isNewEvaluation');
+                print('   Forzando reset completo para nuevo análisis');
                 
                 context.go('/risk_threat_analysis', extra: navigationData);
               }

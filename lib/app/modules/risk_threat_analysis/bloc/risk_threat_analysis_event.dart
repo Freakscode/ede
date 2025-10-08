@@ -69,47 +69,8 @@ class UpdateDynamicSelection extends RiskThreatAnalysisEvent {
   UpdateDynamicSelection(this.subClassificationId, this.category, this.level);
 }
 
-// Eventos para persistencia de formularios
-class SaveCurrentFormData extends RiskThreatAnalysisEvent {}
-
-class LoadFormData extends RiskThreatAnalysisEvent {
-  final String formId;
-  
-  LoadFormData(this.formId);
-}
-
-class ResetToNewForm extends RiskThreatAnalysisEvent {
-  final String eventType;
-  
-  ResetToNewForm(this.eventType);
-}
-
-class CompleteForm extends RiskThreatAnalysisEvent {}
-
-class AutoSaveProgress extends RiskThreatAnalysisEvent {}
-
 class ShowFinalResults extends RiskThreatAnalysisEvent {
   final bool show;
   
   ShowFinalResults(this.show);
-}
-
-// Eventos para cargar datos específicos por clasificación
-class LoadAmenazaData extends RiskThreatAnalysisEvent {
-  final String formId;
-  
-  LoadAmenazaData(this.formId);
-}
-
-class LoadVulnerabilidadData extends RiskThreatAnalysisEvent {
-  final String formId;
-  
-  LoadVulnerabilidadData(this.formId);
-}
-
-class LoadFormWithClassificationData extends RiskThreatAnalysisEvent {
-  final String formId;
-  final String? targetClassification; // 'amenaza' or 'vulnerabilidad'
-  
-  LoadFormWithClassificationData(this.formId, {this.targetClassification});
 }

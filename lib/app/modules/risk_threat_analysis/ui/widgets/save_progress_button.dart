@@ -1,11 +1,9 @@
-import 'package:caja_herramientas/app/shared/widgets/confirmation_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:caja_herramientas/app/core/icons/app_icons.dart';
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import '../../bloc/risk_threat_analysis_bloc.dart';
-import '../../bloc/risk_threat_analysis_event.dart';
 import '../../bloc/risk_threat_analysis_state.dart';
 
 class SaveProgressButton extends StatelessWidget {
@@ -22,7 +20,7 @@ class SaveProgressButton extends StatelessWidget {
           width: double.infinity,
           height: 48,
           child: ElevatedButton.icon(
-            onPressed: onPressed ?? () => _handleSaveProgress(context, state),
+            onPressed: onPressed ?? () => _showProgressInfo(context),
             icon: SvgPicture.asset(
               AppIcons.save,
               width: 20,
@@ -56,19 +54,14 @@ class SaveProgressButton extends StatelessWidget {
     );
   }
 
-  void _handleSaveProgress(
-    BuildContext context,
-    RiskThreatAnalysisState state,
-  ) {
-    final bloc = context.read<RiskThreatAnalysisBloc>();
-
-    bloc.add(SaveCurrentFormData());
-
-    ConfirmationDialog.show(
-      context: context,
-      title: 'Formulario guardado',
-      message: 'La información del formulario ha sido guardada exitosamente.',
-      type: ConfirmationDialogType.success,
+  void _showProgressInfo(BuildContext context) {
+    // Mostrar información sobre el progreso actual
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('El progreso se mantiene activo mientras uses la app'),
+        duration: Duration(seconds: 2),
+        backgroundColor: Colors.blue,
+      ),
     );
   }
 }
