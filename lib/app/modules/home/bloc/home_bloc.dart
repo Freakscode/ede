@@ -108,7 +108,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       }
       
       // Placeholder: No persistence service available
-      print('📋 Formulario activo limpiado para nueva evaluación de ${event.eventName}');
       
       emit(state.copyWith(
         completedEvaluations: updatedCompletedEvaluations,
@@ -132,8 +131,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     
     try {
             // Simulamos que carga la configuración global de formularios
-      // TODO: Implementar nueva lógica sin persistencia
-      print('LoadGlobalFormConfiguration: Cargando configuración sin persistencia');
       
       emit(state.copyWith(
         savedForms: [], // Lista vacía temporalmente

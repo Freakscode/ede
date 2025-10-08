@@ -68,7 +68,6 @@ class RiskCategoriesScreen extends StatelessWidget {
                 // Si es una nueva evaluación de Amenaza, resetear todo el progreso del evento
                 if (isAmenaza && !amenazaCompleted) {
                   homeBloc.add(ResetEvaluationsForEvent(selectedEvent));
-                  print('🔄 RESET COMPLETO: Nueva evaluación de $selectedEvent');
                 }
                 
                 final navigationData = <String, dynamic>{
@@ -80,12 +79,7 @@ class RiskCategoriesScreen extends StatelessWidget {
                   'loadExisting': false, // NO cargar datos existentes
                   'source': 'RiskCategoriesScreen', // Para debugging
                 };
-                
-                print('🎯 NAVEGACIÓN desde RiskCategoriesScreen:');
-                print('   Evento: $selectedEvent');
-                print('   Clasificación: ${classification.name.toLowerCase()}');
-                print('   Nueva evaluación: $isNewEvaluation');
-                print('   Forzando reset completo para nuevo análisis');
+               
                 
                 context.go('/risk_threat_analysis', extra: navigationData);
               }

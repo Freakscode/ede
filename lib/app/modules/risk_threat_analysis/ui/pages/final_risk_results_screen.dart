@@ -219,8 +219,6 @@ class FinalRiskResultsScreen extends StatelessWidget {
     RiskThreatAnalysisBloc bloc,
     RiskThreatAnalysisState state,
   ) {
-    print('DEBUG: _buildProbabilidadItems - selectedEvent: ${state.selectedRiskEvent}');
-    print('DEBUG: probabilidadSelections: ${state.probabilidadSelections}');
     
     final items = <Map<String, dynamic>>[];
     final selectedEvent = state.selectedRiskEvent;
@@ -239,7 +237,6 @@ class FinalRiskResultsScreen extends StatelessWidget {
 
       for (final category in probabilidadSubClass.categories) {
         final selection = state.probabilidadSelections[category.title];
-        print('DEBUG: categoria: ${category.title}, selection: $selection');
         final rating = _getRatingFromSelection(selection);
         final color = _getColorFromRating(rating);
 
@@ -261,8 +258,6 @@ class FinalRiskResultsScreen extends StatelessWidget {
     RiskThreatAnalysisBloc bloc,
     RiskThreatAnalysisState state,
   ) {
-    print('DEBUG: _buildIntensidadItems - selectedEvent: ${state.selectedRiskEvent}');
-    print('DEBUG: intensidadSelections: ${state.intensidadSelections}');
     
     final items = <Map<String, dynamic>>[];
     final selectedEvent = state.selectedRiskEvent;

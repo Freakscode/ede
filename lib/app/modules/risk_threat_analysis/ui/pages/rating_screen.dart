@@ -38,7 +38,6 @@ class _RatingScreenState extends State<RatingScreen> {
         eventToSet = data['event'] as String? ?? eventToSet;
         classificationToSet = data['classification'] as String? ?? classificationToSet;
         
-        print('📱 RATING SCREEN - Configurando: $eventToSet, $classificationToSet');
       }
       
       // Configurar evento de riesgo

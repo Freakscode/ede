@@ -42,7 +42,6 @@ class _RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
   }
 
   void _processNavigationData() {
-    print('DEBUG: _processNavigationData llamado con navigationData: ${widget.navigationData}');
     
     final bloc = context.read<RiskThreatAnalysisBloc>();
     
@@ -67,11 +66,9 @@ class _RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
       
       // PRIORIDAD 1: Navegación a FinalRiskResultsScreen
       if (finalResults && targetIndex != null) {
-        print('DEBUG: Navegando INMEDIATAMENTE a targetIndex: $targetIndex con finalResults: $finalResults');
         
         // Configurar el evento de riesgo si viene de navegación
         if (eventFromNavData != null && eventFromNavData.isNotEmpty) {
-          print('DEBUG: Configurando evento desde navegación: $eventFromNavData');
           bloc.add(UpdateSelectedRiskEvent(eventFromNavData));
         }
         
@@ -82,7 +79,6 @@ class _RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
       // PRIORIDAD 2: Configurar evento de riesgo
       if (eventFromNavData != null) {
         // Configurar el evento seleccionado
-        print('DEBUG: Configurando evento desde navegación: $eventFromNavData');
         bloc.add(UpdateSelectedRiskEvent(eventFromNavData));
       }
       
@@ -101,7 +97,6 @@ class _RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
   Widget build(BuildContext context) {
     return BlocBuilder<RiskThreatAnalysisBloc, RiskThreatAnalysisState>(
         builder: (context, state) {
-          print('DEBUG: currentBottomNavIndex = ${state.currentBottomNavIndex}');
           final List<Widget> screens = [
             RatingScreen(navigationData: widget.navigationData),
             const EvidenceScreen(),
