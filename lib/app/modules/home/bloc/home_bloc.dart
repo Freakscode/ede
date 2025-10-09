@@ -3,7 +3,6 @@ import 'package:caja_herramientas/app/core/icons/app_icons.dart';
 import 'package:caja_herramientas/app/shared/models/risk_event_factory.dart';
 import 'package:caja_herramientas/app/shared/models/risk_event_model.dart';
 import 'package:caja_herramientas/app/shared/services/form_persistence_service.dart';
-import 'package:caja_herramientas/app/shared/models/complete_form_data_model.dart';
 import 'package:caja_herramientas/app/shared/models/form_data_model.dart';
 import '../../home/services/tutorial_overlay_service.dart';
 import 'home_event.dart';
@@ -73,13 +72,15 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         mostrarCategoriasRiesgo: true,
         selectedRiskCategory: null, // Resetear la categoría seleccionada
         activeFormId: null, // Limpiar formulario activo
+        isCreatingNew: true, // Marcar como crear nuevo
         // NO resetear completedEvaluations para permitir progreso acumulativo
         savedForms: const [], // Limpiar formularios guardados
         isLoadingForms: false, // Resetear estado de carga
       ));
       
-      // Crear formulario inicial para el evento seleccionado
-      await _createInitialForm(event.eventName);
+      // NO crear formulario inicial automáticamente
+      // El formulario se creará solo cuando se guarde progreso por primera vez
+      print('HomeBloc: Evento seleccionado $event.eventName - NO se crea formulario hasta guardar progreso');
     });
     on<SelectRiskCategory>((event, emit) {
       emit(state.copyWith(
@@ -338,50 +339,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     return amenazaSaved && vulnerabilidadSaved;
   }
 
-  /// Crea un formulario inicial vacío cuando se selecciona un evento
-  Future<void> _createInitialForm(String eventName) async {
-    try {
-      final persistenceService = FormPersistenceService();
-      
-      // Crear formulario completo inicial (evento + amenaza + vulnerabilidad)
-      final now = DateTime.now();
-      final formId = '${eventName}_complete_${now.millisecondsSinceEpoch}';
-      final completeForm = CompleteFormDataModel(
-        id: formId,
-        eventName: eventName,
-        // Datos iniciales de amenaza
-        amenazaSelections: {},
-        amenazaScores: {},
-        amenazaColors: {},
-        amenazaProbabilidadSelections: {},
-        amenazaIntensidadSelections: {},
-        amenazaSelectedProbabilidad: null,
-        amenazaSelectedIntensidad: null,
-        // Datos iniciales de vulnerabilidad
-        vulnerabilidadSelections: {},
-        vulnerabilidadScores: {},
-        vulnerabilidadColors: {},
-        vulnerabilidadProbabilidadSelections: {},
-        vulnerabilidadIntensidadSelections: {},
-        vulnerabilidadSelectedProbabilidad: null,
-        vulnerabilidadSelectedIntensidad: null,
-        createdAt: now,
-        updatedAt: now,
-      );
-      
-      // Guardar formulario completo
-      await persistenceService.saveCompleteForm(completeForm);
-      
-      // Establecer el formulario como activo
-      await persistenceService.setActiveFormId(formId);
-      
-      print('HomeBloc: Formulario completo inicial creado para evento $eventName');
-      print('HomeBloc: Form ID: $formId');
-      
-    } catch (e) {
-      print('HomeBloc: Error al crear formulario inicial completo - $e');
-    }
-  }
 
   /// Resetear completamente todo el estado para crear un nuevo formulario
   Future<void> _onResetAllForNewForm(ResetAllForNewForm event, Emitter<HomeState> emit) async {

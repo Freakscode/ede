@@ -77,6 +77,7 @@ class SaveProgressButton extends StatelessWidget {
       
       if (existingForms.isNotEmpty) {
         // Actualizar formulario existente
+        print('SaveProgressButton: Actualizando formulario existente ${existingForms.first.id}');
         completeForm = existingForms.first;
         
         // Actualizar según la clasificación actual
@@ -104,7 +105,8 @@ class SaveProgressButton extends StatelessWidget {
           );
         }
       } else {
-        // Crear nuevo formulario completo
+        // Crear nuevo formulario completo (primera vez que se guarda progreso)
+        print('SaveProgressButton: Creando formulario por primera vez para evento ${state.selectedRiskEvent}');
         completeForm = CompleteFormDataModel(
           id: formId,
           eventName: state.selectedRiskEvent,
