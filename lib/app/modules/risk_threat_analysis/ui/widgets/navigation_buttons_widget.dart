@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import 'package:caja_herramientas/app/shared/widgets/dialogs/custom_action_dialog.dart';
+import 'package:caja_herramientas/app/shared/services/form_persistence_service.dart';
 import '../../bloc/risk_threat_analysis_bloc.dart';
 import '../../bloc/risk_threat_analysis_event.dart';
 import '../../bloc/risk_threat_analysis_state.dart';
@@ -114,8 +115,58 @@ class NavigationButtonsWidget extends StatelessWidget {
                 onTap:
                     onContinuePressed ??
                     () {
+                      // Si estamos en FinalRiskResultsScreen (índice 3), completar formulario
+                      if (currentIndex == 3) {
+                        // Mostrar diálogo de confirmación para completar el formulario
+                        CustomActionDialog.show(
+                          context: context,
+                          title: 'Finalizar formulario',
+                          message: ' ¿Deseas finalizar el formulario? Antes de finalizar, puedes revisar tus respuestas. ',
+                          leftButtonText: 'Revisar  ',
+                          leftButtonIcon: Icons.close,
+                          rightButtonText: 'Finalizar  ',
+                          rightButtonIcon: Icons.check_circle,
+                          onRightButtonPressed: () async {
+                            // Marcar el formulario como explícitamente completado
+                            final homeBloc = context.read<HomeBloc>();
+                            final homeState = homeBloc.state;
+                            
+                            if (homeState.activeFormId != null) {
+                              // Obtener el servicio de persistencia
+                              final FormPersistenceService persistenceService = FormPersistenceService();
+                              final completeForm = await persistenceService.getCompleteForm(homeState.activeFormId!);
+                              
+                              if (completeForm != null) {
+                                // Marcar como explícitamente completado
+                                final updatedForm = completeForm.copyWith(
+                                  isExplicitlyCompleted: true,
+                                  updatedAt: DateTime.now(),
+                                );
+                                
+                                // Guardar el formulario actualizado
+                                await persistenceService.saveCompleteForm(updatedForm);
+                                
+                                // Recargar los formularios en HomeBloc
+                                homeBloc.add(LoadForms());
+                                
+                                // Mostrar mensaje de éxito
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Formulario completado exitosamente'),
+                                    backgroundColor: Colors.green,
+                                  ),
+                                );
+                                
+                                // Navegar a la pantalla de formularios
+                                final navigationData = {'showForms': true};
+                                context.go('/home', extra: navigationData);
+                              }
+                            }
+                          },
+                        );
+                      }
                       // Si estamos en la última pestaña (índice 2), manejar finalización
-                      if (currentIndex == 2) {
+                      else if (currentIndex == 2) {
                         final riskBloc = context.read<RiskThreatAnalysisBloc>();
                         
                         // Validar si hay variables sin calificar antes de finalizar
