@@ -219,26 +219,14 @@ class _RiskCategoriesScreenState extends State<RiskCategoriesScreen> {
                         if (isAmenaza) {
                           // Amenaza siempre está disponible
                           isAvailable = true;
-                          isCompleted =
-                              homeState
-                                  .completedEvaluations['${selectedEvent}_amenaza'] ??
-                              false;
+                          isCompleted = false; // No mostrar como completada hasta que esté al 100% real
                         } else if (isVulnerabilidad) {
-                          // Verificar si amenaza está completa usando HomeBloc
-                          final amenazaCompleted =
-                              homeState
-                                  .completedEvaluations['${selectedEvent}_amenaza'] ??
-                              false;
-                          isAvailable = amenazaCompleted;
+                          // Vulnerabilidad siempre está disponible si hay un formulario activo
+                          isAvailable = homeState.activeFormId != null;
                           if (!isAvailable) {
-                            disabledMessage =
-                                'Complete primero la sección de Amenaza';
+                            disabledMessage = 'No hay formulario activo';
                           }
-                          // Verificar si vulnerabilidad está completa
-                          isCompleted =
-                              homeState
-                                  .completedEvaluations['${selectedEvent}_vulnerabilidad'] ??
-                              false;
+                          isCompleted = false; // No mostrar como completada hasta que esté al 100% real
                         }
 
                         return Column(
