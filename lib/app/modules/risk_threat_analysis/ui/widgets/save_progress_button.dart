@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:caja_herramientas/app/core/icons/app_icons.dart';
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import 'package:caja_herramientas/app/shared/services/form_persistence_service.dart';
-import 'package:caja_herramientas/app/shared/models/persistent_form_data_model.dart';
+import 'package:caja_herramientas/app/shared/models/complete_form_data_model.dart';
 import '../../bloc/risk_threat_analysis_bloc.dart';
 import '../../bloc/risk_threat_analysis_state.dart';
 
@@ -61,32 +61,77 @@ class SaveProgressButton extends StatelessWidget {
     final state = bloc.state;
     
     try {
+      final persistenceService = FormPersistenceService();
+      
       // Obtener datos actuales del formulario
       final formData = bloc.getCurrentFormData();
       
-      // Crear PersistentFormDataModel
-      final now = DateTime.now();
-      final formModel = PersistentFormDataModel(
-        id: '${state.selectedRiskEvent}_${state.selectedClassification}_${now.millisecondsSinceEpoch}',
-        eventName: state.selectedRiskEvent,
-        classificationType: state.selectedClassification,
-        dynamicSelections: formData['dynamicSelections'] ?? {},
-        subClassificationScores: formData['subClassificationScores'] ?? {},
-        subClassificationColors: formData['subClassificationColors'] ?? {},
-        probabilidadSelections: formData['probabilidadSelections'] ?? {},
-        intensidadSelections: formData['intensidadSelections'] ?? {},
-        selectedProbabilidad: formData['selectedProbabilidad'],
-        selectedIntensidad: formData['selectedIntensidad'],
-        createdAt: now,
-        updatedAt: now,
-      );
+      // Crear ID único para el formulario completo
+      final formId = '${state.selectedRiskEvent}_complete_${DateTime.now().millisecondsSinceEpoch}';
       
-      // Guardar en SQLite
-      final persistenceService = FormPersistenceService();
-      await persistenceService.saveForm(formModel);
+      // Verificar si ya existe un formulario completo para este evento
+      final existingForms = await persistenceService.getCompleteFormsByEvent(state.selectedRiskEvent);
+      
+      CompleteFormDataModel completeForm;
+      final now = DateTime.now();
+      
+      if (existingForms.isNotEmpty) {
+        // Actualizar formulario existente
+        completeForm = existingForms.first;
+        
+        // Actualizar según la clasificación actual
+        if (state.selectedClassification.toLowerCase() == 'amenaza') {
+          completeForm = completeForm.copyWith(
+            amenazaSelections: formData['dynamicSelections'] ?? completeForm.amenazaSelections,
+            amenazaScores: formData['subClassificationScores'] ?? completeForm.amenazaScores,
+            amenazaColors: formData['subClassificationColors'] ?? completeForm.amenazaColors,
+            amenazaProbabilidadSelections: formData['probabilidadSelections'] ?? completeForm.amenazaProbabilidadSelections,
+            amenazaIntensidadSelections: formData['intensidadSelections'] ?? completeForm.amenazaIntensidadSelections,
+            amenazaSelectedProbabilidad: formData['selectedProbabilidad'] ?? completeForm.amenazaSelectedProbabilidad,
+            amenazaSelectedIntensidad: formData['selectedIntensidad'] ?? completeForm.amenazaSelectedIntensidad,
+            updatedAt: now,
+          );
+        } else if (state.selectedClassification.toLowerCase() == 'vulnerabilidad') {
+          completeForm = completeForm.copyWith(
+            vulnerabilidadSelections: formData['dynamicSelections'] ?? completeForm.vulnerabilidadSelections,
+            vulnerabilidadScores: formData['subClassificationScores'] ?? completeForm.vulnerabilidadScores,
+            vulnerabilidadColors: formData['subClassificationColors'] ?? completeForm.vulnerabilidadColors,
+            vulnerabilidadProbabilidadSelections: formData['probabilidadSelections'] ?? completeForm.vulnerabilidadProbabilidadSelections,
+            vulnerabilidadIntensidadSelections: formData['intensidadSelections'] ?? completeForm.vulnerabilidadIntensidadSelections,
+            vulnerabilidadSelectedProbabilidad: formData['selectedProbabilidad'] ?? completeForm.vulnerabilidadSelectedProbabilidad,
+            vulnerabilidadSelectedIntensidad: formData['selectedIntensidad'] ?? completeForm.vulnerabilidadSelectedIntensidad,
+            updatedAt: now,
+          );
+        }
+      } else {
+        // Crear nuevo formulario completo
+        completeForm = CompleteFormDataModel(
+          id: formId,
+          eventName: state.selectedRiskEvent,
+          amenazaSelections: state.selectedClassification.toLowerCase() == 'amenaza' ? (formData['dynamicSelections'] ?? {}) : {},
+          amenazaScores: state.selectedClassification.toLowerCase() == 'amenaza' ? (formData['subClassificationScores'] ?? {}) : {},
+          amenazaColors: state.selectedClassification.toLowerCase() == 'amenaza' ? (formData['subClassificationColors'] ?? {}) : {},
+          amenazaProbabilidadSelections: state.selectedClassification.toLowerCase() == 'amenaza' ? (formData['probabilidadSelections'] ?? {}) : {},
+          amenazaIntensidadSelections: state.selectedClassification.toLowerCase() == 'amenaza' ? (formData['intensidadSelections'] ?? {}) : {},
+          amenazaSelectedProbabilidad: state.selectedClassification.toLowerCase() == 'amenaza' ? formData['selectedProbabilidad'] : null,
+          amenazaSelectedIntensidad: state.selectedClassification.toLowerCase() == 'amenaza' ? formData['selectedIntensidad'] : null,
+          vulnerabilidadSelections: state.selectedClassification.toLowerCase() == 'vulnerabilidad' ? (formData['dynamicSelections'] ?? {}) : {},
+          vulnerabilidadScores: state.selectedClassification.toLowerCase() == 'vulnerabilidad' ? (formData['subClassificationScores'] ?? {}) : {},
+          vulnerabilidadColors: state.selectedClassification.toLowerCase() == 'vulnerabilidad' ? (formData['subClassificationColors'] ?? {}) : {},
+          vulnerabilidadProbabilidadSelections: state.selectedClassification.toLowerCase() == 'vulnerabilidad' ? (formData['probabilidadSelections'] ?? {}) : {},
+          vulnerabilidadIntensidadSelections: state.selectedClassification.toLowerCase() == 'vulnerabilidad' ? (formData['intensidadSelections'] ?? {}) : {},
+          vulnerabilidadSelectedProbabilidad: state.selectedClassification.toLowerCase() == 'vulnerabilidad' ? formData['selectedProbabilidad'] : null,
+          vulnerabilidadSelectedIntensidad: state.selectedClassification.toLowerCase() == 'vulnerabilidad' ? formData['selectedIntensidad'] : null,
+          createdAt: now,
+          updatedAt: now,
+        );
+      }
+      
+      // Guardar formulario completo
+      await persistenceService.saveCompleteForm(completeForm);
       
       // Establecer como formulario activo
-      await persistenceService.setActiveFormId(formModel.id);
+      await persistenceService.setActiveFormId(completeForm.id);
       
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -98,7 +143,7 @@ class SaveProgressButton extends StatelessWidget {
         );
       }
       
-      print('SaveProgressButton: Formulario guardado en SQLite - ${formModel.id}');
+      print('SaveProgressButton: Formulario completo guardado - ${completeForm.id} (${state.selectedClassification})');
       
     } catch (e) {
       print('SaveProgressButton: Error al guardar progreso - $e');

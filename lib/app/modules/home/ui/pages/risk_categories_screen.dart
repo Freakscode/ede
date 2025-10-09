@@ -5,14 +5,52 @@ import 'package:caja_herramientas/app/modules/home/ui/widgets/results_risk_secti
 import 'package:caja_herramientas/app/modules/home/bloc/home_bloc.dart';
 import 'package:caja_herramientas/app/modules/home/bloc/home_state.dart';
 import 'package:caja_herramientas/app/modules/home/bloc/home_event.dart';
+import 'package:caja_herramientas/app/shared/services/form_persistence_service.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-class RiskCategoriesScreen extends StatelessWidget {
+class RiskCategoriesScreen extends StatefulWidget {
   const RiskCategoriesScreen({super.key});
+
+  @override
+  State<RiskCategoriesScreen> createState() => _RiskCategoriesScreenState();
+}
+
+class _RiskCategoriesScreenState extends State<RiskCategoriesScreen> {
+
+  // Método simple para calcular progreso basado en datos guardados
+  Future<double> _getProgressForCategory(String eventName, String categoryType, String? formId) async {
+    if (formId == null) return 0.0;
+    
+    try {
+      final persistenceService = FormPersistenceService();
+      final completeForm = await persistenceService.getCompleteForm(formId);
+      
+      if (completeForm == null) return 0.0;
+      
+      // Lógica simplificada: contar selecciones vs total esperado
+      if (categoryType.toLowerCase() == 'amenaza') {
+        final totalSelections = completeForm.amenazaProbabilidadSelections.length + 
+                               completeForm.amenazaIntensidadSelections.length;
+        return totalSelections > 0 ? (totalSelections / 6.0).clamp(0.0, 1.0) : 0.0; // Asumiendo 6 categorías totales
+      } else if (categoryType.toLowerCase() == 'vulnerabilidad') {
+        int totalSelections = 0;
+        for (final subClassSelections in completeForm.vulnerabilidadSelections.values) {
+          if (subClassSelections.isNotEmpty) {
+            totalSelections += subClassSelections.length;
+          }
+        }
+        return totalSelections > 0 ? (totalSelections / 8.0).clamp(0.0, 1.0) : 0.0; // Asumiendo 8 categorías totales
+      }
+    } catch (e) {
+      print('Error al calcular progreso: $e');
+    }
+    
+    return 0.0;
+  }
 
   // Método helper para construir las CategoryCard personalizadas
   Widget _buildCategoryCard(
@@ -22,6 +60,7 @@ class RiskCategoriesScreen extends StatelessWidget {
     bool isAvailable,
     bool isCompleted,
     String? disabledMessage,
+    String? activeFormId,
   ) {
     Widget? trailingIcon;
     
@@ -41,9 +80,17 @@ class RiskCategoriesScreen extends StatelessWidget {
 
     return Opacity(
       opacity: isAvailable ? 1.0 : 0.6,
-      child: CategoryCard(
-        title: '${classification.name} $selectedEvent',
-        trailingIcon: trailingIcon,
+      child: FutureBuilder<double>(
+        future: _getProgressForCategory(selectedEvent, classification.name, activeFormId),
+        builder: (context, snapshot) {
+          String title = '${classification.name} $selectedEvent';
+          
+          // No mostrar porcentaje de progreso en los títulos de categorías
+          // El progreso se maneja internamente para la funcionalidad
+          
+          return CategoryCard(
+            title: title,
+            trailingIcon: trailingIcon,
         onTap: isAvailable
             ? () {
                 // Obtener el estado actual del HomeBloc
@@ -54,31 +101,33 @@ class RiskCategoriesScreen extends StatelessWidget {
                   SelectRiskCategory(classification.name, selectedEvent),
                 );
                 
-                // DETECTAR SI ES UNA NUEVA EVALUACIÓN
-                // Verificar el estado actual de las evaluaciones para este evento
+                // Obtener el estado actual del HomeBloc
                 final currentHomeState = homeBloc.state;
-                final isAmenaza = classification.name.toLowerCase() == 'amenaza';
-                final amenazaCompleted = currentHomeState.completedEvaluations['${selectedEvent}_amenaza'] ?? false;
-                final vulnerabilidadCompleted = currentHomeState.completedEvaluations['${selectedEvent}_vulnerabilidad'] ?? false;
-                
-                // Determinar si es nueva evaluación basado en el estado actual
-                final isNewEvaluation = (isAmenaza && !amenazaCompleted) || 
-                                       (!isAmenaza && !vulnerabilidadCompleted && amenazaCompleted);
-                
-                // Si es Amenaza y es nueva evaluación, resetear todo el progreso del evento
-                if (isAmenaza) {
-                  homeBloc.add(ResetEvaluationsForEvent(selectedEvent));
-                }
                 
                 final navigationData = <String, dynamic>{
                   'event': selectedEvent,
                   'classification': classification.name.toLowerCase(),
-                  'directToResults': isCompleted && !isNewEvaluation,
-                  'forceReset': true, // FORZAR reset del formulario
-                  'isNewForm': true,   // SIEMPRE nuevo formulario desde categories
-                  'loadExisting': false, // NO cargar datos existentes
+                  'directToResults': isCompleted,
                   'source': 'RiskCategoriesScreen', // Para debugging
                 };
+                
+                // Usar el campo isCreatingNew para determinar el tipo de formulario
+                print('RiskCategoriesScreen: Estado actual del HomeBloc:');
+                print('  - isCreatingNew: ${currentHomeState.isCreatingNew}');
+                print('  - activeFormId: ${currentHomeState.activeFormId}');
+                print('  - selectedRiskEvent: ${currentHomeState.selectedRiskEvent}');
+                
+                if (currentHomeState.isCreatingNew) {
+                  // Crear formulario nuevo - resetear todo
+                  navigationData['forceReset'] = true;
+                  navigationData['isNewForm'] = true;
+                  print('RiskCategoriesScreen: Creando formulario nuevo - isCreatingNew: true');
+                } else {
+                  // Editar formulario existente - cargar datos guardados
+                  navigationData['loadSavedForm'] = true;
+                  navigationData['formId'] = currentHomeState.activeFormId;
+                  print('RiskCategoriesScreen: Continuando formulario existente - isCreatingNew: false, formId: ${currentHomeState.activeFormId}');
+                }
                
                 
                 context.go('/risk_threat_analysis', extra: navigationData);
@@ -95,6 +144,8 @@ class RiskCategoriesScreen extends StatelessWidget {
                   );
                 }
               },
+          );
+        },
       ),
     );
   }
@@ -199,6 +250,7 @@ class RiskCategoriesScreen extends StatelessWidget {
                               isAvailable,
                               isCompleted,
                               disabledMessage,
+                              homeState.activeFormId,
                             ),
                             // Agregar espaciado entre cards, excepto después del último
                             if (index < classifications.length - 1)

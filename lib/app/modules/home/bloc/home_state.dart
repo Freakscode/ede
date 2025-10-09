@@ -18,6 +18,7 @@ class HomeState extends Equatable {
   final List<FormDataModel> savedForms;
   final bool isLoadingForms;
   final String? activeFormId;
+  final bool isCreatingNew; // true = crear nuevo, false = editar existente
   
   // ======= CAMPOS PARA GUARDAR RISKEVENTMODEL =======
   final Map<String, Map<String, dynamic>> savedRiskEventModels; // Guardar RiskEventModel por evento y clasificación
@@ -37,6 +38,7 @@ class HomeState extends Equatable {
     this.savedForms = const [],
     this.isLoadingForms = false,
     this.activeFormId,
+    this.isCreatingNew = true, // Por defecto, crear nuevo
     this.savedRiskEventModels = const {},
   });
 
@@ -55,6 +57,7 @@ class HomeState extends Equatable {
     List<FormDataModel>? savedForms,
     bool? isLoadingForms,
     String? activeFormId,
+    bool? isCreatingNew,
     Map<String, Map<String, dynamic>>? savedRiskEventModels,
   }) {
     return HomeState(
@@ -72,6 +75,7 @@ class HomeState extends Equatable {
       savedForms: savedForms ?? this.savedForms,
       isLoadingForms: isLoadingForms ?? this.isLoadingForms,
       activeFormId: activeFormId ?? this.activeFormId,
+      isCreatingNew: isCreatingNew ?? this.isCreatingNew,
       savedRiskEventModels: savedRiskEventModels ?? this.savedRiskEventModels,
     );
   }
@@ -89,10 +93,11 @@ class HomeState extends Equatable {
         selectedRiskEvent,
         selectedRiskCategory,
         completedEvaluations,
-        savedForms,
-        isLoadingForms,
-        activeFormId,
-        savedRiskEventModels,
+    savedForms,
+    isLoadingForms,
+    activeFormId,
+    isCreatingNew,
+    savedRiskEventModels,
       ];
 
   // Métodos de conveniencia para filtrar formularios

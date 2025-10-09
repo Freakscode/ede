@@ -151,16 +151,6 @@ class FormCardInProgress extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 4),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(99),
-            child: LinearProgressIndicator(
-              value: progress,
-              minHeight: 9,
-              backgroundColor: const Color(0xFFE5E5E5),
-              valueColor: const AlwaysStoppedAnimation(DAGRDColors.azulDAGRD),
-            ),
-          ),
           const SizedBox(height: 8),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -188,14 +178,11 @@ class FormCardInProgress extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 4),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(99),
-            child: LinearProgressIndicator(
-              value: threat,
-              minHeight: 9,
-              backgroundColor: const Color(0xFFE5E5E5),
-              valueColor: const AlwaysStoppedAnimation(Color(0xFF2563EB)),
-            ),
+          LinearProgressIndicator(
+            value: threat,
+            minHeight: 9,
+            backgroundColor: const Color(0xFFE5E5E5),
+            valueColor: const AlwaysStoppedAnimation(Color(0xFF2563EB)),
           ),
           const SizedBox(height: 8),
           Row(
@@ -225,14 +212,11 @@ class FormCardInProgress extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 4),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(99),
-            child: LinearProgressIndicator(
-              value: vulnerability,
-              minHeight: 9,
-              backgroundColor: const Color(0xFFE5E5E5),
-              valueColor: const AlwaysStoppedAnimation(Color(0xFF2563EB)),
-            ),
+          LinearProgressIndicator(
+            value: vulnerability,
+            minHeight: 9,
+            backgroundColor: const Color(0xFFE5E5E5),
+            valueColor: const AlwaysStoppedAnimation(Color(0xFF2563EB)),
           ),
           const SizedBox(height: 16),
           SizedBox(

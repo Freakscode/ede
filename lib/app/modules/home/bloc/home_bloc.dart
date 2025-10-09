@@ -32,11 +32,39 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         mostrarCategoriasRiesgo: false,
       ));
     });
-    on<HomeShowRiskCategoriesScreen>((event, emit) {
+    on<HomeShowRiskCategoriesScreen>((event, emit) async {
       emit(state.copyWith(
         mostrarEventosRiesgo: false,
         mostrarCategoriasRiesgo: true,
       ));
+      
+      // Si viene con un evento específico, configurarlo
+      if (event.eventName != null) {
+        emit(state.copyWith(
+          selectedRiskEvent: event.eventName,
+          selectedRiskCategory: null, // Resetear la categoría seleccionada
+        ));
+        
+        // Si viene con datos de formulario guardado, configurar el formulario activo
+        if (event.loadSavedForm && event.formId != null) {
+          emit(state.copyWith(
+            activeFormId: event.formId,
+            isCreatingNew: false, // Marcar como editar
+          ));
+          
+          // Mostrar mensaje informativo si se especifica
+          if (event.showProgressInfo) {
+            print('HomeBloc: Cargando formulario guardado - ${event.formId}');
+          }
+        } else {
+          // Si no viene con formulario guardado, limpiar el activeFormId (formulario nuevo)
+          emit(state.copyWith(
+            activeFormId: null,
+            isCreatingNew: true, // Marcar como crear nuevo
+          ));
+          print('HomeBloc: Creando formulario nuevo - limpiando activeFormId');
+        }
+      }
     });
     on<SelectRiskEvent>((event, emit) async {
       emit(state.copyWith(
@@ -158,13 +186,16 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           status = FormStatus.inProgress;
         }
         
+        // Obtener el RiskEventModel correspondiente al eventName
+        final riskEvent = RiskEventFactory.getEventByName(completeForm.eventName);
+        
         return FormDataModel(
           id: completeForm.id,
           title: '${completeForm.eventName} - Análisis Completo',
           status: status,
           createdAt: completeForm.createdAt,
           lastModified: completeForm.updatedAt,
-          riskEvent: null, // Se puede agregar si es necesario
+          riskEvent: riskEvent, // Guardar el RiskEventModel real
         );
       }).toList();
       
@@ -201,8 +232,11 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   }
 
   void _onSetActiveFormId(SetActiveFormId event, Emitter<HomeState> emit) {
-    // TODO: Actualizar según nueva estructura del estado
-    print('SetActiveFormId recibido para ID: ${event.formId}');
+    emit(state.copyWith(
+      activeFormId: event.formId,
+      isCreatingNew: false, // Marcar como editar
+    ));
+    print('SetActiveFormId recibido para ID: ${event.formId} - marcando como editar');
   }
 
   /// Guarda un RiskEventModel completo cuando se completa una evaluación
@@ -361,6 +395,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         selectedRiskEvent: null,
         selectedRiskCategory: null,
         activeFormId: null,
+        isCreatingNew: true, // Marcar como crear nuevo
         completedEvaluations: const {}, // Resetear todas las evaluaciones completadas
         savedRiskEventModels: const {}, // Limpiar modelos guardados
         savedForms: const [], // Limpiar formularios guardados

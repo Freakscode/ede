@@ -17,7 +17,22 @@ class HomeNavBarTapped extends HomeEvent {
 
 class HomeShowRiskEventsSection extends HomeEvent {}
 
-class HomeShowRiskCategoriesScreen extends HomeEvent {}
+class HomeShowRiskCategoriesScreen extends HomeEvent {
+  final String? eventName;
+  final bool loadSavedForm;
+  final String? formId;
+  final bool showProgressInfo;
+  
+  const HomeShowRiskCategoriesScreen(
+    this.eventName, {
+    this.loadSavedForm = false,
+    this.formId,
+    this.showProgressInfo = false,
+  });
+
+  @override
+  List<Object?> get props => [eventName, loadSavedForm, formId, showProgressInfo];
+}
 
 class SelectRiskEvent extends HomeEvent {
   final String eventName;

@@ -40,7 +40,7 @@ class HomeScreen extends StatelessWidget {
       // Manejar diferentes tipos de navegación
       if (navigationData != null) {
         if (navigationData!['showRiskCategories'] == true) {
-          bloc.add(HomeShowRiskCategoriesScreen());
+          bloc.add(HomeShowRiskCategoriesScreen(null));
         } else if (navigationData!['showRiskEvents'] == true) {
           bloc.add(HomeShowRiskEventsSection());
         } else if (navigationData!['selectedIndex'] != null) {

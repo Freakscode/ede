@@ -108,7 +108,17 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     ResetDropdowns event,
     Emitter<RiskThreatAnalysisState> emit,
   ) {
+    print('=== RiskThreatAnalysisBloc: ResetDropdowns ejecutado ===');
+    print('Estado anterior: ${state.toString()}');
+    print('Estado anterior - dynamicSelections: ${state.dynamicSelections}');
+    print('Estado anterior - probabilidadSelections: ${state.probabilidadSelections}');
+    print('Estado anterior - intensidadSelections: ${state.intensidadSelections}');
+    
+    // Reset completo a estado inicial
     emit(const RiskThreatAnalysisState());
+    
+    print('Estado nuevo: Estado inicial completamente limpio');
+    print('=== Fin ResetDropdowns ===');
   }
 
   void _onChangeBottomNavIndex(
@@ -1493,6 +1503,10 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     LoadFormData event,
     Emitter<RiskThreatAnalysisState> emit,
   ) {
+    print('=== _onLoadFormData DEBUG ===');
+    print('Event: ${event.eventName}_${event.classificationType}');
+    print('FormData recibido: ${event.formData}');
+    
     // Cargar las selecciones dinámicas
     final dynamicSelections = Map<String, Map<String, String>>.from(event.formData['dynamicSelections'] ?? {});
     
@@ -1516,6 +1530,15 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     final selectedProbabilidad = event.formData['selectedProbabilidad'] as String?;
     final selectedIntensidad = event.formData['selectedIntensidad'] as String?;
     
+    print('Datos procesados:');
+    print('  - dynamicSelections: $dynamicSelections');
+    print('  - probabilidadSelections: $probabilidadSelections');
+    print('  - intensidadSelections: $intensidadSelections');
+    print('  - selectedProbabilidad: $selectedProbabilidad');
+    print('  - selectedIntensidad: $selectedIntensidad');
+    print('  - subClassificationScores: $subClassificationScores');
+    print('=== FIN _onLoadFormData DEBUG ===');
+    
     emit(state.copyWith(
       dynamicSelections: dynamicSelections,
       subClassificationScores: subClassificationScores,
@@ -1527,11 +1550,7 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
       isLoading: false,
     ));
     
-    print('Datos del formulario cargados para: ${event.eventName}_${event.classificationType}');
-    print('selectedProbabilidad: $selectedProbabilidad');
-    print('selectedIntensidad: $selectedIntensidad');
-    print('subClassificationScores: $subClassificationScores');
-    print('subClassificationColors: $subClassificationColors');
+    print('Estado actualizado con datos del formulario para: ${event.eventName}_${event.classificationType}');
   }
 
   /// Guarda datos actuales del formulario

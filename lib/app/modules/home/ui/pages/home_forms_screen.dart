@@ -10,6 +10,8 @@ import '../../bloc/home_event.dart';
 import '../../bloc/home_state.dart';
 import '../../../../shared/models/form_data_model.dart';
 import '../../../../shared/services/form_persistence_service.dart';
+import '../../../../shared/models/risk_event_factory.dart';
+import '../../../../shared/models/complete_form_data_model.dart';
 
 class HomeFormsScreen extends StatefulWidget {
   const HomeFormsScreen({super.key});
@@ -41,35 +43,36 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
     _loadForms();
   }
 
-  // Método para obtener el progreso real de un formulario
+  // Método para obtener el progreso real de un formulario usando la misma lógica que ProgressBarWidget
   Future<Map<String, double>> _getFormProgress(String formId) async {
     try {
       final persistenceService = FormPersistenceService();
       final completeForm = await persistenceService.getCompleteForm(formId);
       
+      print('_getFormProgress Debug - FormId: $formId');
+      print('  - CompleteForm found: ${completeForm != null}');
+      
       if (completeForm != null) {
-        // Calcular progreso de amenaza basado en subclasificaciones completadas
-        double amenazaProgress = 0.0;
-        if (completeForm.amenazaSelections.isNotEmpty) {
-          final total = completeForm.amenazaSelections.length;
-          final completed = completeForm.amenazaSelections.values
-              .where((selections) => selections.isNotEmpty)
-              .length;
-          amenazaProgress = total > 0 ? completed / total : 0.0;
-        }
+        print('  - EventName: ${completeForm.eventName}');
+        print('  - Amenaza Probabilidad Selections: ${completeForm.amenazaProbabilidadSelections}');
+        print('  - Amenaza Intensidad Selections: ${completeForm.amenazaIntensidadSelections}');
+        print('  - Vulnerabilidad Selections: ${completeForm.vulnerabilidadSelections}');
         
-        // Calcular progreso de vulnerabilidad basado en subclasificaciones completadas
-        double vulnerabilidadProgress = 0.0;
-        if (completeForm.vulnerabilidadSelections.isNotEmpty) {
-          final total = completeForm.vulnerabilidadSelections.length;
-          final completed = completeForm.vulnerabilidadSelections.values
-              .where((selections) => selections.isNotEmpty)
-              .length;
-          vulnerabilidadProgress = total > 0 ? completed / total : 0.0;
-        }
+        // Usar la misma lógica que ProgressBarWidget para consistencia
+        
+        // Calcular progreso de amenaza (probabilidad + intensidad)
+        double amenazaProgress = _calculateAmenazaProgressFromCompleteForm(completeForm);
+        
+        // Calcular progreso de vulnerabilidad (todas las subclasificaciones dinámicas)
+        double vulnerabilidadProgress = _calculateVulnerabilidadProgressFromCompleteForm(completeForm);
         
         // Progreso total (promedio)
         final totalProgress = (amenazaProgress + vulnerabilidadProgress) / 2;
+        
+        print('  - Calculated Progress:');
+        print('    * Amenaza: $amenazaProgress');
+        print('    * Vulnerabilidad: $vulnerabilidadProgress');
+        print('    * Total: $totalProgress');
         
         return {
           'amenaza': amenazaProgress,
@@ -81,11 +84,140 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
       print('Error al obtener progreso del formulario: $e');
     }
     
+    print('  - Returning default progress (0.0)');
     return {
       'amenaza': 0.0,
       'vulnerabilidad': 0.0,
       'total': 0.0,
     };
+  }
+
+  // Calcular progreso de amenaza usando la misma lógica que ProgressBarWidget
+  double _calculateAmenazaProgressFromCompleteForm(CompleteFormDataModel completeForm) {
+    try {
+      // Obtener el total esperado del modelo del evento
+      final eventName = completeForm.eventName;
+      final riskEvent = _getRiskEventByName(eventName);
+      
+      if (riskEvent == null) {
+        print('No se encontró el evento: $eventName');
+        return 0.0;
+      }
+      
+      final amenazaClassification = riskEvent.classifications
+          .where((c) => c.id.toLowerCase() == 'amenaza')
+          .isNotEmpty 
+          ? riskEvent.classifications.where((c) => c.id.toLowerCase() == 'amenaza').first
+          : null;
+      
+      if (amenazaClassification == null) return 0.0;
+      
+      // Buscar subclasificaciones de probabilidad e intensidad
+      final probabilidadSubClass = amenazaClassification.subClassifications
+          .where((s) => s.id == 'probabilidad')
+          .isNotEmpty 
+          ? amenazaClassification.subClassifications.where((s) => s.id == 'probabilidad').first
+          : null;
+      final intensidadSubClass = amenazaClassification.subClassifications
+          .where((s) => s.id == 'intensidad')
+          .isNotEmpty 
+          ? amenazaClassification.subClassifications.where((s) => s.id == 'intensidad').first
+          : null;
+      
+      if (probabilidadSubClass == null || intensidadSubClass == null) return 0.0;
+      
+      // Contar categorías totales (probabilidad + intensidad)
+      final totalCategories = probabilidadSubClass.categories.length + intensidadSubClass.categories.length;
+      if (totalCategories == 0) return 0.0;
+      
+      // Contar categorías completadas
+      double completed = 0.0;
+      
+      // Verificar categorías de probabilidad
+      for (final category in probabilidadSubClass.categories) {
+        if (completeForm.amenazaProbabilidadSelections.containsKey(category.title)) {
+          completed += 1;
+        }
+      }
+      
+      // Verificar categorías de intensidad
+      for (final category in intensidadSubClass.categories) {
+        if (completeForm.amenazaIntensidadSelections.containsKey(category.title)) {
+          completed += 1;
+        }
+      }
+      
+      final progress = completed / totalCategories;
+      print('Amenaza Progress: completed=$completed, total=$totalCategories, progress=$progress');
+      return progress;
+    } catch (e) {
+      print('Error al calcular progreso de amenaza: $e');
+      return 0.0;
+    }
+  }
+
+  // Calcular progreso de vulnerabilidad usando la misma lógica que ProgressBarWidget
+  double _calculateVulnerabilidadProgressFromCompleteForm(CompleteFormDataModel completeForm) {
+    try {
+      final eventName = completeForm.eventName;
+      final riskEvent = _getRiskEventByName(eventName);
+      
+      if (riskEvent == null) {
+        print('No se encontró el evento: $eventName');
+        return 0.0;
+      }
+      
+      final vulnerabilidadClassification = riskEvent.classifications
+          .where((c) => c.id.toLowerCase() == 'vulnerabilidad')
+          .isNotEmpty 
+          ? riskEvent.classifications.where((c) => c.id.toLowerCase() == 'vulnerabilidad').first
+          : null;
+      
+      if (vulnerabilidadClassification == null) return 0.0;
+      
+      // Obtener todas las categorías de vulnerabilidad de todas las subclasificaciones
+      final expectedCategories = <dynamic>[];
+      for (final subClassification in vulnerabilidadClassification.subClassifications) {
+        expectedCategories.addAll(subClassification.categories);
+      }
+      
+      final total = expectedCategories.length.toDouble();
+      if (total == 0) return 0.0;
+      
+      // Contar cuántas categorías tienen selecciones
+      double completed = 0.0;
+      for (final category in expectedCategories) {
+        // Buscar en todas las subclasificaciones dinámicas
+        bool hasSelection = false;
+        for (final subClassId in completeForm.vulnerabilidadSelections.keys) {
+          final subClassSelections = completeForm.vulnerabilidadSelections[subClassId];
+          if (subClassSelections != null && subClassSelections.containsKey(category.title)) {
+            hasSelection = true;
+            break;
+          }
+        }
+        if (hasSelection) {
+          completed += 1;
+        }
+      }
+      
+      final progress = completed / total;
+      print('Vulnerabilidad Progress: completed=$completed, total=$total, progress=$progress');
+      return progress;
+    } catch (e) {
+      print('Error al calcular progreso de vulnerabilidad: $e');
+      return 0.0;
+    }
+  }
+
+  // Helper method para obtener el evento por nombre
+  dynamic _getRiskEventByName(String eventName) {
+    try {
+      return RiskEventFactory.getEventByName(eventName);
+    } catch (e) {
+      print('Error al obtener evento por nombre: $e');
+      return null;
+    }
   }
 
   @override
@@ -264,10 +396,17 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
                       'total': 0.0,
                     };
                     
+                    // Debug: imprimir valores de progreso
+                    print('FormCard Progress Debug - Form: ${form.title}');
+                    print('  - Total: ${progress['total']}');
+                    print('  - Amenaza: ${progress['amenaza']}');
+                    print('  - Vulnerabilidad: ${progress['vulnerabilidad']}');
+                    print('  - Tag (EventName): ${form.riskEvent?.name ?? 'Evento'}');
+                    
                     return FormCardInProgress(
                       title: form.title,
                       lastEdit: form.formattedLastModified,
-                      tag: "Análisis de Riesgo",
+                      tag: form.riskEvent?.name ?? 'Evento', // Mostrar el evento (ej: "Movimiento en Masa")
                       progress: progress['total']!,
                       threat: progress['amenaza']!,
                       vulnerability: progress['vulnerabilidad']!,
@@ -403,26 +542,50 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
       final completeForm = await persistenceService.getCompleteForm(form.id);
       
       if (completeForm != null) {
-        // Determinar qué sección mostrar primero (amenaza o vulnerabilidad)
-        String initialClassification;
-        if (!completeForm.isAmenazaCompleted) {
-          initialClassification = 'amenaza';
-        } else if (!completeForm.isVulnerabilidadCompleted) {
-          initialClassification = 'vulnerabilidad';
+        // Calcular progreso actual para determinar qué sección mostrar
+        final amenazaProgress = _calculateAmenazaProgressFromCompleteForm(completeForm);
+        final vulnerabilidadProgress = _calculateVulnerabilidadProgressFromCompleteForm(completeForm);
+        
+        // Determinar mensaje basado en el progreso
+        String message = '';
+        
+        if (amenazaProgress < 1.0) {
+          // Amenaza no está completa
+          final amenazaPercentage = (amenazaProgress * 100).toInt();
+          message = 'Continuando evaluación de Amenaza ($amenazaPercentage% completado)';
+        } else if (vulnerabilidadProgress < 1.0) {
+          // Amenaza completa, pero vulnerabilidad no
+          final vulnerabilidadPercentage = (vulnerabilidadProgress * 100).toInt();
+          message = 'Continuando evaluación de Vulnerabilidad ($vulnerabilidadPercentage% completado)';
         } else {
-          // Si ambas están completas, mostrar amenaza por defecto
-          initialClassification = 'amenaza';
+          // Ambas completas - ir a resultados finales
+          message = 'Formulario completado - Mostrando resultados finales';
         }
         
-        // Navegar al RiskThreatAnalysisScreen con el formulario completo cargado
-        final navigationData = {
-          'event': completeForm.eventName,
-          'classification': initialClassification,
-          'loadSavedCompleteForm': true,
-          'formId': completeForm.id,
-        };
+        // Mostrar mensaje informativo
+        if (message.isNotEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(message),
+              backgroundColor: Colors.blue,
+              duration: const Duration(seconds: 2),
+            ),
+          );
+        }
         
-        context.go('/risk_threat_analysis', extra: navigationData);
+        // Establecer el formulario como activo antes de navegar
+        await persistenceService.setActiveFormId(completeForm.id);
+        
+        // Marcar como editar (no crear nuevo)
+        context.read<HomeBloc>().add(SetActiveFormId(completeForm.id));
+        
+        // Navegar a la pantalla de categorías para ver el progreso y continuar
+        context.read<HomeBloc>().add(HomeShowRiskCategoriesScreen(
+          completeForm.eventName,
+          loadSavedForm: true,
+          formId: completeForm.id,
+          showProgressInfo: true,
+        ));
       } else {
         // Si no se encuentra el formulario, mostrar error
         ScaffoldMessenger.of(context).showSnackBar(
@@ -457,7 +620,7 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
           'finalResults': true,
           'targetIndex': 3,
           'readOnly': true,
-          'loadSavedCompleteForm': true,
+          'loadSavedForm': true, // Cambiado de loadSavedCompleteForm a loadSavedForm
           'formId': completeForm.id,
         };
         context.go('/risk_threat_analysis', extra: navigationData);
