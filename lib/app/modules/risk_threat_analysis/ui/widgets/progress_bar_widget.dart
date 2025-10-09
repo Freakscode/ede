@@ -36,9 +36,7 @@ class ProgressBarWidget extends StatelessWidget {
                   backgroundColor: Colors.transparent,
                   valueColor: AlwaysStoppedAnimation<Color>(
                     // Color dinámico según la clasificación
-                    state.selectedClassification == 'amenaza' 
-                      ? const Color(0xFF10B981) // Verde para amenaza
-                      : const Color(0xFF6366F1), // Morado para vulnerabilidad
+                    DAGRDColors.amarDAGRD
                   ),
                 ),
               ),
