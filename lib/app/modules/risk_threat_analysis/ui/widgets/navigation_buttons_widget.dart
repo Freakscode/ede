@@ -36,7 +36,11 @@ class NavigationButtonsWidget extends StatelessWidget {
           onTap:
               onBackPressed ??
               () {
-                if (currentIndex > 0) {
+                if (currentIndex == 3) {
+                  // Cuando estamos en FinalRiskResultsScreen (índice 3), volver a categorías
+                  final navigationData = {'showRiskCategories': true};
+                  context.go('/home', extra: navigationData);
+                } else if (currentIndex > 0) {
                   context.read<RiskThreatAnalysisBloc>().add(
                     ChangeBottomNavIndex(currentIndex - 1),
                   );

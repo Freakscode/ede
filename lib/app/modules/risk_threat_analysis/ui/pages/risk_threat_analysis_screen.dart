@@ -183,7 +183,11 @@ class RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
             appBar:  CustomAppBar(
               showBack: true,
               onBack: () {
-                if (state.currentBottomNavIndex > 0) {
+                if (state.currentBottomNavIndex == 3) {
+                  // Cuando estamos en FinalRiskResultsScreen (índice 3), volver a categorías
+                  final navigationData = {'showRiskCategories': true};
+                  context.go('/home', extra: navigationData);
+                } else if (state.currentBottomNavIndex > 0) {
                   context.read<RiskThreatAnalysisBloc>().add(
                     ChangeBottomNavIndex(state.currentBottomNavIndex - 1),
                   );
