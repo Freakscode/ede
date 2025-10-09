@@ -13,6 +13,7 @@ import '../../../home/bloc/home_event.dart';
 class RatingResultsScreen extends StatelessWidget {
   const RatingResultsScreen({super.key});
 
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<RiskThreatAnalysisBloc, RiskThreatAnalysisState>(
@@ -53,19 +54,30 @@ class RatingResultsScreen extends StatelessWidget {
                 onContinuePressed: () {
                   // Si estamos en la última pestaña (índice 2)
                   if (state.currentBottomNavIndex == 2) {
+                    // Validar si hay variables sin calificar antes de finalizar
+                    final riskBloc = context.read<RiskThreatAnalysisBloc>();
+                    if (riskBloc.hasUnqualifiedVariables()) {
+                      // Mostrar diálogo de formulario incompleto
+                      CustomActionDialog.show(
+                        context: context,
+                        title: 'Formulario incompleto',
+                        message: 'Antes de finalizar, revisa el formulario. Algunas variables aún no han sido evaluadas',
+                        leftButtonText: 'Cancelar ',
+                        leftButtonIcon: Icons.close,
+                        rightButtonText: 'Revisar ',
+                        rightButtonIcon: Icons.edit_outlined,
+                        onRightButtonPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      );
+                      return;
+                    }
+
                     if (state.selectedClassification.toLowerCase() ==
                         'amenaza') {
                       // Guardar datos del formulario antes de marcar como completada
                       final riskBloc = context.read<RiskThreatAnalysisBloc>();
                       final formData = riskBloc.getCurrentFormData();
-
-                      // PRINT COMPLETO DEL OBJETO DILIGENCIADO
-                      print('=== OBJETO COMPLETO AMENAZA DILIGENCIADO ===');
-                      print('Evento: ${state.selectedRiskEvent}');
-                      print('Clasificación: amenaza');
-                      print('Datos completos del formulario:');
-                      print(formData.toString());
-                      print('=== FIN DEL OBJETO ===');
 
                       context.read<HomeBloc>().add(
                         SaveRiskEventModel(
@@ -101,16 +113,6 @@ class RatingResultsScreen extends StatelessWidget {
                         'vulnerabilidad') {
                       final riskBloc = context.read<RiskThreatAnalysisBloc>();
                       final formData = riskBloc.getCurrentFormData();
-
-                      // PRINT COMPLETO DEL OBJETO DILIGENCIADO
-                      print(
-                        '=== OBJETO COMPLETO VULNERABILIDAD DILIGENCIADO ===',
-                      );
-                      print('Evento: ${state.selectedRiskEvent}');
-                      print('Clasificación: vulnerabilidad');
-                      print('Datos completos del formulario:');
-                      print(formData.toString());
-                      print('=== FIN DEL OBJETO ===');
 
                       context.read<HomeBloc>().add(
                         SaveRiskEventModel(
