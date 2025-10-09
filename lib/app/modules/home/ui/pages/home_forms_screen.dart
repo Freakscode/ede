@@ -1,5 +1,4 @@
 import 'package:caja_herramientas/app/core/icons/app_icons.dart';
-import 'package:caja_herramientas/app/modules/home/ui/widgets/form_card_completed.dart';
 import 'package:flutter/material.dart';
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import 'package:caja_herramientas/app/modules/home/ui/widgets/form_card_in_progress.dart';
@@ -40,6 +39,53 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
     super.didUpdateWidget(oldWidget);
     // Recargar formularios cuando el widget se actualiza
     _loadForms();
+  }
+
+  // Método para obtener el progreso real de un formulario
+  Future<Map<String, double>> _getFormProgress(String formId) async {
+    try {
+      final persistenceService = FormPersistenceService();
+      final completeForm = await persistenceService.getCompleteForm(formId);
+      
+      if (completeForm != null) {
+        // Calcular progreso de amenaza basado en subclasificaciones completadas
+        double amenazaProgress = 0.0;
+        if (completeForm.amenazaSelections.isNotEmpty) {
+          final total = completeForm.amenazaSelections.length;
+          final completed = completeForm.amenazaSelections.values
+              .where((selections) => selections.isNotEmpty)
+              .length;
+          amenazaProgress = total > 0 ? completed / total : 0.0;
+        }
+        
+        // Calcular progreso de vulnerabilidad basado en subclasificaciones completadas
+        double vulnerabilidadProgress = 0.0;
+        if (completeForm.vulnerabilidadSelections.isNotEmpty) {
+          final total = completeForm.vulnerabilidadSelections.length;
+          final completed = completeForm.vulnerabilidadSelections.values
+              .where((selections) => selections.isNotEmpty)
+              .length;
+          vulnerabilidadProgress = total > 0 ? completed / total : 0.0;
+        }
+        
+        // Progreso total (promedio)
+        final totalProgress = (amenazaProgress + vulnerabilidadProgress) / 2;
+        
+        return {
+          'amenaza': amenazaProgress,
+          'vulnerabilidad': vulnerabilidadProgress,
+          'total': totalProgress,
+        };
+      }
+    } catch (e) {
+      print('Error al obtener progreso del formulario: $e');
+    }
+    
+    return {
+      'amenaza': 0.0,
+      'vulnerabilidad': 0.0,
+      'total': 0.0,
+    };
   }
 
   @override
@@ -209,15 +255,26 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
             return Column(
               children: [
                 if (index > 0) const SizedBox(height: 16),
-                FormCardInProgress(
-                  title: form.title,
-                  lastEdit: form.formattedLastModified,
-                  tag: "Análisis de Riesgo", // Valor fijo temporal
-                  progress: 0.0, // Valor fijo temporal
-                  threat: 0.0, // Valor fijo temporal
-                  vulnerability: 0.0, // Valor fijo temporal
-                  onDelete: () => _deleteForm(context, form.id, form.title),
-                  onTap: () => _navigateToForm(context, form),
+                FutureBuilder<Map<String, double>>(
+                  future: _getFormProgress(form.id),
+                  builder: (context, snapshot) {
+                    final progress = snapshot.data ?? {
+                      'amenaza': 0.0,
+                      'vulnerabilidad': 0.0,
+                      'total': 0.0,
+                    };
+                    
+                    return FormCardInProgress(
+                      title: form.title,
+                      lastEdit: form.formattedLastModified,
+                      tag: "Análisis de Riesgo",
+                      progress: progress['total']!,
+                      threat: progress['amenaza']!,
+                      vulnerability: progress['vulnerabilidad']!,
+                      onDelete: () => _deleteForm(context, form.id, form.title),
+                      onTap: () => _navigateToForm(context, form),
+                    );
+                  },
                 ),
               ],
             );
@@ -230,13 +287,101 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
             return Column(
               children: [
                 if (index > 0) const SizedBox(height: 16),
-                GestureDetector(
-                  onTap: () => _viewCompletedForm(context, form),
-                  child: FormCardCompleted(
-                    title: form.title,
-                    lastEdit: form.formattedLastModified,
-                    tag: "Análisis de Riesgo",
-                  ),
+                FutureBuilder<Map<String, double>>(
+                  future: _getFormProgress(form.id),
+                  builder: (context, snapshot) {
+                    final progress = snapshot.data ?? {
+                      'amenaza': 1.0,
+                      'vulnerabilidad': 1.0,
+                      'total': 1.0,
+                    };
+                    
+                    return GestureDetector(
+                      onTap: () => _viewCompletedForm(context, form),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.grey[300]!),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Información del formulario
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          form.title,
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.black87,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          form.formattedLastModified,
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.grey,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 4,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.green[100],
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: const Text(
+                                      'Completado',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.green,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 12),
+                              // Información de progreso
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      'Amenaza: ${(progress['amenaza']! * 100).toInt()}%',
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                  ),
+                                  Text(
+                                    'Vulnerabilidad: ${(progress['vulnerabilidad']! * 100).toInt()}%',
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ],
             );
