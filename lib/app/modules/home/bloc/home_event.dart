@@ -153,11 +153,12 @@ class CompleteForm extends HomeEvent {
   
 class SetActiveFormId extends HomeEvent {
   final String formId;
+  final bool isCreatingNew;
   
-  const SetActiveFormId(this.formId);
+  const SetActiveFormId(this.formId, {this.isCreatingNew = false});
 
   @override
-  List<Object?> get props => [formId];
+  List<Object?> get props => [formId, isCreatingNew];
 }
 
 /// Guardar un RiskEventModel completo cuando se completa una evaluación

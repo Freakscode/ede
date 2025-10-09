@@ -235,9 +235,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   void _onSetActiveFormId(SetActiveFormId event, Emitter<HomeState> emit) {
     emit(state.copyWith(
       activeFormId: event.formId,
-      isCreatingNew: false, // Marcar como editar
+      isCreatingNew: event.isCreatingNew,
     ));
-    print('SetActiveFormId recibido para ID: ${event.formId} - marcando como editar');
+    print('SetActiveFormId recibido para ID: ${event.formId} - isCreatingNew: ${event.isCreatingNew}');
   }
 
   /// Guarda un RiskEventModel completo cuando se completa una evaluación

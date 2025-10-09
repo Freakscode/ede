@@ -1,14 +1,10 @@
-import 'package:caja_herramientas/app/shared/widgets/dialogs/custom_action_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
+import 'package:caja_herramientas/app/shared/models/risk_event_model.dart';
+import 'package:caja_herramientas/app/shared/models/risk_event_factory.dart';
 import '../../bloc/risk_threat_analysis_bloc.dart';
 import '../../bloc/risk_threat_analysis_state.dart';
 import '../widgets/widgets.dart';
-import 'package:caja_herramientas/app/shared/models/risk_event_model.dart';
-import 'package:caja_herramientas/app/shared/models/risk_event_factory.dart';
-import '../../../home/bloc/home_bloc.dart';
-import '../../../home/bloc/home_event.dart';
 
 class RatingResultsScreen extends StatelessWidget {
   const RatingResultsScreen({super.key});
@@ -51,102 +47,6 @@ class RatingResultsScreen extends StatelessWidget {
               // Botones de navegación
               NavigationButtonsWidget(
                 currentIndex: state.currentBottomNavIndex,
-                onContinuePressed: () {
-                  // Si estamos en la última pestaña (índice 2)
-                  if (state.currentBottomNavIndex == 2) {
-                    // Validar si hay variables sin calificar antes de finalizar
-                    final riskBloc = context.read<RiskThreatAnalysisBloc>();
-                    if (riskBloc.hasUnqualifiedVariables()) {
-                      // Mostrar diálogo de formulario incompleto
-                      CustomActionDialog.show(
-                        context: context,
-                        title: 'Formulario incompleto',
-                        message: 'Antes de finalizar, revisa el formulario. Algunas variables aún no han sido evaluadas',
-                        leftButtonText: 'Cancelar ',
-                        leftButtonIcon: Icons.close,
-                        rightButtonText: 'Revisar ',
-                        rightButtonIcon: Icons.edit_outlined,
-                        onRightButtonPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                      );
-                      return;
-                    }
-
-                    if (state.selectedClassification.toLowerCase() ==
-                        'amenaza') {
-                      // Guardar datos del formulario antes de marcar como completada
-                      final riskBloc = context.read<RiskThreatAnalysisBloc>();
-                      final formData = riskBloc.getCurrentFormData();
-
-                      context.read<HomeBloc>().add(
-                        SaveRiskEventModel(
-                          state.selectedRiskEvent,
-                          'amenaza',
-                          formData,
-                        ),
-                      );
-
-                      // Marcar amenaza como completada
-                      context.read<HomeBloc>().add(
-                        MarkEvaluationCompleted(
-                          state.selectedRiskEvent,
-                          'amenaza',
-                        ),
-                      );
-
-                      CustomActionDialog.show(
-                        context: context,
-                        title: 'Finalizar formulario',
-                        message:
-                            '¿Está seguro que desea finalizar el formulario para la categoría de ${state.selectedClassification}?',
-                        leftButtonText: 'Revisar ',
-                        leftButtonIcon: Icons.close,
-                        rightButtonText: 'Finalizar ',
-                        rightButtonIcon: Icons.check,
-                        onRightButtonPressed: () {
-                          final navigationData = {'showRiskCategories': true};
-                          context.go('/home', extra: navigationData);
-                        },
-                      );
-                    } else if (state.selectedClassification.toLowerCase() ==
-                        'vulnerabilidad') {
-                      final riskBloc = context.read<RiskThreatAnalysisBloc>();
-                      final formData = riskBloc.getCurrentFormData();
-
-                      context.read<HomeBloc>().add(
-                        SaveRiskEventModel(
-                          state.selectedRiskEvent,
-                          'vulnerabilidad',
-                          formData,
-                        ),
-                      );
-
-                      // Marcar vulnerabilidad como completada
-                      context.read<HomeBloc>().add(
-                        MarkEvaluationCompleted(
-                          state.selectedRiskEvent,
-                          'vulnerabilidad',
-                        ),
-                      );
-
-                      CustomActionDialog.show(
-                        context: context,
-                        title: 'Finalizar formulario',
-                        message:
-                            '¿Está seguro que desea finalizar el formulario para la categoría de ${state.selectedClassification}?',
-                        leftButtonText: 'Revisar ',
-                        leftButtonIcon: Icons.close,
-                        rightButtonText: 'Finalizar ',
-                        rightButtonIcon: Icons.check,
-                        onRightButtonPressed: () {
-                          final navigationData = {'showRiskCategories': true};
-                          context.go('/home', extra: navigationData);
-                        },
-                      );
-                    }
-                  }
-                },
               ),
 
               const SizedBox(height: 50),

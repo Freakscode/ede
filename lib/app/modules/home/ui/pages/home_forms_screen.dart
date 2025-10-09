@@ -30,8 +30,10 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
   }
 
   void _loadForms() {
+    print('=== HomeFormsScreen: _loadForms llamado ===');
     // Cargar formularios
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      print('HomeFormsScreen: Enviando evento LoadForms al HomeBloc');
       context.read<HomeBloc>().add(LoadForms());
     });
   }
@@ -224,6 +226,28 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
   Widget build(BuildContext context) {
     return BlocBuilder<HomeBloc, HomeState>(
       builder: (context, state) {
+        print('=== HomeFormsScreen: BlocBuilder rebuild ===');
+        print('HomeFormsScreen: savedForms.length = ${state.savedForms.length}');
+        print('HomeFormsScreen: isLoadingForms = ${state.isLoadingForms}');
+        
+        if (state.savedForms.isNotEmpty) {
+          for (int i = 0; i < state.savedForms.length; i++) {
+            final form = state.savedForms[i];
+            print('HomeFormsScreen: Form[$i] - ID: ${form.id}, RiskEvent: ${form.riskEvent?.name}');
+            
+            // Debug específico para Movimiento en Masa
+            if (form.riskEvent?.name == 'Movimiento en Masa') {
+              print('HomeFormsScreen: *** FORMULARIO MOVIMIENTO EN MASA ENCONTRADO ***');
+              print('HomeFormsScreen:   - Form ID: ${form.id}');
+              print('HomeFormsScreen:   - RiskEvent: ${form.riskEvent?.name}');
+              print('HomeFormsScreen:   - RiskEvent ID: ${form.riskEvent?.id}');
+            }
+          }
+          print('HomeFormsScreen: Construyendo ${state.savedForms.length} FormCardInProgress widgets');
+        } else {
+          print('HomeFormsScreen: NO HAY FORMULARIOS PARA MOSTRAR - savedForms está vacío');
+        }
+        
         return RefreshIndicator(
           onRefresh: () async {
             context.read<HomeBloc>().add(LoadForms());
@@ -402,6 +426,17 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
                     print('  - Amenaza: ${progress['amenaza']}');
                     print('  - Vulnerabilidad: ${progress['vulnerabilidad']}');
                     print('  - Tag (EventName): ${form.riskEvent?.name ?? 'Evento'}');
+                    
+                    // Debug específico para Movimiento en Masa
+                    if (form.riskEvent?.name == 'Movimiento en Masa') {
+                      print('*** CONSTRUYENDO FormCardInProgress PARA MOVIMIENTO EN MASA ***');
+                      print('  - Title: ${form.title}');
+                      print('  - LastEdit: ${form.formattedLastModified}');
+                      print('  - Tag: ${form.riskEvent?.name ?? 'Evento'}');
+                      print('  - Progress: ${progress['total']}');
+                      print('  - Threat: ${progress['amenaza']}');
+                      print('  - Vulnerability: ${progress['vulnerabilidad']}');
+                    }
                     
                     return FormCardInProgress(
                       title: form.title,
