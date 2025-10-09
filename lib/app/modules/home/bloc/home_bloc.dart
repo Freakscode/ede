@@ -133,6 +133,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<CompleteForm>(_onCompleteForm);
     on<SetActiveFormId>(_onSetActiveFormId);
     on<SaveRiskEventModel>(_onSaveRiskEventModel);
+    on<ResetAllForNewForm>(_onResetAllForNewForm);
   }
 
   // ======= HANDLERS PARA GESTIÓN DE FORMULARIOS =======
@@ -345,6 +346,32 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       
     } catch (e) {
       print('HomeBloc: Error al crear formulario inicial completo - $e');
+    }
+  }
+
+  /// Resetear completamente todo el estado para crear un nuevo formulario
+  Future<void> _onResetAllForNewForm(ResetAllForNewForm event, Emitter<HomeState> emit) async {
+    try {
+      // Limpiar el formulario activo de la base de datos
+      final persistenceService = FormPersistenceService();
+      await persistenceService.setActiveFormId(null);
+      
+      // Resetear completamente el estado
+      emit(state.copyWith(
+        selectedRiskEvent: null,
+        selectedRiskCategory: null,
+        activeFormId: null,
+        completedEvaluations: const {}, // Resetear todas las evaluaciones completadas
+        savedRiskEventModels: const {}, // Limpiar modelos guardados
+        savedForms: const [], // Limpiar formularios guardados
+        isLoadingForms: false,
+        mostrarEventosRiesgo: false,
+        mostrarCategoriasRiesgo: false,
+      ));
+      
+      print('HomeBloc: Estado completamente reseteado para nuevo formulario');
+    } catch (e) {
+      print('HomeBloc: Error al resetear estado para nuevo formulario - $e');
     }
   }
 }

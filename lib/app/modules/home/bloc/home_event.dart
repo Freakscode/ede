@@ -156,3 +156,6 @@ class SaveRiskEventModel extends HomeEvent {
   @override
   List<Object?> get props => [eventName, classificationType, evaluationData];
 }
+
+/// Resetear completamente todo el estado para crear un nuevo formulario
+class ResetAllForNewForm extends HomeEvent {}

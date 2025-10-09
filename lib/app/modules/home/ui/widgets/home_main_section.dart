@@ -7,6 +7,8 @@ import 'package:caja_herramientas/app/modules/home/ui/widgets/home_tool_card.dar
 import 'package:caja_herramientas/app/modules/home/bloc/home_bloc.dart';
 import 'package:caja_herramientas/app/modules/home/bloc/home_event.dart';
 import 'package:caja_herramientas/app/shared/widgets/dialogs/forms_in_progress_dialog.dart';
+import 'package:caja_herramientas/app/modules/risk_threat_analysis/bloc/risk_threat_analysis_bloc.dart';
+import 'package:caja_herramientas/app/modules/risk_threat_analysis/bloc/risk_threat_analysis_event.dart';
 import 'package:go_router/go_router.dart';
 
 class HomeMainSection extends StatefulWidget {
@@ -129,12 +131,23 @@ class _HomeMainSectionState extends State<HomeMainSection> {
         return FormsInProgressDialog(
           pendingFormsCount: pendingFormsCount,
           onViewForms: () {
-            // Navegar a la pantalla de formularios en proceso y finalizados
             context.go('/home_forms');
           },
           onCreateNew: () {
-            // Navegar a eventos de riesgo para crear nuevo
-            context.read<HomeBloc>().add(HomeShowRiskEventsSection());
+            context.read<HomeBloc>().add(ResetAllForNewForm());
+            
+            try {
+              final riskBloc = context.read<RiskThreatAnalysisBloc>();
+              riskBloc.add(ResetDropdowns());
+            } catch (e) {
+              print('RiskThreatAnalysisBloc no disponible en este contexto: $e');
+            }
+            
+            Future.delayed(const Duration(milliseconds: 100), () {
+              if (context.mounted) {
+                context.read<HomeBloc>().add(HomeShowRiskEventsSection());
+              }
+            });
           },
         );
       },
