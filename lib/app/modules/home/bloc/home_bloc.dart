@@ -178,14 +178,10 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       // Convertir CompleteFormDataModel a FormDataModel para compatibilidad
       final convertedForms = completeForms.map((completeForm) {
         // Determinar el estado del formulario
-        FormStatus status;
-        if (completeForm.isComplete) {
-          status = FormStatus.completed;
-        } else if (completeForm.isAmenazaCompleted || completeForm.isVulnerabilidadCompleted) {
-          status = FormStatus.inProgress;
-        } else {
-          status = FormStatus.inProgress;
-        }
+        // Solo está completado si fue explícitamente marcado como tal
+        FormStatus status = completeForm.isExplicitlyCompleted 
+            ? FormStatus.completed 
+            : FormStatus.inProgress;
         
         // Obtener el RiskEventModel correspondiente al eventName
         final riskEvent = RiskEventFactory.getEventByName(completeForm.eventName);
