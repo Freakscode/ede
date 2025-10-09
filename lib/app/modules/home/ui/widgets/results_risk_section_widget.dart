@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:caja_herramientas/app/core/icons/app_icons.dart';
+import 'package:caja_herramientas/app/shared/services/form_persistence_service.dart';
 import '../../bloc/home_state.dart';
 
 class ResultsRiskSectionWidget extends StatelessWidget {
@@ -14,12 +15,36 @@ class ResultsRiskSectionWidget extends StatelessWidget {
     required this.selectedEvent,
   });
 
+  /// Verifica si tanto Amenaza como Vulnerabilidad están completadas al 100%
+  Future<bool> _isBothCompleted() async {
+    if (homeState.activeFormId == null) return false;
+    
+    try {
+      final persistenceService = FormPersistenceService();
+      final completeForm = await persistenceService.getCompleteForm(homeState.activeFormId!);
+      
+      if (completeForm == null) return false;
+      
+      // Verificar si Amenaza está completa
+      final amenazaCompleted = completeForm.amenazaProbabilidadSelections.isNotEmpty && 
+                              completeForm.amenazaIntensidadSelections.isNotEmpty;
+      
+      // Verificar si Vulnerabilidad está completa (tiene al menos una subclasificación con datos)
+      final vulnerabilidadCompleted = completeForm.vulnerabilidadSelections.isNotEmpty;
+      
+      return amenazaCompleted && vulnerabilidadCompleted;
+    } catch (e) {
+      print('Error al verificar completitud: $e');
+      return false;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Verificar si ambas evaluaciones están completadas
-    final amenazaCompleted = homeState.completedEvaluations['${selectedEvent}_amenaza'] ?? false;
-    final vulnerabilidadCompleted = homeState.completedEvaluations['${selectedEvent}_vulnerabilidad'] ?? false;
-    final bothCompleted = amenazaCompleted && vulnerabilidadCompleted;
+    return FutureBuilder<bool>(
+      future: _isBothCompleted(),
+      builder: (context, snapshot) {
+        final bothCompleted = snapshot.data ?? false;
     
     return GestureDetector(
       onTap: bothCompleted ? () {
@@ -108,6 +133,8 @@ class ResultsRiskSectionWidget extends StatelessWidget {
           ],
         ),
       ),
+    );
+      },
     );
   }
 }
