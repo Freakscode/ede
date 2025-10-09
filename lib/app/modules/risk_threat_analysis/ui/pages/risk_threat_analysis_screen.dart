@@ -90,6 +90,13 @@ class RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
         if (eventFromNavData != null && eventFromNavData.isNotEmpty) {
           bloc.add(UpdateSelectedRiskEvent(eventFromNavData));
         }
+        
+        // Cargar datos del formulario completo antes de ir a resultados finales
+        final homeState = context.read<HomeBloc>().state;
+        if (homeState.activeFormId != null) {
+          _loadCompleteFormDataForFinalResults(homeState.activeFormId!, bloc);
+        }
+        
         bloc.add(ChangeBottomNavIndex(targetIndex));
         return; // Salir inmediatamente sin procesar otras opciones
       }
@@ -309,6 +316,62 @@ class RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
       print('=== FIN _loadFormFromSQLite DEBUG ===');
     } catch (e) {
       print('Error al cargar formulario completo desde SQLite: $e');
+      print('Stack trace: ${StackTrace.current}');
+    }
+  }
+
+  /// Carga datos completos del formulario para mostrar en resultados finales
+  void _loadCompleteFormDataForFinalResults(String formId, RiskThreatAnalysisBloc bloc) async {
+    try {
+      print('=== _loadCompleteFormDataForFinalResults DEBUG ===');
+      print('Cargando formulario completo para resultados finales: $formId');
+      
+      final persistenceService = FormPersistenceService();
+      final completeForm = await persistenceService.getCompleteForm(formId);
+      
+      if (completeForm != null) {
+        print('Formulario completo encontrado para resultados finales');
+        print('Evento: ${completeForm.eventName}');
+        
+        // Combinar datos de Amenaza y Vulnerabilidad para mostrar en resultados finales
+        final combinedData = <String, dynamic>{
+          'dynamicSelections': {
+            ...completeForm.amenazaSelections,
+            ...completeForm.vulnerabilidadSelections,
+          },
+          'subClassificationScores': {
+            ...completeForm.amenazaScores,
+            ...completeForm.vulnerabilidadScores,
+          },
+          'subClassificationColors': {
+            ...completeForm.amenazaColors,
+            ...completeForm.vulnerabilidadColors,
+          },
+          'probabilidadSelections': completeForm.amenazaProbabilidadSelections,
+          'intensidadSelections': completeForm.amenazaIntensidadSelections,
+          'selectedProbabilidad': completeForm.amenazaSelectedProbabilidad,
+          'selectedIntensidad': completeForm.amenazaSelectedIntensidad,
+        };
+        
+        print('Datos combinados cargados para resultados finales:');
+        print('  - Amenaza probabilidad: ${completeForm.amenazaProbabilidadSelections}');
+        print('  - Amenaza intensidad: ${completeForm.amenazaIntensidadSelections}');
+        print('  - Vulnerabilidad: ${completeForm.vulnerabilidadSelections}');
+        
+        // Cargar datos combinados en el bloc
+        bloc.loadExistingFormData(
+          completeForm.eventName, 
+          'final_results', 
+          {'evaluationData': combinedData}
+        );
+        
+        print('Datos cargados exitosamente en el bloc para resultados finales');
+      } else {
+        print('No se encontró el formulario completo para resultados finales con ID: $formId');
+      }
+      print('=== FIN _loadCompleteFormDataForFinalResults DEBUG ===');
+    } catch (e) {
+      print('Error al cargar formulario completo para resultados finales: $e');
       print('Stack trace: ${StackTrace.current}');
     }
   }
