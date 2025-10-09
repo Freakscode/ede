@@ -1,4 +1,3 @@
-import 'package:caja_herramientas/app/shared/widgets/dialogs/confirmation_dialog.dart';
 import 'package:caja_herramientas/app/shared/widgets/dialogs/custom_action_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -100,7 +99,6 @@ class RatingResultsScreen extends StatelessWidget {
                       );
                     } else if (state.selectedClassification.toLowerCase() ==
                         'vulnerabilidad') {
-                      // Guardar datos del formulario antes de marcar como completada
                       final riskBloc = context.read<RiskThreatAnalysisBloc>();
                       final formData = riskBloc.getCurrentFormData();
 
@@ -130,19 +128,19 @@ class RatingResultsScreen extends StatelessWidget {
                         ),
                       );
 
-                      // Navegar de vuelta al HomeScreen con RiskCategoriesScreen activo
-                      final navigationData = {'showRiskCategories': true};
-                      context.go('/home', extra: navigationData);
-
-                      // Mostrar mensaje de éxito para vulnerabilidad
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text(
-                            'Evaluación de Vulnerabilidad completada. ¡Evaluación de riesgo finalizada!',
-                          ),
-                          backgroundColor: Colors.green,
-                          duration: Duration(seconds: 3),
-                        ),
+                      CustomActionDialog.show(
+                        context: context,
+                        title: 'Finalizar formulario',
+                        message:
+                            '¿Está seguro que desea finalizar el formulario para la categoría de ${state.selectedClassification}?',
+                        leftButtonText: 'Revisar ',
+                        leftButtonIcon: Icons.close,
+                        rightButtonText: 'Finalizar ',
+                        rightButtonIcon: Icons.check,
+                        onRightButtonPressed: () {
+                          final navigationData = {'showRiskCategories': true};
+                          context.go('/home', extra: navigationData);
+                        },
                       );
                     }
                   }
