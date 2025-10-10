@@ -5,7 +5,7 @@ import 'package:caja_herramientas/app/shared/models/risk_event_model.dart';
 import 'package:caja_herramientas/app/shared/services/form_persistence_service.dart';
 import 'package:caja_herramientas/app/shared/models/form_data_model.dart';
 import '../../home/services/tutorial_overlay_service.dart';
-import 'home_event.dart';
+import 'events/home_event.dart';
 import 'home_state.dart';
 
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
@@ -42,22 +42,22 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       ));
       
       // Si viene con un evento específico, configurarlo
-      if (event.eventName != null) {
+      if (event.navigationData.eventName.isNotEmpty) {
         emit(state.copyWith(
-          selectedRiskEvent: event.eventName,
+          selectedRiskEvent: event.navigationData.eventName,
           selectedRiskCategory: null, // Resetear la categoría seleccionada
         ));
         
         // Si viene con datos de formulario guardado, configurar el formulario activo
-        if (event.loadSavedForm && event.formId != null) {
+        if (event.navigationData.loadSavedForm && event.navigationData.formId.isNotEmpty) {
           emit(state.copyWith(
-            activeFormId: event.formId,
+            activeFormId: event.navigationData.formId,
             isCreatingNew: false, // Marcar como editar
           ));
           
           // Mostrar mensaje informativo si se especifica
-          if (event.showProgressInfo) {
-            print('HomeBloc: Cargando formulario guardado - ${event.formId}');
+          if (event.navigationData.showProgressInfo) {
+            print('HomeBloc: Cargando formulario guardado - ${event.navigationData.formId}');
           }
         } else {
           // Si no viene con formulario guardado, limpiar el activeFormId (formulario nuevo)

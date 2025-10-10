@@ -1,8 +1,8 @@
 // Re-exportar todos los eventos específicos
-export 'events/navigation_events.dart';
-export 'events/form_events.dart';
-export 'events/evaluation_events.dart';
-export 'events/ui_events.dart';
+export 'navigation_events.dart';
+export 'form_events.dart';
+export 'evaluation_events.dart';
+export 'ui_events.dart';
 
 import 'package:equatable/equatable.dart';
 

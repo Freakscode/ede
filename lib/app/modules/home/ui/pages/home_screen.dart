@@ -13,6 +13,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:caja_herramientas/app/modules/home/bloc/home_bloc.dart';
 import 'package:caja_herramientas/app/modules/home/bloc/home_event.dart';
 import 'package:caja_herramientas/app/modules/home/bloc/home_state.dart';
+import 'package:caja_herramientas/app/modules/home/models/domain/form_navigation_data.dart';
 import 'package:caja_herramientas/app/shared/widgets/layouts/custom_bottom_nav_bar.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -41,7 +42,9 @@ class HomeScreen extends StatelessWidget {
       // Manejar diferentes tipos de navegación
       if (navigationData != null) {
         if (navigationData!['showRiskCategories'] == true) {
-          bloc.add(HomeShowRiskCategoriesScreen(null));
+          bloc.add(HomeShowRiskCategoriesScreen(
+            FormNavigationData.forNewForm(''),
+          ));
         } else if (navigationData!['showRiskEvents'] == true) {
           bloc.add(HomeShowRiskEventsSection());
         } else if (navigationData!['selectedIndex'] != null) {

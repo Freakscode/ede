@@ -8,6 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../bloc/home_bloc.dart';
 import '../../bloc/home_event.dart';
 import '../../bloc/home_state.dart';
+import '../../models/domain/form_navigation_data.dart';
 import '../../../../shared/models/form_data_model.dart';
 import '../../../../shared/services/form_persistence_service.dart';
 import '../../../../shared/models/risk_event_factory.dart';
@@ -472,10 +473,11 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
         // Navegar a la pantalla de categorías para ver el progreso y continuar
         homeBloc.add(
           HomeShowRiskCategoriesScreen(
-            completeForm.eventName,
-            loadSavedForm: true,
-            formId: completeForm.id,
-            showProgressInfo: true,
+            FormNavigationData.forExistingForm(
+              eventName: completeForm.eventName,
+              formId: completeForm.id,
+              showProgressInfo: true,
+            ),
           ),
         );
       } else {
