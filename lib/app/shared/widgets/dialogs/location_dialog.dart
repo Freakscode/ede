@@ -82,79 +82,81 @@ class _LocationDialogState extends State<LocationDialog> {
                 children: [
                   GestureDetector(
                     onTap: () => setState(() => _isAutomaticSelected = true),
-                    child: Column(
-                      children: [
-                        Text(
-                          'Ubicación',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: _isAutomaticSelected
-                                ? const Color(0xFF232B48) // color: var(--AzulDAGRD, #232B48)
-                                : const Color(0xFF6B7280),
-                            fontFamily: 'Work Sans', // font-family: "Work Sans"
-                            fontSize: 14, // font-size: 14px
-                            fontStyle: FontStyle.normal, // font-style: normal
-                            fontWeight: FontWeight.w500, // font-weight: 500
-                            height: 22 / 14, // line-height: 22px (157.143%)
+                    child: RichText(
+                      textAlign: TextAlign.center,
+                      text: TextSpan(
+                        children: [
+                          TextSpan(
+                            text: 'Ubicación\n',
+                            style: TextStyle(
+                              color: _isAutomaticSelected
+                                  ? const Color(0xFF232B48) // color: var(--AzulDAGRD, #232B48)
+                                  : const Color(0xFF6B7280),
+                              fontFamily: 'Work Sans', // font-family: "Work Sans"
+                              fontSize: 14, // font-size: 14px
+                              fontStyle: FontStyle.normal, // font-style: normal
+                              fontWeight: FontWeight.w500, // font-weight: 500
+                              height: 22 / 14, // line-height: 22px (157.143%)
+                            ),
                           ),
-                        ),
-                        Text(
-                          'Automática',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: _isAutomaticSelected
-                                ? const Color(0xFF232B48) // color: var(--AzulDAGRD, #232B48)
-                                : const Color(0xFF6B7280),
-                            fontFamily: 'Work Sans', // font-family: "Work Sans"
-                            fontSize: 14, // font-size: 14px
-                            fontStyle: FontStyle.normal, // font-style: normal
-                            fontWeight: FontWeight.w500, // font-weight: 500
-                            height: 22 / 14, // line-height: 22px (157.143%)
-                            decoration: _isAutomaticSelected
-                                ? TextDecoration.underline
-                                : TextDecoration.none,
+                          TextSpan(
+                            text: 'Automática',
+                            style: TextStyle(
+                              color: _isAutomaticSelected
+                                  ? const Color(0xFF232B48) // color: var(--AzulDAGRD, #232B48)
+                                  : const Color(0xFF6B7280),
+                              fontFamily: 'Work Sans', // font-family: "Work Sans"
+                              fontSize: 14, // font-size: 14px
+                              fontStyle: FontStyle.normal, // font-style: normal
+                              fontWeight: FontWeight.w500, // font-weight: 500
+                              height: 22 / 14, // line-height: 22px (157.143%)
+                              decoration: _isAutomaticSelected
+                                  ? TextDecoration.underline
+                                  : TextDecoration.none,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                   const SizedBox(width: 32),
                   GestureDetector(
                     onTap: () => setState(() => _isAutomaticSelected = false),
-                    child: Column(
-                      children: [
-                        Text(
-                          'Ubicación',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: !_isAutomaticSelected
-                                ? const Color(0xFF232B48) // color: var(--AzulDAGRD, #232B48)
-                                : const Color(0xFF6B7280),
-                            fontFamily: 'Work Sans', // font-family: "Work Sans"
-                            fontSize: 14, // font-size: 14px
-                            fontStyle: FontStyle.normal, // font-style: normal
-                            fontWeight: FontWeight.w500, // font-weight: 500
-                            height: 22 / 14, // line-height: 22px (157.143%)
+                    child: RichText(
+                      textAlign: TextAlign.center,
+                      text: TextSpan(
+                        children: [
+                          TextSpan(
+                            text: 'Ubicación\n',
+                            style: TextStyle(
+                              color: !_isAutomaticSelected
+                                  ? const Color(0xFF232B48) // color: var(--AzulDAGRD, #232B48)
+                                  : const Color(0xFF6B7280),
+                              fontFamily: 'Work Sans', // font-family: "Work Sans"
+                              fontSize: 14, // font-size: 14px
+                              fontStyle: FontStyle.normal, // font-style: normal
+                              fontWeight: FontWeight.w500, // font-weight: 500
+                              height: 22 / 14, // line-height: 22px (157.143%)
+                            ),
                           ),
-                        ),
-                        Text(
-                          'manual',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: !_isAutomaticSelected
-                                ? const Color(0xFF232B48) // color: var(--AzulDAGRD, #232B48)
-                                : const Color(0xFF6B7280),
-                            fontFamily: 'Work Sans', // font-family: "Work Sans"
-                            fontSize: 14, // font-size: 14px
-                            fontStyle: FontStyle.normal, // font-style: normal
-                            fontWeight: FontWeight.w500, // font-weight: 500
-                            height: 22 / 14, // line-height: 22px (157.143%)
-                            decoration: !_isAutomaticSelected
-                                ? TextDecoration.underline
-                                : TextDecoration.none,
+                          TextSpan(
+                            text: 'manual',
+                            style: TextStyle(
+                              color: !_isAutomaticSelected
+                                  ? const Color(0xFF232B48) // color: var(--AzulDAGRD, #232B48)
+                                  : const Color(0xFF6B7280),
+                              fontFamily: 'Work Sans', // font-family: "Work Sans"
+                              fontSize: 14, // font-size: 14px
+                              fontStyle: FontStyle.normal, // font-style: normal
+                              fontWeight: FontWeight.w500, // font-weight: 500
+                              height: 22 / 14, // line-height: 22px (157.143%)
+                              decoration: !_isAutomaticSelected
+                                  ? TextDecoration.underline
+                                  : TextDecoration.none,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ],
