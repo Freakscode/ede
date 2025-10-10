@@ -90,26 +90,26 @@ class _LocationDialogState extends State<LocationDialog> {
                             text: 'Ubicación\n',
                             style: TextStyle(
                               color: _isAutomaticSelected
-                                  ? const Color(0xFF232B48) // color: var(--AzulDAGRD, #232B48)
+                                  ? const Color(0xFF232B48)
                                   : const Color(0xFF6B7280),
-                              fontFamily: 'Work Sans', // font-family: "Work Sans"
-                              fontSize: 14, // font-size: 14px
-                              fontStyle: FontStyle.normal, // font-style: normal
-                              fontWeight: FontWeight.w500, // font-weight: 500
-                              height: 22 / 14, // line-height: 22px (157.143%)
+                              fontFamily: 'Work Sans',
+                              fontSize: 14,
+                              fontStyle: FontStyle.normal,
+                              fontWeight: FontWeight.w500,
+                              height: 22 / 14,
                             ),
                           ),
                           TextSpan(
                             text: 'Automática',
                             style: TextStyle(
                               color: _isAutomaticSelected
-                                  ? const Color(0xFF232B48) // color: var(--AzulDAGRD, #232B48)
+                                  ? const Color(0xFF232B48)
                                   : const Color(0xFF6B7280),
-                              fontFamily: 'Work Sans', // font-family: "Work Sans"
-                              fontSize: 14, // font-size: 14px
-                              fontStyle: FontStyle.normal, // font-style: normal
-                              fontWeight: FontWeight.w500, // font-weight: 500
-                              height: 22 / 14, // line-height: 22px (157.143%)
+                              fontFamily: 'Work Sans',
+                              fontSize: 14,
+                              fontStyle: FontStyle.normal,
+                              fontWeight: FontWeight.w500,
+                              height: 22 / 14,
                               decoration: _isAutomaticSelected
                                   ? TextDecoration.underline
                                   : TextDecoration.none,
@@ -130,26 +130,26 @@ class _LocationDialogState extends State<LocationDialog> {
                             text: 'Ubicación\n',
                             style: TextStyle(
                               color: !_isAutomaticSelected
-                                  ? const Color(0xFF232B48) // color: var(--AzulDAGRD, #232B48)
+                                  ? const Color(0xFF232B48)
                                   : const Color(0xFF6B7280),
-                              fontFamily: 'Work Sans', // font-family: "Work Sans"
-                              fontSize: 14, // font-size: 14px
-                              fontStyle: FontStyle.normal, // font-style: normal
-                              fontWeight: FontWeight.w500, // font-weight: 500
-                              height: 22 / 14, // line-height: 22px (157.143%)
+                              fontFamily: 'Work Sans',
+                              fontSize: 14,
+                              fontStyle: FontStyle.normal,
+                              fontWeight: FontWeight.w500,
+                              height: 22 / 14,
                             ),
                           ),
                           TextSpan(
                             text: 'manual',
                             style: TextStyle(
                               color: !_isAutomaticSelected
-                                  ? const Color(0xFF232B48) // color: var(--AzulDAGRD, #232B48)
+                                  ? const Color(0xFF232B48)
                                   : const Color(0xFF6B7280),
-                              fontFamily: 'Work Sans', // font-family: "Work Sans"
-                              fontSize: 14, // font-size: 14px
-                              fontStyle: FontStyle.normal, // font-style: normal
-                              fontWeight: FontWeight.w500, // font-weight: 500
-                              height: 22 / 14, // line-height: 22px (157.143%)
+                              fontFamily: 'Work Sans',
+                              fontSize: 14,
+                              fontStyle: FontStyle.normal,
+                              fontWeight: FontWeight.w500,
+                              height: 22 / 14,
                               decoration: !_isAutomaticSelected
                                   ? TextDecoration.underline
                                   : TextDecoration.none,
@@ -289,7 +289,9 @@ class _LocationDialogState extends State<LocationDialog> {
                           color: Color(0xFF1E1E1E),
                           fontFamily: 'Work Sans',
                           fontSize: 14,
+                          fontStyle: FontStyle.normal,
                           fontWeight: FontWeight.w500,
+                          height: 24 / 14,
                         ),
                       ),
                     ),
@@ -298,28 +300,44 @@ class _LocationDialogState extends State<LocationDialog> {
                   const SizedBox(height: 16),
 
                   // Coordenadas actuales
-                  const Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      'Coordenadas actuales',
-                      style: TextStyle(
-                        color: Color(0xFF374151),
-                        fontFamily: 'Work Sans',
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
+                  SizedBox(
+                    width: double.infinity,
+                    child: Container(
+                      height: 48,
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF9FAFB),
+                        borderRadius: BorderRadius.circular(4),
                       ),
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      '$_currentLat, $_currentLng',
-                      style: const TextStyle(
-                        color: Color(0xFF6B7280),
-                        fontFamily: 'Work Sans',
-                        fontSize: 12,
-                        fontWeight: FontWeight.w400,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Coordenadas actuales',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Color(0xFF1E1E1E),
+                              fontFamily: 'Work Sans',
+                              fontSize: 12,
+                              fontStyle: FontStyle.normal,
+                              fontWeight: FontWeight.w500,
+                              height: 1.2,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            '$_currentLat, $_currentLng',
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              color: Color(0xFF1E1E1E),
+                              fontFamily: 'Work Sans',
+                              fontSize: 12,
+                              fontStyle: FontStyle.normal,
+                              fontWeight: FontWeight.w400,
+                              height: 1.2,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -346,10 +364,12 @@ class _LocationDialogState extends State<LocationDialog> {
                       label: const Text(
                         'Guardar ubicación',
                         style: TextStyle(
-                          color: Colors.white,
+                          color: Color(0xFFFFFFFF),
                           fontFamily: 'Work Sans',
                           fontSize: 14,
+                          fontStyle: FontStyle.normal,
                           fontWeight: FontWeight.w500,
+                          height: 24 / 14,
                         ),
                       ),
                     ),
