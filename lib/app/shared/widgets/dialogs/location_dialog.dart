@@ -37,16 +37,20 @@ class _LocationDialogState extends State<LocationDialog> {
       backgroundColor: Colors.transparent,
       child: Container(
         width: double.infinity,
-        height: MediaQuery.of(context).size.height * 0.9,
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.8,
+          minHeight: 400,
+        ),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             // Header
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 40),
+              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 35),
               child: Row(
                 children: [
                   const Expanded(
@@ -164,217 +168,233 @@ class _LocationDialogState extends State<LocationDialog> {
             ),
             const SizedBox(height: 20),
 
-            // Mapa simulado
-            Container(
-              height: 194, // height: 194px
-              margin: const EdgeInsets.symmetric(horizontal: 20),
-              padding: const EdgeInsets.symmetric(
-                horizontal: 16, // padding: 13px 16px (horizontal)
-                vertical: 13, // padding: 13px 16px (vertical)
-              ),
-              decoration: BoxDecoration(
-                color: const Color(0xFFF3F4F6),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: const Color(0xFFE5E7EB)),
-              ),
-              child: Stack(
-                children: [
-                  // Mapa simulado
-                  Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(
-                          Icons.map,
-                          size: 64,
-                          color: Color(0xFF6B7280),
-                        ),
-                        const SizedBox(height: 16),
-                        const Text(
-                          'Mapa interactivo',
-                          style: TextStyle(
-                            color: Color(0xFF6B7280),
-                            fontFamily: 'Work Sans',
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        const Text(
-                          'Calle 55, Carrera 65',
-                          style: TextStyle(
-                            color: Color(0xFF9CA3AF),
-                            fontFamily: 'Work Sans',
-                            fontSize: 14,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  // Marcador rojo
-                  Positioned(
-                    top: 100,
-                    left: 120,
-                    child: Icon(
-                      Icons.location_on,
-                      color: const Color(0xFFEF4444),
-                      size: 32,
-                    ),
-                  ),
-                  // Controles de zoom
-                  Positioned(
-                    top: 16,
-                    left: 16,
-                    child: Column(
-                      children: [
-                        Container(
-                          width: 32,
-                          height: 32,
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.all(Radius.circular(4)),
-                          ),
-                          child: const Icon(
-                            Icons.add,
-                            color: Color(0xFF374151),
-                            size: 20,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Container(
-                          width: 32,
-                          height: 32,
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.all(Radius.circular(4)),
-                          ),
-                          child: const Icon(
-                            Icons.remove,
-                            color: Color(0xFF374151),
-                            size: 20,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // Botones y coordenadas
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                children: [
-                  // Botón "Obtener ubicación actual"
-                  SizedBox(
-                    width: double.infinity,
-                    height: 48,
-                    child: ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: DAGRDColors.amarDAGRD,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(4),
-                        ),
+            // Contenido principal scrolleable
+            Flexible(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    // Mapa simulado
+                    Container(
+                      height: 194, // height: 194px
+                      margin: const EdgeInsets.symmetric(horizontal: 20),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16, // padding: 13px 16px (horizontal)
+                        vertical: 13, // padding: 13px 16px (vertical)
                       ),
-                      onPressed: () => _getCurrentLocation(),
-                      icon: const Icon(
-                        Icons.my_location,
-                        color: Color(0xFF1E1E1E),
-                        size: 20,
-                      ),
-                      label: const Text(
-                        'Obtener ubicación actual',
-                        style: TextStyle(
-                          color: Color(0xFF1E1E1E),
-                          fontFamily: 'Work Sans',
-                          fontSize: 14,
-                          fontStyle: FontStyle.normal,
-                          fontWeight: FontWeight.w500,
-                          height: 24 / 14,
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 16),
-
-                  // Coordenadas actuales
-                  SizedBox(
-                    width: double.infinity,
-                    child: Container(
-                      height: 48,
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF9FAFB),
-                        borderRadius: BorderRadius.circular(4),
+                        color: const Color(0xFFF3F4F6),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: const Color(0xFFE5E7EB)),
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      child: Stack(
                         children: [
-                          const Text(
-                            'Coordenadas actuales',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: Color(0xFF1E1E1E),
-                              fontFamily: 'Work Sans',
-                              fontSize: 12,
-                              fontStyle: FontStyle.normal,
-                              fontWeight: FontWeight.w500,
-                              height: 1.2,
+                          // Mapa simulado
+                          Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(
+                                  Icons.map,
+                                  size: 64,
+                                  color: Color(0xFF6B7280),
+                                ),
+                                const SizedBox(height: 16),
+                                const Text(
+                                  'Mapa interactivo',
+                                  style: TextStyle(
+                                    color: Color(0xFF6B7280),
+                                    fontFamily: 'Work Sans',
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                const Text(
+                                  'Calle 55, Carrera 65',
+                                  style: TextStyle(
+                                    color: Color(0xFF9CA3AF),
+                                    fontFamily: 'Work Sans',
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                          const SizedBox(height: 2),
-                          Text(
-                            '$_currentLat, $_currentLng',
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              color: Color(0xFF1E1E1E),
-                              fontFamily: 'Work Sans',
-                              fontSize: 12,
-                              fontStyle: FontStyle.normal,
-                              fontWeight: FontWeight.w400,
-                              height: 1.2,
+                          // Marcador rojo
+                          Positioned(
+                            top: 100,
+                            left: 120,
+                            child: Icon(
+                              Icons.location_on,
+                              color: const Color(0xFFEF4444),
+                              size: 32,
+                            ),
+                          ),
+                          // Controles de zoom
+                          Positioned(
+                            top: 16,
+                            left: 16,
+                            child: Column(
+                              children: [
+                                Container(
+                                  width: 32,
+                                  height: 32,
+                                  decoration: const BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(4),
+                                    ),
+                                  ),
+                                  child: const Icon(
+                                    Icons.add,
+                                    color: Color(0xFF374151),
+                                    size: 20,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Container(
+                                  width: 32,
+                                  height: 32,
+                                  decoration: const BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(4),
+                                    ),
+                                  ),
+                                  child: const Icon(
+                                    Icons.remove,
+                                    color: Color(0xFF374151),
+                                    size: 20,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],
                       ),
                     ),
-                  ),
 
-                  const SizedBox(height: 16),
+                    // Botones y coordenadas
+                    Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        children: [
+                          // Botón "Obtener ubicación actual"
+                          SizedBox(
+                            width: double.infinity,
+                            height: 48,
+                            child: ElevatedButton.icon(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: DAGRDColors.amarDAGRD,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                              ),
+                              onPressed: () => _getCurrentLocation(),
+                              icon: const Icon(
+                                Icons.my_location,
+                                color: Color(0xFF1E1E1E),
+                                size: 20,
+                              ),
+                              label: const Text(
+                                'Obtener ubicación actual',
+                                style: TextStyle(
+                                  color: Color(0xFF1E1E1E),
+                                  fontFamily: 'Work Sans',
+                                  fontSize: 14,
+                                  fontStyle: FontStyle.normal,
+                                  fontWeight: FontWeight.w500,
+                                  height: 24 / 14,
+                                ),
+                              ),
+                            ),
+                          ),
 
-                  // Botón "Guardar ubicación"
-                  SizedBox(
-                    width: double.infinity,
-                    height: 48,
-                    child: ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF232B48),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                      ),
-                      onPressed: () => _saveLocation(),
-                      icon: const Icon(
-                        Icons.save,
-                        color: Colors.white,
-                        size: 20,
-                      ),
-                      label: const Text(
-                        'Guardar ubicación',
-                        style: TextStyle(
-                          color: Color(0xFFFFFFFF),
-                          fontFamily: 'Work Sans',
-                          fontSize: 14,
-                          fontStyle: FontStyle.normal,
-                          fontWeight: FontWeight.w500,
-                          height: 24 / 14,
-                        ),
+                          const SizedBox(height: 16),
+
+                          // Coordenadas actuales
+                          SizedBox(
+                            width: double.infinity,
+                            child: Container(
+                              height: 48,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 6,
+                              ),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF9FAFB),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'Coordenadas actuales',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      color: Color(0xFF1E1E1E),
+                                      fontFamily: 'Work Sans',
+                                      fontSize: 12,
+                                      fontStyle: FontStyle.normal,
+                                      fontWeight: FontWeight.w500,
+                                      height: 1.2,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    '$_currentLat, $_currentLng',
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(
+                                      color: Color(0xFF1E1E1E),
+                                      fontFamily: 'Work Sans',
+                                      fontSize: 12,
+                                      fontStyle: FontStyle.normal,
+                                      fontWeight: FontWeight.w400,
+                                      height: 1.2,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+
+                          const SizedBox(height: 16),
+
+                          // Botón "Guardar ubicación"
+                          SizedBox(
+                            width: double.infinity,
+                            height: 48,
+                            child: ElevatedButton.icon(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF232B48),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                              ),
+                              onPressed: () => _saveLocation(),
+                              icon: const Icon(
+                                Icons.save,
+                                color: Colors.white,
+                                size: 20,
+                              ),
+                              label: const Text(
+                                'Guardar ubicación',
+                                style: TextStyle(
+                                  color: Color(0xFFFFFFFF),
+                                  fontFamily: 'Work Sans',
+                                  fontSize: 14,
+                                  fontStyle: FontStyle.normal,
+                                  fontWeight: FontWeight.w500,
+                                  height: 24 / 14,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ],
