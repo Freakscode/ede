@@ -12,6 +12,7 @@ import '../../bloc/risk_threat_analysis_state.dart';
 import '../widgets/info_note_widget.dart';
 import '../widgets/image_upload_area_widget.dart';
 import '../widgets/save_progress_button.dart';
+import 'package:caja_herramientas/app/shared/widgets/dialogs/location_dialog.dart';
 
 class EvidenceScreen extends StatefulWidget {
   const EvidenceScreen({super.key});
@@ -22,6 +23,7 @@ class EvidenceScreen extends StatefulWidget {
 
 class _EvidenceScreenState extends State<EvidenceScreen> {
   final List<String> _imagePaths = [];
+  final Map<int, Map<String, String>> _imageCoordinates = {}; // Almacenar coordenadas por índice
   final int _maxImages = 3;
   final ImagePicker _picker = ImagePicker();
 
@@ -251,58 +253,96 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
                   ),
                 ),
                 const SizedBox(height: 8),
-                Row(
-                  children: [
-                    // Campo de texto con coordenadas
-                    Expanded(
-                      child: Container(
-                        height: 40, // height: 40px
+                
+                // Mostrar botón "Georreferenciar imagen" si no hay coordenadas
+                if (!_imageCoordinates.containsKey(index) || 
+                    _imageCoordinates[index] == null) ...[
+                  SizedBox(
+                    width: double.infinity,
+                    height: 48, // height: 48px
+                    child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF232B48), // background: var(--AzulDAGRD, #232B48)
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(4), // border-radius: 4px
+                        ),
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 16, // padding: 8px 16px (lateral)
-                          vertical: 8, // padding: 8px 16px (vertical)
+                          horizontal: 10, // padding: 8px 10px
+                          vertical: 8,
                         ),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: const Color(0xFFD1D5DB)),
-                          borderRadius: BorderRadius.circular(4),
+                      ),
+                      onPressed: () => _showLocationDialog(index),
+                      icon: const Icon(
+                        Icons.location_on_outlined, // icono de ubicación outline
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                      label: const Text(
+                        'Georreferenciar imagen',
+                        style: TextStyle(
                           color: Colors.white,
+                          fontFamily: 'Work Sans',
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
                         ),
-                        child: const Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            '6.244747, -75.573553',
-                            style: TextStyle(
-                              color: Color(0xFF374151),
-                              fontFamily: 'Work Sans',
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ] else ...[
+                  // Mostrar coordenadas si ya están definidas
+                  Row(
+                    children: [
+                      // Campo de texto con coordenadas
+                      Expanded(
+                        child: Container(
+                          height: 40, // height: 40px
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16, // padding: 8px 16px (lateral)
+                            vertical: 8, // padding: 8px 16px (vertical)
+                          ),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: const Color(0xFFD1D5DB)),
+                            borderRadius: BorderRadius.circular(4),
+                            color: Colors.white,
+                          ),
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              '${_imageCoordinates[index]!['lat']}, ${_imageCoordinates[index]!['lng']}',
+                              style: const TextStyle(
+                                color: Color(0xFF374151),
+                                fontFamily: 'Work Sans',
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                    // Separación de 18px
-                    const SizedBox(width: 18),
-                    // Botón de ubicación separado
-                    GestureDetector(
-                      onTap: () => _handleGeoreference(imagePath),
-                      child: Container(
-                        height: 40,
-                        width: 40,
-                        decoration: BoxDecoration(
-                          color: const Color(
-                            0xFF232B48,
-                          ), // Fondo azul para el botón
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: const Icon(
-                          Icons.location_on,
-                          color: Colors.white,
-                          size: 20,
+                      // Separación de 18px
+                      const SizedBox(width: 18),
+                      // Botón de ubicación separado
+                      GestureDetector(
+                        onTap: () => _showLocationDialog(index),
+                        child: Container(
+                          height: 40,
+                          width: 40,
+                          decoration: BoxDecoration(
+                            color: const Color(
+                              0xFF232B48,
+                            ), // Fondo azul para el botón
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: const Icon(
+                            Icons.location_on,
+                            color: Colors.white,
+                            size: 20,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
+                    ],
+                  ),
+                ],
               ],
             ),
           ),
@@ -394,6 +434,16 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
   void _removeImage(int index) {
     setState(() {
       _imagePaths.removeAt(index);
+      _imageCoordinates.remove(index);
+      // Reindexar coordenadas después de eliminar
+      final newCoordinates = <int, Map<String, String>>{};
+      for (int i = 0; i < _imagePaths.length; i++) {
+        if (_imageCoordinates.containsKey(i + 1)) {
+          newCoordinates[i] = _imageCoordinates[i + 1]!;
+        }
+      }
+      _imageCoordinates.clear();
+      _imageCoordinates.addAll(newCoordinates);
     });
   }
 
@@ -415,13 +465,31 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
     );
   }
 
-  /// Maneja la georreferenciación de la imagen
-  void _handleGeoreference(String imagePath) {
-    // TODO: Implementar georreferenciación real
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Funcionalidad de georreferenciación en desarrollo'),
-        backgroundColor: Colors.blue,
+
+  /// Muestra el diálogo de ubicación
+  void _showLocationDialog(int imageIndex) {
+    final currentCoordinates = _imageCoordinates[imageIndex];
+    
+    showDialog(
+      context: context,
+      builder: (context) => LocationDialog(
+        initialLat: currentCoordinates?['lat'],
+        initialLng: currentCoordinates?['lng'],
+        onLocationSelected: (lat, lng) {
+          setState(() {
+            _imageCoordinates[imageIndex] = {
+              'lat': lat,
+              'lng': lng,
+            };
+          });
+          
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Ubicación guardada exitosamente'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        },
       ),
     );
   }
