@@ -5,7 +5,7 @@ import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import 'package:caja_herramientas/app/shared/widgets/dialogs/custom_action_dialog.dart';
 import 'package:caja_herramientas/app/shared/services/form_persistence_service.dart';
 import '../../bloc/risk_threat_analysis_bloc.dart';
-import '../../bloc/risk_threat_analysis_event.dart';
+import '../../bloc/events/risk_threat_analysis_event.dart';
 import '../../bloc/risk_threat_analysis_state.dart';
 import '../../../home/bloc/home_bloc.dart';
 import '../../../home/bloc/home_event.dart';

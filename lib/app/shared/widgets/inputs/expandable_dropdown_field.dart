@@ -5,7 +5,7 @@ import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:caja_herramientas/app/shared/models/models.dart';
 import 'package:caja_herramientas/app/modules/risk_threat_analysis/bloc/risk_threat_analysis_bloc.dart';
-import 'package:caja_herramientas/app/modules/risk_threat_analysis/bloc/risk_threat_analysis_event.dart';
+import 'package:caja_herramientas/app/modules/risk_threat_analysis/bloc/events/risk_threat_analysis_event.dart';
 import 'package:caja_herramientas/app/modules/risk_threat_analysis/bloc/risk_threat_analysis_state.dart';
 
 class ExpandableDropdownField extends StatefulWidget {

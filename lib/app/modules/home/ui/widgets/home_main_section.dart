@@ -8,7 +8,7 @@ import 'package:caja_herramientas/app/modules/home/bloc/home_bloc.dart';
 import 'package:caja_herramientas/app/modules/home/bloc/home_event.dart';
 import 'package:caja_herramientas/app/shared/widgets/dialogs/forms_in_progress_dialog.dart';
 import 'package:caja_herramientas/app/modules/risk_threat_analysis/bloc/risk_threat_analysis_bloc.dart';
-import 'package:caja_herramientas/app/modules/risk_threat_analysis/bloc/risk_threat_analysis_event.dart' as risk_events;
+import 'package:caja_herramientas/app/modules/risk_threat_analysis/bloc/events/risk_threat_analysis_event.dart' as risk_events;
 import 'package:go_router/go_router.dart';
 
 class HomeMainSection extends StatefulWidget {

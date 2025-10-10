@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:caja_herramientas/app/shared/models/models.dart';
 
-import 'risk_threat_analysis_event.dart';
+import 'events/risk_threat_analysis_event.dart';
 import 'risk_threat_analysis_state.dart';
 
 class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAnalysisState> {
