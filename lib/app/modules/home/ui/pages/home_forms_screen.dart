@@ -30,10 +30,8 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
   }
 
   void _loadForms() {
-    print('=== HomeFormsScreen: _loadForms llamado ===');
     // Cargar formularios
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      print('HomeFormsScreen: Enviando evento LoadForms al HomeBloc');
       context.read<HomeBloc>().add(LoadForms());
     });
   }
@@ -51,20 +49,7 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
       final persistenceService = FormPersistenceService();
       final completeForm = await persistenceService.getCompleteForm(formId);
 
-      print('_getFormProgress Debug - FormId: $formId');
-      print('  - CompleteForm found: ${completeForm != null}');
-
       if (completeForm != null) {
-        print('  - EventName: ${completeForm.eventName}');
-        print(
-          '  - Amenaza Probabilidad Selections: ${completeForm.amenazaProbabilidadSelections}',
-        );
-        print(
-          '  - Amenaza Intensidad Selections: ${completeForm.amenazaIntensidadSelections}',
-        );
-        print(
-          '  - Vulnerabilidad Selections: ${completeForm.vulnerabilidadSelections}',
-        );
 
         // Usar la misma lógica que ProgressBarWidget para consistencia
 
@@ -80,11 +65,6 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
         // Progreso total (promedio)
         final totalProgress = (amenazaProgress + vulnerabilidadProgress) / 2;
 
-        print('  - Calculated Progress:');
-        print('    * Amenaza: $amenazaProgress');
-        print('    * Vulnerabilidad: $vulnerabilidadProgress');
-        print('    * Total: $totalProgress');
-
         return {
           'amenaza': amenazaProgress,
           'vulnerabilidad': vulnerabilidadProgress,
@@ -92,10 +72,9 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
         };
       }
     } catch (e) {
-      print('Error al obtener progreso del formulario: $e');
+      // Error al obtener progreso del formulario
     }
 
-    print('  - Returning default progress (0.0)');
     return {'amenaza': 0.0, 'vulnerabilidad': 0.0, 'total': 0.0};
   }
 
@@ -109,7 +88,6 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
       final riskEvent = _getRiskEventByName(eventName);
 
       if (riskEvent == null) {
-        print('No se encontró el evento: $eventName');
         return 0.0;
       }
 
@@ -173,12 +151,8 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
       }
 
       final progress = completed / totalCategories;
-      print(
-        'Amenaza Progress: completed=$completed, total=$totalCategories, progress=$progress',
-      );
       return progress;
     } catch (e) {
-      print('Error al calcular progreso de amenaza: $e');
       return 0.0;
     }
   }
@@ -192,7 +166,6 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
       final riskEvent = _getRiskEventByName(eventName);
 
       if (riskEvent == null) {
-        print('No se encontró el evento: $eventName');
         return 0.0;
       }
 
@@ -237,12 +210,8 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
       }
 
       final progress = completed / total;
-      print(
-        'Vulnerabilidad Progress: completed=$completed, total=$total, progress=$progress',
-      );
       return progress;
     } catch (e) {
-      print('Error al calcular progreso de vulnerabilidad: $e');
       return 0.0;
     }
   }
@@ -252,7 +221,6 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
     try {
       return RiskEventFactory.getEventByName(eventName);
     } catch (e) {
-      print('Error al obtener evento por nombre: $e');
       return null;
     }
   }
@@ -261,38 +229,6 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
   Widget build(BuildContext context) {
     return BlocBuilder<HomeBloc, HomeState>(
       builder: (context, state) {
-        print('=== HomeFormsScreen: BlocBuilder rebuild ===');
-        print(
-          'HomeFormsScreen: savedForms.length = ${state.savedForms.length}',
-        );
-        print('HomeFormsScreen: isLoadingForms = ${state.isLoadingForms}');
-
-        if (state.savedForms.isNotEmpty) {
-          for (int i = 0; i < state.savedForms.length; i++) {
-            final form = state.savedForms[i];
-            print(
-              'HomeFormsScreen: Form[$i] - ID: ${form.id}, RiskEvent: ${form.riskEvent?.name}',
-            );
-
-            // Debug específico para Movimiento en Masa
-            if (form.riskEvent?.name == 'Movimiento en Masa') {
-              print(
-                'HomeFormsScreen: *** FORMULARIO MOVIMIENTO EN MASA ENCONTRADO ***',
-              );
-              print('HomeFormsScreen:   - Form ID: ${form.id}');
-              print('HomeFormsScreen:   - RiskEvent: ${form.riskEvent?.name}');
-              print('HomeFormsScreen:   - RiskEvent ID: ${form.riskEvent?.id}');
-            }
-          }
-          print(
-            'HomeFormsScreen: Construyendo ${state.savedForms.length} FormCardInProgress widgets',
-          );
-        } else {
-          print(
-            'HomeFormsScreen: NO HAY FORMULARIOS PARA MOSTRAR - savedForms está vacío',
-          );
-        }
-
         return RefreshIndicator(
           onRefresh: () async {
             context.read<HomeBloc>().add(LoadForms());
@@ -467,38 +403,6 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
                                 'total': 0.0,
                               };
 
-                          // Debug: imprimir valores de progreso
-                          print(
-                            'FormCard Progress Debug - Form: ${form.title}',
-                          );
-                          print('  - Total: ${progress['total']}');
-                          print('  - Amenaza: ${progress['amenaza']}');
-                          print(
-                            '  - Vulnerabilidad: ${progress['vulnerabilidad']}',
-                          );
-                          print(
-                            '  - Tag (EventName): ${form.riskEvent?.name ?? 'Evento'}',
-                          );
-
-                          // Debug específico para Movimiento en Masa
-                          if (form.riskEvent?.name == 'Movimiento en Masa') {
-                            print(
-                              '*** CONSTRUYENDO FormCardInProgress PARA MOVIMIENTO EN MASA ***',
-                            );
-                            print('  - Title: ${form.title}');
-                            print(
-                              '  - LastEdit: ${form.formattedLastModified}',
-                            );
-                            print(
-                              '  - Tag: ${form.riskEvent?.name ?? 'Evento'}',
-                            );
-                            print('  - Progress: ${progress['total']}');
-                            print('  - Threat: ${progress['amenaza']}');
-                            print(
-                              '  - Vulnerability: ${progress['vulnerabilidad']}',
-                            );
-                          }
-
                           return FormCardInProgress(
                             title: form.title,
                             lastEdit: form.formattedLastModified,
@@ -615,7 +519,6 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
         );
       }
     } catch (e) {
-      print('Error al navegar al formulario: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error al cargar el formulario: $e'),
@@ -666,7 +569,6 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
                     ),
                   );
                 } catch (e) {
-                  print('Error al eliminar formulario completo: $e');
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text('Error al eliminar formulario: $e'),
