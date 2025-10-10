@@ -457,51 +457,20 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
       final completeForm = await persistenceService.getCompleteForm(form.id);
 
       if (completeForm != null) {
-        // Calcular progreso actual para determinar qué sección mostrar
-        final amenazaProgress = _calculateAmenazaProgressFromCompleteForm(
-          completeForm,
-        );
-        final vulnerabilidadProgress =
-            _calculateVulnerabilidadProgressFromCompleteForm(completeForm);
-
-        // Determinar mensaje basado en el progreso
-        String message = '';
-
-        if (amenazaProgress < 1.0) {
-          // Amenaza no está completa
-          final amenazaPercentage = (amenazaProgress * 100).toInt();
-          message =
-              'Continuando evaluación de Amenaza ($amenazaPercentage% completado)';
-        } else if (vulnerabilidadProgress < 1.0) {
-          // Amenaza completa, pero vulnerabilidad no
-          final vulnerabilidadPercentage = (vulnerabilidadProgress * 100)
-              .toInt();
-          message =
-              'Continuando evaluación de Vulnerabilidad ($vulnerabilidadPercentage% completado)';
-        } else {
-          // Ambas completas - ir a resultados finales
-          message = 'Formulario completado - Mostrando resultados finales';
-        }
-
-        // Mostrar mensaje informativo
-        if (message.isNotEmpty) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(message),
-              backgroundColor: Colors.blue,
-              duration: const Duration(seconds: 2),
-            ),
-          );
-        }
-
         // Establecer el formulario como activo antes de navegar
         await persistenceService.setActiveFormId(completeForm.id);
 
+        // Check if widget is still mounted before using context
+        if (!mounted) return;
+
+        // Get bloc reference before async gap
+        final homeBloc = context.read<HomeBloc>();
+
         // Marcar como editar (no crear nuevo)
-        context.read<HomeBloc>().add(SetActiveFormId(completeForm.id));
+        homeBloc.add(SetActiveFormId(completeForm.id));
 
         // Navegar a la pantalla de categorías para ver el progreso y continuar
-        context.read<HomeBloc>().add(
+        homeBloc.add(
           HomeShowRiskCategoriesScreen(
             completeForm.eventName,
             loadSavedForm: true,
@@ -511,6 +480,7 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
         );
       } else {
         // Si no se encuentra el formulario, mostrar error
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('No se pudo cargar el formulario'),
@@ -519,6 +489,7 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
         );
       }
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error al cargar el formulario: $e'),
