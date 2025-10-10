@@ -121,7 +121,8 @@ class NavigationButtonsWidget extends StatelessWidget {
                         CustomActionDialog.show(
                           context: context,
                           title: 'Finalizar formulario',
-                          message: ' ¿Deseas finalizar el formulario? Antes de finalizar, puedes revisar tus respuestas. ',
+                          message:
+                              ' ¿Deseas finalizar el formulario? Antes de finalizar, puedes revisar tus respuestas. ',
                           leftButtonText: 'Revisar  ',
                           leftButtonIcon: Icons.close,
                           rightButtonText: 'Finalizar  ',
@@ -130,35 +131,43 @@ class NavigationButtonsWidget extends StatelessWidget {
                             // Marcar el formulario como explícitamente completado
                             final homeBloc = context.read<HomeBloc>();
                             final homeState = homeBloc.state;
-                            
+
                             if (homeState.activeFormId != null) {
                               // Obtener el servicio de persistencia
-                              final FormPersistenceService persistenceService = FormPersistenceService();
-                              final completeForm = await persistenceService.getCompleteForm(homeState.activeFormId!);
-                              
+                              final FormPersistenceService persistenceService =
+                                  FormPersistenceService();
+                              final completeForm = await persistenceService
+                                  .getCompleteForm(homeState.activeFormId!);
+
                               if (completeForm != null) {
                                 // Marcar como explícitamente completado
                                 final updatedForm = completeForm.copyWith(
                                   isExplicitlyCompleted: true,
                                   updatedAt: DateTime.now(),
                                 );
-                                
+
                                 // Guardar el formulario actualizado
-                                await persistenceService.saveCompleteForm(updatedForm);
-                                
+                                await persistenceService.saveCompleteForm(
+                                  updatedForm,
+                                );
+
                                 // Recargar los formularios en HomeBloc
                                 homeBloc.add(LoadForms());
-                                
+
                                 // Mostrar mensaje de éxito
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
-                                    content: Text('Formulario completado exitosamente'),
+                                    content: Text(
+                                      'Formulario completado exitosamente',
+                                    ),
                                     backgroundColor: Colors.green,
                                   ),
                                 );
-                                
+
                                 // Navegar a la pantalla de formulario completado
                                 homeBloc.add(HomeShowFormCompletedScreen());
+                                context.go('/home');
+                                Navigator.of(context).pop();
                               }
                             }
                           },
@@ -167,14 +176,15 @@ class NavigationButtonsWidget extends StatelessWidget {
                       // Si estamos en la última pestaña (índice 2), manejar finalización
                       else if (currentIndex == 2) {
                         final riskBloc = context.read<RiskThreatAnalysisBloc>();
-                        
+
                         // Validar si hay variables sin calificar antes de finalizar
                         if (riskBloc.hasUnqualifiedVariables()) {
                           // Mostrar diálogo de formulario incompleto
                           CustomActionDialog.show(
                             context: context,
                             title: 'Formulario incompleto',
-                            message: 'Antes de finalizar, revisa el formulario. Algunas variables aún no han sido evaluadas',
+                            message:
+                                'Antes de finalizar, revisa el formulario. Algunas variables aún no han sido evaluadas',
                             leftButtonText: 'Cancelar ',
                             leftButtonIcon: Icons.close,
                             rightButtonText: 'Revisar ',
@@ -187,7 +197,8 @@ class NavigationButtonsWidget extends StatelessWidget {
                         }
 
                         // Si estamos en amenaza, guardar datos y mostrar diálogo de confirmación
-                        if (state.selectedClassification.toLowerCase() == 'amenaza') {
+                        if (state.selectedClassification.toLowerCase() ==
+                            'amenaza') {
                           // Guardar datos del formulario antes de marcar como completada
                           final formData = riskBloc.getCurrentFormData();
 
@@ -210,17 +221,21 @@ class NavigationButtonsWidget extends StatelessWidget {
                           CustomActionDialog.show(
                             context: context,
                             title: 'Finalizar formulario',
-                            message: '¿Está seguro que desea finalizar el formulario para la categoría de ${state.selectedClassification}?',
+                            message:
+                                '¿Está seguro que desea finalizar el formulario para la categoría de ${state.selectedClassification}?',
                             leftButtonText: 'Revisar ',
                             leftButtonIcon: Icons.close,
                             rightButtonText: 'Finalizar ',
                             rightButtonIcon: Icons.check,
                             onRightButtonPressed: () {
-                              final navigationData = {'showRiskCategories': true};
+                              final navigationData = {
+                                'showRiskCategories': true,
+                              };
                               context.go('/home', extra: navigationData);
                             },
                           );
-                        } else if (state.selectedClassification.toLowerCase() == 'vulnerabilidad') {
+                        } else if (state.selectedClassification.toLowerCase() ==
+                            'vulnerabilidad') {
                           // Guardar datos del formulario antes de marcar como completada
                           final formData = riskBloc.getCurrentFormData();
 
@@ -243,13 +258,15 @@ class NavigationButtonsWidget extends StatelessWidget {
                           CustomActionDialog.show(
                             context: context,
                             title: 'Finalizar formulario',
-                            message: '¿Está seguro que desea finalizar el formulario para la categoría de ${state.selectedClassification}?',
+                            message:
+                                '¿Está seguro que desea finalizar el formulario para la categoría de ${state.selectedClassification}?',
                             leftButtonText: 'Revisar ',
                             leftButtonIcon: Icons.close,
                             rightButtonText: 'Finalizar ',
                             rightButtonIcon: Icons.check,
                             onRightButtonPressed: () {
-                              final navigationData = homeNavigationType.toNavigationData(tabIndex: homeTabIndex);
+                              final navigationData = homeNavigationType
+                                  .toNavigationData(tabIndex: homeTabIndex);
                               context.go('/home', extra: navigationData);
                             },
                           );
