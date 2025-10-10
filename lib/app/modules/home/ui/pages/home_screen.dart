@@ -3,6 +3,7 @@ import 'package:caja_herramientas/app/modules/home/ui/pages/risk_categories_scre
 import 'package:caja_herramientas/app/modules/home/ui/pages/settings_screen.dart';
 import 'package:caja_herramientas/app/modules/home/ui/widgets/home_main_section.dart';
 import 'package:caja_herramientas/app/modules/home/ui/pages/risk_events_screen.dart';
+import 'package:caja_herramientas/app/modules/home/ui/pages/form_completed_screen.dart';
 import 'package:caja_herramientas/app/modules/home/ui/widgets/tutorial_overlay.dart';
 import 'package:caja_herramientas/app/shared/widgets/layouts/custom_app_bar.dart';
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
@@ -67,6 +68,8 @@ class HomeScreen extends StatelessWidget {
             bodyContent = const RiskEventsScreen();
           } else if (state.mostrarCategoriasRiesgo) {
             bodyContent = const RiskCategoriesScreen();
+          } else if (state.mostrarFormularioCompletado) {
+            bodyContent = const FormCompletedScreen();
           } else {
             switch (state.selectedIndex) {
               case 0:
@@ -95,12 +98,15 @@ class HomeScreen extends StatelessWidget {
           }
           return Scaffold(
             appBar:  CustomAppBar(
-              showBack: (state.mostrarEventosRiesgo || state.mostrarCategoriasRiesgo),
+              showBack: (state.mostrarEventosRiesgo || state.mostrarCategoriasRiesgo || state.mostrarFormularioCompletado),
               onBack: () {
                 if (state.mostrarCategoriasRiesgo) {
                   context.read<HomeBloc>().add(HomeShowRiskEventsSection());
                 } else if (state.mostrarEventosRiesgo) {
                   context.read<HomeBloc>().add(HomeResetRiskSections());
+                } else if (state.mostrarFormularioCompletado) {
+                  // Volver a la pantalla de formularios
+                  context.read<HomeBloc>().add(HomeNavBarTapped(2));
                 }
               },
               showInfo: true,
@@ -108,7 +114,7 @@ class HomeScreen extends StatelessWidget {
             ),
             body: bodyContent,
             bottomNavigationBar: CustomBottomNavBar(
-              currentIndex: (state.mostrarEventosRiesgo || state.mostrarCategoriasRiesgo) 
+              currentIndex: (state.mostrarEventosRiesgo || state.mostrarCategoriasRiesgo || state.mostrarFormularioCompletado) 
                   ? -1  // No seleccionar ningún tab
                   : state.selectedIndex,
               onTap: (index) {

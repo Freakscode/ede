@@ -15,6 +15,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           selectedIndex: 0,
           mostrarEventosRiesgo: false,
           mostrarCategoriasRiesgo: false,
+          mostrarFormularioCompletado: false,
           tutorialShown: false,
         ),
       ) {
@@ -23,18 +24,21 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         selectedIndex: event.index,
         mostrarEventosRiesgo: false,
         mostrarCategoriasRiesgo: false,
+        mostrarFormularioCompletado: false,
       ));
     });
     on<HomeShowRiskEventsSection>((event, emit) {
       emit(state.copyWith(
         mostrarEventosRiesgo: true,
         mostrarCategoriasRiesgo: false,
+        mostrarFormularioCompletado: false,
       ));
     });
     on<HomeShowRiskCategoriesScreen>((event, emit) async {
       emit(state.copyWith(
         mostrarEventosRiesgo: false,
         mostrarCategoriasRiesgo: true,
+        mostrarFormularioCompletado: false,
       ));
       
       // Si viene con un evento específico, configurarlo
@@ -91,6 +95,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       emit(state.copyWith(
         mostrarEventosRiesgo: false,
         mostrarCategoriasRiesgo: false,
+        mostrarFormularioCompletado: false,
       ));
     });
     on<HomeCheckAndShowTutorial>((event, emit) {
@@ -163,6 +168,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<SetActiveFormId>(_onSetActiveFormId);
     on<SaveRiskEventModel>(_onSaveRiskEventModel);
     on<ResetAllForNewForm>(_onResetAllForNewForm);
+    on<HomeShowFormCompletedScreen>(_onHomeShowFormCompletedScreen);
   }
 
   // ======= HANDLERS PARA GESTIÓN DE FORMULARIOS =======
@@ -355,11 +361,21 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         isLoadingForms: false,
         mostrarEventosRiesgo: false,
         mostrarCategoriasRiesgo: false,
+        mostrarFormularioCompletado: false,
       ));
       
       print('HomeBloc: Estado completamente reseteado para nuevo formulario');
     } catch (e) {
       print('HomeBloc: Error al resetear estado para nuevo formulario - $e');
     }
+  }
+
+  void _onHomeShowFormCompletedScreen(HomeShowFormCompletedScreen event, Emitter<HomeState> emit) {
+    emit(state.copyWith(
+      mostrarFormularioCompletado: true,
+      mostrarEventosRiesgo: false,
+      mostrarCategoriasRiesgo: false,
+    ));
+    print('HomeBloc: Mostrando pantalla de formulario completado');
   }
 }

@@ -5,6 +5,7 @@ class HomeState extends Equatable {
   final int selectedIndex;
   final bool mostrarEventosRiesgo;
   final bool mostrarCategoriasRiesgo;
+  final bool mostrarFormularioCompletado;
   final bool tutorialShown;
   final bool showTutorial;
   final bool notificationsEnabled;
@@ -27,6 +28,7 @@ class HomeState extends Equatable {
     required this.selectedIndex,
     required this.mostrarEventosRiesgo,
     required this.mostrarCategoriasRiesgo,
+    required this.mostrarFormularioCompletado,
     required this.tutorialShown,
     this.showTutorial = true,
     this.notificationsEnabled = true,
@@ -46,6 +48,7 @@ class HomeState extends Equatable {
     int? selectedIndex,
     bool? mostrarEventosRiesgo,
     bool? mostrarCategoriasRiesgo,
+    bool? mostrarFormularioCompletado,
     bool? tutorialShown,
     bool? showTutorial,
     bool? notificationsEnabled,
@@ -64,6 +67,7 @@ class HomeState extends Equatable {
       selectedIndex: selectedIndex ?? this.selectedIndex,
       mostrarEventosRiesgo: mostrarEventosRiesgo ?? this.mostrarEventosRiesgo,
       mostrarCategoriasRiesgo: mostrarCategoriasRiesgo ?? this.mostrarCategoriasRiesgo,
+      mostrarFormularioCompletado: mostrarFormularioCompletado ?? this.mostrarFormularioCompletado,
       tutorialShown: tutorialShown ?? this.tutorialShown,
       showTutorial: showTutorial ?? this.showTutorial,
       notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
@@ -85,6 +89,7 @@ class HomeState extends Equatable {
         selectedIndex,
         mostrarEventosRiesgo,
         mostrarCategoriasRiesgo,
+        mostrarFormularioCompletado,
         tutorialShown,
         showTutorial,
         notificationsEnabled,

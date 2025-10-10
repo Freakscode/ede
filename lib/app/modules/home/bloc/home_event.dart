@@ -175,3 +175,8 @@ class SaveRiskEventModel extends HomeEvent {
 
 /// Resetear completamente todo el estado para crear un nuevo formulario
 class ResetAllForNewForm extends HomeEvent {}
+
+/// Mostrar la pantalla de formulario completado
+class HomeShowFormCompletedScreen extends HomeEvent {
+  const HomeShowFormCompletedScreen();
+}

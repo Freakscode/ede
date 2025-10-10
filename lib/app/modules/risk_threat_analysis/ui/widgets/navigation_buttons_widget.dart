@@ -157,9 +157,8 @@ class NavigationButtonsWidget extends StatelessWidget {
                                   ),
                                 );
                                 
-                                // Navegar a la pantalla de formularios
-                                final navigationData = {'showForms': true};
-                                context.go('/home', extra: navigationData);
+                                // Navegar a la pantalla de formulario completado
+                                homeBloc.add(HomeShowFormCompletedScreen());
                               }
                             }
                           },
