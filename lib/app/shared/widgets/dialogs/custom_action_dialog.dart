@@ -106,7 +106,7 @@ class CustomActionDialog extends StatelessWidget {
                     onPressed:
                         onLeftButtonPressed ??
                         () => Navigator.of(context).pop(),
-                    icon: Icon(leftButtonIcon, size: 16, color: Colors.black),
+                    icon: Icon(leftButtonIcon, size: 20, color: Colors.black),
                     label: Text(
                       leftButtonText,
                       textAlign: TextAlign.center,
@@ -135,7 +135,7 @@ class CustomActionDialog extends StatelessWidget {
                     onPressed:
                         onRightButtonPressed ??
                         () => Navigator.of(context).pop(),
-                    icon: Icon(rightButtonIcon, size: 16, color: Colors.white),
+                    icon: Icon(rightButtonIcon, size: 20, color: Colors.white),
                     label: Text(
                       rightButtonText,
                       textAlign: TextAlign.center,

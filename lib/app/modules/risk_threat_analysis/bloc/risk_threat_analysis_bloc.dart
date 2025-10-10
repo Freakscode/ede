@@ -108,7 +108,17 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     ResetDropdowns event,
     Emitter<RiskThreatAnalysisState> emit,
   ) {
+    print('=== RiskThreatAnalysisBloc: ResetDropdowns ejecutado ===');
+    print('Estado anterior: ${state.toString()}');
+    print('Estado anterior - dynamicSelections: ${state.dynamicSelections}');
+    print('Estado anterior - probabilidadSelections: ${state.probabilidadSelections}');
+    print('Estado anterior - intensidadSelections: ${state.intensidadSelections}');
+    
+    // Reset completo a estado inicial
     emit(const RiskThreatAnalysisState());
+    
+    print('Estado nuevo: Estado inicial completamente limpio');
+    print('=== Fin ResetDropdowns ===');
   }
 
   void _onChangeBottomNavIndex(
@@ -1493,6 +1503,10 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     LoadFormData event,
     Emitter<RiskThreatAnalysisState> emit,
   ) {
+    print('=== _onLoadFormData DEBUG ===');
+    print('Event: ${event.eventName}_${event.classificationType}');
+    print('FormData recibido: ${event.formData}');
+    
     // Cargar las selecciones dinámicas
     final dynamicSelections = Map<String, Map<String, String>>.from(event.formData['dynamicSelections'] ?? {});
     
@@ -1516,6 +1530,15 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     final selectedProbabilidad = event.formData['selectedProbabilidad'] as String?;
     final selectedIntensidad = event.formData['selectedIntensidad'] as String?;
     
+    print('Datos procesados:');
+    print('  - dynamicSelections: $dynamicSelections');
+    print('  - probabilidadSelections: $probabilidadSelections');
+    print('  - intensidadSelections: $intensidadSelections');
+    print('  - selectedProbabilidad: $selectedProbabilidad');
+    print('  - selectedIntensidad: $selectedIntensidad');
+    print('  - subClassificationScores: $subClassificationScores');
+    print('=== FIN _onLoadFormData DEBUG ===');
+    
     emit(state.copyWith(
       dynamicSelections: dynamicSelections,
       subClassificationScores: subClassificationScores,
@@ -1527,11 +1550,7 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
       isLoading: false,
     ));
     
-    print('Datos del formulario cargados para: ${event.eventName}_${event.classificationType}');
-    print('selectedProbabilidad: $selectedProbabilidad');
-    print('selectedIntensidad: $selectedIntensidad');
-    print('subClassificationScores: $subClassificationScores');
-    print('subClassificationColors: $subClassificationColors');
+    print('Estado actualizado con datos del formulario para: ${event.eventName}_${event.classificationType}');
   }
 
   /// Guarda datos actuales del formulario
@@ -1571,6 +1590,86 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
       'selectedProbabilidad': state.selectedProbabilidad,
       'selectedIntensidad': state.selectedIntensidad,
     };
+  }
+
+  /// Valida si hay variables sin calificar en la clasificación actual
+  bool hasUnqualifiedVariables() {
+    final classification = state.selectedClassification.toLowerCase();
+    
+    if (classification == 'amenaza') {
+      // Para amenaza, verificar probabilidad e intensidad
+      final probabilidadSelections = state.probabilidadSelections;
+      final intensidadSelections = state.intensidadSelections;
+      
+      // Obtener el evento de riesgo para acceder a las categorías
+      final riskEvent = RiskEventFactory.getEventByName(state.selectedRiskEvent);
+      if (riskEvent == null) return false;
+      
+      final amenazaClassifications = riskEvent.classifications
+          .where((c) => c.name.toLowerCase() == 'amenaza')
+          .toList();
+      
+      if (amenazaClassifications.isNotEmpty) {
+        final amenazaClassification = amenazaClassifications.first;
+        final probabilidadSubClass = amenazaClassification.subClassifications
+            .where((sc) => sc.id == 'probabilidad')
+            .firstOrNull;
+        final intensidadSubClass = amenazaClassification.subClassifications
+            .where((sc) => sc.id == 'intensidad')
+            .firstOrNull;
+        
+        if (probabilidadSubClass != null) {
+          // Verificar que todas las categorías de probabilidad estén calificadas
+          for (final category in probabilidadSubClass.categories) {
+            if (!probabilidadSelections.containsKey(category.title)) {
+              print('RiskThreatAnalysisBloc: Variable sin calificar en Probabilidad: ${category.title}');
+              return true;
+            }
+          }
+        }
+        
+        if (intensidadSubClass != null) {
+          // Verificar que todas las categorías de intensidad estén calificadas
+          for (final category in intensidadSubClass.categories) {
+            if (!intensidadSelections.containsKey(category.title)) {
+              print('RiskThreatAnalysisBloc: Variable sin calificar en Intensidad: ${category.title}');
+              return true;
+            }
+          }
+        }
+      }
+      
+    } else if (classification == 'vulnerabilidad') {
+      // Para vulnerabilidad, verificar todas las subclasificaciones dinámicas
+      final dynamicSelections = state.dynamicSelections;
+      
+      // Obtener el evento de riesgo para acceder a las categorías
+      final riskEvent = RiskEventFactory.getEventByName(state.selectedRiskEvent);
+      if (riskEvent == null) return false;
+      
+      final vulnerabilidadClassifications = riskEvent.classifications
+          .where((c) => c.name.toLowerCase() == 'vulnerabilidad')
+          .toList();
+      
+      if (vulnerabilidadClassifications.isNotEmpty) {
+        final vulnerabilidadClassification = vulnerabilidadClassifications.first;
+        
+        // Verificar todas las subclasificaciones de vulnerabilidad
+        for (final subClass in vulnerabilidadClassification.subClassifications) {
+          final subClassSelections = dynamicSelections[subClass.id] ?? {};
+          
+          // Verificar que todas las categorías de esta subclasificación estén calificadas
+          for (final category in subClass.categories) {
+            if (!subClassSelections.containsKey(category.title)) {
+              print('RiskThreatAnalysisBloc: Variable sin calificar en Vulnerabilidad - ${subClass.name}: ${category.title}');
+              return true;
+            }
+          }
+        }
+      }
+    }
+    
+    return false; // Todas las variables están calificadas
   }
 
   @override

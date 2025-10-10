@@ -131,7 +131,9 @@ class _HomeMainSectionState extends State<HomeMainSection> {
         return FormsInProgressDialog(
           pendingFormsCount: pendingFormsCount,
           onViewForms: () {
-            context.go('/home_forms');
+            if (context.mounted) {
+                context.read<HomeBloc>().add(HomeNavBarTapped(2));
+              }
           },
           onCreateNew: () {
             context.read<HomeBloc>().add(ResetAllForNewForm());

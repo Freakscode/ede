@@ -4,9 +4,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:caja_herramientas/app/core/icons/app_icons.dart';
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import 'package:caja_herramientas/app/shared/services/form_persistence_service.dart';
-import 'package:caja_herramientas/app/shared/models/persistent_form_data_model.dart';
+import 'package:caja_herramientas/app/shared/models/complete_form_data_model.dart';
+import 'package:caja_herramientas/app/shared/widgets/dialogs/custom_action_dialog.dart';
 import '../../bloc/risk_threat_analysis_bloc.dart';
 import '../../bloc/risk_threat_analysis_state.dart';
+import '../../../home/bloc/home_bloc.dart';
+import '../../../home/bloc/home_event.dart';
 
 class SaveProgressButton extends StatelessWidget {
   final VoidCallback? onPressed;
@@ -59,50 +62,224 @@ class SaveProgressButton extends StatelessWidget {
   void _showProgressInfo(BuildContext context) async {
     final bloc = context.read<RiskThreatAnalysisBloc>();
     final state = bloc.state;
-    
+    final homeBloc = context.read<HomeBloc>();
+    final homeState = homeBloc.state;
+
+    print('=== SaveProgressButton: Iniciando guardado ===');
+    print('Evento seleccionado: ${state.selectedRiskEvent}');
+    print('Clasificación seleccionada: ${state.selectedClassification}');
+    print('isCreatingNew: ${homeState.isCreatingNew}');
+    print('activeFormId: ${homeState.activeFormId}');
+
     try {
+      final persistenceService = FormPersistenceService();
+
       // Obtener datos actuales del formulario
       final formData = bloc.getCurrentFormData();
-      
-      // Crear PersistentFormDataModel
+      print('FormData obtenido: $formData');
+
+      // Crear ID único para el formulario completo
+      final formId =
+          '${state.selectedRiskEvent}_complete_${DateTime.now().millisecondsSinceEpoch}';
+      print('FormID generado: $formId');
+
+      CompleteFormDataModel completeForm;
       final now = DateTime.now();
-      final formModel = PersistentFormDataModel(
-        id: '${state.selectedRiskEvent}_${state.selectedClassification}_${now.millisecondsSinceEpoch}',
-        eventName: state.selectedRiskEvent,
-        classificationType: state.selectedClassification,
-        dynamicSelections: formData['dynamicSelections'] ?? {},
-        subClassificationScores: formData['subClassificationScores'] ?? {},
-        subClassificationColors: formData['subClassificationColors'] ?? {},
-        probabilidadSelections: formData['probabilidadSelections'] ?? {},
-        intensidadSelections: formData['intensidadSelections'] ?? {},
-        selectedProbabilidad: formData['selectedProbabilidad'],
-        selectedIntensidad: formData['selectedIntensidad'],
-        createdAt: now,
-        updatedAt: now,
-      );
-      
-      // Guardar en SQLite
-      final persistenceService = FormPersistenceService();
-      await persistenceService.saveForm(formModel);
-      
-      // Establecer como formulario activo
-      await persistenceService.setActiveFormId(formModel.id);
-      
+
+      // Si estamos creando un nuevo formulario, siempre crear uno nuevo
+      if (homeState.isCreatingNew || homeState.activeFormId == null) {
+        print('SaveProgressButton: Creando nuevo formulario (isCreatingNew: ${homeState.isCreatingNew})');
+        
+        completeForm = CompleteFormDataModel(
+          id: formId,
+          eventName: state.selectedRiskEvent,
+          amenazaSelections:
+              state.selectedClassification.toLowerCase() == 'amenaza'
+              ? (formData['dynamicSelections'] ?? {})
+              : {},
+          amenazaScores: state.selectedClassification.toLowerCase() == 'amenaza'
+              ? (formData['subClassificationScores'] ?? {})
+              : {},
+          amenazaColors: state.selectedClassification.toLowerCase() == 'amenaza'
+              ? (formData['subClassificationColors'] ?? {})
+              : {},
+          amenazaProbabilidadSelections:
+              state.selectedClassification.toLowerCase() == 'amenaza'
+              ? (formData['probabilidadSelections'] ?? {})
+              : {},
+          amenazaIntensidadSelections:
+              state.selectedClassification.toLowerCase() == 'amenaza'
+              ? (formData['intensidadSelections'] ?? {})
+              : {},
+          amenazaSelectedProbabilidad:
+              state.selectedClassification.toLowerCase() == 'amenaza'
+              ? formData['selectedProbabilidad']
+              : null,
+          amenazaSelectedIntensidad:
+              state.selectedClassification.toLowerCase() == 'amenaza'
+              ? formData['selectedIntensidad']
+              : null,
+          vulnerabilidadSelections:
+              state.selectedClassification.toLowerCase() == 'vulnerabilidad'
+              ? (formData['dynamicSelections'] ?? {})
+              : {},
+          vulnerabilidadScores:
+              state.selectedClassification.toLowerCase() == 'vulnerabilidad'
+              ? (formData['subClassificationScores'] ?? {})
+              : {},
+          vulnerabilidadColors:
+              state.selectedClassification.toLowerCase() == 'vulnerabilidad'
+              ? (formData['subClassificationColors'] ?? {})
+              : {},
+          vulnerabilidadProbabilidadSelections:
+              state.selectedClassification.toLowerCase() == 'vulnerabilidad'
+              ? (formData['probabilidadSelections'] ?? {})
+              : {},
+          vulnerabilidadIntensidadSelections:
+              state.selectedClassification.toLowerCase() == 'vulnerabilidad'
+              ? (formData['intensidadSelections'] ?? {})
+              : {},
+          vulnerabilidadSelectedProbabilidad:
+              state.selectedClassification.toLowerCase() == 'vulnerabilidad'
+              ? formData['selectedProbabilidad']
+              : null,
+          vulnerabilidadSelectedIntensidad:
+              state.selectedClassification.toLowerCase() == 'vulnerabilidad'
+              ? formData['selectedIntensidad']
+              : null,
+          createdAt: now,
+          updatedAt: now,
+        );
+      } else {
+        // Estamos editando un formulario existente
+        print('SaveProgressButton: Editando formulario existente ${homeState.activeFormId}');
+        
+        // Obtener el formulario existente por ID
+        final existingForm = await persistenceService.getCompleteForm(homeState.activeFormId!);
+        if (existingForm == null) {
+          throw Exception('No se encontró el formulario existente con ID: ${homeState.activeFormId}');
+        }
+
+        completeForm = existingForm;
+
+        // Actualizar según la clasificación actual
+        if (state.selectedClassification.toLowerCase() == 'amenaza') {
+          completeForm = completeForm.copyWith(
+            amenazaSelections:
+                formData['dynamicSelections'] ?? completeForm.amenazaSelections,
+            amenazaScores:
+                formData['subClassificationScores'] ??
+                completeForm.amenazaScores,
+            amenazaColors:
+                formData['subClassificationColors'] ??
+                completeForm.amenazaColors,
+            amenazaProbabilidadSelections:
+                formData['probabilidadSelections'] ??
+                completeForm.amenazaProbabilidadSelections,
+            amenazaIntensidadSelections:
+                formData['intensidadSelections'] ??
+                completeForm.amenazaIntensidadSelections,
+            amenazaSelectedProbabilidad:
+                formData['selectedProbabilidad'] ??
+                completeForm.amenazaSelectedProbabilidad,
+            amenazaSelectedIntensidad:
+                formData['selectedIntensidad'] ??
+                completeForm.amenazaSelectedIntensidad,
+            updatedAt: now,
+          );
+        } else if (state.selectedClassification.toLowerCase() ==
+            'vulnerabilidad') {
+          completeForm = completeForm.copyWith(
+            vulnerabilidadSelections:
+                formData['dynamicSelections'] ??
+                completeForm.vulnerabilidadSelections,
+            vulnerabilidadScores:
+                formData['subClassificationScores'] ??
+                completeForm.vulnerabilidadScores,
+            vulnerabilidadColors:
+                formData['subClassificationColors'] ??
+                completeForm.vulnerabilidadColors,
+            vulnerabilidadProbabilidadSelections:
+                formData['probabilidadSelections'] ??
+                completeForm.vulnerabilidadProbabilidadSelections,
+            vulnerabilidadIntensidadSelections:
+                formData['intensidadSelections'] ??
+                completeForm.vulnerabilidadIntensidadSelections,
+            vulnerabilidadSelectedProbabilidad:
+                formData['selectedProbabilidad'] ??
+                completeForm.vulnerabilidadSelectedProbabilidad,
+            vulnerabilidadSelectedIntensidad:
+                formData['selectedIntensidad'] ??
+                completeForm.vulnerabilidadSelectedIntensidad,
+            updatedAt: now,
+          );
+        }
+      }
+
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Progreso guardado exitosamente'),
-            duration: Duration(seconds: 2),
-            backgroundColor: Colors.green,
-          ),
+        CustomActionDialog.show(
+          context: context,
+          title: 'Guardar borrador',
+          message:
+              '¿Está seguro que desea guardar un borrador de este formulario? Podrá continuar más tarde.',
+          leftButtonText: 'Cancelar',
+          leftButtonIcon: Icons.close,
+          rightButtonText: 'Guardar',
+          rightButtonIcon: Icons.check,
+          onRightButtonPressed: () async {
+            print('=== SaveProgressButton: Usuario confirmó guardado ===');
+            print('Formulario a guardar: ${completeForm.id}');
+            
+            try {
+              // Guardar formulario completo
+              await persistenceService.saveCompleteForm(completeForm);
+              print('SaveProgressButton: Formulario guardado en base de datos');
+
+              // Establecer como formulario activo
+              await persistenceService.setActiveFormId(completeForm.id);
+              print('SaveProgressButton: Formulario activo establecido');
+
+              // Si era un formulario nuevo, actualizar el estado del HomeBloc
+              if (homeState.isCreatingNew) {
+                homeBloc.add(SetActiveFormId(completeForm.id, isCreatingNew: false));
+                print('SaveProgressButton: Actualizando HomeBloc - isCreatingNew: false');
+              }
+
+              print(
+                'SaveProgressButton: Formulario completo guardado exitosamente - ${completeForm.id} (${state.selectedClassification})',
+              );
+
+              Navigator.of(context).pop();
+
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Progreso guardado exitosamente'),
+                    duration: Duration(seconds: 2),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+              }
+            } catch (e) {
+              print('SaveProgressButton: Error en onRightButtonPressed - $e');
+              Navigator.of(context).pop();
+              
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Error al guardar: $e'),
+                    duration: const Duration(seconds: 3),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+            }
+          },
         );
       }
-      
-      print('SaveProgressButton: Formulario guardado en SQLite - ${formModel.id}');
-      
     } catch (e) {
       print('SaveProgressButton: Error al guardar progreso - $e');
-      
+
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

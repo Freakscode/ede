@@ -5,6 +5,7 @@ class HomeState extends Equatable {
   final int selectedIndex;
   final bool mostrarEventosRiesgo;
   final bool mostrarCategoriasRiesgo;
+  final bool mostrarFormularioCompletado;
   final bool tutorialShown;
   final bool showTutorial;
   final bool notificationsEnabled;
@@ -18,6 +19,7 @@ class HomeState extends Equatable {
   final List<FormDataModel> savedForms;
   final bool isLoadingForms;
   final String? activeFormId;
+  final bool isCreatingNew; // true = crear nuevo, false = editar existente
   
   // ======= CAMPOS PARA GUARDAR RISKEVENTMODEL =======
   final Map<String, Map<String, dynamic>> savedRiskEventModels; // Guardar RiskEventModel por evento y clasificación
@@ -26,6 +28,7 @@ class HomeState extends Equatable {
     required this.selectedIndex,
     required this.mostrarEventosRiesgo,
     required this.mostrarCategoriasRiesgo,
+    required this.mostrarFormularioCompletado,
     required this.tutorialShown,
     this.showTutorial = true,
     this.notificationsEnabled = true,
@@ -37,6 +40,7 @@ class HomeState extends Equatable {
     this.savedForms = const [],
     this.isLoadingForms = false,
     this.activeFormId,
+    this.isCreatingNew = true, // Por defecto, crear nuevo
     this.savedRiskEventModels = const {},
   });
 
@@ -44,6 +48,7 @@ class HomeState extends Equatable {
     int? selectedIndex,
     bool? mostrarEventosRiesgo,
     bool? mostrarCategoriasRiesgo,
+    bool? mostrarFormularioCompletado,
     bool? tutorialShown,
     bool? showTutorial,
     bool? notificationsEnabled,
@@ -55,12 +60,14 @@ class HomeState extends Equatable {
     List<FormDataModel>? savedForms,
     bool? isLoadingForms,
     String? activeFormId,
+    bool? isCreatingNew,
     Map<String, Map<String, dynamic>>? savedRiskEventModels,
   }) {
     return HomeState(
       selectedIndex: selectedIndex ?? this.selectedIndex,
       mostrarEventosRiesgo: mostrarEventosRiesgo ?? this.mostrarEventosRiesgo,
       mostrarCategoriasRiesgo: mostrarCategoriasRiesgo ?? this.mostrarCategoriasRiesgo,
+      mostrarFormularioCompletado: mostrarFormularioCompletado ?? this.mostrarFormularioCompletado,
       tutorialShown: tutorialShown ?? this.tutorialShown,
       showTutorial: showTutorial ?? this.showTutorial,
       notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
@@ -72,6 +79,7 @@ class HomeState extends Equatable {
       savedForms: savedForms ?? this.savedForms,
       isLoadingForms: isLoadingForms ?? this.isLoadingForms,
       activeFormId: activeFormId ?? this.activeFormId,
+      isCreatingNew: isCreatingNew ?? this.isCreatingNew,
       savedRiskEventModels: savedRiskEventModels ?? this.savedRiskEventModels,
     );
   }
@@ -81,6 +89,7 @@ class HomeState extends Equatable {
         selectedIndex,
         mostrarEventosRiesgo,
         mostrarCategoriasRiesgo,
+        mostrarFormularioCompletado,
         tutorialShown,
         showTutorial,
         notificationsEnabled,
@@ -89,10 +98,11 @@ class HomeState extends Equatable {
         selectedRiskEvent,
         selectedRiskCategory,
         completedEvaluations,
-        savedForms,
-        isLoadingForms,
-        activeFormId,
-        savedRiskEventModels,
+    savedForms,
+    isLoadingForms,
+    activeFormId,
+    isCreatingNew,
+    savedRiskEventModels,
       ];
 
   // Métodos de conveniencia para filtrar formularios

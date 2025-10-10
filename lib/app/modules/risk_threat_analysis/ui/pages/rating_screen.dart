@@ -42,19 +42,29 @@ class _RatingScreenState extends State<RatingScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (widget.navigationData != null) {
         final data = widget.navigationData!;
-        final eventToSet = data['event'] as String?;
-        final classificationToSet = data['classification'] as String?;
+        final forceReset = data['forceReset'] as bool? ?? false;
+        final isNewForm = data['isNewForm'] as bool? ?? false;
         
-        if (eventToSet != null) {
-          context.read<RiskThreatAnalysisBloc>().add(
-            UpdateSelectedRiskEvent(eventToSet)
-          );
-        }
-        
-        if (classificationToSet != null) {
-          context.read<RiskThreatAnalysisBloc>().add(
-            SelectClassification(classificationToSet)
-          );
+        // Solo procesar navigationData si NO es un formulario nuevo
+        if (!forceReset && !isNewForm) {
+          final eventToSet = data['event'] as String?;
+          final classificationToSet = data['classification'] as String?;
+          
+          print('RatingScreen: Procesando navigationData - event: $eventToSet, classification: $classificationToSet');
+          
+          if (eventToSet != null) {
+            context.read<RiskThreatAnalysisBloc>().add(
+              UpdateSelectedRiskEvent(eventToSet)
+            );
+          }
+          
+          if (classificationToSet != null) {
+            context.read<RiskThreatAnalysisBloc>().add(
+              SelectClassification(classificationToSet)
+            );
+          }
+        } else {
+          print('RatingScreen: Formulario nuevo detectado - NO procesando navigationData');
         }
       }
     });

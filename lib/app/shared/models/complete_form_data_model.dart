@@ -25,6 +25,7 @@ class CompleteFormDataModel extends Equatable {
   
   final DateTime createdAt;
   final DateTime updatedAt;
+  final bool isExplicitlyCompleted; // Indica si el formulario fue explícitamente marcado como completado
 
   const CompleteFormDataModel({
     required this.id,
@@ -45,6 +46,7 @@ class CompleteFormDataModel extends Equatable {
     this.vulnerabilidadSelectedIntensidad,
     required this.createdAt,
     required this.updatedAt,
+    this.isExplicitlyCompleted = false, // Por defecto, no está explícitamente completado
   });
 
   CompleteFormDataModel copyWith({
@@ -66,6 +68,7 @@ class CompleteFormDataModel extends Equatable {
     String? vulnerabilidadSelectedIntensidad,
     DateTime? createdAt,
     DateTime? updatedAt,
+    bool? isExplicitlyCompleted,
   }) {
     return CompleteFormDataModel(
       id: id ?? this.id,
@@ -86,6 +89,7 @@ class CompleteFormDataModel extends Equatable {
       vulnerabilidadSelectedIntensidad: vulnerabilidadSelectedIntensidad ?? this.vulnerabilidadSelectedIntensidad,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      isExplicitlyCompleted: isExplicitlyCompleted ?? this.isExplicitlyCompleted,
     );
   }
 
@@ -120,6 +124,7 @@ class CompleteFormDataModel extends Equatable {
       'vulnerabilidadSelectedIntensidad': vulnerabilidadSelectedIntensidad,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
+      'isExplicitlyCompleted': isExplicitlyCompleted,
     };
   }
 
@@ -177,13 +182,14 @@ class CompleteFormDataModel extends Equatable {
       vulnerabilidadSelectedIntensidad: json['vulnerabilidadSelectedIntensidad'] as String?,
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
+      isExplicitlyCompleted: json['isExplicitlyCompleted'] as bool? ?? false,
     );
   }
 
   // Métodos de conveniencia para verificar el estado del formulario
   bool get isAmenazaCompleted => amenazaSelections.isNotEmpty;
   bool get isVulnerabilidadCompleted => vulnerabilidadSelections.isNotEmpty;
-  bool get isComplete => isAmenazaCompleted && isVulnerabilidadCompleted;
+  bool get isComplete => isExplicitlyCompleted; // Solo está completo si fue explícitamente marcado como tal
 
   @override
   List<Object?> get props => [
@@ -205,5 +211,6 @@ class CompleteFormDataModel extends Equatable {
     vulnerabilidadSelectedIntensidad,
     createdAt,
     updatedAt,
+    isExplicitlyCompleted,
   ];
 }

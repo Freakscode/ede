@@ -17,7 +17,22 @@ class HomeNavBarTapped extends HomeEvent {
 
 class HomeShowRiskEventsSection extends HomeEvent {}
 
-class HomeShowRiskCategoriesScreen extends HomeEvent {}
+class HomeShowRiskCategoriesScreen extends HomeEvent {
+  final String? eventName;
+  final bool loadSavedForm;
+  final String? formId;
+  final bool showProgressInfo;
+  
+  const HomeShowRiskCategoriesScreen(
+    this.eventName, {
+    this.loadSavedForm = false,
+    this.formId,
+    this.showProgressInfo = false,
+  });
+
+  @override
+  List<Object?> get props => [eventName, loadSavedForm, formId, showProgressInfo];
+}
 
 class SelectRiskEvent extends HomeEvent {
   final String eventName;
@@ -138,11 +153,12 @@ class CompleteForm extends HomeEvent {
   
 class SetActiveFormId extends HomeEvent {
   final String formId;
+  final bool isCreatingNew;
   
-  const SetActiveFormId(this.formId);
+  const SetActiveFormId(this.formId, {this.isCreatingNew = false});
 
   @override
-  List<Object?> get props => [formId];
+  List<Object?> get props => [formId, isCreatingNew];
 }
 
 /// Guardar un RiskEventModel completo cuando se completa una evaluación
@@ -159,3 +175,8 @@ class SaveRiskEventModel extends HomeEvent {
 
 /// Resetear completamente todo el estado para crear un nuevo formulario
 class ResetAllForNewForm extends HomeEvent {}
+
+/// Mostrar la pantalla de formulario completado
+class HomeShowFormCompletedScreen extends HomeEvent {
+  const HomeShowFormCompletedScreen();
+}

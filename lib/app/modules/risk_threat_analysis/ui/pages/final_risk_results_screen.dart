@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import '../../bloc/risk_threat_analysis_bloc.dart';
 import '../../bloc/risk_threat_analysis_state.dart';
 import '../widgets/risk_matrix_widget.dart';
@@ -200,10 +199,6 @@ class FinalRiskResultsScreen extends StatelessWidget {
 
               NavigationButtonsWidget(
                 currentIndex: state.currentBottomNavIndex,
-                onContinuePressed: () {
-                  
-                  context.go('/home');
-                },
               ),
 
               const SizedBox(height: 50),
