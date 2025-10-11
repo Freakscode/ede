@@ -21,6 +21,8 @@ class _LocationDialogState extends State<LocationDialog> {
   bool _isAutomaticSelected = true;
   String _currentLat = '4.609700';
   String _currentLng = '-74.081700';
+  final TextEditingController _latController = TextEditingController();
+  final TextEditingController _lngController = TextEditingController();
 
   @override
   void initState() {
@@ -29,6 +31,15 @@ class _LocationDialogState extends State<LocationDialog> {
       _currentLat = widget.initialLat!;
       _currentLng = widget.initialLng!;
     }
+    _latController.text = _currentLat;
+    _lngController.text = _currentLng;
+  }
+
+  @override
+  void dispose() {
+    _latController.dispose();
+    _lngController.dispose();
+    super.dispose();
   }
 
   @override
@@ -274,6 +285,102 @@ class _LocationDialogState extends State<LocationDialog> {
                       ),
                     ),
 
+                    // Campos de ubicación manual
+                    if (!_isAutomaticSelected) ...[
+                      const SizedBox(height: 20),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Campo Latitud
+                            const Text(
+                              'Latitud',
+                              style: TextStyle(
+                                color: Color(0xFF1E1E1E),
+                                fontFamily: 'Work Sans',
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            TextField(
+                              controller: _latController,
+                              keyboardType: TextInputType.numberWithOptions(
+                                decimal: true,
+                              ),
+                              decoration: InputDecoration(
+                                hintText: '6.244747',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(4),
+                                  borderSide: const BorderSide(
+                                    color: Color(0xFFE5E7EB),
+                                  ),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(4),
+                                  borderSide: const BorderSide(
+                                    color: Color(0xFF232B48),
+                                  ),
+                                ),
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 12,
+                                ),
+                              ),
+                              style: const TextStyle(
+                                color: Color(0xFF1E1E1E),
+                                fontFamily: 'Work Sans',
+                                fontSize: 14,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            // Campo Longitud
+                            const Text(
+                              'Longitud',
+                              style: TextStyle(
+                                color: Color(0xFF1E1E1E),
+                                fontFamily: 'Work Sans',
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            TextField(
+                              controller: _lngController,
+                              keyboardType: TextInputType.numberWithOptions(
+                                decimal: true,
+                              ),
+                              decoration: InputDecoration(
+                                hintText: '-75.573553',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(4),
+                                  borderSide: const BorderSide(
+                                    color: Color(0xFFE5E7EB),
+                                  ),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(4),
+                                  borderSide: const BorderSide(
+                                    color: Color(0xFF232B48),
+                                  ),
+                                ),
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 12,
+                                ),
+                              ),
+                              style: const TextStyle(
+                                color: Color(0xFF1E1E1E),
+                                fontFamily: 'Work Sans',
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+
                     // Botones y coordenadas
                     Padding(
                       padding: const EdgeInsets.all(20),
@@ -408,6 +515,9 @@ class _LocationDialogState extends State<LocationDialog> {
     setState(() {
       _currentLat = '4.609700';
       _currentLng = '-74.081700';
+      // Sincronizar con los campos manuales
+      _latController.text = _currentLat;
+      _lngController.text = _currentLng;
     });
 
     ScaffoldMessenger.of(context).showSnackBar(
@@ -419,6 +529,12 @@ class _LocationDialogState extends State<LocationDialog> {
   }
 
   void _saveLocation() {
+    // Si está en modo manual, usar los valores de los campos de entrada
+    if (!_isAutomaticSelected) {
+      _currentLat = _latController.text;
+      _currentLng = _lngController.text;
+    }
+
     if (widget.onLocationSelected != null) {
       widget.onLocationSelected!(_currentLat, _currentLng);
     }
