@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:app_settings/app_settings.dart';
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 
 class LocationDialog extends StatefulWidget {
@@ -465,24 +466,44 @@ class _LocationDialogState extends State<LocationDialog> {
 
   void _getCurrentLocation() async {
     try {
+      // Verificar si los servicios de ubicación están habilitados
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        _showLocationPermissionDialog(
+          'Servicios de ubicación deshabilitados',
+          'Para obtener tu ubicación actual, necesitas habilitar los servicios de ubicación en la configuración de tu dispositivo.',
+          false, // No se puede intentar de nuevo, debe ir a configuraciones
+        );
+        return;
+      }
+
       // Verificar permisos
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
-          _showErrorSnackBar('Permisos de ubicación denegados');
+          _showLocationPermissionDialog(
+            'Permisos de ubicación denegados',
+            'Para obtener tu ubicación actual, necesitas otorgar permisos de ubicación a la aplicación. ¿Deseas intentar de nuevo o ir a configuraciones?',
+            true, // Se puede intentar de nuevo
+          );
           return;
         }
       }
 
       if (permission == LocationPermission.deniedForever) {
-        _showErrorSnackBar('Los permisos de ubicación están permanentemente denegados');
+        _showLocationPermissionDialog(
+          'Permisos permanentemente denegados',
+          'Los permisos de ubicación han sido denegados permanentemente. Para usar esta función, debes habilitar los permisos manualmente en la configuración de la aplicación.',
+          false, // No se puede intentar de nuevo, debe ir a configuraciones
+        );
         return;
       }
 
       // Obtener ubicación actual
       Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
+        timeLimit: const Duration(seconds: 10), // Timeout de 10 segundos
       );
 
       setState(() {
@@ -503,12 +524,23 @@ class _LocationDialogState extends State<LocationDialog> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Ubicación actual obtenida'),
+          content: Text('Ubicación actual obtenida exitosamente'),
           backgroundColor: Colors.green,
+          duration: Duration(seconds: 2),
         ),
       );
+    } on TimeoutException {
+      _showLocationPermissionDialog(
+        'Tiempo de espera agotado',
+        'No se pudo obtener tu ubicación en el tiempo esperado. Verifica que tengas una buena señal GPS y que los permisos de ubicación estén habilitados.',
+        true, // Se puede intentar de nuevo
+      );
     } catch (e) {
-      _showErrorSnackBar('Error al obtener ubicación: $e');
+      _showLocationPermissionDialog(
+        'Error al obtener ubicación',
+        'Ocurrió un error al intentar obtener tu ubicación. Verifica que tengas una buena señal GPS y que los permisos de ubicación estén habilitados.',
+        true, // Se puede intentar de nuevo
+      );
     }
   }
 
@@ -586,12 +618,112 @@ class _LocationDialogState extends State<LocationDialog> {
     });
   }
 
-  void _showErrorSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red,
-      ),
+  void _showLocationPermissionDialog(String title, String message, bool canRequestAgain) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          title: Text(
+            title,
+            style: const TextStyle(
+              color: Color(0xFF1E1E1E),
+              fontFamily: 'Work Sans',
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          content: Text(
+            message,
+            style: const TextStyle(
+              color: Color(0xFF6B7280),
+              fontFamily: 'Work Sans',
+              fontSize: 14,
+              height: 1.5,
+            ),
+          ),
+          actions: [
+            if (canRequestAgain) ...[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text(
+                  'Cancelar',
+                  style: TextStyle(
+                    color: Color(0xFF6B7280),
+                    fontFamily: 'Work Sans',
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  _getCurrentLocation(); // Intentar de nuevo
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF232B48),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                ),
+                child: const Text(
+                  'Intentar de nuevo',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontFamily: 'Work Sans',
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ] else ...[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text(
+                  'Entendido',
+                  style: TextStyle(
+                    color: Color(0xFF6B7280),
+                    fontFamily: 'Work Sans',
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  AppSettings.openAppSettings(type: AppSettingsType.location);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF232B48),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                ),
+                child: const Text(
+                  'Ir a configuraciones',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontFamily: 'Work Sans',
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
+          ],
+        );
+      },
     );
   }
 
