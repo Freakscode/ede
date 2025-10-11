@@ -23,6 +23,10 @@ class CompleteFormDataModel extends Equatable {
   final String? vulnerabilidadSelectedProbabilidad;
   final String? vulnerabilidadSelectedIntensidad;
   
+  // Datos de Evidencias
+  final Map<String, List<String>> evidenceImages; // categoría -> lista de rutas de imágenes
+  final Map<String, Map<int, Map<String, String>>> evidenceCoordinates; // categoría -> índice -> coordenadas
+  
   final DateTime createdAt;
   final DateTime updatedAt;
   final bool isExplicitlyCompleted; // Indica si el formulario fue explícitamente marcado como completado
@@ -44,6 +48,8 @@ class CompleteFormDataModel extends Equatable {
     required this.vulnerabilidadIntensidadSelections,
     this.vulnerabilidadSelectedProbabilidad,
     this.vulnerabilidadSelectedIntensidad,
+    required this.evidenceImages,
+    required this.evidenceCoordinates,
     required this.createdAt,
     required this.updatedAt,
     this.isExplicitlyCompleted = false, // Por defecto, no está explícitamente completado
@@ -66,6 +72,8 @@ class CompleteFormDataModel extends Equatable {
     Map<String, String>? vulnerabilidadIntensidadSelections,
     String? vulnerabilidadSelectedProbabilidad,
     String? vulnerabilidadSelectedIntensidad,
+    Map<String, List<String>>? evidenceImages,
+    Map<String, Map<int, Map<String, String>>>? evidenceCoordinates,
     DateTime? createdAt,
     DateTime? updatedAt,
     bool? isExplicitlyCompleted,
@@ -87,6 +95,8 @@ class CompleteFormDataModel extends Equatable {
       vulnerabilidadIntensidadSelections: vulnerabilidadIntensidadSelections ?? this.vulnerabilidadIntensidadSelections,
       vulnerabilidadSelectedProbabilidad: vulnerabilidadSelectedProbabilidad ?? this.vulnerabilidadSelectedProbabilidad,
       vulnerabilidadSelectedIntensidad: vulnerabilidadSelectedIntensidad ?? this.vulnerabilidadSelectedIntensidad,
+      evidenceImages: evidenceImages ?? this.evidenceImages,
+      evidenceCoordinates: evidenceCoordinates ?? this.evidenceCoordinates,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       isExplicitlyCompleted: isExplicitlyCompleted ?? this.isExplicitlyCompleted,
@@ -122,6 +132,11 @@ class CompleteFormDataModel extends Equatable {
       'vulnerabilidadIntensidadSelections': vulnerabilidadIntensidadSelections,
       'vulnerabilidadSelectedProbabilidad': vulnerabilidadSelectedProbabilidad,
       'vulnerabilidadSelectedIntensidad': vulnerabilidadSelectedIntensidad,
+      'evidenceImages': evidenceImages,
+      'evidenceCoordinates': evidenceCoordinates.map((category, indexMap) => MapEntry(
+        category,
+        indexMap.map((index, coords) => MapEntry(index.toString(), coords)),
+      )),
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
       'isExplicitlyCompleted': isExplicitlyCompleted,
@@ -180,6 +195,30 @@ class CompleteFormDataModel extends Equatable {
       ),
       vulnerabilidadSelectedProbabilidad: json['vulnerabilidadSelectedProbabilidad'] as String?,
       vulnerabilidadSelectedIntensidad: json['vulnerabilidadSelectedIntensidad'] as String?,
+      evidenceImages: json['evidenceImages'] != null 
+          ? Map<String, List<String>>.from(
+              (json['evidenceImages'] as Map<String, dynamic>).map(
+                (key, value) => MapEntry(key, List<String>.from(value as List)),
+              ),
+            )
+          : {},
+      evidenceCoordinates: json['evidenceCoordinates'] != null
+          ? Map<String, Map<int, Map<String, String>>>.from(
+              (json['evidenceCoordinates'] as Map<String, dynamic>).map(
+                (key, value) => MapEntry(
+                  key, 
+                  Map<int, Map<String, String>>.from(
+                    (value as Map<String, dynamic>).map(
+                      (k, v) => MapEntry(
+                        int.parse(k), 
+                        Map<String, String>.from(v as Map<String, dynamic>),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            )
+          : {},
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
       isExplicitlyCompleted: json['isExplicitlyCompleted'] as bool? ?? false,
@@ -209,6 +248,8 @@ class CompleteFormDataModel extends Equatable {
     vulnerabilidadIntensidadSelections,
     vulnerabilidadSelectedProbabilidad,
     vulnerabilidadSelectedIntensidad,
+    evidenceImages,
+    evidenceCoordinates,
     createdAt,
     updatedAt,
     isExplicitlyCompleted,

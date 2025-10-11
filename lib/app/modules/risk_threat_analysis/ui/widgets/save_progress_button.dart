@@ -77,6 +77,16 @@ class SaveProgressButton extends StatelessWidget {
       // Obtener datos actuales del formulario
       final formData = bloc.getCurrentFormData();
       print('FormData obtenido: $formData');
+      print('EvidenceImages: ${formData['evidenceImages']}');
+      print('EvidenceCoordinates: ${formData['evidenceCoordinates']}');
+      print('EvidenceCoordinates type: ${formData['evidenceCoordinates'].runtimeType}');
+
+      // Convertir colores a valores enteros para serialización
+      final colorsData = formData['subClassificationColors'] as Map<String, Color>? ?? {};
+      final serializableColors = <String, Color>{};
+      colorsData.forEach((key, value) {
+        serializableColors[key] = value;
+      });
 
       // Crear ID único para el formulario completo
       final formId =
@@ -101,7 +111,7 @@ class SaveProgressButton extends StatelessWidget {
               ? (formData['subClassificationScores'] ?? {})
               : {},
           amenazaColors: state.selectedClassification.toLowerCase() == 'amenaza'
-              ? (formData['subClassificationColors'] ?? {})
+              ? serializableColors
               : {},
           amenazaProbabilidadSelections:
               state.selectedClassification.toLowerCase() == 'amenaza'
@@ -129,7 +139,7 @@ class SaveProgressButton extends StatelessWidget {
               : {},
           vulnerabilidadColors:
               state.selectedClassification.toLowerCase() == 'vulnerabilidad'
-              ? (formData['subClassificationColors'] ?? {})
+              ? serializableColors
               : {},
           vulnerabilidadProbabilidadSelections:
               state.selectedClassification.toLowerCase() == 'vulnerabilidad'
@@ -147,6 +157,8 @@ class SaveProgressButton extends StatelessWidget {
               state.selectedClassification.toLowerCase() == 'vulnerabilidad'
               ? formData['selectedIntensidad']
               : null,
+          evidenceImages: state.evidenceImages,
+          evidenceCoordinates: state.evidenceCoordinates,
           createdAt: now,
           updatedAt: now,
         );
@@ -171,8 +183,7 @@ class SaveProgressButton extends StatelessWidget {
                 formData['subClassificationScores'] ??
                 completeForm.amenazaScores,
             amenazaColors:
-                formData['subClassificationColors'] ??
-                completeForm.amenazaColors,
+                serializableColors.isNotEmpty ? serializableColors : completeForm.amenazaColors,
             amenazaProbabilidadSelections:
                 formData['probabilidadSelections'] ??
                 completeForm.amenazaProbabilidadSelections,
@@ -185,6 +196,8 @@ class SaveProgressButton extends StatelessWidget {
             amenazaSelectedIntensidad:
                 formData['selectedIntensidad'] ??
                 completeForm.amenazaSelectedIntensidad,
+            evidenceImages: state.evidenceImages,
+            evidenceCoordinates: state.evidenceCoordinates,
             updatedAt: now,
           );
         } else if (state.selectedClassification.toLowerCase() ==
@@ -197,8 +210,7 @@ class SaveProgressButton extends StatelessWidget {
                 formData['subClassificationScores'] ??
                 completeForm.vulnerabilidadScores,
             vulnerabilidadColors:
-                formData['subClassificationColors'] ??
-                completeForm.vulnerabilidadColors,
+                serializableColors.isNotEmpty ? serializableColors : completeForm.vulnerabilidadColors,
             vulnerabilidadProbabilidadSelections:
                 formData['probabilidadSelections'] ??
                 completeForm.vulnerabilidadProbabilidadSelections,
@@ -211,6 +223,8 @@ class SaveProgressButton extends StatelessWidget {
             vulnerabilidadSelectedIntensidad:
                 formData['selectedIntensidad'] ??
                 completeForm.vulnerabilidadSelectedIntensidad,
+            evidenceImages: state.evidenceImages,
+            evidenceCoordinates: state.evidenceCoordinates,
             updatedAt: now,
           );
         }
@@ -252,10 +266,10 @@ class SaveProgressButton extends StatelessWidget {
               Navigator.of(context).pop();
 
               if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
                     content: Text('Progreso guardado exitosamente'),
-                    duration: Duration(seconds: 2),
+        duration: Duration(seconds: 2),
                     backgroundColor: Colors.green,
                   ),
                 );

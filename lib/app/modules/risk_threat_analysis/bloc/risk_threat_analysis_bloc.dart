@@ -1537,6 +1537,12 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     final selectedProbabilidad = event.formData['selectedProbabilidad'] as String?;
     final selectedIntensidad = event.formData['selectedIntensidad'] as String?;
     
+    // Cargar evidencias
+    final evidenceImages = Map<String, List<String>>.from(event.formData['evidenceImages'] ?? {});
+    final evidenceCoordinates = Map<String, Map<int, Map<String, String>>>.from(
+      event.formData['evidenceCoordinates'] ?? {}
+    );
+    
     print('Datos procesados:');
     print('  - dynamicSelections: $dynamicSelections');
     print('  - probabilidadSelections: $probabilidadSelections');
@@ -1544,6 +1550,8 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     print('  - selectedProbabilidad: $selectedProbabilidad');
     print('  - selectedIntensidad: $selectedIntensidad');
     print('  - subClassificationScores: $subClassificationScores');
+    print('  - evidenceImages: $evidenceImages');
+    print('  - evidenceCoordinates: $evidenceCoordinates');
     print('=== FIN _onLoadFormData DEBUG ===');
     
     emit(state.copyWith(
@@ -1554,6 +1562,8 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
       intensidadSelections: intensidadSelections,
       selectedProbabilidad: selectedProbabilidad,
       selectedIntensidad: selectedIntensidad,
+      evidenceImages: evidenceImages,
+      evidenceCoordinates: evidenceCoordinates,
       isLoading: false,
     ));
     
@@ -1596,6 +1606,8 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
       'intensidadSelections': state.intensidadSelections,
       'selectedProbabilidad': state.selectedProbabilidad,
       'selectedIntensidad': state.selectedIntensidad,
+      'evidenceImages': state.evidenceImages,
+      'evidenceCoordinates': state.evidenceCoordinates,
     };
   }
 
