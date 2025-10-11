@@ -475,7 +475,10 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
       builder: (context) => LocationDialog(
         initialLat: currentCoordinates?['lat'],
         initialLng: currentCoordinates?['lng'],
+        imageIndex: imageIndex,
         onLocationSelected: (lat, lng) {
+          // El bloc ya maneja la actualización del estado
+          // Solo necesitamos actualizar el estado local si es necesario
           setState(() {
             _imageCoordinates[imageIndex] = {
               'lat': lat,

@@ -4,6 +4,7 @@ export 'dropdown_events.dart';
 export 'selection_events.dart';
 export 'form_events.dart';
 export 'risk_events.dart';
+export 'evidence_events.dart';
 
 import 'package:equatable/equatable.dart';
 

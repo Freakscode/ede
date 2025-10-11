@@ -22,6 +22,9 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     on<ShowFinalResults>(_onShowFinalResults);
     on<LoadFormData>(_onLoadFormData);
     on<SaveFormData>(_onSaveFormData);
+    on<UpdateImageCoordinates>(_onUpdateImageCoordinates);
+    on<GetCurrentLocationForImage>(_onGetCurrentLocationForImage);
+    on<SelectLocationFromMapForImage>(_onSelectLocationFromMapForImage);
   }
 
   void _onToggleProbabilidadDropdown(
@@ -1670,6 +1673,50 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     }
     
     return false; // Todas las variables están calificadas
+  }
+
+  void _onUpdateImageCoordinates(
+    UpdateImageCoordinates event,
+    Emitter<RiskThreatAnalysisState> emit,
+  ) {
+    final updatedCoordinates = Map<int, Map<String, String>>.from(state.imageCoordinates);
+    updatedCoordinates[event.imageIndex] = {
+      'lat': event.lat,
+      'lng': event.lng,
+    };
+    
+    emit(state.copyWith(imageCoordinates: updatedCoordinates));
+  }
+
+  void _onGetCurrentLocationForImage(
+    GetCurrentLocationForImage event,
+    Emitter<RiskThreatAnalysisState> emit,
+  ) async {
+    // Simular obtención de ubicación actual
+    // En una implementación real, aquí usarías Geolocator
+    const currentLat = '4.609700';
+    const currentLng = '-74.081700';
+    
+    final updatedCoordinates = Map<int, Map<String, String>>.from(state.imageCoordinates);
+    updatedCoordinates[event.imageIndex] = {
+      'lat': currentLat,
+      'lng': currentLng,
+    };
+    
+    emit(state.copyWith(imageCoordinates: updatedCoordinates));
+  }
+
+  void _onSelectLocationFromMapForImage(
+    SelectLocationFromMapForImage event,
+    Emitter<RiskThreatAnalysisState> emit,
+  ) {
+    final updatedCoordinates = Map<int, Map<String, String>>.from(state.imageCoordinates);
+    updatedCoordinates[event.imageIndex] = {
+      'lat': event.lat.toString(),
+      'lng': event.lng.toString(),
+    };
+    
+    emit(state.copyWith(imageCoordinates: updatedCoordinates));
   }
 
   @override
