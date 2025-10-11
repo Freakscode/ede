@@ -258,6 +258,8 @@ class RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
         print('  - Amenaza Selected Prob: ${completeForm.amenazaSelectedProbabilidad}');
         print('  - Amenaza Selected Int: ${completeForm.amenazaSelectedIntensidad}');
         print('  - Vulnerabilidad: ${completeForm.vulnerabilidadSelections}');
+        print('  - EvidenceImages: ${completeForm.evidenceImages}');
+        print('  - EvidenceCoordinates: ${completeForm.evidenceCoordinates}');
         
         // Obtener la clasificación actual del navigationData
         final classification = widget.navigationData?['classification'] as String? ?? 'amenaza';
@@ -275,6 +277,8 @@ class RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
             'intensidadSelections': completeForm.amenazaIntensidadSelections,
             'selectedProbabilidad': completeForm.amenazaSelectedProbabilidad,
             'selectedIntensidad': completeForm.amenazaSelectedIntensidad,
+            'evidenceImages': completeForm.evidenceImages,
+            'evidenceCoordinates': completeForm.evidenceCoordinates,
           };
           print('Cargando datos de AMENAZA');
         } else if (classification.toLowerCase() == 'vulnerabilidad') {
@@ -286,6 +290,8 @@ class RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
             'intensidadSelections': completeForm.vulnerabilidadIntensidadSelections,
             'selectedProbabilidad': completeForm.vulnerabilidadSelectedProbabilidad,
             'selectedIntensidad': completeForm.vulnerabilidadSelectedIntensidad,
+            'evidenceImages': completeForm.evidenceImages,
+            'evidenceCoordinates': completeForm.evidenceCoordinates,
           };
           print('Cargando datos de VULNERABILIDAD');
         } else {
@@ -298,6 +304,8 @@ class RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
             'intensidadSelections': completeForm.amenazaIntensidadSelections,
             'selectedProbabilidad': completeForm.amenazaSelectedProbabilidad,
             'selectedIntensidad': completeForm.amenazaSelectedIntensidad,
+            'evidenceImages': completeForm.evidenceImages,
+            'evidenceCoordinates': completeForm.evidenceCoordinates,
           };
           print('Cargando datos de AMENAZA (fallback)');
         }
@@ -355,12 +363,16 @@ class RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
           'intensidadSelections': completeForm.amenazaIntensidadSelections,
           'selectedProbabilidad': completeForm.amenazaSelectedProbabilidad,
           'selectedIntensidad': completeForm.amenazaSelectedIntensidad,
+          'evidenceImages': completeForm.evidenceImages,
+          'evidenceCoordinates': completeForm.evidenceCoordinates,
         };
         
         print('Datos combinados cargados para resultados finales:');
         print('  - Amenaza probabilidad: ${completeForm.amenazaProbabilidadSelections}');
         print('  - Amenaza intensidad: ${completeForm.amenazaIntensidadSelections}');
         print('  - Vulnerabilidad: ${completeForm.vulnerabilidadSelections}');
+        print('  - EvidenceImages: ${completeForm.evidenceImages}');
+        print('  - EvidenceCoordinates: ${completeForm.evidenceCoordinates}');
         
         // Cargar datos combinados en el bloc
         bloc.loadExistingFormData(
