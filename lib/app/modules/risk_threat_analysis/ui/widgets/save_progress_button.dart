@@ -81,6 +81,12 @@ class SaveProgressButton extends StatelessWidget {
       print('EvidenceCoordinates: ${formData['evidenceCoordinates']}');
       print('EvidenceCoordinates type: ${formData['evidenceCoordinates'].runtimeType}');
 
+      // Validar si hay imágenes sin georeferenciar
+      if (_hasUngeoreferencedImages(state)) {
+        _showUngeoreferencedImagesDialog(context);
+        return;
+      }
+
       // Convertir colores a valores enteros para serialización
       final colorsData = formData['subClassificationColors'] as Map<String, Color>? ?? {};
       final serializableColors = <String, Color>{};
@@ -300,9 +306,54 @@ class SaveProgressButton extends StatelessWidget {
             content: Text('Error al guardar progreso: $e'),
             duration: const Duration(seconds: 3),
             backgroundColor: Colors.red,
-          ),
-        );
-      }
+      ),
+    );
+  }
     }
   }
+
+  /// Verifica si hay imágenes sin georeferenciar
+  bool _hasUngeoreferencedImages(RiskThreatAnalysisState state) {
+    final evidenceImages = state.evidenceImages;
+    final evidenceCoordinates = state.evidenceCoordinates;
+
+    // Verificar cada categoría (amenaza, vulnerabilidad)
+    for (final category in evidenceImages.keys) {
+      final images = evidenceImages[category] ?? [];
+      final coordinates = evidenceCoordinates[category] ?? {};
+
+      // Si hay imágenes pero no todas tienen coordenadas
+      if (images.isNotEmpty) {
+        for (int i = 0; i < images.length; i++) {
+          if (!coordinates.containsKey(i)) {
+            print('Imagen sin georeferenciar encontrada: $category - índice $i');
+            return true;
+          }
+        }
+      }
+    }
+
+    return false;
+  }
+
+  /// Muestra el diálogo de advertencia para imágenes sin georeferenciar
+  void _showUngeoreferencedImagesDialog(BuildContext context) {
+    CustomActionDialog.show(
+      context: context,
+      title: 'Imágenes sin georeferenciar',
+      message: 'Debes georeferenciar todas las imágenes antes de poder guardar el formulario. Por favor, agrega las coordenadas a todas las imágenes.',
+      leftButtonText: 'Cancelar',
+      leftButtonIcon: Icons.close,
+      rightButtonText: 'Revisar',
+      rightButtonIcon: Icons.photo_camera,
+      onLeftButtonPressed: () {
+        Navigator.of(context).pop();
+      },
+      onRightButtonPressed: () {
+        Navigator.of(context).pop();
+      },
+    );
+  }
+
+
 }
