@@ -13,6 +13,7 @@ import '../widgets/info_note_widget.dart';
 import '../widgets/image_upload_area_widget.dart';
 import '../widgets/save_progress_button.dart';
 import 'package:caja_herramientas/app/shared/widgets/dialogs/location_dialog.dart';
+import '../../bloc/events/evidence_events.dart';
 
 class EvidenceScreen extends StatefulWidget {
   const EvidenceScreen({super.key});
@@ -22,8 +23,6 @@ class EvidenceScreen extends StatefulWidget {
 }
 
 class _EvidenceScreenState extends State<EvidenceScreen> {
-  final List<String> _imagePaths = [];
-  final Map<int, Map<String, String>> _imageCoordinates = {}; // Almacenar coordenadas por índice
   final int _maxImages = 3;
   final ImagePicker _picker = ImagePicker();
 
@@ -36,7 +35,7 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
           child: Column(
             children: [
               Text(
-                'Metodología de Análisis del Riesgo',
+                'Evidencia Fotográfica - ${state.selectedClassification.toUpperCase()}',
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   color: Color(0xFF232B48),
@@ -121,13 +120,13 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
                     const InfoNoteWidget(),
                     const SizedBox(height: 14),
                     ImageUploadAreaWidget(
-                      onSelectFromGallery: _selectFromGallery,
-                      onTakePhoto: _takePhoto,
+                      onSelectFromGallery: () => _selectFromGallery(state),
+                      onTakePhoto: () => _takePhoto(state),
                     ),
                     const SizedBox(height: 14),
 
-                    if (_imagePaths.isNotEmpty) ...[
-                      _buildUploadedImages(),
+                    if (_getCurrentCategoryImages(state).isNotEmpty) ...[
+                      _buildUploadedImages(state),
                       const SizedBox(height: 32),
                     ],
                   ],
@@ -150,19 +149,20 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
     );
   }
 
-  Widget _buildUploadedImages() {
+  Widget _buildUploadedImages(RiskThreatAnalysisState state) {
+    final currentImages = _getCurrentCategoryImages(state);
     return Wrap(
       spacing: 12,
       runSpacing: 12,
-      children: _imagePaths.asMap().entries.map((entry) {
+      children: currentImages.asMap().entries.map((entry) {
         final index = entry.key;
         final imagePath = entry.value;
-        return _buildImageThumbnail(imagePath, index);
+        return _buildImageThumbnail(imagePath, index, state);
       }).toList(),
     );
   }
 
-  Widget _buildImageThumbnail(String imagePath, int index) {
+  Widget _buildImageThumbnail(String imagePath, int index, RiskThreatAnalysisState state) {
     return Container(
       // width: 200,
       decoration: BoxDecoration(
@@ -214,7 +214,7 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
                   top: 8,
                   right: 8,
                   child: GestureDetector(
-                    onTap: () => _removeImage(index),
+                    onTap: () => _removeImage(index, state),
                     child: Container(
                       width: 18, // width: 18px
                       height: 18, // height: 18px
@@ -255,42 +255,43 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
                 const SizedBox(height: 8),
                 
                 // Mostrar botón "Georreferenciar imagen" si no hay coordenadas
-                if (!_imageCoordinates.containsKey(index) || 
-                    _imageCoordinates[index] == null) ...[
-                  SizedBox(
-                    width: double.infinity,
-                    height: 48, // height: 48px
-                    child: ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF232B48), // background: var(--AzulDAGRD, #232B48)
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(4), // border-radius: 4px
+                Builder(
+                  builder: (context) {
+                    final currentCoordinates = _getCurrentCategoryCoordinates(state)[index];
+                    if (currentCoordinates == null) {
+                      return SizedBox(
+                        width: double.infinity,
+                        height: 48, // height: 48px
+                        child: ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF232B48), // background: var(--AzulDAGRD, #232B48)
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(4), // border-radius: 4px
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10, // padding: 8px 10px
+                              vertical: 8,
+                            ),
+                          ),
+                          onPressed: () => _showLocationDialog(index, state),
+                          icon: const Icon(
+                            Icons.location_on_outlined, // icono de ubicación outline
+                            color: Colors.white,
+                            size: 20,
+                          ),
+                          label: const Text(
+                            'Georreferenciar imagen',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontFamily: 'Work Sans',
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
                         ),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10, // padding: 8px 10px
-                          vertical: 8,
-                        ),
-                      ),
-                      onPressed: () => _showLocationDialog(index),
-                      icon: const Icon(
-                        Icons.location_on_outlined, // icono de ubicación outline
-                        color: Colors.white,
-                        size: 20,
-                      ),
-                      label: const Text(
-                        'Georreferenciar imagen',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontFamily: 'Work Sans',
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ),
-                ] else ...[
-                  // Mostrar coordenadas si ya están definidas
-                  Row(
+                      );
+                    } else {
+                      return Row(
                     children: [
                       // Campo de texto con coordenadas
                       Expanded(
@@ -308,7 +309,7 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
                           child: Align(
                             alignment: Alignment.centerLeft,
                             child: Text(
-                              '${_imageCoordinates[index]!['lat']}, ${_imageCoordinates[index]!['lng']}',
+                              '${currentCoordinates['lat']}, ${currentCoordinates['lng']}',
                               style: const TextStyle(
                                 color: Color(0xFF374151),
                                 fontFamily: 'Work Sans',
@@ -323,7 +324,7 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
                       const SizedBox(width: 18),
                       // Botón de ubicación separado
                       GestureDetector(
-                        onTap: () => _showLocationDialog(index),
+                        onTap: () => _showLocationDialog(index, state),
                         child: Container(
                           height: 40,
                           width: 40,
@@ -341,8 +342,10 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
                         ),
                       ),
                     ],
-                  ),
-                ],
+                      );
+                    }
+                  },
+                ),
               ],
             ),
           ),
@@ -351,8 +354,9 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
     );
   }
 
-  void _selectFromGallery() async {
-    if (_imagePaths.length >= _maxImages) {
+  void _selectFromGallery(RiskThreatAnalysisState state) async {
+    final currentImages = _getCurrentCategoryImages(state);
+    if (currentImages.length >= _maxImages) {
       _showMaxImagesDialog();
       return;
     }
@@ -366,9 +370,12 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
       );
 
       if (image != null) {
-        setState(() {
-          _imagePaths.add(image.path);
-        });
+        context.read<RiskThreatAnalysisBloc>().add(
+          AddEvidenceImage(
+            category: state.selectedClassification.toLowerCase(),
+            imagePath: image.path,
+          ),
+        );
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -391,8 +398,9 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
     }
   }
 
-  void _takePhoto() async {
-    if (_imagePaths.length >= _maxImages) {
+  void _takePhoto(RiskThreatAnalysisState state) async {
+    final currentImages = _getCurrentCategoryImages(state);
+    if (currentImages.length >= _maxImages) {
       _showMaxImagesDialog();
       return;
     }
@@ -406,9 +414,12 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
       );
 
       if (image != null) {
-        setState(() {
-          _imagePaths.add(image.path);
-        });
+        context.read<RiskThreatAnalysisBloc>().add(
+          AddEvidenceImage(
+            category: state.selectedClassification.toLowerCase(),
+            imagePath: image.path,
+          ),
+        );
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -431,20 +442,13 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
     }
   }
 
-  void _removeImage(int index) {
-    setState(() {
-      _imagePaths.removeAt(index);
-      _imageCoordinates.remove(index);
-      // Reindexar coordenadas después de eliminar
-      final newCoordinates = <int, Map<String, String>>{};
-      for (int i = 0; i < _imagePaths.length; i++) {
-        if (_imageCoordinates.containsKey(i + 1)) {
-          newCoordinates[i] = _imageCoordinates[i + 1]!;
-        }
-      }
-      _imageCoordinates.clear();
-      _imageCoordinates.addAll(newCoordinates);
-    });
+  void _removeImage(int index, RiskThreatAnalysisState state) {
+    context.read<RiskThreatAnalysisBloc>().add(
+      RemoveEvidenceImage(
+        category: state.selectedClassification.toLowerCase(),
+        imageIndex: index,
+      ),
+    );
   }
 
   void _showMaxImagesDialog() {
@@ -467,8 +471,19 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
 
 
   /// Muestra el diálogo de ubicación
-  void _showLocationDialog(int imageIndex) {
-    final currentCoordinates = _imageCoordinates[imageIndex];
+  // Métodos helper para obtener datos de la categoría actual
+  List<String> _getCurrentCategoryImages(RiskThreatAnalysisState state) {
+    final category = state.selectedClassification.toLowerCase();
+    return state.evidenceImages[category] ?? [];
+  }
+
+  Map<int, Map<String, String>> _getCurrentCategoryCoordinates(RiskThreatAnalysisState state) {
+    final category = state.selectedClassification.toLowerCase();
+    return state.evidenceCoordinates[category] ?? {};
+  }
+
+  void _showLocationDialog(int imageIndex, RiskThreatAnalysisState state) {
+    final currentCoordinates = _getCurrentCategoryCoordinates(state)[imageIndex];
     
     showDialog(
       context: context,
@@ -476,15 +491,17 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
         initialLat: currentCoordinates?['lat'],
         initialLng: currentCoordinates?['lng'],
         imageIndex: imageIndex,
+        category: state.selectedClassification.toLowerCase(),
         onLocationSelected: (lat, lng) {
-          // El bloc ya maneja la actualización del estado
-          // Solo necesitamos actualizar el estado local si es necesario
-          setState(() {
-            _imageCoordinates[imageIndex] = {
-              'lat': lat,
-              'lng': lng,
-            };
-          });
+          // Actualizar coordenadas en el bloc
+          context.read<RiskThreatAnalysisBloc>().add(
+            UpdateEvidenceCoordinates(
+              category: state.selectedClassification.toLowerCase(),
+              imageIndex: imageIndex,
+              lat: lat,
+              lng: lng,
+            ),
+          );
           
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(

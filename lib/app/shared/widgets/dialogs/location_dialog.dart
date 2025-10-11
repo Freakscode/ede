@@ -11,6 +11,7 @@ class LocationDialog extends StatefulWidget {
   final String? initialLat;
   final String? initialLng;
   final int? imageIndex; // Para identificar qué imagen está siendo editada
+  final String? category; // Categoría de la imagen (amenaza/vulnerabilidad)
 
   const LocationDialog({
     super.key,
@@ -18,6 +19,7 @@ class LocationDialog extends StatefulWidget {
     this.initialLat,
     this.initialLng,
     this.imageIndex,
+    this.category,
   });
 
   @override
@@ -63,11 +65,14 @@ class _LocationDialogState extends State<LocationDialog> {
     return BlocConsumer<RiskThreatAnalysisBloc, RiskThreatAnalysisState>(
       listener: (context, state) {
         // Sincronizar coordenadas desde el bloc si hay cambios
-        if (widget.imageIndex != null) {
-          final coordinates = state.imageCoordinates[widget.imageIndex!];
-          if (coordinates != null) {
-            _latController.text = coordinates['lat'] ?? '';
-            _lngController.text = coordinates['lng'] ?? '';
+        if (widget.imageIndex != null && widget.category != null) {
+          final categoryCoordinates = state.evidenceCoordinates[widget.category!];
+          if (categoryCoordinates != null) {
+            final coordinates = categoryCoordinates[widget.imageIndex!];
+            if (coordinates != null) {
+              _latController.text = coordinates['lat'] ?? '';
+              _lngController.text = coordinates['lng'] ?? '';
+            }
           }
         }
       },
@@ -525,9 +530,10 @@ class _LocationDialogState extends State<LocationDialog> {
     final lng = _isAutomaticSelected ? _lngController.text : _lngController.text;
     
     // Actualizar el bloc existente
-    if (widget.imageIndex != null) {
+    if (widget.imageIndex != null && widget.category != null) {
       context.read<RiskThreatAnalysisBloc>().add(
-        UpdateImageCoordinates(
+        UpdateEvidenceCoordinates(
+          category: widget.category!,
           imageIndex: widget.imageIndex!,
           lat: lat,
           lng: lng,

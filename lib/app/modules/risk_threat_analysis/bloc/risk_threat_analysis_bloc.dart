@@ -25,6 +25,10 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     on<UpdateImageCoordinates>(_onUpdateImageCoordinates);
     on<GetCurrentLocationForImage>(_onGetCurrentLocationForImage);
     on<SelectLocationFromMapForImage>(_onSelectLocationFromMapForImage);
+    on<AddEvidenceImage>(_onAddEvidenceImage);
+    on<RemoveEvidenceImage>(_onRemoveEvidenceImage);
+    on<UpdateEvidenceCoordinates>(_onUpdateEvidenceCoordinates);
+    on<LoadEvidenceData>(_onLoadEvidenceData);
   }
 
   void _onToggleProbabilidadDropdown(
@@ -1679,44 +1683,118 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     UpdateImageCoordinates event,
     Emitter<RiskThreatAnalysisState> emit,
   ) {
-    final updatedCoordinates = Map<int, Map<String, String>>.from(state.imageCoordinates);
-    updatedCoordinates[event.imageIndex] = {
-      'lat': event.lat,
-      'lng': event.lng,
-    };
-    
-    emit(state.copyWith(imageCoordinates: updatedCoordinates));
+    // Este método se mantiene para compatibilidad con el LocationDialog original
+    // Las nuevas coordenadas se manejan con UpdateEvidenceCoordinates
+    emit(state);
   }
 
   void _onGetCurrentLocationForImage(
     GetCurrentLocationForImage event,
     Emitter<RiskThreatAnalysisState> emit,
   ) async {
-    // Simular obtención de ubicación actual
-    // En una implementación real, aquí usarías Geolocator
-    const currentLat = '4.609700';
-    const currentLng = '-74.081700';
-    
-    final updatedCoordinates = Map<int, Map<String, String>>.from(state.imageCoordinates);
-    updatedCoordinates[event.imageIndex] = {
-      'lat': currentLat,
-      'lng': currentLng,
-    };
-    
-    emit(state.copyWith(imageCoordinates: updatedCoordinates));
+    // Este método se mantiene para compatibilidad con el LocationDialog original
+    // Las nuevas ubicaciones se manejan con UpdateEvidenceCoordinates
+    emit(state);
   }
 
   void _onSelectLocationFromMapForImage(
     SelectLocationFromMapForImage event,
     Emitter<RiskThreatAnalysisState> emit,
   ) {
-    final updatedCoordinates = Map<int, Map<String, String>>.from(state.imageCoordinates);
-    updatedCoordinates[event.imageIndex] = {
-      'lat': event.lat.toString(),
-      'lng': event.lng.toString(),
+    // Este método se mantiene para compatibilidad con el LocationDialog original
+    // Las nuevas selecciones de ubicación se manejan con UpdateEvidenceCoordinates
+    emit(state);
+  }
+
+  /// Agregar imagen de evidencia para una categoría específica
+  void _onAddEvidenceImage(
+    AddEvidenceImage event,
+    Emitter<RiskThreatAnalysisState> emit,
+  ) {
+    final updatedImages = Map<String, List<String>>.from(state.evidenceImages);
+    
+    if (!updatedImages.containsKey(event.category)) {
+      updatedImages[event.category] = [];
+    }
+    
+    updatedImages[event.category]!.add(event.imagePath);
+    
+    emit(state.copyWith(evidenceImages: updatedImages));
+  }
+
+  /// Remover imagen de evidencia para una categoría específica
+  void _onRemoveEvidenceImage(
+    RemoveEvidenceImage event,
+    Emitter<RiskThreatAnalysisState> emit,
+  ) {
+    final updatedImages = Map<String, List<String>>.from(state.evidenceImages);
+    final updatedCoordinates = Map<String, Map<int, Map<String, String>>>.from(state.evidenceCoordinates);
+    
+    if (updatedImages.containsKey(event.category) && 
+        event.imageIndex < updatedImages[event.category]!.length) {
+      
+      // Remover la imagen
+      updatedImages[event.category]!.removeAt(event.imageIndex);
+      
+      // Remover coordenadas asociadas y reindexar
+      if (updatedCoordinates.containsKey(event.category)) {
+        final categoryCoordinates = Map<int, Map<String, String>>.from(updatedCoordinates[event.category]!);
+        categoryCoordinates.remove(event.imageIndex);
+        
+        // Reindexar coordenadas
+        final reindexedCoordinates = <int, Map<String, String>>{};
+        categoryCoordinates.forEach((key, value) {
+          if (key > event.imageIndex) {
+            reindexedCoordinates[key - 1] = value;
+          } else {
+            reindexedCoordinates[key] = value;
+          }
+        });
+        
+        updatedCoordinates[event.category] = reindexedCoordinates;
+      }
+    }
+    
+    emit(state.copyWith(
+      evidenceImages: updatedImages,
+      evidenceCoordinates: updatedCoordinates,
+    ));
+  }
+
+  /// Actualizar coordenadas de imagen de evidencia para una categoría específica
+  void _onUpdateEvidenceCoordinates(
+    UpdateEvidenceCoordinates event,
+    Emitter<RiskThreatAnalysisState> emit,
+  ) {
+    final updatedCoordinates = Map<String, Map<int, Map<String, String>>>.from(state.evidenceCoordinates);
+    
+    if (!updatedCoordinates.containsKey(event.category)) {
+      updatedCoordinates[event.category] = {};
+    }
+    
+    updatedCoordinates[event.category]![event.imageIndex] = {
+      'lat': event.lat,
+      'lng': event.lng,
     };
     
-    emit(state.copyWith(imageCoordinates: updatedCoordinates));
+    emit(state.copyWith(evidenceCoordinates: updatedCoordinates));
+  }
+
+  /// Cargar datos de evidencia para una categoría específica
+  void _onLoadEvidenceData(
+    LoadEvidenceData event,
+    Emitter<RiskThreatAnalysisState> emit,
+  ) {
+    final updatedImages = Map<String, List<String>>.from(state.evidenceImages);
+    final updatedCoordinates = Map<String, Map<int, Map<String, String>>>.from(state.evidenceCoordinates);
+    
+    updatedImages[event.category] = List<String>.from(event.imagePaths);
+    updatedCoordinates[event.category] = Map<int, Map<String, String>>.from(event.coordinates);
+    
+    emit(state.copyWith(
+      evidenceImages: updatedImages,
+      evidenceCoordinates: updatedCoordinates,
+    ));
   }
 
   @override
