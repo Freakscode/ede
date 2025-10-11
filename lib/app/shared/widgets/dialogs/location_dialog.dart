@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
@@ -30,6 +31,9 @@ class _LocationDialogState extends State<LocationDialog> {
   GoogleMapController? _mapController;
   Set<Marker> _markers = {};
   LatLng _currentPosition = const LatLng(4.609700, -74.081700);
+  
+  // Timer para debounce de coordenadas manuales
+  Timer? _coordinateUpdateTimer;
 
   @override
   void initState() {
@@ -44,12 +48,17 @@ class _LocationDialogState extends State<LocationDialog> {
     
     // Inicializar marcador
     _updateMarker();
+    
+    // Agregar listeners para actualizar el mapa cuando cambien las coordenadas manuales
+    _latController.addListener(_onManualCoordinatesChanged);
+    _lngController.addListener(_onManualCoordinatesChanged);
   }
 
   @override
   void dispose() {
     _latController.dispose();
     _lngController.dispose();
+    _coordinateUpdateTimer?.cancel();
     super.dispose();
   }
 
@@ -223,7 +232,7 @@ class _LocationDialogState extends State<LocationDialog> {
                            mapType: MapType.normal,
                            myLocationEnabled: true,
                            myLocationButtonEnabled: false,
-                           zoomControlsEnabled: false,
+                           zoomControlsEnabled: true,
                            mapToolbarEnabled: false,
                          ),
                        ),
@@ -512,6 +521,54 @@ class _LocationDialogState extends State<LocationDialog> {
       _lngController.text = _currentLng;
       _updateMarker();
     });
+  }
+
+  void _onManualCoordinatesChanged() {
+    // Solo actualizar si estamos en modo manual
+    if (!_isAutomaticSelected) {
+      // Cancelar timer anterior si existe
+      _coordinateUpdateTimer?.cancel();
+      
+      // Crear nuevo timer con debounce de 1 segundo
+      _coordinateUpdateTimer = Timer(const Duration(milliseconds: 1000), () {
+        _updateMapFromManualCoordinates();
+      });
+    }
+  }
+
+  void _updateMapFromManualCoordinates() {
+    try {
+      final latText = _latController.text.trim();
+      final lngText = _lngController.text.trim();
+      
+      // Verificar que ambos campos tengan valores válidos
+      if (latText.isNotEmpty && lngText.isNotEmpty) {
+        final lat = double.parse(latText);
+        final lng = double.parse(lngText);
+        
+        // Validar rangos de coordenadas
+        if (lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
+          final newPosition = LatLng(lat, lng);
+          
+          setState(() {
+            _currentPosition = newPosition;
+            _currentLat = latText;
+            _currentLng = lngText;
+            _updateMarker();
+          });
+          
+          // Mover la cámara del mapa a la nueva ubicación
+          if (_mapController != null) {
+            _mapController!.animateCamera(
+              CameraUpdate.newLatLng(newPosition),
+            );
+          }
+        }
+      }
+    } catch (e) {
+      // Ignorar errores de parsing - el usuario puede estar escribiendo
+      // Los valores se validarán cuando termine de escribir
+    }
   }
 
   void _updateMarker() {
