@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 
 class LocationDialog extends StatefulWidget {
@@ -23,6 +25,11 @@ class _LocationDialogState extends State<LocationDialog> {
   String _currentLng = '-74.081700';
   final TextEditingController _latController = TextEditingController();
   final TextEditingController _lngController = TextEditingController();
+  
+  // Variables para Google Maps
+  GoogleMapController? _mapController;
+  Set<Marker> _markers = {};
+  LatLng _currentPosition = const LatLng(4.609700, -74.081700);
 
   @override
   void initState() {
@@ -30,9 +37,13 @@ class _LocationDialogState extends State<LocationDialog> {
     if (widget.initialLat != null && widget.initialLng != null) {
       _currentLat = widget.initialLat!;
       _currentLng = widget.initialLng!;
+      _currentPosition = LatLng(double.parse(_currentLat), double.parse(_currentLng));
     }
     _latController.text = _currentLat;
     _lngController.text = _currentLng;
+    
+    // Inicializar marcador
+    _updateMarker();
   }
 
   @override
@@ -197,92 +208,25 @@ class _LocationDialogState extends State<LocationDialog> {
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(color: const Color(0xFFE5E7EB)),
                       ),
-                      child: Stack(
-                        children: [
-                          // Mapa simulado
-                          Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(
-                                  Icons.map,
-                                  size: 64,
-                                  color: Color(0xFF6B7280),
-                                ),
-                                const SizedBox(height: 16),
-                                const Text(
-                                  'Mapa interactivo',
-                                  style: TextStyle(
-                                    color: Color(0xFF6B7280),
-                                    fontFamily: 'Work Sans',
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                const Text(
-                                  'Calle 55, Carrera 65',
-                                  style: TextStyle(
-                                    color: Color(0xFF9CA3AF),
-                                    fontFamily: 'Work Sans',
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          // Marcador rojo
-                          Positioned(
-                            top: 100,
-                            left: 120,
-                            child: Icon(
-                              Icons.location_on,
-                              color: const Color(0xFFEF4444),
-                              size: 32,
-                            ),
-                          ),
-                          // Controles de zoom
-                          Positioned(
-                            top: 16,
-                            left: 16,
-                            child: Column(
-                              children: [
-                                Container(
-                                  width: 32,
-                                  height: 32,
-                                  decoration: const BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.all(
-                                      Radius.circular(4),
-                                    ),
-                                  ),
-                                  child: const Icon(
-                                    Icons.add,
-                                    color: Color(0xFF374151),
-                                    size: 20,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Container(
-                                  width: 32,
-                                  height: 32,
-                                  decoration: const BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.all(
-                                      Radius.circular(4),
-                                    ),
-                                  ),
-                                  child: const Icon(
-                                    Icons.remove,
-                                    color: Color(0xFF374151),
-                                    size: 20,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
+                       child: ClipRRect(
+                         borderRadius: BorderRadius.circular(8),
+                         child: GoogleMap(
+                           onMapCreated: (GoogleMapController controller) {
+                             _mapController = controller;
+                           },
+                           initialCameraPosition: CameraPosition(
+                             target: _currentPosition,
+                             zoom: 15.0,
+                           ),
+                           markers: _markers,
+                           onTap: _isAutomaticSelected ? _onMapTapped : null,
+                           mapType: MapType.normal,
+                           myLocationEnabled: true,
+                           myLocationButtonEnabled: false,
+                           zoomControlsEnabled: false,
+                           mapToolbarEnabled: false,
+                         ),
+                       ),
                     ),
 
                     // Campos de ubicación manual
@@ -510,20 +454,86 @@ class _LocationDialogState extends State<LocationDialog> {
     );
   }
 
-  void _getCurrentLocation() {
-    // Simular obtención de ubicación actual
+  void _getCurrentLocation() async {
+    try {
+      // Verificar permisos
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          _showErrorSnackBar('Permisos de ubicación denegados');
+          return;
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        _showErrorSnackBar('Los permisos de ubicación están permanentemente denegados');
+        return;
+      }
+
+      // Obtener ubicación actual
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      setState(() {
+        _currentLat = position.latitude.toString();
+        _currentLng = position.longitude.toString();
+        _currentPosition = LatLng(position.latitude, position.longitude);
+        _latController.text = _currentLat;
+        _lngController.text = _currentLng;
+        _updateMarker();
+      });
+
+      // Mover cámara a la ubicación actual
+      if (_mapController != null) {
+        _mapController!.animateCamera(
+          CameraUpdate.newLatLng(_currentPosition),
+        );
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Ubicación actual obtenida'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (e) {
+      _showErrorSnackBar('Error al obtener ubicación: $e');
+    }
+  }
+
+  void _onMapTapped(LatLng location) {
     setState(() {
-      _currentLat = '4.609700';
-      _currentLng = '-74.081700';
-      // Sincronizar con los campos manuales
+      _currentPosition = location;
+      _currentLat = location.latitude.toString();
+      _currentLng = location.longitude.toString();
       _latController.text = _currentLat;
       _lngController.text = _currentLng;
+      _updateMarker();
     });
+  }
 
+  void _updateMarker() {
+    setState(() {
+      _markers = {
+        Marker(
+          markerId: const MarkerId('current_location'),
+          position: _currentPosition,
+          infoWindow: const InfoWindow(
+            title: 'Ubicación seleccionada',
+            snippet: 'Toque para seleccionar esta ubicación',
+          ),
+        ),
+      };
+    });
+  }
+
+  void _showErrorSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Ubicación actual obtenida'),
-        backgroundColor: Colors.green,
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
       ),
     );
   }
