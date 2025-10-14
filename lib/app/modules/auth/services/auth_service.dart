@@ -12,10 +12,20 @@ class AuthService implements AuthInterface {
   UserModel? _currentUser;
   
   @override
-  UserModel? get currentUser => _currentUser;
+  UserModel? get currentUser {
+    print('=== DEBUG AUTH SERVICE - currentUser ===');
+    print('_currentUser: $_currentUser');
+    return _currentUser;
+  }
   
   @override
-  bool get isLoggedIn => _currentUser != null;
+  bool get isLoggedIn {
+    final result = _currentUser != null;
+    print('=== DEBUG AUTH SERVICE - isLoggedIn ===');
+    print('_currentUser: $_currentUser');
+    print('isLoggedIn: $result');
+    return result;
+  }
   
   @override
   bool get isDagrdUser => _currentUser?.isDagrdUser ?? false;

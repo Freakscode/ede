@@ -3,10 +3,7 @@ import 'package:flutter/material.dart';
 class InspectionFormWidget extends StatefulWidget {
   final GlobalKey<FormState> formKey;
 
-  const InspectionFormWidget({
-    super.key,
-    required this.formKey,
-  });
+  const InspectionFormWidget({super.key, required this.formKey});
 
   @override
   State<InspectionFormWidget> createState() => _InspectionFormWidgetState();
@@ -44,134 +41,120 @@ class _InspectionFormWidgetState extends State<InspectionFormWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
+    return Form(
+      key: widget.formKey,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Título
+          const Text(
+            'Registro de datos',
+            style: TextStyle(
+              color: Colors.black,
+              fontFamily: 'Work Sans',
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+
+          const SizedBox(height: 8),
+
+          // Subtítulo
+          const Text(
+            'Inspección por riesgo',
+            style: TextStyle(
+              color: Colors.black,
+              fontFamily: 'Work Sans',
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+
+          const SizedBox(height: 20),
+
+          // Campo Estado
+          _buildDropdownField(
+            label: 'Estado *',
+            value: _selectedStatus,
+            items: _statusOptions,
+            onChanged: (value) {
+              setState(() {
+                _selectedStatus = value;
+              });
+            },
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Por favor seleccione un estado';
+              }
+              return null;
+            },
+          ),
+
+          const SizedBox(height: 16),
+
+          // Campo Fecha
+          _buildDateField(),
+
+          const SizedBox(height: 16),
+
+          // Campo Hora
+          _buildTimeField(),
+
+          const SizedBox(height: 16),
+
+          // Campo Comentario
+          _buildTextField(
+            controller: _commentController,
+            label: 'Comentario *',
+            hintText:
+                'Ingrese un comentario adicional de la inspección realizada...',
+            maxLines: 4,
+            validator: (value) {
+              if (value == null || value.trim().isEmpty) {
+                return 'Por favor ingrese un comentario';
+              }
+              return null;
+            },
+          ),
+
+          const SizedBox(height: 16),
+
+          // Campo Número de lesionados
+          _buildTextField(
+            controller: _injuredController,
+            label: 'Número de lesionados',
+            hintText: 'Ingrese número de lesionados',
+            keyboardType: TextInputType.number,
+            validator: (value) {
+              if (value != null && value.isNotEmpty) {
+                final number = int.tryParse(value);
+                if (number == null || number < 0) {
+                  return 'Por favor ingrese un número válido';
+                }
+              }
+              return null;
+            },
+          ),
+
+          const SizedBox(height: 16),
+
+          // Campo Número de muertos
+          _buildTextField(
+            controller: _deadController,
+            label: 'Número de muertos',
+            hintText: 'Ingrese número de muertos',
+            keyboardType: TextInputType.number,
+            validator: (value) {
+              if (value != null && value.isNotEmpty) {
+                final number = int.tryParse(value);
+                if (number == null || number < 0) {
+                  return 'Por favor ingrese un número válido';
+                }
+              }
+              return null;
+            },
           ),
         ],
-      ),
-      child: Form(
-        key: widget.formKey,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Título
-            const Text(
-              'Registro de datos',
-              style: TextStyle(
-                color: Colors.black,
-                fontFamily: 'Work Sans',
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            
-            const SizedBox(height: 8),
-            
-            // Subtítulo
-            const Text(
-              'Inspección por riesgo',
-              style: TextStyle(
-                color: Colors.black,
-                fontFamily: 'Work Sans',
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            
-            const SizedBox(height: 20),
-            
-            // Campo Estado
-            _buildDropdownField(
-              label: 'Estado *',
-              value: _selectedStatus,
-              items: _statusOptions,
-              onChanged: (value) {
-                setState(() {
-                  _selectedStatus = value;
-                });
-              },
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Por favor seleccione un estado';
-                }
-                return null;
-              },
-            ),
-            
-            const SizedBox(height: 16),
-            
-            // Campo Fecha
-            _buildDateField(),
-            
-            const SizedBox(height: 16),
-            
-            // Campo Hora
-            _buildTimeField(),
-            
-            const SizedBox(height: 16),
-            
-            // Campo Comentario
-            _buildTextField(
-              controller: _commentController,
-              label: 'Comentario *',
-              hintText: 'Ingrese un comentario adicional de la inspección realizada...',
-              maxLines: 4,
-              validator: (value) {
-                if (value == null || value.trim().isEmpty) {
-                  return 'Por favor ingrese un comentario';
-                }
-                return null;
-              },
-            ),
-            
-            const SizedBox(height: 16),
-            
-            // Campo Número de lesionados
-            _buildTextField(
-              controller: _injuredController,
-              label: 'Número de lesionados',
-              hintText: 'Ingrese número de lesionados',
-              keyboardType: TextInputType.number,
-              validator: (value) {
-                if (value != null && value.isNotEmpty) {
-                  final number = int.tryParse(value);
-                  if (number == null || number < 0) {
-                    return 'Por favor ingrese un número válido';
-                  }
-                }
-                return null;
-              },
-            ),
-            
-            const SizedBox(height: 16),
-            
-            // Campo Número de muertos
-            _buildTextField(
-              controller: _deadController,
-              label: 'Número de muertos',
-              hintText: 'Ingrese número de muertos',
-              keyboardType: TextInputType.number,
-              validator: (value) {
-                if (value != null && value.isNotEmpty) {
-                  final number = int.tryParse(value);
-                  if (number == null || number < 0) {
-                    return 'Por favor ingrese un número válido';
-                  }
-                }
-                return null;
-              },
-            ),
-          ],
-        ),
       ),
     );
   }
@@ -226,7 +209,10 @@ class _InspectionFormWidgetState extends State<InspectionFormWidget> {
               borderRadius: BorderRadius.circular(4),
               borderSide: const BorderSide(color: Colors.red),
             ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 16,
+            ),
           ),
         ),
       ],
@@ -295,7 +281,10 @@ class _InspectionFormWidgetState extends State<InspectionFormWidget> {
               borderRadius: BorderRadius.circular(4),
               borderSide: const BorderSide(color: Colors.red),
             ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 16,
+            ),
             suffixIcon: const Icon(
               Icons.keyboard_arrow_down,
               color: Color(0xFF9E9E9E),
@@ -342,7 +331,9 @@ class _InspectionFormWidgetState extends State<InspectionFormWidget> {
                         ? '${_selectedDate!.day.toString().padLeft(2, '0')}/${_selectedDate!.month.toString().padLeft(2, '0')}/${_selectedDate!.year}'
                         : 'dd/mm/aaaa',
                     style: TextStyle(
-                      color: _selectedDate != null ? Colors.black : const Color(0xFF9E9E9E),
+                      color: _selectedDate != null
+                          ? Colors.black
+                          : const Color(0xFF9E9E9E),
                       fontFamily: 'Work Sans',
                       fontSize: 14,
                       fontWeight: FontWeight.w400,
@@ -393,7 +384,9 @@ class _InspectionFormWidgetState extends State<InspectionFormWidget> {
                         ? '${_selectedTime!.hour.toString().padLeft(2, '0')}:${_selectedTime!.minute.toString().padLeft(2, '0')}'
                         : 'hh:mm',
                     style: TextStyle(
-                      color: _selectedTime != null ? Colors.black : const Color(0xFF9E9E9E),
+                      color: _selectedTime != null
+                          ? Colors.black
+                          : const Color(0xFF9E9E9E),
                       fontFamily: 'Work Sans',
                       fontSize: 14,
                       fontWeight: FontWeight.w400,

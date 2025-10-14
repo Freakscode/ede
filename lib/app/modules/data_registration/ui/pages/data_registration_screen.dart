@@ -13,35 +13,27 @@ class DataRegistrationScreen extends StatefulWidget {
 class _DataRegistrationScreenState extends State<DataRegistrationScreen> {
   final _contactFormKey = GlobalKey<FormState>();
   final _inspectionFormKey = GlobalKey<FormState>();
+  bool _showInspectionForm = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
-      appBar: const CustomAppBar(
+      appBar: CustomAppBar(
         showBack: true,
         showInfo: true,
         showProfile: true,
+        onBack: _showInspectionForm ? _handleBackPressed : null,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Contact Form
-            ContactFormWidget(
-              formKey: _contactFormKey,
-              onNextPressed: _handleNextPressed,
-            ),
-            
-            const SizedBox(height: 20),
-            
-            // Inspection Form
-            InspectionFormWidget(
-              formKey: _inspectionFormKey,
-            ),
-          ],
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 37, vertical: 31),
+        child: _showInspectionForm
+            ? InspectionFormWidget(
+                formKey: _inspectionFormKey,
+              )
+            : ContactFormWidget(
+                formKey: _contactFormKey,
+                onNextPressed: _handleNextPressed,
+              ),
       ),
     );
   }
@@ -60,8 +52,17 @@ class _DataRegistrationScreenState extends State<DataRegistrationScreen> {
         ),
       );
       
-      // Aquí puedes agregar lógica adicional después de guardar el contacto
-      // Por ejemplo, habilitar el formulario de inspección o navegar a otra pantalla
+      // Mostrar el formulario de inspección
+      setState(() {
+        _showInspectionForm = true;
+      });
     }
+  }
+
+  void _handleBackPressed() {
+    // Volver al formulario de contacto
+    setState(() {
+      _showInspectionForm = false;
+    });
   }
 }

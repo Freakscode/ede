@@ -8,7 +8,11 @@ import 'package:caja_herramientas/app/modules/home/bloc/home_bloc.dart';
 import 'package:caja_herramientas/app/modules/home/bloc/home_event.dart';
 import 'package:caja_herramientas/app/shared/widgets/dialogs/forms_in_progress_dialog.dart';
 import 'package:caja_herramientas/app/modules/risk_threat_analysis/bloc/risk_threat_analysis_bloc.dart';
-import 'package:caja_herramientas/app/modules/risk_threat_analysis/bloc/events/risk_threat_analysis_event.dart' as risk_events;
+import 'package:caja_herramientas/app/modules/risk_threat_analysis/bloc/events/risk_threat_analysis_event.dart'
+    as risk_events;
+import 'package:caja_herramientas/app/modules/auth/bloc/auth_bloc.dart';
+import 'package:caja_herramientas/app/modules/auth/bloc/auth_state.dart';
+import 'package:caja_herramientas/app/modules/auth/bloc/events/auth_events.dart';
 import 'package:go_router/go_router.dart';
 
 class HomeMainSection extends StatefulWidget {
@@ -19,6 +23,15 @@ class HomeMainSection extends StatefulWidget {
 }
 
 class _HomeMainSectionState extends State<HomeMainSection> {
+  @override
+  void initState() {
+    super.initState();
+    // Verificar el estado de autenticación al iniciar
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<AuthBloc>().add(AuthStatusCheckRequested());
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -69,7 +82,6 @@ class _HomeMainSectionState extends State<HomeMainSection> {
           GestureDetector(
             onTap: () {
               context.go('/login');
-
             },
             child: Container(
               width: double.infinity,
@@ -114,45 +126,80 @@ class _HomeMainSectionState extends State<HomeMainSection> {
   }
 
   void _handleRiskAnalysisTap(BuildContext context) {
-    final homeBloc = context.read<HomeBloc>();
-    final homeState = homeBloc.state;
-    
-    // Contar formularios pendientes (evaluaciones completadas parcialmente)
-    int pendingFormsCount = 0;
-    homeState.completedEvaluations.forEach((key, value) {
-      if (value) pendingFormsCount++;
-    });
-    
-    // Siempre mostrar el dialog
-    showDialog(
-      context: context,
-      barrierDismissible: true,
-      builder: (BuildContext dialogContext) {
-        return FormsInProgressDialog(
-          pendingFormsCount: pendingFormsCount,
-          onViewForms: () {
-            if (context.mounted) {
-                context.read<HomeBloc>().add(HomeNavBarTapped(2));
-              }
-          },
-          onCreateNew: () {
-            context.read<HomeBloc>().add(ResetAllForNewForm());
-            
-            try {
-              final riskBloc = context.read<RiskThreatAnalysisBloc>();
-              riskBloc.add(risk_events.ResetDropdowns());
-            } catch (e) {
-              print('RiskThreatAnalysisBloc no disponible en este contexto: $e');
-            }
-            
-            Future.delayed(const Duration(milliseconds: 100), () {
-              if (context.mounted) {
-                context.read<HomeBloc>().add(HomeShowRiskEventsSection());
-              }
-            });
-          },
-        );
-      },
-    );
+    // Verificar el tipo de usuario
+    print('=== DEBUG NAVEGACIÓN ===');
+    try {
+      final authBloc = context.read<AuthBloc>();
+      final authState = authBloc.state;
+      print('AuthBloc encontrado: ✅');
+      print('Estado de autenticación: ${authState.runtimeType}');
+      print('Estado completo: $authState');
+
+      if (authState is AuthAuthenticated) {
+        print('Usuario autenticado: ${authState.user.nombre}');
+        print('Es usuario DAGRD: ${authState.user.isDagrdUser}');
+
+        // Si es usuario general, redirigir a data_registration
+        if (!authState.user.isDagrdUser) {
+          print('Redirigiendo a data_registration (usuario general)');
+          context.go('/data_registration');
+          return;
+        } else {
+          print('Continuando con flujo DAGRD (usuario DAGRD)');
+          // Si es usuario DAGRD, continuar con el flujo normal
+          final homeBloc = context.read<HomeBloc>();
+          final homeState = homeBloc.state;
+
+          // Contar formularios pendientes (evaluaciones completadas parcialmente)
+          int pendingFormsCount = 0;
+          homeState.completedEvaluations.forEach((key, value) {
+            if (value) pendingFormsCount++;
+          });
+
+          // Siempre mostrar el dialog
+          showDialog(
+            context: context,
+            barrierDismissible: true,
+            builder: (BuildContext dialogContext) {
+              return FormsInProgressDialog(
+                pendingFormsCount: pendingFormsCount,
+                onViewForms: () {
+                  if (context.mounted) {
+                    context.read<HomeBloc>().add(HomeNavBarTapped(2));
+                  }
+                },
+                onCreateNew: () {
+                  context.read<HomeBloc>().add(ResetAllForNewForm());
+
+                  try {
+                    final riskBloc = context.read<RiskThreatAnalysisBloc>();
+                    riskBloc.add(risk_events.ResetDropdowns());
+                  } catch (e) {
+                    print(
+                      'RiskThreatAnalysisBloc no disponible en este contexto: $e',
+                    );
+                  }
+
+                  Future.delayed(const Duration(milliseconds: 100), () {
+                    if (context.mounted) {
+                      context.read<HomeBloc>().add(HomeShowRiskEventsSection());
+                    }
+                  });
+                },
+              );
+            },
+          );
+        }
+      } else {
+        print('Usuario no autenticado = Usuario General, redirigiendo a data_registration');
+        context.go('/data_registration');
+        return;
+      }
+    } catch (e) {
+      print('Error al acceder al AuthBloc: $e');
+      print('Error = Usuario General, redirigiendo a data_registration');
+      context.go('/data_registration');
+      return;
+    }
   }
 }
