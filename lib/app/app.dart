@@ -15,6 +15,8 @@ import 'modules/evaluacion/presentation/bloc/evaluacion_global_bloc.dart';
 import 'modules/risk_threat_analysis/bloc/risk_threat_analysis_bloc.dart';
 import 'modules/home/bloc/home_bloc.dart';
 import 'modules/home/bloc/home_event.dart';
+import 'modules/auth/bloc/auth_bloc.dart';
+import 'modules/auth/services/auth_service.dart';
 import '../injection_container.dart' as di;
 import 'config/app_router.dart';
 
@@ -59,6 +61,10 @@ class MyApp extends StatelessWidget {
         // Home BLoC
         BlocProvider<HomeBloc>(
           create: (context) => di.sl<HomeBloc>()..add(HomeCheckAndShowTutorial()),
+        ),
+        // Auth BLoC
+        BlocProvider<AuthBloc>(
+          create: (context) => AuthBloc(authService: AuthService()),
         ),
         // EvaluacionGlobalBloc must be last as it depends on all other evaluacion BLoCs
         BlocProvider<EvaluacionGlobalBloc>(

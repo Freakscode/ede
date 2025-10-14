@@ -15,6 +15,7 @@ import 'package:caja_herramientas/app/modules/home/bloc/home_event.dart';
 import 'package:caja_herramientas/app/modules/home/bloc/home_state.dart';
 import 'package:caja_herramientas/app/modules/home/models/domain/form_navigation_data.dart';
 import 'package:caja_herramientas/app/shared/widgets/layouts/custom_bottom_nav_bar.dart';
+import 'package:go_router/go_router.dart';
 
 class HomeScreen extends StatelessWidget {
   final Map<String, dynamic>? navigationData;
@@ -114,6 +115,9 @@ class HomeScreen extends StatelessWidget {
               },
               showInfo: true,
               showProfile: true,
+              onProfile: () {
+                context.go('/login');
+              },
             ),
             body: bodyContent,
             bottomNavigationBar: CustomBottomNavBar(

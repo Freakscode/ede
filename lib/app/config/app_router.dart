@@ -24,6 +24,7 @@ import '../modules/evaluacion/presentation/pages/sect_6/nivel_dano_page.dart';
 import '../modules/evaluacion/presentation/pages/sect_7/habitabilidad_page.dart';
 import '../modules/evaluacion/presentation/pages/sect_8/acciones_page.dart';
 import '../modules/evaluacion/presentation/pages/resumen_evaluacion_page.dart';
+import '../modules/data_registration/ui/pages/data_registration_screen.dart';
 
 // Routes
 import 'routes.dart';
@@ -69,6 +70,12 @@ GoRouter getAppRouter(BuildContext context) {
             return RiskThreatAnalysisScreen(selectedEvent: selectedEvent);
           }
         },
+      ),
+      
+      // Data Registration - Registro de datos
+      GoRoute(
+        path: '/data_registration',
+        builder: (context, state) => const DataRegistrationScreen(),
       ),
       
 
