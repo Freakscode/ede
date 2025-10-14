@@ -78,13 +78,42 @@ class MyApp extends StatelessWidget {
         builder: (context) {
           return MaterialApp.router(
             title: AppConstants.appName,
-            
             routerConfig: getAppRouter(context),
             debugShowCheckedModeBanner: false,
-            theme: AppTheme.theme,
+            theme: AppTheme.theme.copyWith(
+              pageTransitionsTheme: PageTransitionsTheme(
+                builders: {
+                  TargetPlatform.android: _FadePageTransitionsBuilder(),
+                  TargetPlatform.iOS: _FadePageTransitionsBuilder(),
+                },
+              ),
+            ),
           );
         },
       ),
+    );
+  }
+}
+
+/// Transición personalizada de fade suave
+class _FadePageTransitionsBuilder extends PageTransitionsBuilder {
+  const _FadePageTransitionsBuilder();
+
+  @override
+  Widget buildTransitions<T extends Object?>(
+    PageRoute<T> route,
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) {
+    return FadeTransition(
+      opacity: animation.drive(
+        Tween<double>(begin: 0.0, end: 1.0).chain(
+          CurveTween(curve: Curves.easeInOut),
+        ),
+      ),
+      child: child,
     );
   }
 }
