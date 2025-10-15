@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:caja_herramientas/app/shared/widgets/inputs/custom_text_field.dart';
-import 'package:caja_herramientas/app/shared/widgets/inputs/custom_dropdown_field.dart';
+import 'package:caja_herramientas/app/shared/widgets/inputs/custom_expandable_dropdown.dart';
 import 'package:caja_herramientas/app/shared/widgets/inputs/custom_date_picker.dart';
 import 'package:caja_herramientas/app/shared/widgets/inputs/custom_time_picker.dart';
 import 'package:caja_herramientas/app/shared/widgets/text/section_title.dart';
@@ -60,7 +61,7 @@ class _InspectionFormWidgetState extends State<InspectionFormWidget> {
           const SizedBox(height: 20),
 
           // Campo Estado
-          CustomDropdownField<String>(
+          CustomExpandableDropdown<String>(
             label: 'Estado *',
             value: _selectedStatus,
             items: _statusOptions,
@@ -76,6 +77,7 @@ class _InspectionFormWidgetState extends State<InspectionFormWidget> {
               }
               return null;
             },
+            hintText: 'Seleccione un estado',
           ),
 
           const SizedBox(height: 16),
@@ -140,6 +142,9 @@ class _InspectionFormWidgetState extends State<InspectionFormWidget> {
             label: 'Número de lesionados',
             hintText: 'Ingrese número de lesionados',
             keyboardType: TextInputType.number,
+            inputFormatters: [
+              FilteringTextInputFormatter.digitsOnly,
+            ],
             validator: (value) {
               if (value != null && value.isNotEmpty) {
                 final number = int.tryParse(value);
@@ -159,6 +164,9 @@ class _InspectionFormWidgetState extends State<InspectionFormWidget> {
             label: 'Número de muertos',
             hintText: 'Ingrese número de muertos',
             keyboardType: TextInputType.number,
+            inputFormatters: [
+              FilteringTextInputFormatter.digitsOnly,
+            ],
             validator: (value) {
               if (value != null && value.isNotEmpty) {
                 final number = int.tryParse(value);

@@ -1,5 +1,6 @@
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class CustomTextField extends StatelessWidget {
   final TextEditingController controller;
@@ -12,6 +13,7 @@ class CustomTextField extends StatelessWidget {
   final Widget? prefixIcon;
   final void Function(String)? onChanged;
   final int maxLines;
+  final List<TextInputFormatter>? inputFormatters;
 
   const CustomTextField({
     super.key,
@@ -25,6 +27,7 @@ class CustomTextField extends StatelessWidget {
     this.prefixIcon,
     this.onChanged,
     this.maxLines = 1,
+    this.inputFormatters,
   });
 
   @override
@@ -50,6 +53,7 @@ class CustomTextField extends StatelessWidget {
           obscureText: obscureText,
           onChanged: onChanged,
           maxLines: maxLines,
+          inputFormatters: inputFormatters,
           style: const TextStyle(
             color: Colors.black,
             fontFamily: 'Work Sans',

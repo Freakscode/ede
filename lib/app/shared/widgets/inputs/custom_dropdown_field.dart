@@ -37,6 +37,7 @@ class CustomDropdownField<T> extends StatelessWidget {
         const SizedBox(height: 8),
         DropdownButtonFormField<T>(
           value: value,
+          isExpanded: true,
           items: items.map((T item) {
             return DropdownMenuItem<T>(
               value: item,
@@ -53,14 +54,15 @@ class CustomDropdownField<T> extends StatelessWidget {
           }).toList(),
           onChanged: onChanged,
           validator: validator,
+          dropdownColor: DAGRDColors.blancoDAGRD,
+          menuMaxHeight: 200,
           decoration: InputDecoration(
-            hintText: 'Seleccione una opción',
+            hintText: value == null ? 'Seleccione una opción' : null,
             hintStyle: const TextStyle(
               color: Color(0xFFCCCCCC), // var(--Texto-inputs, #CCC)
               fontFamily: 'Work Sans',
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              height: 1.42857, // 20px / 14px = 1.42857 (142.857%)
+              fontSize: 10,
+              fontWeight: FontWeight.w400,
             ),
             filled: true,
             fillColor: DAGRDColors.blancoDAGRD,
