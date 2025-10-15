@@ -1,30 +1,22 @@
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import 'package:flutter/material.dart';
 
-class CustomTextField extends StatelessWidget {
-  final TextEditingController controller;
+class CustomDropdownField<T> extends StatelessWidget {
   final String label;
-  final String hintText;
-  final TextInputType? keyboardType;
-  final String? Function(String?)? validator;
-  final bool obscureText;
-  final Widget? suffixIcon;
-  final Widget? prefixIcon;
-  final void Function(String)? onChanged;
-  final int maxLines;
+  final T? value;
+  final List<T> items;
+  final ValueChanged<T?> onChanged;
+  final String? Function(T?)? validator;
+  final String Function(T) itemBuilder;
 
-  const CustomTextField({
+  const CustomDropdownField({
     super.key,
-    required this.controller,
     required this.label,
-    required this.hintText,
-    this.keyboardType,
+    required this.value,
+    required this.items,
+    required this.onChanged,
     this.validator,
-    this.obscureText = false,
-    this.suffixIcon,
-    this.prefixIcon,
-    this.onChanged,
-    this.maxLines = 1,
+    required this.itemBuilder,
   });
 
   @override
@@ -43,21 +35,26 @@ class CustomTextField extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 8),
-        TextFormField(
-          controller: controller,
-          keyboardType: keyboardType,
-          validator: validator,
-          obscureText: obscureText,
+        DropdownButtonFormField<T>(
+          value: value,
+          items: items.map((T item) {
+            return DropdownMenuItem<T>(
+              value: item,
+              child: Text(
+                itemBuilder(item),
+                style: const TextStyle(
+                  color: Colors.black,
+                  fontFamily: 'Work Sans',
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+            );
+          }).toList(),
           onChanged: onChanged,
-          maxLines: maxLines,
-          style: const TextStyle(
-            color: Colors.black,
-            fontFamily: 'Work Sans',
-            fontSize: 14,
-            fontWeight: FontWeight.w400,
-          ),
+          validator: validator,
           decoration: InputDecoration(
-            hintText: hintText,
+            hintText: 'Seleccione una opción',
             hintStyle: const TextStyle(
               color: Color(0xFFCCCCCC), // var(--Texto-inputs, #CCC)
               fontFamily: 'Work Sans',
@@ -84,8 +81,10 @@ class CustomTextField extends StatelessWidget {
               borderSide: const BorderSide(color: DAGRDColors.error, width: 1),
             ),
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            suffixIcon: suffixIcon,
-            prefixIcon: prefixIcon,
+            suffixIcon: const Icon(
+              Icons.keyboard_arrow_down,
+              color: DAGRDColors.grisMedio,
+            ),
           ),
         ),
       ],

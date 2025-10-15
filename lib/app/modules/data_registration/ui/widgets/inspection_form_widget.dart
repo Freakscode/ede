@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import 'package:caja_herramientas/app/shared/widgets/inputs/custom_text_field.dart';
+import 'package:caja_herramientas/app/shared/widgets/inputs/custom_dropdown_field.dart';
+import 'package:caja_herramientas/app/shared/widgets/inputs/custom_date_picker.dart';
+import 'package:caja_herramientas/app/shared/widgets/inputs/custom_time_picker.dart';
 import 'package:caja_herramientas/app/shared/widgets/text/section_title.dart';
 
 class InspectionFormWidget extends StatefulWidget {
@@ -58,10 +60,11 @@ class _InspectionFormWidgetState extends State<InspectionFormWidget> {
           const SizedBox(height: 20),
 
           // Campo Estado
-          _buildDropdownField(
+          CustomDropdownField<String>(
             label: 'Estado *',
             value: _selectedStatus,
             items: _statusOptions,
+            itemBuilder: (item) => item,
             onChanged: (value) {
               setState(() {
                 _selectedStatus = value;
@@ -78,17 +81,56 @@ class _InspectionFormWidgetState extends State<InspectionFormWidget> {
           const SizedBox(height: 16),
 
           // Campo Fecha
-          _buildDateField(),
+          CustomDatePicker(
+            label: 'Fecha *',
+            selectedDate: _selectedDate,
+            onDateSelected: (date) {
+              setState(() {
+                _selectedDate = date;
+              });
+            },
+            validator: (date) {
+              if (date == null) {
+                return 'Por favor seleccione una fecha';
+              }
+              return null;
+            },
+          ),
 
           const SizedBox(height: 16),
 
           // Campo Hora
-          _buildTimeField(),
+          CustomTimePicker(
+            label: 'Hora *',
+            selectedTime: _selectedTime,
+            onTimeSelected: (time) {
+              setState(() {
+                _selectedTime = time;
+              });
+            },
+            validator: (time) {
+              if (time == null) {
+                return 'Por favor seleccione una hora';
+              }
+              return null;
+            },
+          ),
 
           const SizedBox(height: 16),
 
           // Campo Comentario
-          _buildCommentField(),
+          CustomTextField(
+            controller: _commentController,
+            label: 'Comentario *',
+            hintText: 'Ingrese un comentario adicional de la inspección realizada...',
+            maxLines: 4,
+            validator: (value) {
+              if (value == null || value.trim().isEmpty) {
+                return 'Por favor ingrese un comentario';
+              }
+              return null;
+            },
+          ),
 
           const SizedBox(height: 16),
 
@@ -132,276 +174,4 @@ class _InspectionFormWidgetState extends State<InspectionFormWidget> {
     );
   }
 
-  Widget _buildCommentField() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Comentario *',
-          style: TextStyle(
-            color: DAGRDColors.azulDAGRD,
-            fontFamily: 'Work Sans',
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-            height: 1.33333, // 16px / 12px = 1.33333 (133.333%)
-          ),
-        ),
-        const SizedBox(height: 8),
-        TextFormField(
-          controller: _commentController,
-          maxLines: 4,
-          validator: (value) {
-            if (value == null || value.trim().isEmpty) {
-              return 'Por favor ingrese un comentario';
-            }
-            return null;
-          },
-          style: const TextStyle(
-            color: Colors.black,
-            fontFamily: 'Work Sans',
-            fontSize: 14,
-            fontWeight: FontWeight.w400,
-          ),
-          decoration: InputDecoration(
-            hintText: 'Ingrese un comentario adicional de la inspección realizada...',
-            hintStyle: const TextStyle(
-              color: Color(0xFFCCCCCC), // var(--Texto-inputs, #CCC)
-              fontFamily: 'Work Sans',
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              height: 1.42857, // 20px / 14px = 1.42857 (142.857%)
-            ),
-            filled: true,
-            fillColor: DAGRDColors.blancoDAGRD,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: DAGRDColors.grisMedio, width: 1),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: DAGRDColors.grisMedio, width: 1),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: DAGRDColors.azulDAGRD, width: 2),
-            ),
-            errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: DAGRDColors.error, width: 1),
-            ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildDropdownField({
-    required String label,
-    required String? value,
-    required List<String> items,
-    required ValueChanged<String?> onChanged,
-    String? Function(String?)? validator,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            color: DAGRDColors.azulDAGRD,
-            fontFamily: 'Work Sans',
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-            height: 1.33333, // 16px / 12px = 1.33333 (133.333%)
-          ),
-        ),
-        const SizedBox(height: 8),
-        DropdownButtonFormField<String>(
-          value: value,
-          items: items.map((String item) {
-            return DropdownMenuItem<String>(
-              value: item,
-              child: Text(
-                item,
-                style: const TextStyle(
-                  color: Colors.black,
-                  fontFamily: 'Work Sans',
-                  fontSize: 14,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-            );
-          }).toList(),
-          onChanged: onChanged,
-          validator: validator,
-          decoration: InputDecoration(
-            hintText: 'Seleccione una opción',
-            hintStyle: const TextStyle(
-              color: Color(0xFFCCCCCC), // var(--Texto-inputs, #CCC)
-              fontFamily: 'Work Sans',
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              height: 1.42857, // 20px / 14px = 1.42857 (142.857%)
-            ),
-            filled: true,
-            fillColor: DAGRDColors.blancoDAGRD,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: DAGRDColors.grisMedio, width: 1),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: DAGRDColors.grisMedio, width: 1),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: DAGRDColors.azulDAGRD, width: 2),
-            ),
-            errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: DAGRDColors.error, width: 1),
-            ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            suffixIcon: const Icon(
-              Icons.keyboard_arrow_down,
-              color: DAGRDColors.grisMedio,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildDateField() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Fecha *',
-          style: TextStyle(
-            color: Colors.black,
-            fontFamily: 'Work Sans',
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        const SizedBox(height: 8),
-        InkWell(
-          onTap: _selectDate,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-            decoration: BoxDecoration(
-              border: Border.all(color: const Color(0xFFE0E0E0)),
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: Row(
-              children: [
-                const Icon(
-                  Icons.calendar_today,
-                  color: Color(0xFF9E9E9E),
-                  size: 20,
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    _selectedDate != null
-                        ? '${_selectedDate!.day.toString().padLeft(2, '0')}/${_selectedDate!.month.toString().padLeft(2, '0')}/${_selectedDate!.year}'
-                        : 'dd/mm/aaaa',
-                    style: TextStyle(
-                      color: _selectedDate != null
-                          ? Colors.black
-                          : const Color(0xFF9E9E9E),
-                      fontFamily: 'Work Sans',
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildTimeField() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Hora *',
-          style: TextStyle(
-            color: Colors.black,
-            fontFamily: 'Work Sans',
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        const SizedBox(height: 8),
-        InkWell(
-          onTap: _selectTime,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-            decoration: BoxDecoration(
-              border: Border.all(color: const Color(0xFFE0E0E0)),
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: Row(
-              children: [
-                const Icon(
-                  Icons.access_time,
-                  color: Color(0xFF9E9E9E),
-                  size: 20,
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    _selectedTime != null
-                        ? '${_selectedTime!.hour.toString().padLeft(2, '0')}:${_selectedTime!.minute.toString().padLeft(2, '0')}'
-                        : 'hh:mm',
-                    style: TextStyle(
-                      color: _selectedTime != null
-                          ? Colors.black
-                          : const Color(0xFF9E9E9E),
-                      fontFamily: 'Work Sans',
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Future<void> _selectDate() async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
-    );
-    if (picked != null && picked != _selectedDate) {
-      setState(() {
-        _selectedDate = picked;
-      });
-    }
-  }
-
-  Future<void> _selectTime() async {
-    final TimeOfDay? picked = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.now(),
-    );
-    if (picked != null && picked != _selectedTime) {
-      setState(() {
-        _selectedTime = picked;
-      });
-    }
-  }
 }
