@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
+import 'package:caja_herramientas/app/shared/widgets/inputs/custom_text_field.dart';
+import 'package:caja_herramientas/app/shared/widgets/text/section_title.dart';
 
 class InspectionFormWidget extends StatefulWidget {
   final GlobalKey<FormState> formKey;
@@ -46,28 +49,10 @@ class _InspectionFormWidgetState extends State<InspectionFormWidget> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Título
-          const Text(
-            'Registro de datos',
-            style: TextStyle(
-              color: Colors.black,
-              fontFamily: 'Work Sans',
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-
-          const SizedBox(height: 8),
-
-          // Subtítulo
-          const Text(
-            'Inspección por riesgo',
-            style: TextStyle(
-              color: Colors.black,
-              fontFamily: 'Work Sans',
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-            ),
+          // Título y subtítulo
+          const SectionTitle(
+            title: 'Registro de datos',
+            subtitle: 'Inspección por riesgo',
           ),
 
           const SizedBox(height: 20),
@@ -103,24 +88,12 @@ class _InspectionFormWidgetState extends State<InspectionFormWidget> {
           const SizedBox(height: 16),
 
           // Campo Comentario
-          _buildTextField(
-            controller: _commentController,
-            label: 'Comentario *',
-            hintText:
-                'Ingrese un comentario adicional de la inspección realizada...',
-            maxLines: 4,
-            validator: (value) {
-              if (value == null || value.trim().isEmpty) {
-                return 'Por favor ingrese un comentario';
-              }
-              return null;
-            },
-          ),
+          _buildCommentField(),
 
           const SizedBox(height: 16),
 
           // Campo Número de lesionados
-          _buildTextField(
+          CustomTextField(
             controller: _injuredController,
             label: 'Número de lesionados',
             hintText: 'Ingrese número de lesionados',
@@ -139,7 +112,7 @@ class _InspectionFormWidgetState extends State<InspectionFormWidget> {
           const SizedBox(height: 16),
 
           // Campo Número de muertos
-          _buildTextField(
+          CustomTextField(
             controller: _deadController,
             label: 'Número de muertos',
             hintText: 'Ingrese número de muertos',
@@ -159,60 +132,64 @@ class _InspectionFormWidgetState extends State<InspectionFormWidget> {
     );
   }
 
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String label,
-    required String hintText,
-    TextInputType? keyboardType,
-    int maxLines = 1,
-    String? Function(String?)? validator,
-  }) {
+  Widget _buildCommentField() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: const TextStyle(
-            color: Colors.black,
+        const Text(
+          'Comentario *',
+          style: TextStyle(
+            color: DAGRDColors.azulDAGRD,
             fontFamily: 'Work Sans',
-            fontSize: 14,
+            fontSize: 12,
             fontWeight: FontWeight.w500,
+            height: 1.33333, // 16px / 12px = 1.33333 (133.333%)
           ),
         ),
         const SizedBox(height: 8),
         TextFormField(
-          controller: controller,
-          keyboardType: keyboardType,
-          maxLines: maxLines,
-          validator: validator,
+          controller: _commentController,
+          maxLines: 4,
+          validator: (value) {
+            if (value == null || value.trim().isEmpty) {
+              return 'Por favor ingrese un comentario';
+            }
+            return null;
+          },
+          style: const TextStyle(
+            color: Colors.black,
+            fontFamily: 'Work Sans',
+            fontSize: 14,
+            fontWeight: FontWeight.w400,
+          ),
           decoration: InputDecoration(
-            hintText: hintText,
+            hintText: 'Ingrese un comentario adicional de la inspección realizada...',
             hintStyle: const TextStyle(
-              color: Color(0xFF9E9E9E),
+              color: Color(0xFFCCCCCC), // var(--Texto-inputs, #CCC)
               fontFamily: 'Work Sans',
               fontSize: 14,
-              fontWeight: FontWeight.w400,
+              fontWeight: FontWeight.w500,
+              height: 1.42857, // 20px / 14px = 1.42857 (142.857%)
             ),
+            filled: true,
+            fillColor: DAGRDColors.blancoDAGRD,
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(4),
-              borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(color: DAGRDColors.grisMedio, width: 1),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(4),
-              borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(color: DAGRDColors.grisMedio, width: 1),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(4),
-              borderSide: const BorderSide(color: Color(0xFF232B48), width: 2),
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(color: DAGRDColors.azulDAGRD, width: 2),
             ),
             errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(4),
-              borderSide: const BorderSide(color: Colors.red),
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(color: DAGRDColors.error, width: 1),
             ),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 16,
-            ),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           ),
         ),
       ],
@@ -232,10 +209,11 @@ class _InspectionFormWidgetState extends State<InspectionFormWidget> {
         Text(
           label,
           style: const TextStyle(
-            color: Colors.black,
+            color: DAGRDColors.azulDAGRD,
             fontFamily: 'Work Sans',
-            fontSize: 14,
+            fontSize: 12,
             fontWeight: FontWeight.w500,
+            height: 1.33333, // 16px / 12px = 1.33333 (133.333%)
           ),
         ),
         const SizedBox(height: 8),
@@ -260,34 +238,34 @@ class _InspectionFormWidgetState extends State<InspectionFormWidget> {
           decoration: InputDecoration(
             hintText: 'Seleccione una opción',
             hintStyle: const TextStyle(
-              color: Color(0xFF9E9E9E),
+              color: Color(0xFFCCCCCC), // var(--Texto-inputs, #CCC)
               fontFamily: 'Work Sans',
               fontSize: 14,
-              fontWeight: FontWeight.w400,
+              fontWeight: FontWeight.w500,
+              height: 1.42857, // 20px / 14px = 1.42857 (142.857%)
             ),
+            filled: true,
+            fillColor: DAGRDColors.blancoDAGRD,
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(4),
-              borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(color: DAGRDColors.grisMedio, width: 1),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(4),
-              borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(color: DAGRDColors.grisMedio, width: 1),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(4),
-              borderSide: const BorderSide(color: Color(0xFF232B48), width: 2),
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(color: DAGRDColors.azulDAGRD, width: 2),
             ),
             errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(4),
-              borderSide: const BorderSide(color: Colors.red),
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(color: DAGRDColors.error, width: 1),
             ),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 16,
-            ),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             suffixIcon: const Icon(
               Icons.keyboard_arrow_down,
-              color: Color(0xFF9E9E9E),
+              color: DAGRDColors.grisMedio,
             ),
           ),
         ),

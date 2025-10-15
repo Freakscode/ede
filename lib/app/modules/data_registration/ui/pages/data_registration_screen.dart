@@ -13,7 +13,7 @@ class DataRegistrationScreen extends StatefulWidget {
 class _DataRegistrationScreenState extends State<DataRegistrationScreen> {
   final _contactFormKey = GlobalKey<FormState>();
   final _inspectionFormKey = GlobalKey<FormState>();
-  bool _showInspectionForm = false;
+  bool _showInspectionForm = true;
 
   @override
   Widget build(BuildContext context) {
