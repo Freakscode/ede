@@ -30,9 +30,6 @@ class DataRegistrationBloc
           isInspectionValid: false,
           // Navegación
           showInspectionForm: false,
-          // Form keys
-          contactFormKey: null,
-          inspectionFormKey: null,
         ),
       ) {
     // Eventos de formulario de contacto
@@ -58,9 +55,6 @@ class DataRegistrationBloc
     on<ResetAllForms>(_onResetAllForms);
     on<SaveCompleteRegistration>(_onSaveCompleteRegistration);
 
-    // Eventos para form keys
-    on<SetContactFormKey>(_onSetContactFormKey);
-    on<SetInspectionFormKey>(_onSetInspectionFormKey);
   }
 
   // === MANEJADORES DE FORMULARIO DE CONTACTO ===
@@ -274,22 +268,20 @@ class DataRegistrationBloc
     InspectionFormValidated event,
     Emitter<DataRegistrationState> emit,
   ) {
-    if (state is DataRegistrationData) {
-      final currentState = state as DataRegistrationData;
-      
-      final errors = _validateInspectionForm(currentState);
-      final isValid = errors.isEmpty;
+    if (state is! DataRegistrationData) return;
+    
+    final currentState = state as DataRegistrationData;
+    final errors = _validateInspectionForm(currentState);
+    final isValid = errors.isEmpty;
 
-      final newState = currentState.copyWith(
-        inspectionErrors: errors,
-        isInspectionValid: isValid,
-      );
-      emit(newState);
+    emit(currentState.copyWith(
+      inspectionErrors: errors,
+      isInspectionValid: isValid,
+    ));
 
-      // Si el formulario es válido, guardar automáticamente
-      if (isValid) {
-        add(const SaveCompleteRegistration());
-      }
+    // Guardar automáticamente si es válido
+    if (isValid) {
+      add(const SaveCompleteRegistration());
     }
   }
 
@@ -319,6 +311,7 @@ class DataRegistrationBloc
     ResetAllForms event,
     Emitter<DataRegistrationState> emit,
   ) {
+    // Emitir estado inicial limpio, asegurando que no quede en loading
     emit(
       const DataRegistrationData(
         contactNames: '',
@@ -345,36 +338,30 @@ class DataRegistrationBloc
     SaveCompleteRegistration event,
     Emitter<DataRegistrationState> emit,
   ) async {
+    if (state is! DataRegistrationData) return;
+    
     emit(const DataRegistrationLoading());
 
     try {
-      if (state is DataRegistrationData) {
-        final currentState = state as DataRegistrationData;
+      final currentState = state as DataRegistrationData;
+      
+      // Crear y guardar datos de inspección
+      final inspectionData = InspectionData(
+        incidentId: currentState.inspectionIncidentId,
+        status: currentState.inspectionStatus ?? '',
+        date: currentState.inspectionDate ?? DateTime.now(),
+        time: currentState.inspectionTime,
+        comment: currentState.inspectionComment,
+        injured: currentState.inspectionInjured,
+        dead: currentState.inspectionDead,
+      );
 
-        // Simular guardado
-        await Future.delayed(const Duration(milliseconds: 500));
+      final storageService = InspectionStorageService();
+      await storageService.saveInspection(inspectionData);
 
-        // Crear los objetos de datos
-        final inspectionData = InspectionData(
-          incidentId: currentState.inspectionIncidentId,
-          status: currentState.inspectionStatus ?? '',
-          date: currentState.inspectionDate ?? DateTime.now(),
-          time: currentState.inspectionTime,
-          comment: currentState.inspectionComment,
-          injured: currentState.inspectionInjured,
-          dead: currentState.inspectionDead,
-        );
-
-        // Guardar en memoria usando el servicio
-        final storageService = InspectionStorageService();
-        await storageService.saveInspection(inspectionData);
-
-        emit(
-          const CompleteRegistrationSaved(
-            message: 'Registro completo guardado correctamente',
-          ),
-        );
-      }
+      emit(const CompleteRegistrationSaved(
+        message: 'Registro completo guardado correctamente',
+      ));
     } catch (e) {
       emit(DataRegistrationError('Error al guardar los datos: $e'));
     }
@@ -488,25 +475,4 @@ class DataRegistrationBloc
     return null;
   }
 
-  // === MANEJADORES DE FORM KEYS ===
-
-  void _onSetContactFormKey(
-    SetContactFormKey event,
-    Emitter<DataRegistrationState> emit,
-  ) {
-    if (state is DataRegistrationData) {
-      final currentState = state as DataRegistrationData;
-      emit(currentState.copyWith(contactFormKey: event.formKey));
-    }
-  }
-
-  void _onSetInspectionFormKey(
-    SetInspectionFormKey event,
-    Emitter<DataRegistrationState> emit,
-  ) {
-    if (state is DataRegistrationData) {
-      final currentState = state as DataRegistrationData;
-      emit(currentState.copyWith(inspectionFormKey: event.formKey));
-    }
-  }
 }

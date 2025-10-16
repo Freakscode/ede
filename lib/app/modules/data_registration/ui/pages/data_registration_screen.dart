@@ -7,58 +7,54 @@ import '../../bloc/data_registration_bloc.dart';
 import '../../bloc/events/data_registration_events.dart';
 import '../../bloc/data_registration_state.dart';
 
-class DataRegistrationScreen extends StatelessWidget {
+class DataRegistrationScreen extends StatefulWidget {
   const DataRegistrationScreen({super.key});
+
+  @override
+  State<DataRegistrationScreen> createState() => _DataRegistrationScreenState();
+}
+
+class _DataRegistrationScreenState extends State<DataRegistrationScreen> {
+  late final GlobalKey<FormState> _contactFormKey;
+  late final GlobalKey<FormState> _inspectionFormKey;
+
+  @override
+  void initState() {
+    super.initState();
+    _contactFormKey = GlobalKey<FormState>();
+    _inspectionFormKey = GlobalKey<FormState>();
+    
+    // Resetear el formulario una sola vez al inicializar
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<DataRegistrationBloc>().add(const ResetAllForms());
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<DataRegistrationBloc, DataRegistrationState>(
       builder: (context, state) {
-        // Obtener las form keys del estado del BLoC
-        final contactFormKey = state is DataRegistrationData ? state.contactFormKey : null;
-        final inspectionFormKey = state is DataRegistrationData ? state.inspectionFormKey : null;
         final showInspectionForm = state is DataRegistrationData ? state.showInspectionForm : false;
-
-        // Crear las form keys si no existen
-        final effectiveContactFormKey = contactFormKey ?? GlobalKey<FormState>();
-        final effectiveInspectionFormKey = inspectionFormKey ?? GlobalKey<FormState>();
-
-        // Establecer las form keys en el BLoC si no están establecidas
-        if (contactFormKey == null) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            context.read<DataRegistrationBloc>().add(SetContactFormKey(effectiveContactFormKey));
-          });
-        }
-        if (inspectionFormKey == null) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            context.read<DataRegistrationBloc>().add(SetInspectionFormKey(effectiveInspectionFormKey));
-          });
-        }
 
         return Scaffold(
           appBar: CustomAppBar(
             showBack: true,
             showInfo: true,
             showProfile: true,
-            onBack: showInspectionForm ? () => _handleBackPressed(context) : null,
+            onBack: showInspectionForm ? _handleBackPressed : null,
           ),
           body: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 37, vertical: 31),
             child: showInspectionForm
-                ? InspectionFormWidget(
-                    formKey: effectiveInspectionFormKey,
-                  )
-                : ContactFormWidget(
-                    formKey: effectiveContactFormKey,
-                  ),
+                ? InspectionFormWidget(formKey: _inspectionFormKey)
+                : ContactFormWidget(formKey: _contactFormKey),
           ),
         );
       },
     );
   }
 
-  void _handleBackPressed(BuildContext context) {
-    // Volver al formulario de contacto
+  void _handleBackPressed() {
     context.read<DataRegistrationBloc>().add(const NavigateToContactForm());
   }
 }

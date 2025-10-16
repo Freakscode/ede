@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 abstract class DataRegistrationState {
   const DataRegistrationState();
 }
@@ -34,10 +32,6 @@ class DataRegistrationData extends DataRegistrationState {
 
   // Estado de navegación
   final bool showInspectionForm;
-  
-  // Form keys
-  final GlobalKey<FormState>? contactFormKey;
-  final GlobalKey<FormState>? inspectionFormKey;
 
   const DataRegistrationData({
     // Datos de contacto
@@ -59,9 +53,6 @@ class DataRegistrationData extends DataRegistrationState {
     required this.isInspectionValid,
     // Navegación
     required this.showInspectionForm,
-    // Form keys
-    this.contactFormKey,
-    this.inspectionFormKey,
   });
 
   DataRegistrationData copyWith({
@@ -84,9 +75,6 @@ class DataRegistrationData extends DataRegistrationState {
     bool? isInspectionValid,
     // Navegación
     bool? showInspectionForm,
-    // Form keys
-    GlobalKey<FormState>? contactFormKey,
-    GlobalKey<FormState>? inspectionFormKey,
   }) {
     return DataRegistrationData(
       // Datos de contacto
@@ -108,9 +96,6 @@ class DataRegistrationData extends DataRegistrationState {
       isInspectionValid: isInspectionValid ?? this.isInspectionValid,
       // Navegación
       showInspectionForm: showInspectionForm ?? this.showInspectionForm,
-      // Form keys
-      contactFormKey: contactFormKey ?? this.contactFormKey,
-      inspectionFormKey: inspectionFormKey ?? this.inspectionFormKey,
     );
   }
 
@@ -133,9 +118,7 @@ class DataRegistrationData extends DataRegistrationState {
         other.inspectionDead == inspectionDead &&
         other.inspectionErrors.toString() == inspectionErrors.toString() &&
         other.isInspectionValid == isInspectionValid &&
-        other.showInspectionForm == showInspectionForm &&
-        other.contactFormKey == contactFormKey &&
-        other.inspectionFormKey == inspectionFormKey;
+        other.showInspectionForm == showInspectionForm;
   }
 
   @override
@@ -155,9 +138,7 @@ class DataRegistrationData extends DataRegistrationState {
         inspectionDead.hashCode ^
         inspectionErrors.hashCode ^
         isInspectionValid.hashCode ^
-        showInspectionForm.hashCode ^
-        contactFormKey.hashCode ^
-        inspectionFormKey.hashCode;
+        showInspectionForm.hashCode;
   }
 }
 

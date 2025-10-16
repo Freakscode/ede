@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 abstract class DataRegistrationEvent {
   const DataRegistrationEvent();
 }
@@ -86,13 +84,3 @@ class SaveCompleteRegistration extends DataRegistrationEvent {
   const SaveCompleteRegistration();
 }
 
-// Eventos para manejar form keys
-class SetContactFormKey extends DataRegistrationEvent {
-  final GlobalKey<FormState> formKey;
-  const SetContactFormKey(this.formKey);
-}
-
-class SetInspectionFormKey extends DataRegistrationEvent {
-  final GlobalKey<FormState> formKey;
-  const SetInspectionFormKey(this.formKey);
-}

@@ -48,7 +48,7 @@ class _InspectionFormWidgetState extends State<InspectionFormWidget> {
   Widget build(BuildContext context) {
     return BlocListener<DataRegistrationBloc, DataRegistrationState>(
       listener: (context, state) {
-        if (state is InspectionFormSaved) {
+        if (state is CompleteRegistrationSaved) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.message),
@@ -56,15 +56,7 @@ class _InspectionFormWidgetState extends State<InspectionFormWidget> {
               duration: const Duration(seconds: 2),
             ),
           );
-          context.go('/home');
-        } else if (state is CompleteRegistrationSaved) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.message),
-              backgroundColor: Colors.green,
-              duration: const Duration(seconds: 2),
-            ),
-          );
+          // Navegar al home después de guardar exitosamente
           context.go('/home');
         } else if (state is DataRegistrationError) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -138,14 +130,7 @@ class _InspectionFormWidgetState extends State<InspectionFormWidget> {
                 // Botón Finalizar
                 CustomElevatedButton(
                   text: 'Finalizar',
-                  onPressed: state is DataRegistrationLoading ? null : () {
-                    // Primero validar el formulario Flutter
-                    if (widget.formKey.currentState!.validate()) {
-                      widget.formKey.currentState!.save();
-                      // Luego disparar la validación del BLoC
-                      context.read<DataRegistrationBloc>().add(const InspectionFormValidated());
-                    }
-                  },
+                  onPressed: _canSubmit(state) ? _handleSubmit : null,
                   isLoading: state is DataRegistrationLoading,
                 ),
               ],
@@ -293,5 +278,21 @@ class _InspectionFormWidgetState extends State<InspectionFormWidget> {
         context.read<DataRegistrationBloc>().add(InspectionFormDeadChanged(dead));
       },
     );
+  }
+
+  // === MÉTODOS AUXILIARES OPTIMIZADOS ===
+
+  /// Verifica si el formulario puede ser enviado
+  bool _canSubmit(DataRegistrationState state) {
+    return state is! DataRegistrationLoading;
+  }
+
+  /// Maneja el envío del formulario de manera optimizada
+  void _handleSubmit() {
+    final formState = widget.formKey.currentState;
+    if (formState?.validate() == true) {
+      formState!.save();
+      context.read<DataRegistrationBloc>().add(const InspectionFormValidated());
+    }
   }
 }
