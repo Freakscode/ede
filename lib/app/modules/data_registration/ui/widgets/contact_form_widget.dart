@@ -46,6 +46,9 @@ class _ContactFormWidgetState extends State<ContactFormWidget> {
         print('Email: "${state.contactEmail}"');
         print('==================================');
       }
+      
+      // Inicializar formulario en el bloc
+      bloc.add(const ContactFormInitialize());
     });
   }
 
@@ -171,25 +174,8 @@ class _ContactFormWidgetState extends State<ContactFormWidget> {
                     // Siempre guardar el formulario primero
                     widget.formKey.currentState!.save();
                     
-                    // Imprimir los datos de contacto antes de enviar
-                    final bloc = context.read<DataRegistrationBloc>();
-                    final currentState = bloc.state;
-                    
-                    if (currentState is DataRegistrationData) {
-                      print('=== DATOS DEL FORMULARIO DE CONTACTO ===');
-                      print('Nombres: ${currentState.contactNames}');
-                      print('Número de celular: ${currentState.contactCellPhone}');
-                      print('Número de teléfono fijo: ${currentState.contactLandline}');
-                      print('Correo electrónico: ${currentState.contactEmail}');
-                      print('Contacto válido: ${currentState.isContactValid}');
-                      print('Errores: ${currentState.contactErrors}');
-                      print('========================================');
-                    }
-                    
-                    // Siempre disparar la validación del BLoC
-                    print('=== ENVIANDO ContactFormValidated ===');
-                    bloc.add(const ContactFormValidated());
-                    print('=== EVENTO ENVIADO ===');
+                    // Disparar evento de envío en el bloc (lógica separada)
+                    context.read<DataRegistrationBloc>().add(const ContactFormSubmit());
                   },
                   backgroundColor: DAGRDColors.azulDAGRD,
                   textColor: DAGRDColors.blancoDAGRD,

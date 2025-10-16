@@ -58,6 +58,12 @@ class DataRegistrationBloc
     on<ResetAllForms>(_onResetAllForms);
     on<SaveCompleteRegistration>(_onSaveCompleteRegistration);
 
+    // Eventos de lógica de formularios
+    on<ContactFormSubmit>(_onContactFormSubmit);
+    on<InspectionFormSubmit>(_onInspectionFormSubmit);
+    on<ContactFormInitialize>(_onContactFormInitialize);
+    on<InspectionFormInitialize>(_onInspectionFormInitialize);
+
   }
 
   // === MANEJADORES DE FORMULARIO DE CONTACTO ===
@@ -624,6 +630,85 @@ class DataRegistrationBloc
       );
     }
     return null;
+  }
+
+  // === MANEJADORES DE LÓGICA DE FORMULARIOS ===
+
+  /// Maneja el envío del formulario de contacto
+  void _onContactFormSubmit(
+    ContactFormSubmit event,
+    Emitter<DataRegistrationState> emit,
+  ) {
+    if (state is! DataRegistrationData) return;
+    
+    final currentState = state as DataRegistrationData;
+    
+    // Imprimir datos del formulario antes de enviar
+    print('=== ENVIANDO FORMULARIO DE CONTACTO ===');
+    print('Nombres: ${currentState.contactNames}');
+    print('Celular: ${currentState.contactCellPhone}');
+    print('Teléfono fijo: ${currentState.contactLandline}');
+    print('Email: ${currentState.contactEmail}');
+    print('=======================================');
+    
+    // Disparar validación
+    add(const ContactFormValidated());
+  }
+
+  /// Maneja el envío del formulario de inspección
+  void _onInspectionFormSubmit(
+    InspectionFormSubmit event,
+    Emitter<DataRegistrationState> emit,
+  ) {
+    if (state is! DataRegistrationData) return;
+    
+    final currentState = state as DataRegistrationData;
+    
+    // Imprimir datos del formulario antes de enviar
+    print('=== ENVIANDO FORMULARIO DE INSPECCIÓN ===');
+    print('ID Incidente: ${currentState.inspectionIncidentId}');
+    print('Estado: ${currentState.inspectionStatus}');
+    print('Fecha: ${currentState.inspectionDate}');
+    print('Hora: ${currentState.inspectionTime}');
+    print('Comentario: ${currentState.inspectionComment}');
+    print('Lesionados: ${currentState.inspectionInjured}');
+    print('Muertos: ${currentState.inspectionDead}');
+    print('==========================================');
+    
+    // Disparar validación
+    add(const InspectionFormValidated());
+  }
+
+  /// Inicializa el formulario de contacto
+  void _onContactFormInitialize(
+    ContactFormInitialize event,
+    Emitter<DataRegistrationState> emit,
+  ) {
+    if (state is DataRegistrationData) {
+      final currentState = state as DataRegistrationData;
+      
+      print('=== INICIALIZANDO FORMULARIO DE CONTACTO ===');
+      print('Estado actual: ${currentState.contactErrors}');
+      print('===========================================');
+      
+      // El estado ya está inicializado, solo log para debug
+    }
+  }
+
+  /// Inicializa el formulario de inspección
+  void _onInspectionFormInitialize(
+    InspectionFormInitialize event,
+    Emitter<DataRegistrationState> emit,
+  ) {
+    if (state is DataRegistrationData) {
+      final currentState = state as DataRegistrationData;
+      
+      print('=== INICIALIZANDO FORMULARIO DE INSPECCIÓN ===');
+      print('Estado actual: ${currentState.inspectionErrors}');
+      print('=============================================');
+      
+      // El estado ya está inicializado, solo log para debug
+    }
   }
 
 }

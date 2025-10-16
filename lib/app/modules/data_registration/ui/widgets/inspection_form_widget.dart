@@ -36,6 +36,15 @@ class _InspectionFormWidgetState extends State<InspectionFormWidget> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    // Inicializar formulario en el bloc
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<DataRegistrationBloc>().add(const InspectionFormInitialize());
+    });
+  }
+
+  @override
   void dispose() {
     _incidentIdController.dispose();
     _commentController.dispose();
@@ -325,23 +334,7 @@ class _InspectionFormWidgetState extends State<InspectionFormWidget> {
     // Siempre guardar el formulario primero
     formState?.save();
     
-    // Imprimir datos del formulario antes de enviar
-    final bloc = context.read<DataRegistrationBloc>();
-    final state = bloc.state;
-    
-    if (state is DataRegistrationData) {
-      print('=== ENVIANDO FORMULARIO DE INSPECCIÓN ===');
-      print('ID Incidente: ${state.inspectionIncidentId}');
-      print('Estado: ${state.inspectionStatus}');
-      print('Fecha: ${state.inspectionDate}');
-      print('Hora: ${state.inspectionTime}');
-      print('Comentario: ${state.inspectionComment}');
-      print('Lesionados: ${state.inspectionInjured}');
-      print('Muertos: ${state.inspectionDead}');
-      print('==========================================');
-    }
-    
-    // Siempre disparar la validación del BLoC
-    bloc.add(const InspectionFormValidated());
+    // Disparar evento de envío en el bloc (lógica separada)
+    context.read<DataRegistrationBloc>().add(const InspectionFormSubmit());
   }
 }

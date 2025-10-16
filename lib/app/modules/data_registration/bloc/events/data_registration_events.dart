@@ -84,3 +84,20 @@ class SaveCompleteRegistration extends DataRegistrationEvent {
   const SaveCompleteRegistration();
 }
 
+// Eventos para lógica de formularios
+class ContactFormSubmit extends DataRegistrationEvent {
+  const ContactFormSubmit();
+}
+
+class InspectionFormSubmit extends DataRegistrationEvent {
+  const InspectionFormSubmit();
+}
+
+class ContactFormInitialize extends DataRegistrationEvent {
+  const ContactFormInitialize();
+}
+
+class InspectionFormInitialize extends DataRegistrationEvent {
+  const InspectionFormInitialize();
+}
+
