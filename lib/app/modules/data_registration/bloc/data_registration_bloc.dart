@@ -345,12 +345,22 @@ class DataRegistrationBloc
   ) async {
     if (state is! DataRegistrationData) return;
     
+    // Guardar el estado antes de emitir loading
+    final currentState = state as DataRegistrationData;
     emit(const DataRegistrationLoading());
 
     try {
-      final currentState = state as DataRegistrationData;
       
       // Crear y guardar datos de inspección
+      print('=== CREANDO InspectionData ===');
+      print('incidentId: ${currentState.inspectionIncidentId} (${currentState.inspectionIncidentId.runtimeType})');
+      print('status: ${currentState.inspectionStatus} (${currentState.inspectionStatus.runtimeType})');
+      print('date: ${currentState.inspectionDate} (${currentState.inspectionDate.runtimeType})');
+      print('time: ${currentState.inspectionTime} (${currentState.inspectionTime.runtimeType})');
+      print('comment: ${currentState.inspectionComment} (${currentState.inspectionComment.runtimeType})');
+      print('injured: ${currentState.inspectionInjured} (${currentState.inspectionInjured.runtimeType})');
+      print('dead: ${currentState.inspectionDead} (${currentState.inspectionDead.runtimeType})');
+      
       final inspectionData = InspectionData(
         incidentId: currentState.inspectionIncidentId,
         status: currentState.inspectionStatus ?? '',
@@ -360,6 +370,9 @@ class DataRegistrationBloc
         injured: currentState.inspectionInjured,
         dead: currentState.inspectionDead,
       );
+      
+      print('InspectionData creado exitosamente: $inspectionData');
+      print('===============================');
 
       final storageService = InspectionStorageService();
       await storageService.saveInspection(inspectionData);
@@ -378,6 +391,11 @@ class DataRegistrationBloc
         message: 'Registro completo guardado correctamente',
       ));
     } catch (e) {
+      print('=== ERROR EN GUARDADO ===');
+      print('Error: $e');
+      print('Tipo de error: ${e.runtimeType}');
+      print('Stack trace: ${StackTrace.current}');
+      print('========================');
       emit(DataRegistrationError('Error al guardar los datos: $e'));
     }
   }
