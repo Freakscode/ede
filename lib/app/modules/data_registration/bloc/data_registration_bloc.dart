@@ -69,8 +69,6 @@ class DataRegistrationBloc
     ContactFormNamesChanged event,
     Emitter<DataRegistrationState> emit,
   ) {
-    print('=== _onContactNamesChanged ===');
-    print('Nuevo nombre: "${event.names}"');
     if (state is DataRegistrationData) {
       final currentState = state as DataRegistrationData;
       final newState = currentState.copyWith(
@@ -78,9 +76,6 @@ class DataRegistrationBloc
         contactErrors: _clearContactError('names', currentState.contactErrors),
       );
       emit(newState);
-      print('Nombre actualizado en estado');
-    } else {
-      print('Estado no es DataRegistrationData: ${state.runtimeType}');
     }
   }
 
@@ -136,21 +131,11 @@ class DataRegistrationBloc
     ContactFormValidated event,
     Emitter<DataRegistrationState> emit,
   ) {
-    print('=== _onContactFormValidated ===');
     if (state is DataRegistrationData) {
       final currentState = state as DataRegistrationData;
-
-      print('Datos actuales:');
-      print('- Nombres: "${currentState.contactNames}"');
-      print('- Celular: "${currentState.contactCellPhone}"');
-      print('- Fijo: "${currentState.contactLandline}"');
-      print('- Email: "${currentState.contactEmail}"');
       
       final errors = _validateContactForm(currentState);
       final isValid = errors.isEmpty;
-
-      print('Errores encontrados: $errors');
-      print('¿Formulario válido?: $isValid');
 
       final newState = currentState.copyWith(
         contactErrors: errors,
@@ -159,13 +144,8 @@ class DataRegistrationBloc
       emit(newState);
 
       if (isValid) {
-        print('Formulario válido, navegando...');
         emit(newState.copyWith(showInspectionForm: true));
-      } else {
-        print('Formulario inválido, no navegando');
       }
-    } else {
-      print('Estado no es DataRegistrationData: ${state.runtimeType}');
     }
   }
 
@@ -294,16 +274,11 @@ class DataRegistrationBloc
     InspectionFormValidated event,
     Emitter<DataRegistrationState> emit,
   ) {
-    print('=== _onInspectionFormValidated ===');
     if (state is DataRegistrationData) {
       final currentState = state as DataRegistrationData;
-      print('Validando formulario de inspección...');
       
       final errors = _validateInspectionForm(currentState);
       final isValid = errors.isEmpty;
-
-      print('Errores encontrados: $errors');
-      print('¿Formulario válido?: $isValid');
 
       final newState = currentState.copyWith(
         inspectionErrors: errors,
@@ -313,13 +288,8 @@ class DataRegistrationBloc
 
       // Si el formulario es válido, guardar automáticamente
       if (isValid) {
-        print('Formulario válido, iniciando guardado...');
         add(const SaveCompleteRegistration());
-      } else {
-        print('Formulario inválido, no guardando');
       }
-    } else {
-      print('Estado no es DataRegistrationData: ${state.runtimeType}');
     }
   }
 
@@ -375,26 +345,16 @@ class DataRegistrationBloc
     SaveCompleteRegistration event,
     Emitter<DataRegistrationState> emit,
   ) async {
-    print('=== _onSaveCompleteRegistration ===');
     emit(const DataRegistrationLoading());
-    print('Estado cambiado a DataRegistrationLoading');
 
     try {
       if (state is DataRegistrationData) {
         final currentState = state as DataRegistrationData;
-        print('Guardando datos de inspección...');
 
         // Simular guardado
         await Future.delayed(const Duration(milliseconds: 500));
 
         // Crear los objetos de datos
-        final contactData = ContactData(
-          names: currentState.contactNames,
-          cellPhone: currentState.contactCellPhone,
-          landline: currentState.contactLandline,
-          email: currentState.contactEmail,
-        );
-
         final inspectionData = InspectionData(
           incidentId: currentState.inspectionIncidentId,
           status: currentState.inspectionStatus ?? '',
@@ -409,22 +369,13 @@ class DataRegistrationBloc
         final storageService = InspectionStorageService();
         await storageService.saveInspection(inspectionData);
 
-        // Aquí podrías guardar también los datos de contacto si tienes un servicio para eso
-        print('Contacto guardado: ${contactData.toJson()}');
-        print('Inspección guardada: ${inspectionData.toJson()}');
-
-        print('Emitiendo CompleteRegistrationSaved...');
         emit(
           const CompleteRegistrationSaved(
             message: 'Registro completo guardado correctamente',
           ),
         );
-        print('Estado cambiado a CompleteRegistrationSaved');
-      } else {
-        print('Estado no es DataRegistrationData: ${state.runtimeType}');
       }
     } catch (e) {
-      print('Error al guardar: $e');
       emit(DataRegistrationError('Error al guardar los datos: $e'));
     }
   }
@@ -442,7 +393,7 @@ class DataRegistrationBloc
       errors['cellPhone'] = 'Por favor ingrese su número de celular';
     } else if (data.contactCellPhone.length < 10) {
       final remaining = 10 - data.contactCellPhone.length;
-      errors['cellPhone'] = 'Faltan $remaining dígitos (${data.contactCellPhone.length}/10)';
+      errors['cellPhone'] = 'Faltan $remaining dígitos';
     }
 
     if (data.contactLandline.trim().isEmpty) {

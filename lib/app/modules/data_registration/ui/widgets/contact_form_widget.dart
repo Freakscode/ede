@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import 'package:caja_herramientas/app/shared/widgets/buttons/custom_elevated_button.dart';
@@ -97,12 +98,9 @@ class _ContactFormWidgetState extends State<ContactFormWidget> {
                 CustomElevatedButton(
                   text: 'Siguiente',
                   onPressed: state is DataRegistrationLoading ? null : () {
-                    // Primero validar el formulario Flutter 
-                    print('Validando formulario Flutter');
+                    // Primero validar el formulario Flutter
                     if (widget.formKey.currentState!.validate()) {
-                      print('Formulario validado');
                       widget.formKey.currentState!.save();
-                      print('Guardando formulario');
                       // Luego disparar la validación del BLoC
                       context.read<DataRegistrationBloc>().add(const ContactFormValidated());
                     }
@@ -164,12 +162,27 @@ class _ContactFormWidgetState extends State<ContactFormWidget> {
       });
     }
     
+    // Generar helper text con contador de dígitos
+    String? helperText;
+    final currentLength = _cellPhoneController.text.length;
+    if (currentLength > 0 && currentLength < 10) {
+      final remaining = 10 - currentLength;
+      helperText = 'Faltan $remaining dígitos';
+    } else if (currentLength == 10) {
+      helperText = 'Número completo';
+    }
+    
     return CustomTextField(
       controller: _cellPhoneController,
       label: 'Número de celular *',
       hintText: 'Ingrese su número de celular',
       keyboardType: TextInputType.phone,
       validator: (value) => error,
+      helperText: helperText,
+      inputFormatters: [
+        FilteringTextInputFormatter.digitsOnly,
+        LengthLimitingTextInputFormatter(10),
+      ],
       onChanged: (value) {
         context.read<DataRegistrationBloc>().add(ContactFormCellPhoneChanged(value));
       },
@@ -200,6 +213,10 @@ class _ContactFormWidgetState extends State<ContactFormWidget> {
       hintText: 'Ingrese su número fijo',
       keyboardType: TextInputType.phone,
       validator: (value) => error,
+      inputFormatters: [
+        FilteringTextInputFormatter.digitsOnly,
+        LengthLimitingTextInputFormatter(10),
+      ],
       onChanged: (value) {
         context.read<DataRegistrationBloc>().add(ContactFormLandlineChanged(value));
       },

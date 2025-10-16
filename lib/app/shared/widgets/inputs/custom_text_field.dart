@@ -15,6 +15,7 @@ class CustomTextField extends StatelessWidget {
   final void Function(String?)? onSaved;
   final int maxLines;
   final List<TextInputFormatter>? inputFormatters;
+  final String? helperText;
 
   const CustomTextField({
     super.key,
@@ -30,6 +31,7 @@ class CustomTextField extends StatelessWidget {
     this.onSaved,
     this.maxLines = 1,
     this.inputFormatters,
+    this.helperText,
   });
 
   @override
@@ -95,6 +97,21 @@ class CustomTextField extends StatelessWidget {
             prefixIcon: prefixIcon,
           ),
         ),
+        
+        // Helper text (contador de dígitos)
+        if (helperText != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 4.0),
+            child: Text(
+              helperText!,
+              style: const TextStyle(
+                color: Color(0xFF666666),
+                fontFamily: 'Work Sans',
+                fontSize: 12,
+                fontWeight: FontWeight.w400,
+              ),
+            ),
+          ),
       ],
     );
   }

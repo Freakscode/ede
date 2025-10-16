@@ -14,17 +14,10 @@ class DataRegistrationScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<DataRegistrationBloc, DataRegistrationState>(
       builder: (context, state) {
-        print('=== DataRegistrationScreen rebuild ===');
-        print('Estado: ${state.runtimeType}');
-        
         // Obtener las form keys del estado del BLoC
         final contactFormKey = state is DataRegistrationData ? state.contactFormKey : null;
         final inspectionFormKey = state is DataRegistrationData ? state.inspectionFormKey : null;
         final showInspectionForm = state is DataRegistrationData ? state.showInspectionForm : false;
-        
-        print('showInspectionForm: $showInspectionForm');
-        print('contactFormKey: $contactFormKey');
-        print('inspectionFormKey: $inspectionFormKey');
 
         // Crear las form keys si no existen
         final effectiveContactFormKey = contactFormKey ?? GlobalKey<FormState>();
