@@ -48,29 +48,61 @@ class _CustomExpandableDropdownState<T>
   }
 
   @override
+  void didUpdateWidget(CustomExpandableDropdown<T> oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    
+    // Si el valor cambió, cerrar el dropdown si está abierto
+    if (oldWidget.value != widget.value) {
+      if (_isExpanded) {
+        setState(() {
+          _isExpanded = false;
+        });
+      }
+      // Limpiar error si el valor cambió
+      if (_errorText != null) {
+        setState(() {
+          _errorText = null;
+        });
+      }
+    }
+  }
+
+  @override
   void dispose() {
     _animationController.dispose();
     super.dispose();
   }
 
   void _toggleExpansion() {
+    print('=== TOGGLE EXPANSION ===');
+    print('Estado actual: $_isExpanded');
+    print('Valor actual: ${widget.value}');
+    print('Número de items: ${widget.items.length}');
+    print('Items: ${widget.items}');
+    print('=======================');
+    
     setState(() {
       _isExpanded = !_isExpanded;
-      if (_isExpanded) {
-        _animationController.forward();
-      } else {
-        _animationController.reverse();
-      }
     });
+    
+    print('Nuevo estado: $_isExpanded');
+    print('Altura calculada: ${_isExpanded ? widget.items.length * 48.0 : 0}');
+    print('=======================');
   }
 
   void _selectItem(T item) {
+    print('=== SELECTING ITEM ===');
+    print('Item seleccionado: $item');
+    print('======================');
+    
     widget.onChanged(item);
     setState(() {
       _isExpanded = false;
       _errorText = null;
     });
-    _animationController.reverse();
+    
+    print('Item seleccionado y dropdown cerrado');
+    print('======================');
   }
 
   @override
@@ -149,10 +181,11 @@ class _CustomExpandableDropdownState<T>
           ),
 
         // Expandable container
-        ClipRect(
-          child: Align(
-            alignment: Alignment.topCenter,
-            heightFactor: _expandAnimation.value,
+        AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          height: _isExpanded ? widget.items.length * 48.0 : 0,
+          curve: Curves.easeInOut,
+          child: ClipRect(
             child: Container(
               decoration: BoxDecoration(
                 color: DAGRDColors.blancoDAGRD,

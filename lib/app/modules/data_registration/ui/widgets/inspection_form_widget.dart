@@ -174,10 +174,16 @@ class _InspectionFormWidgetState extends State<InspectionFormWidget> {
     final currentData = state is DataRegistrationData ? state : null;
     final error = currentData?.inspectionErrors['status'];
     
+    print('=== REBUILDING STATUS FIELD ===');
+    print('Estado actual: ${currentData?.inspectionStatus}');
+    print('Error: $error');
+    print('================================');
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         CustomExpandableDropdown<String>(
+          key: ValueKey('status_${currentData?.inspectionStatus}_${error ?? 'no_error'}'), // Key único para forzar rebuild
           label: 'Estado *',
           value: currentData?.inspectionStatus,
           items: _statusOptions,
