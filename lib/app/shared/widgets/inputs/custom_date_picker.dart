@@ -23,6 +23,8 @@ class CustomDatePicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final errorMessage = validator?.call(selectedDate);
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -43,14 +45,21 @@ class CustomDatePicker extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             decoration: BoxDecoration(
               color: DAGRDColors.blancoDAGRD,
-              border: Border.all(color: DAGRDColors.grisMedio, width: 1),
+              border: Border.all(
+                color: errorMessage != null 
+                    ? const Color(0xFFE53E3E) // Rojo para error
+                    : DAGRDColors.grisMedio, 
+                width: 1
+              ),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Row(
               children: [
-                const Icon(
+                Icon(
                   Icons.calendar_today,
-                  color: DAGRDColors.grisMedio,
+                  color: errorMessage != null 
+                      ? const Color(0xFFE53E3E) // Rojo para error
+                      : DAGRDColors.grisMedio,
                   size: 20,
                 ),
                 const SizedBox(width: 12),
@@ -74,6 +83,19 @@ class CustomDatePicker extends StatelessWidget {
             ),
           ),
         ),
+        // Mostrar mensaje de error si existe
+        if (errorMessage != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: Text(
+              errorMessage,
+              style: const TextStyle(
+                color: Color(0xFFE53E3E),
+                fontFamily: 'Work Sans',
+                fontSize: 12,
+              ),
+            ),
+          ),
       ],
     );
   }

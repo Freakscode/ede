@@ -4,6 +4,9 @@ import 'data_registration_state.dart';
 import '../models/contact_data.dart';
 import '../models/inspection_data.dart';
 import '../services/inspection_storage_service.dart';
+import '../../../core/validation/validation_messages.dart';
+import '../../../core/validation/ui_messages.dart';
+import '../../../core/validation/validation_constants.dart';
 
 /// BLoC unificado para manejar todo el proceso de registro de datos
 class DataRegistrationBloc
@@ -420,7 +423,7 @@ class DataRegistrationBloc
       print('Tipo de error: ${e.runtimeType}');
       print('Stack trace: ${StackTrace.current}');
       print('========================');
-      emit(DataRegistrationError('Error al guardar los datos: $e'));
+      emit(DataRegistrationError('${UIMessages.saveError}: $e'));
     }
   }
 
@@ -431,36 +434,64 @@ class DataRegistrationBloc
 
     // Validación de nombres
     if (data.contactNames.trim().isEmpty) {
-      errors['names'] = 'Por favor ingrese sus nombres';
-    } else if (data.contactNames.trim().length < 2) {
-      errors['names'] = 'Los nombres deben tener al menos 2 caracteres';
+      errors['names'] = ValidationMessages.contactNamesRequired;
+    } else {
+      final names = data.contactNames.trim();
+      if (names.length < ValidationConstants.contactNamesMinLength) {
+        errors['names'] = ValidationMessages.contactNamesMinLength;
+      } else if (names.length > ValidationConstants.contactNamesMaxLength) {
+        errors['names'] = ValidationMessages.contactNamesMaxLength;
+      } else if (names.split(' ').length < ValidationConstants.contactNamesMinWords) {
+        errors['names'] = ValidationMessages.contactNamesMinWords;
+      } else if (!RegExp(ValidationConstants.contactNamesPattern).hasMatch(names)) {
+        errors['names'] = ValidationMessages.contactNamesInvalidFormat;
+      }
     }
 
     // Validación de celular
     if (data.contactCellPhone.trim().isEmpty) {
-      errors['cellPhone'] = 'Por favor ingrese su número de celular';
-    } else if (data.contactCellPhone.length != 10) {
-      errors['cellPhone'] = 'El número de celular debe tener exactamente 10 dígitos';
-    } else if (!RegExp(r'^[0-9]{10}$').hasMatch(data.contactCellPhone)) {
-      errors['cellPhone'] = 'El número de celular debe contener solo dígitos';
+      errors['cellPhone'] = ValidationMessages.contactCellPhoneRequired;
+    } else {
+      final cellPhone = data.contactCellPhone.trim();
+      if (cellPhone.length != ValidationConstants.contactCellPhoneLength) {
+        errors['cellPhone'] = ValidationMessages.contactCellPhoneLength;
+      } else if (!RegExp(ValidationConstants.contactCellPhonePattern).hasMatch(cellPhone)) {
+        errors['cellPhone'] = ValidationMessages.contactCellPhoneDigitsOnly;
+      } else if (!cellPhone.startsWith(ValidationConstants.contactCellPhonePrefix)) {
+        errors['cellPhone'] = ValidationMessages.contactCellPhonePrefix;
+      }
     }
 
     // Validación de teléfono fijo
     if (data.contactLandline.trim().isEmpty) {
-      errors['landline'] = 'Por favor ingrese su número fijo';
-    } else if (data.contactLandline.length < 7) {
-      errors['landline'] = 'El número fijo debe tener al menos 7 dígitos';
-    } else if (!RegExp(r'^[0-9]+$').hasMatch(data.contactLandline)) {
-      errors['landline'] = 'El número fijo debe contener solo dígitos';
+      errors['landline'] = ValidationMessages.contactLandlineRequired;
+    } else {
+      final landline = data.contactLandline.trim();
+      if (landline.length < ValidationConstants.contactLandlineMinLength) {
+        errors['landline'] = ValidationMessages.contactLandlineMinLength;
+      } else if (landline.length > ValidationConstants.contactLandlineMaxLength) {
+        errors['landline'] = ValidationMessages.contactLandlineMaxLength;
+      } else if (!RegExp(ValidationConstants.contactLandlinePattern).hasMatch(landline)) {
+        errors['landline'] = ValidationMessages.contactLandlineDigitsOnly;
+      } else if (!landline.startsWith(RegExp(ValidationConstants.contactLandlineStartPattern))) {
+        errors['landline'] = ValidationMessages.contactLandlineInvalidStart;
+      }
     }
 
     // Validación de email
     if (data.contactEmail.trim().isEmpty) {
-      errors['email'] = 'Por favor ingrese su correo electrónico';
-    } else if (!RegExp(
-      r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
-    ).hasMatch(data.contactEmail)) {
-      errors['email'] = 'Por favor ingrese un correo electrónico válido';
+      errors['email'] = ValidationMessages.contactEmailRequired;
+    } else {
+      final email = data.contactEmail.trim().toLowerCase();
+      final emailRegex = RegExp(ValidationConstants.contactEmailPattern);
+      
+      if (!emailRegex.hasMatch(email)) {
+        errors['email'] = ValidationMessages.contactEmailInvalidFormat;
+      } else if (email.length > ValidationConstants.contactEmailMaxLength) {
+        errors['email'] = ValidationMessages.contactEmailTooLong;
+      } else if (email.contains('..')) {
+        errors['email'] = ValidationMessages.contactEmailConsecutiveDots;
+      }
     }
 
     return errors;
@@ -471,49 +502,73 @@ class DataRegistrationBloc
 
     // Validación de ID de incidente
     if (data.inspectionIncidentId.trim().isEmpty) {
-      errors['incidentId'] = 'Por favor ingrese el ID del incidente';
-    } else if (!RegExp(r'^[0-9]+$').hasMatch(data.inspectionIncidentId.trim())) {
-      errors['incidentId'] = 'El ID del incidente debe contener solo números';
+      errors['incidentId'] = ValidationMessages.inspectionIncidentIdRequired;
+    } else {
+      final incidentId = data.inspectionIncidentId.trim();
+      if (!RegExp(ValidationConstants.inspectionIncidentIdPattern).hasMatch(incidentId)) {
+        errors['incidentId'] = ValidationMessages.inspectionIncidentIdDigitsOnly;
+      } else if (incidentId.length < ValidationConstants.inspectionIncidentIdMinLength) {
+        errors['incidentId'] = ValidationMessages.inspectionIncidentIdMinLength;
+      } else if (incidentId.length > ValidationConstants.inspectionIncidentIdMaxLength) {
+        errors['incidentId'] = ValidationMessages.inspectionIncidentIdMaxLength;
+      }
     }
 
     // Validación de estado
     if (data.inspectionStatus == null || data.inspectionStatus!.isEmpty) {
-      errors['status'] = 'Por favor seleccione un estado';
+      errors['status'] = ValidationMessages.inspectionStatusRequired;
     }
 
     // Validación de fecha
     if (data.inspectionDate == null) {
-      errors['date'] = 'Por favor seleccione una fecha';
+      errors['date'] = ValidationMessages.inspectionDateRequired;
     } else {
       final now = DateTime.now();
       final today = DateTime(now.year, now.month, now.day);
-      if (data.inspectionDate!.isBefore(today.subtract(const Duration(days: 365)))) {
-        errors['date'] = 'La fecha no puede ser anterior a hace un año';
-      } else if (data.inspectionDate!.isAfter(today)) {
-        errors['date'] = 'La fecha no puede ser futura';
+      final twoYearsAgo = today.subtract(const Duration(days: ValidationConstants.inspectionDateMaxYearsBack));
+      final oneMonthFromNow = today.add(const Duration(days: ValidationConstants.inspectionDateMaxDaysForward));
+      
+      if (data.inspectionDate!.isBefore(twoYearsAgo)) {
+        errors['date'] = ValidationMessages.inspectionDateTooOld;
+      } else if (data.inspectionDate!.isAfter(oneMonthFromNow)) {
+        errors['date'] = ValidationMessages.inspectionDateTooFuture;
       }
     }
 
     // Validación de hora
     if (data.inspectionTime.isEmpty) {
-      errors['time'] = 'Por favor seleccione una hora';
-    } else if (!RegExp(r'^([01]?[0-9]|2[0-3]):[0-5][0-9]$').hasMatch(data.inspectionTime)) {
-      errors['time'] = 'Formato de hora inválido (HH:MM)';
+      errors['time'] = ValidationMessages.inspectionTimeRequired;
+    } else {
+      final timeRegex = RegExp(ValidationConstants.inspectionTimePattern);
+      if (!timeRegex.hasMatch(data.inspectionTime)) {
+        errors['time'] = ValidationMessages.inspectionTimeInvalidFormat;
+      } else {
+        final hour = int.parse(data.inspectionTime.split(':')[0]);
+        if (hour < ValidationConstants.inspectionTimeMinHour || hour > ValidationConstants.inspectionTimeMaxHour) {
+          errors['time'] = ValidationMessages.inspectionTimeOutOfRange;
+        }
+      }
     }
 
-    // Validación de comentario
-    if (data.inspectionComment.trim().isEmpty) {
-      errors['comment'] = 'Por favor ingrese un comentario';
-    } else if (data.inspectionComment.trim().length < 10) {
-      errors['comment'] = 'El comentario debe tener al menos 10 caracteres';
-    }
+    // Validación de comentario - Sin validación (completamente opcional)
+    // No se valida el comentario, es completamente opcional
 
     // Validación de números (lesionados y muertos)
     if (data.inspectionInjured < 0) {
-      errors['injured'] = 'El número de lesionados no puede ser negativo';
+      errors['injured'] = ValidationMessages.inspectionInjuredNegative;
+    } else if (data.inspectionInjured > ValidationConstants.inspectionInjuredMaxValue) {
+      errors['injured'] = ValidationMessages.inspectionInjuredTooHigh;
     }
+    
     if (data.inspectionDead < 0) {
-      errors['dead'] = 'El número de muertos no puede ser negativo';
+      errors['dead'] = ValidationMessages.inspectionDeadNegative;
+    } else if (data.inspectionDead > ValidationConstants.inspectionDeadMaxValue) {
+      errors['dead'] = ValidationMessages.inspectionDeadTooHigh;
+    }
+
+    // Validación de coherencia entre lesionados y muertos
+    if (data.inspectionInjured > 0 && data.inspectionDead > data.inspectionInjured) {
+      errors['dead'] = ValidationMessages.inspectionDeadInconsistent;
     }
 
     return errors;
@@ -538,6 +593,7 @@ class DataRegistrationBloc
     newErrors.remove(field);
     return newErrors;
   }
+
 
   // === MÉTODOS DE ACCESO ===
 

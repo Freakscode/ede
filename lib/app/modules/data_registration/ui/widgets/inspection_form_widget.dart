@@ -74,6 +74,20 @@ class _InspectionFormWidgetState extends State<InspectionFormWidget> {
             ),
           );
         }
+        
+        // Forzar actualización de la UI cuando hay errores de validación
+        if (state is DataRegistrationData && state.inspectionErrors.isNotEmpty) {
+          print('=== FORZANDO ACTUALIZACIÓN DE UI ===');
+          print('Errores en estado: ${state.inspectionErrors}');
+          print('====================================');
+          
+          // Forzar reconstrucción del widget
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) {
+              setState(() {});
+            }
+          });
+        }
       },
       child: BlocBuilder<DataRegistrationBloc, DataRegistrationState>(
         builder: (context, state) {
@@ -159,7 +173,7 @@ class _InspectionFormWidgetState extends State<InspectionFormWidget> {
     
     return CustomTextField(
       controller: _incidentIdController,
-      label: 'Id Incidente',
+      label: 'Id Incidente *',
       hintText: 'Ingrese el ID del incidente',
       keyboardType: TextInputType.number,
       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -257,7 +271,7 @@ class _InspectionFormWidgetState extends State<InspectionFormWidget> {
     
     return CustomTextField(
       controller: _commentController,
-      label: 'Comentario *',
+      label: 'Comentario',
       hintText: 'Ingrese un comentario adicional de la inspección realizada...',
       maxLines: 4,
       validator: (value) => error,
@@ -323,26 +337,27 @@ class _InspectionFormWidgetState extends State<InspectionFormWidget> {
   /// Maneja el envío del formulario de manera optimizada
   void _handleSubmit() {
     final formState = widget.formKey.currentState;
-    if (formState?.validate() == true) {
-      formState!.save();
-      
-      // Imprimir datos del formulario antes de enviar
-      final bloc = context.read<DataRegistrationBloc>();
-      final state = bloc.state;
-      
-      if (state is DataRegistrationData) {
-        print('=== ENVIANDO FORMULARIO DE INSPECCIÓN ===');
-        print('ID Incidente: ${state.inspectionIncidentId}');
-        print('Estado: ${state.inspectionStatus}');
-        print('Fecha: ${state.inspectionDate}');
-        print('Hora: ${state.inspectionTime}');
-        print('Comentario: ${state.inspectionComment}');
-        print('Lesionados: ${state.inspectionInjured}');
-        print('Muertos: ${state.inspectionDead}');
-        print('==========================================');
-      }
-      
-      bloc.add(const InspectionFormValidated());
+    
+    // Siempre guardar el formulario primero
+    formState?.save();
+    
+    // Imprimir datos del formulario antes de enviar
+    final bloc = context.read<DataRegistrationBloc>();
+    final state = bloc.state;
+    
+    if (state is DataRegistrationData) {
+      print('=== ENVIANDO FORMULARIO DE INSPECCIÓN ===');
+      print('ID Incidente: ${state.inspectionIncidentId}');
+      print('Estado: ${state.inspectionStatus}');
+      print('Fecha: ${state.inspectionDate}');
+      print('Hora: ${state.inspectionTime}');
+      print('Comentario: ${state.inspectionComment}');
+      print('Lesionados: ${state.inspectionInjured}');
+      print('Muertos: ${state.inspectionDead}');
+      print('==========================================');
     }
+    
+    // Siempre disparar la validación del BLoC
+    bloc.add(const InspectionFormValidated());
   }
 }
