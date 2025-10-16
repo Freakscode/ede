@@ -5,6 +5,8 @@ import 'package:caja_herramientas/app/shared/widgets/inputs/custom_expandable_dr
 import 'package:caja_herramientas/app/shared/widgets/inputs/custom_date_picker.dart';
 import 'package:caja_herramientas/app/shared/widgets/inputs/custom_time_picker.dart';
 import 'package:caja_herramientas/app/shared/widgets/text/section_title.dart';
+import 'package:caja_herramientas/app/shared/widgets/info/warning_info_widget.dart';
+import 'package:caja_herramientas/app/shared/widgets/buttons/finalize_button.dart';
 
 class InspectionFormWidget extends StatefulWidget {
   final GlobalKey<FormState> formKey;
@@ -16,6 +18,7 @@ class InspectionFormWidget extends StatefulWidget {
 }
 
 class _InspectionFormWidgetState extends State<InspectionFormWidget> {
+  final _incidentIdController = TextEditingController();
   final _statusController = TextEditingController();
   final _dateController = TextEditingController();
   final _timeController = TextEditingController();
@@ -36,6 +39,7 @@ class _InspectionFormWidgetState extends State<InspectionFormWidget> {
 
   @override
   void dispose() {
+    _incidentIdController.dispose();
     _statusController.dispose();
     _dateController.dispose();
     _timeController.dispose();
@@ -59,6 +63,8 @@ class _InspectionFormWidgetState extends State<InspectionFormWidget> {
           ),
 
           const SizedBox(height: 20),
+
+          // Campo Id Incidente
 
           // Campo Estado
           CustomExpandableDropdown<String>(
@@ -124,7 +130,8 @@ class _InspectionFormWidgetState extends State<InspectionFormWidget> {
           CustomTextField(
             controller: _commentController,
             label: 'Comentario *',
-            hintText: 'Ingrese un comentario adicional de la inspección realizada...',
+            hintText:
+                'Ingrese un comentario adicional de la inspección realizada...',
             maxLines: 4,
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
@@ -142,9 +149,7 @@ class _InspectionFormWidgetState extends State<InspectionFormWidget> {
             label: 'Número de lesionados',
             hintText: 'Ingrese número de lesionados',
             keyboardType: TextInputType.number,
-            inputFormatters: [
-              FilteringTextInputFormatter.digitsOnly,
-            ],
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             validator: (value) {
               if (value != null && value.isNotEmpty) {
                 final number = int.tryParse(value);
@@ -164,9 +169,7 @@ class _InspectionFormWidgetState extends State<InspectionFormWidget> {
             label: 'Número de muertos',
             hintText: 'Ingrese número de muertos',
             keyboardType: TextInputType.number,
-            inputFormatters: [
-              FilteringTextInputFormatter.digitsOnly,
-            ],
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             validator: (value) {
               if (value != null && value.isNotEmpty) {
                 final number = int.tryParse(value);
@@ -177,9 +180,53 @@ class _InspectionFormWidgetState extends State<InspectionFormWidget> {
               return null;
             },
           ),
+          const SizedBox(height: 16),
+
+          CustomTextField(
+            controller: _incidentIdController,
+            label: 'Id Incidente',
+            hintText: 'Ingrese el ID del incidente',
+            keyboardType: TextInputType.number,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            validator: (value) {
+              if (value == null || value.trim().isEmpty) {
+                return 'Por favor ingrese el ID del incidente';
+              }
+              return null;
+            },
+          ),
+
+          const SizedBox(height: 24),
+
+          // Widget de advertencia
+          const WarningInfoWidget(
+            title: 'Información',
+            message:
+                'Antes de iniciar la evaluación del riesgo, tenga en cuenta que los resultados son únicamente de carácter orientativo. El DAGRD no asume responsabilidad alguna sobre su uso o interpretación',
+          ),
+
+          const SizedBox(height: 24),
+
+          // Botón Finalizar
+          FinalizeButton(
+            text: 'Finalizar',
+            onPressed: () {
+              if (widget.formKey.currentState!.validate()) {
+                widget.formKey.currentState!.save();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text(
+                      'Formulario de inspección guardado correctamente',
+                    ),
+                    backgroundColor: Colors.green,
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+              }
+            },
+          ),
         ],
       ),
     );
   }
-
 }
