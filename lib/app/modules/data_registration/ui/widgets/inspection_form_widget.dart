@@ -6,7 +6,10 @@ import 'package:caja_herramientas/app/shared/widgets/inputs/custom_date_picker.d
 import 'package:caja_herramientas/app/shared/widgets/inputs/custom_time_picker.dart';
 import 'package:caja_herramientas/app/shared/widgets/text/section_title.dart';
 import 'package:caja_herramientas/app/shared/widgets/info/warning_info_widget.dart';
-import 'package:caja_herramientas/app/shared/widgets/buttons/finalize_button.dart';
+import 'package:caja_herramientas/app/shared/widgets/buttons/custom_elevated_button.dart';
+import 'package:caja_herramientas/app/modules/data_registration/models/inspection_data.dart';
+import 'package:caja_herramientas/app/modules/data_registration/services/inspection_storage_service.dart';
+import 'package:go_router/go_router.dart';
 
 class InspectionFormWidget extends StatefulWidget {
   final GlobalKey<FormState> formKey;
@@ -208,20 +211,42 @@ class _InspectionFormWidgetState extends State<InspectionFormWidget> {
           const SizedBox(height: 24),
 
           // Botón Finalizar
-          FinalizeButton(
+          CustomElevatedButton(
             text: 'Finalizar',
-            onPressed: () {
+            onPressed: () async {
               if (widget.formKey.currentState!.validate()) {
                 widget.formKey.currentState!.save();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text(
-                      'Formulario de inspección guardado correctamente',
-                    ),
-                    backgroundColor: Colors.green,
-                    duration: Duration(seconds: 2),
-                  ),
+                
+                // Crear el objeto InspectionData con los datos del formulario
+                final inspectionData = InspectionData(
+                  incidentId: _incidentIdController.text.trim(),
+                  status: _selectedStatus ?? '',
+                  date: _selectedDate ?? DateTime.now(),
+                  time: _selectedTime?.format(context) ?? '',
+                  comment: _commentController.text.trim(),
+                  injured: int.tryParse(_injuredController.text.trim()) ?? 0,
+                  dead: int.tryParse(_deadController.text.trim()) ?? 0,
                 );
+
+                // Guardar en memoria usando el servicio
+                final storageService = InspectionStorageService();
+                await storageService.saveInspection(inspectionData);
+
+                // Mostrar mensaje de éxito
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                        'Formulario de inspección guardado correctamente',
+                      ),
+                      backgroundColor: Colors.green,
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
+                  
+                  // Navegar a home
+                  context.go('/home');
+                }
               }
             },
           ),

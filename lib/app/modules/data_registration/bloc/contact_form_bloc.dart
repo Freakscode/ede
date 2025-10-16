@@ -91,6 +91,11 @@ class ContactFormBloc extends Bloc<ContactFormEvent, ContactFormState> {
         isValid: isValid,
       );
       emit(newState);
+      
+      // Si el formulario es válido, guardar automáticamente
+      if (isValid) {
+        add(ContactFormSaveRequested());
+      }
     }
   }
 

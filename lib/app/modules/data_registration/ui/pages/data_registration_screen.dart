@@ -13,7 +13,7 @@ class DataRegistrationScreen extends StatefulWidget {
 class _DataRegistrationScreenState extends State<DataRegistrationScreen> {
   final _contactFormKey = GlobalKey<FormState>();
   final _inspectionFormKey = GlobalKey<FormState>();
-  bool _showInspectionForm = true;
+  bool _showInspectionForm = false;
 
   @override
   Widget build(BuildContext context) {
@@ -39,24 +39,11 @@ class _DataRegistrationScreenState extends State<DataRegistrationScreen> {
   }
 
   void _handleNextPressed() {
-    // Validar formulario de contacto
-    if (_contactFormKey.currentState!.validate()) {
-      _contactFormKey.currentState!.save();
-      
-      // Mostrar snackbar de éxito
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Datos de contacto guardados correctamente'),
-          backgroundColor: Colors.green,
-          duration: Duration(seconds: 2),
-        ),
-      );
-      
-      // Mostrar el formulario de inspección
-      setState(() {
-        _showInspectionForm = true;
-      });
-    }
+    // El BLoC maneja la validación y guardado automáticamente
+    // Solo cambiar la vista al formulario de inspección
+    setState(() {
+      _showInspectionForm = true;
+    });
   }
 
   void _handleBackPressed() {
