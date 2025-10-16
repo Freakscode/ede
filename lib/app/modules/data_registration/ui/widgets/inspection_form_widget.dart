@@ -292,7 +292,24 @@ class _InspectionFormWidgetState extends State<InspectionFormWidget> {
     final formState = widget.formKey.currentState;
     if (formState?.validate() == true) {
       formState!.save();
-      context.read<DataRegistrationBloc>().add(const InspectionFormValidated());
+      
+      // Imprimir datos del formulario antes de enviar
+      final bloc = context.read<DataRegistrationBloc>();
+      final state = bloc.state;
+      
+      if (state is DataRegistrationData) {
+        print('=== ENVIANDO FORMULARIO DE INSPECCIÓN ===');
+        print('ID Incidente: ${state.inspectionIncidentId}');
+        print('Estado: ${state.inspectionStatus}');
+        print('Fecha: ${state.inspectionDate}');
+        print('Hora: ${state.inspectionTime}');
+        print('Comentario: ${state.inspectionComment}');
+        print('Lesionados: ${state.inspectionInjured}');
+        print('Muertos: ${state.inspectionDead}');
+        print('==========================================');
+      }
+      
+      bloc.add(const InspectionFormValidated());
     }
   }
 }

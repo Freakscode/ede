@@ -274,6 +274,11 @@ class DataRegistrationBloc
     final errors = _validateInspectionForm(currentState);
     final isValid = errors.isEmpty;
 
+    print('=== VALIDACIÓN COMPLETADA ===');
+    print('Errores: $errors');
+    print('Válido: $isValid');
+    print('============================');
+
     emit(currentState.copyWith(
       inspectionErrors: errors,
       isInspectionValid: isValid,
@@ -358,6 +363,16 @@ class DataRegistrationBloc
 
       final storageService = InspectionStorageService();
       await storageService.saveInspection(inspectionData);
+
+      print('=== DATOS COMPLETOS GUARDADOS EN STORAGE ===');
+      print('--- DATOS DE CONTACTO ---');
+      print('Nombres: ${currentState.contactNames}');
+      print('Celular: ${currentState.contactCellPhone}');
+      print('Teléfono fijo: ${currentState.contactLandline}');
+      print('Email: ${currentState.contactEmail}');
+      print('--- DATOS DE INSPECCIÓN ---');
+      print('InspectionData guardado: $inspectionData');
+      print('==========================================');
 
       emit(const CompleteRegistrationSaved(
         message: 'Registro completo guardado correctamente',
