@@ -47,18 +47,12 @@ class HomeScreen extends StatelessWidget {
             FormNavigationData.forNewForm(''),
           ));
         } else if (navigationData!['showRiskEvents'] == true) {
-          // Si viene de data registration, resetear formularios primero
+          // Si viene de data registration, resetear formularios y mostrar RiskEventsScreen
           if (navigationData!['resetForNewForm'] == true) {
-            print('=== RESETEANDO FORMULARIOS DESDE DATA REGISTRATION ===');
+            print('=== CONFIGURANDO HOME PARA RiskEventsScreen DESDE DATA REGISTRATION ===');
             bloc.add(ResetAllForNewForm());
-            
-            // Mostrar RiskEventsScreen después del reset
-            Future.delayed(const Duration(milliseconds: 100), () {
-              if (context.mounted) {
-                bloc.add(HomeShowRiskEventsSection());
-                print('=== RiskEventsScreen MOSTRADO ===');
-              }
-            });
+            bloc.add(HomeShowRiskEventsSection());
+            print('=== RiskEventsScreen CONFIGURADO SIN DELAY ===');
           } else {
             bloc.add(HomeShowRiskEventsSection());
           }

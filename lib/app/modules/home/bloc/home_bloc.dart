@@ -349,7 +349,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       final persistenceService = FormPersistenceService();
       await persistenceService.setActiveFormId(null);
       
-      // Resetear completamente el estado
+      // Resetear completamente el estado (pero mantener flags de navegación)
       emit(state.copyWith(
         selectedRiskEvent: null,
         selectedRiskCategory: null,
@@ -359,9 +359,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         savedRiskEventModels: const {}, // Limpiar modelos guardados
         savedForms: const [], // Limpiar formularios guardados
         isLoadingForms: false,
-        mostrarEventosRiesgo: false,
-        mostrarCategoriasRiesgo: false,
-        mostrarFormularioCompletado: false,
+        // No resetear los flags de navegación aquí
       ));
       
       print('HomeBloc: Estado completamente reseteado para nuevo formulario');
