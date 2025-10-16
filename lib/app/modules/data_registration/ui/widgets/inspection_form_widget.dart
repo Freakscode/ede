@@ -56,8 +56,14 @@ class _InspectionFormWidgetState extends State<InspectionFormWidget> {
               duration: const Duration(seconds: 2),
             ),
           );
-          // Navegar al home después de guardar exitosamente
-          context.go('/home');
+          
+          // Navegar al home con navigationData para mostrar RiskEventsScreen
+          print('=== NAVEGANDO AL HOME PARA CREAR NUEVO FORMULARIO ===');
+          context.go('/home', extra: {
+            'showRiskEvents': true,
+            'resetForNewForm': true,
+          });
+          print('=== NAVEGACIÓN CONFIGURADA ===');
         } else if (state is DataRegistrationError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(

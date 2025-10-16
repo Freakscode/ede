@@ -47,7 +47,21 @@ class HomeScreen extends StatelessWidget {
             FormNavigationData.forNewForm(''),
           ));
         } else if (navigationData!['showRiskEvents'] == true) {
-          bloc.add(HomeShowRiskEventsSection());
+          // Si viene de data registration, resetear formularios primero
+          if (navigationData!['resetForNewForm'] == true) {
+            print('=== RESETEANDO FORMULARIOS DESDE DATA REGISTRATION ===');
+            bloc.add(ResetAllForNewForm());
+            
+            // Mostrar RiskEventsScreen después del reset
+            Future.delayed(const Duration(milliseconds: 100), () {
+              if (context.mounted) {
+                bloc.add(HomeShowRiskEventsSection());
+                print('=== RiskEventsScreen MOSTRADO ===');
+              }
+            });
+          } else {
+            bloc.add(HomeShowRiskEventsSection());
+          }
         } else if (navigationData!['selectedIndex'] != null) {
           bloc.add(HomeNavBarTapped(navigationData!['selectedIndex'] as int));
         }
