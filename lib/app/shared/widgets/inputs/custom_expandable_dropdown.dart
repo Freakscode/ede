@@ -1,13 +1,36 @@
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import 'package:flutter/material.dart';
 
+// Constantes para mejor mantenimiento
+const double _animationDuration = 300.0;
+const double _maxDropdownHeight = 200.0;
+const int _listViewThreshold = 5;
+
+/// Un dropdown personalizado que se expande y contrae con animaciones suaves.
+/// 
+/// Este widget es genérico y puede manejar cualquier tipo de datos.
+/// Utiliza AnimatedSize para transiciones suaves y ListView.builder para
+/// optimizar el rendimiento con listas grandes.
 class CustomExpandableDropdown<T> extends StatefulWidget {
+  /// Etiqueta que se muestra arriba del campo
   final String label;
+  
+  /// Valor actualmente seleccionado
   final T? value;
+  
+  /// Lista de opciones disponibles
   final List<T> items;
+  
+  /// Callback que se ejecuta cuando se selecciona un item
   final ValueChanged<T?> onChanged;
+  
+  /// Función de validación opcional
   final String? Function(T?)? validator;
+  
+  /// Función que construye el texto a mostrar para cada item
   final String Function(T) itemBuilder;
+  
+  /// Texto placeholder cuando no hay valor seleccionado
   final String hintText;
 
   const CustomExpandableDropdown({
@@ -27,25 +50,9 @@ class CustomExpandableDropdown<T> extends StatefulWidget {
 }
 
 class _CustomExpandableDropdownState<T>
-    extends State<CustomExpandableDropdown<T>>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _animationController;
-  late Animation<double> _expandAnimation;
+    extends State<CustomExpandableDropdown<T>> {
   bool _isExpanded = false;
   String? _errorText;
-
-  @override
-  void initState() {
-    super.initState();
-    _animationController = AnimationController(
-      duration: const Duration(milliseconds: 300),
-      vsync: this,
-    );
-    _expandAnimation = CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
-    );
-  }
 
   @override
   void didUpdateWidget(CustomExpandableDropdown<T> oldWidget) {
@@ -67,47 +74,62 @@ class _CustomExpandableDropdownState<T>
     }
   }
 
-  @override
-  void dispose() {
-    _animationController.dispose();
-    super.dispose();
-  }
-
   void _toggleExpansion() {
-    print('=== TOGGLE EXPANSION ===');
-    print('Estado actual: $_isExpanded');
-    print('Valor actual: ${widget.value}');
-    print('Número de items: ${widget.items.length}');
-    print('Items: ${widget.items}');
-    print('=======================');
-    
     setState(() {
       _isExpanded = !_isExpanded;
     });
-    
-    print('Nuevo estado: $_isExpanded');
-    print('Items a mostrar: ${_isExpanded ? widget.items.length : 0}');
-    print('=======================');
   }
 
   void _selectItem(T item) {
-    print('=== SELECTING ITEM ===');
-    print('Item seleccionado: $item');
-    print('======================');
-    
     widget.onChanged(item);
     setState(() {
       _isExpanded = false;
       _errorText = null;
     });
-    
-    print('Item seleccionado y dropdown cerrado');
-    print('======================');
+  }
+
+  Widget _buildDropdownItem(T item, int index) {
+    final isLast = index == widget.items.length - 1;
+    return InkWell(
+      onTap: () => _selectItem(item),
+      borderRadius: isLast
+          ? const BorderRadius.only(
+              bottomLeft: Radius.circular(8),
+              bottomRight: Radius.circular(8),
+            )
+          : null,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 12,
+        ),
+        decoration: BoxDecoration(
+          border: !isLast
+              ? Border(
+                  bottom: BorderSide(
+                    color: DAGRDColors.grisMedio.withOpacity(0.3),
+                    width: 0.5,
+                  ),
+                )
+              : null,
+        ),
+        child: Text(
+          widget.itemBuilder(item),
+          style: const TextStyle(
+            color: Color(0xFF1E1E1E),
+            fontFamily: 'Work Sans',
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return Column( 
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Label
@@ -126,7 +148,11 @@ class _CustomExpandableDropdownState<T>
         // Input field
         GestureDetector(
           onTap: _toggleExpansion,
-          child: Container(
+          child: Semantics(
+            label: '${widget.label}. ${widget.value != null ? widget.itemBuilder(widget.value as T) : widget.hintText}',
+            hint: 'Toca para abrir opciones',
+            button: true,
+            child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             decoration: BoxDecoration(
               color: DAGRDColors.blancoDAGRD,
@@ -154,7 +180,7 @@ class _CustomExpandableDropdownState<T>
                 ),
                 AnimatedRotation(
                   turns: _isExpanded ? 0.5 : 0.0,
-                  duration: const Duration(milliseconds: 300),
+                  duration: Duration(milliseconds: _animationDuration.round()),
                   child: Icon(
                     Icons.keyboard_arrow_down,
                     color: DAGRDColors.grisMedio,
@@ -163,6 +189,7 @@ class _CustomExpandableDropdownState<T>
                 ),
               ],
             ),
+          ),
           ),
         ),
 
@@ -182,10 +209,13 @@ class _CustomExpandableDropdownState<T>
 
         // Expandable container
         AnimatedSize(
-          duration: const Duration(milliseconds: 300),
+          duration: Duration(milliseconds: _animationDuration.round()),
           curve: Curves.easeInOut,
           child: _isExpanded
               ? Container(
+                  constraints: const BoxConstraints(
+                    maxHeight: _maxDropdownHeight,
+                  ),
                   decoration: BoxDecoration(
                     color: DAGRDColors.blancoDAGRD,
                     border: Border.all(color: DAGRDColors.grisMedio, width: 1),
@@ -198,34 +228,21 @@ class _CustomExpandableDropdownState<T>
                       ),
                     ],
                   ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: widget.items.map((T item) {
-                      return InkWell(
-                        onTap: () => _selectItem(item),
-                        borderRadius: const BorderRadius.only(
-                          bottomLeft: Radius.circular(8),
-                          bottomRight: Radius.circular(8),
+                  child: widget.items.length > _listViewThreshold
+                      ? ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: widget.items.length,
+                          itemBuilder: (context, index) {
+                            final item = widget.items[index];
+                            return _buildDropdownItem(item, index);
+                          },
+                        )
+                      : Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: widget.items.asMap().entries.map((entry) {
+                            return _buildDropdownItem(entry.value, entry.key);
+                          }).toList(),
                         ),
-                        child: Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 12,
-                          ),
-                          child: Text(
-                            widget.itemBuilder(item),
-                            style: const TextStyle(
-                              color: Color(0xFF1E1E1E),
-                              fontFamily: 'Work Sans',
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  ),
                 )
               : const SizedBox.shrink(),
         ),
