@@ -86,7 +86,7 @@ class _CustomExpandableDropdownState<T>
     });
     
     print('Nuevo estado: $_isExpanded');
-    print('Altura calculada: ${_isExpanded ? widget.items.length * 48.0 : 0}');
+    print('Items a mostrar: ${_isExpanded ? widget.items.length : 0}');
     print('=======================');
   }
 
@@ -181,53 +181,53 @@ class _CustomExpandableDropdownState<T>
           ),
 
         // Expandable container
-        AnimatedContainer(
+        AnimatedSize(
           duration: const Duration(milliseconds: 300),
-          height: _isExpanded ? widget.items.length * 48.0 : 0,
           curve: Curves.easeInOut,
-          child: ClipRect(
-            child: Container(
-              decoration: BoxDecoration(
-                color: DAGRDColors.blancoDAGRD,
-                border: Border.all(color: DAGRDColors.grisMedio, width: 1),
-                borderRadius: BorderRadius.circular(8),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
+          child: _isExpanded
+              ? Container(
+                  decoration: BoxDecoration(
+                    color: DAGRDColors.blancoDAGRD,
+                    border: Border.all(color: DAGRDColors.grisMedio, width: 1),
+                    borderRadius: BorderRadius.circular(8),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-              child: Column(
-                children: widget.items.map((T item) {
-                  return InkWell(
-                    onTap: () => _selectItem(item),
-                    borderRadius: const BorderRadius.only(
-                      bottomLeft: Radius.circular(8),
-                      bottomRight: Radius.circular(8),
-                    ),
-                    child: Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
-                      ),
-                      child: Text(
-                        widget.itemBuilder(item),
-                        style: const TextStyle(
-                          color: Color(0xFF1E1E1E),
-                          fontFamily: 'Work Sans',
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: widget.items.map((T item) {
+                      return InkWell(
+                        onTap: () => _selectItem(item),
+                        borderRadius: const BorderRadius.only(
+                          bottomLeft: Radius.circular(8),
+                          bottomRight: Radius.circular(8),
                         ),
-                      ),
-                    ),
-                  );
-                }).toList(),
-              ),
-            ),
-          ),
+                        child: Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
+                          child: Text(
+                            widget.itemBuilder(item),
+                            style: const TextStyle(
+                              color: Color(0xFF1E1E1E),
+                              fontFamily: 'Work Sans',
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                )
+              : const SizedBox.shrink(),
         ),
       ],
     );
