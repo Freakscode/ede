@@ -28,6 +28,28 @@ class _ContactFormWidgetState extends State<ContactFormWidget> {
   final _emailController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    // Inicializar controladores con valores del estado inicial
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final bloc = context.read<DataRegistrationBloc>();
+      final state = bloc.state;
+      if (state is DataRegistrationData) {
+        _namesController.text = state.contactNames;
+        _cellPhoneController.text = state.contactCellPhone;
+        _landlineController.text = state.contactLandline;
+        _emailController.text = state.contactEmail;
+        print('=== CONTROLADORES INICIALIZADOS ===');
+        print('Nombres: "${state.contactNames}"');
+        print('Celular: "${state.contactCellPhone}"');
+        print('Fijo: "${state.contactLandline}"');
+        print('Email: "${state.contactEmail}"');
+        print('==================================');
+      }
+    });
+  }
+
+  @override
   void dispose() {
     _namesController.dispose();
     _cellPhoneController.dispose();
@@ -40,6 +62,41 @@ class _ContactFormWidgetState extends State<ContactFormWidget> {
   Widget build(BuildContext context) {
     return BlocListener<DataRegistrationBloc, DataRegistrationState>(
       listener: (context, state) {
+        print('=== BLOCLISTENER EJECUTADO ===');
+        print('Nuevo estado: ${state.runtimeType}');
+        print('==============================');
+        
+        // Actualizar controladores cuando el estado cambie
+        if (state is DataRegistrationData) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            bool updated = false;
+            if (_namesController.text != state.contactNames) {
+              _namesController.text = state.contactNames;
+              updated = true;
+            }
+            if (_cellPhoneController.text != state.contactCellPhone) {
+              _cellPhoneController.text = state.contactCellPhone;
+              updated = true;
+            }
+            if (_landlineController.text != state.contactLandline) {
+              _landlineController.text = state.contactLandline;
+              updated = true;
+            }
+            if (_emailController.text != state.contactEmail) {
+              _emailController.text = state.contactEmail;
+              updated = true;
+            }
+            if (updated) {
+              print('=== CONTROLADORES ACTUALIZADOS ===');
+              print('Nombres: "${state.contactNames}"');
+              print('Celular: "${state.contactCellPhone}"');
+              print('Fijo: "${state.contactLandline}"');
+              print('Email: "${state.contactEmail}"');
+              print('==================================');
+            }
+          });
+        }
+        
         if (state is DataRegistrationData && state.showInspectionForm) {
           // Mostrar mensaje de éxito cuando navega al formulario de inspección
           ScaffoldMessenger.of(context).showSnackBar(
@@ -57,6 +114,20 @@ class _ContactFormWidgetState extends State<ContactFormWidget> {
               duration: const Duration(seconds: 3),
             ),
           );
+        }
+        
+        // Forzar actualización de la UI cuando hay errores
+        if (state is DataRegistrationData && state.contactErrors.isNotEmpty) {
+          print('=== FORZANDO ACTUALIZACIÓN DE UI ===');
+          print('Errores en estado: ${state.contactErrors}');
+          print('====================================');
+          
+          // Forzar reconstrucción del widget
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) {
+              setState(() {});
+            }
+          });
         }
       },
       child: BlocBuilder<DataRegistrationBloc, DataRegistrationState>(
@@ -98,28 +169,33 @@ class _ContactFormWidgetState extends State<ContactFormWidget> {
                 CustomElevatedButton(
                   text: 'Siguiente',
                   onPressed: state is DataRegistrationLoading ? null : () {
-                    // Primero validar el formulario Flutter
-                    if (widget.formKey.currentState!.validate()) {
-                      widget.formKey.currentState!.save();
-                      
-                      // Imprimir los datos de contacto antes de enviar
-                      final bloc = context.read<DataRegistrationBloc>();
-                      final currentState = bloc.state;
-                      
-                      if (currentState is DataRegistrationData) {
-                        print('=== DATOS DEL FORMULARIO DE CONTACTO ===');
-                        print('Nombres: ${currentState.contactNames}');
-                        print('Número de celular: ${currentState.contactCellPhone}');
-                        print('Número de teléfono fijo: ${currentState.contactLandline}');
-                        print('Correo electrónico: ${currentState.contactEmail}');
-                        print('Contacto válido: ${currentState.isContactValid}');
-                        print('Errores: ${currentState.contactErrors}');
-                        print('========================================');
-                      }
-                      
-                      // Luego disparar la validación del BLoC
-                      bloc.add(const ContactFormValidated());
+                    print('=== BOTÓN SIGUIENTE PRESIONADO ===');
+                    print('Estado actual: ${state.runtimeType}');
+                    print('Formulario válido: ${widget.formKey.currentState?.validate()}');
+                    print('==================================');
+                    
+                    // Siempre guardar el formulario primero
+                    widget.formKey.currentState!.save();
+                    
+                    // Imprimir los datos de contacto antes de enviar
+                    final bloc = context.read<DataRegistrationBloc>();
+                    final currentState = bloc.state;
+                    
+                    if (currentState is DataRegistrationData) {
+                      print('=== DATOS DEL FORMULARIO DE CONTACTO ===');
+                      print('Nombres: ${currentState.contactNames}');
+                      print('Número de celular: ${currentState.contactCellPhone}');
+                      print('Número de teléfono fijo: ${currentState.contactLandline}');
+                      print('Correo electrónico: ${currentState.contactEmail}');
+                      print('Contacto válido: ${currentState.isContactValid}');
+                      print('Errores: ${currentState.contactErrors}');
+                      print('========================================');
                     }
+                    
+                    // Siempre disparar la validación del BLoC
+                    print('=== ENVIANDO ContactFormValidated ===');
+                    bloc.add(const ContactFormValidated());
+                    print('=== EVENTO ENVIADO ===');
                   },
                   backgroundColor: DAGRDColors.azulDAGRD,
                   textColor: DAGRDColors.blancoDAGRD,
@@ -140,43 +216,43 @@ class _ContactFormWidgetState extends State<ContactFormWidget> {
     final currentData = state is DataRegistrationData ? state : null;
     final error = currentData?.contactErrors['names'];
     
-    // Actualizar el controlador si el estado cambió (solo si es diferente para evitar loops)
-    if (currentData != null && _namesController.text != currentData.contactNames) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (_namesController.text != currentData.contactNames) {
-          _namesController.text = currentData.contactNames;
-        }
-      });
-    }
-    
-    return CustomTextField(
-      controller: _namesController,
-      label: 'Nombres *',
-      hintText: 'Ingrese sus nombres',
-      validator: (value) => error,
-      onChanged: (value) {
-        context.read<DataRegistrationBloc>().add(ContactFormNamesChanged(value));
-      },
-      onSaved: (value) {
-        if (value != null) {
-          context.read<DataRegistrationBloc>().add(ContactFormNamesChanged(value));
-        }
-      },
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        CustomTextField(
+          controller: _namesController,
+          label: 'Nombres *',
+          hintText: 'Ingrese sus nombres',
+          validator: (value) => null, // No usar validator de Flutter
+          onChanged: (value) {
+            context.read<DataRegistrationBloc>().add(ContactFormNamesChanged(value));
+          },
+          onSaved: (value) {
+            if (value != null) {
+              context.read<DataRegistrationBloc>().add(ContactFormNamesChanged(value));
+            }
+          },
+        ),
+        // Mostrar error del bloc
+        if (error != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: Text(
+              error,
+              style: const TextStyle(
+                color: Color(0xFFE53E3E),
+                fontFamily: 'Work Sans',
+                fontSize: 12,
+              ),
+            ),
+          ),
+      ],
     );
   }
 
   Widget _buildCellPhoneField(BuildContext context, DataRegistrationState state) {
     final currentData = state is DataRegistrationData ? state : null;
     final error = currentData?.contactErrors['cellPhone'];
-    
-    // Actualizar el controlador si el estado cambió (solo si es diferente para evitar loops)
-    if (currentData != null && _cellPhoneController.text != currentData.contactCellPhone) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (_cellPhoneController.text != currentData.contactCellPhone) {
-          _cellPhoneController.text = currentData.contactCellPhone;
-        }
-      });
-    }
     
     // Generar helper text con contador de dígitos
     String? helperText;
@@ -188,25 +264,43 @@ class _ContactFormWidgetState extends State<ContactFormWidget> {
       helperText = 'Número completo';
     }
     
-    return CustomTextField(
-      controller: _cellPhoneController,
-      label: 'Número de celular *',
-      hintText: 'Ingrese su número de celular',
-      keyboardType: TextInputType.phone,
-      validator: (value) => error,
-      helperText: helperText,
-      inputFormatters: [
-        FilteringTextInputFormatter.digitsOnly,
-        LengthLimitingTextInputFormatter(10),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        CustomTextField(
+          controller: _cellPhoneController,
+          label: 'Número de celular *',
+          hintText: 'Ingrese su número de celular',
+          keyboardType: TextInputType.phone,
+          validator: (value) => null, // No usar validator de Flutter
+          helperText: helperText,
+          inputFormatters: [
+            FilteringTextInputFormatter.digitsOnly,
+            LengthLimitingTextInputFormatter(10),
+          ],
+          onChanged: (value) {
+            context.read<DataRegistrationBloc>().add(ContactFormCellPhoneChanged(value));
+          },
+          onSaved: (value) {
+            if (value != null) {
+              context.read<DataRegistrationBloc>().add(ContactFormCellPhoneChanged(value));
+            }
+          },
+        ),
+        // Mostrar error del bloc
+        if (error != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: Text(
+              error,
+              style: const TextStyle(
+                color: Color(0xFFE53E3E),
+                fontFamily: 'Work Sans',
+                fontSize: 12,
+              ),
+            ),
+          ),
       ],
-      onChanged: (value) {
-        context.read<DataRegistrationBloc>().add(ContactFormCellPhoneChanged(value));
-      },
-      onSaved: (value) {
-        if (value != null) {
-          context.read<DataRegistrationBloc>().add(ContactFormCellPhoneChanged(value));
-        }
-      },
     );
   }
 
@@ -214,33 +308,42 @@ class _ContactFormWidgetState extends State<ContactFormWidget> {
     final currentData = state is DataRegistrationData ? state : null;
     final error = currentData?.contactErrors['landline'];
     
-    // Actualizar el controlador si el estado cambió (solo si es diferente para evitar loops)
-    if (currentData != null && _landlineController.text != currentData.contactLandline) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (_landlineController.text != currentData.contactLandline) {
-          _landlineController.text = currentData.contactLandline;
-        }
-      });
-    }
-    
-    return CustomTextField(
-      controller: _landlineController,
-      label: 'Número de teléfono fijo *',
-      hintText: 'Ingrese su número fijo',
-      keyboardType: TextInputType.phone,
-      validator: (value) => error,
-      inputFormatters: [
-        FilteringTextInputFormatter.digitsOnly,
-        LengthLimitingTextInputFormatter(10),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        CustomTextField(
+          controller: _landlineController,
+          label: 'Número de teléfono fijo *',
+          hintText: 'Ingrese su número fijo',
+          keyboardType: TextInputType.phone,
+          validator: (value) => null, // No usar validator de Flutter
+          inputFormatters: [
+            FilteringTextInputFormatter.digitsOnly,
+            LengthLimitingTextInputFormatter(10),
+          ],
+          onChanged: (value) {
+            context.read<DataRegistrationBloc>().add(ContactFormLandlineChanged(value));
+          },
+          onSaved: (value) {
+            if (value != null) {
+              context.read<DataRegistrationBloc>().add(ContactFormLandlineChanged(value));
+            }
+          },
+        ),
+        // Mostrar error del bloc
+        if (error != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: Text(
+              error,
+              style: const TextStyle(
+                color: Color(0xFFE53E3E),
+                fontFamily: 'Work Sans',
+                fontSize: 12,
+              ),
+            ),
+          ),
       ],
-      onChanged: (value) {
-        context.read<DataRegistrationBloc>().add(ContactFormLandlineChanged(value));
-      },
-      onSaved: (value) {
-        if (value != null) {
-          context.read<DataRegistrationBloc>().add(ContactFormLandlineChanged(value));
-        }
-      },
     );
   }
 
@@ -248,29 +351,38 @@ class _ContactFormWidgetState extends State<ContactFormWidget> {
     final currentData = state is DataRegistrationData ? state : null;
     final error = currentData?.contactErrors['email'];
     
-    // Actualizar el controlador si el estado cambió (solo si es diferente para evitar loops)
-    if (currentData != null && _emailController.text != currentData.contactEmail) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (_emailController.text != currentData.contactEmail) {
-          _emailController.text = currentData.contactEmail;
-        }
-      });
-    }
-    
-    return CustomTextField(
-      controller: _emailController,
-      label: 'Correo electrónico *',
-      hintText: 'Ingrese su correo electrónico',
-      keyboardType: TextInputType.emailAddress,
-      validator: (value) => error,
-      onChanged: (value) {
-        context.read<DataRegistrationBloc>().add(ContactFormEmailChanged(value));
-      },
-      onSaved: (value) {
-        if (value != null) {
-          context.read<DataRegistrationBloc>().add(ContactFormEmailChanged(value));
-        }
-      },
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        CustomTextField(
+          controller: _emailController,
+          label: 'Correo electrónico *',
+          hintText: 'Ingrese su correo electrónico',
+          keyboardType: TextInputType.emailAddress,
+          validator: (value) => null, // No usar validator de Flutter
+          onChanged: (value) {
+            context.read<DataRegistrationBloc>().add(ContactFormEmailChanged(value));
+          },
+          onSaved: (value) {
+            if (value != null) {
+              context.read<DataRegistrationBloc>().add(ContactFormEmailChanged(value));
+            }
+          },
+        ),
+        // Mostrar error del bloc
+        if (error != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: Text(
+              error,
+              style: const TextStyle(
+                color: Color(0xFFE53E3E),
+                fontFamily: 'Work Sans',
+                fontSize: 12,
+              ),
+            ),
+          ),
+      ],
     );
   }
 }

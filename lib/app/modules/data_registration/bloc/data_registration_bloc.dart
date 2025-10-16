@@ -131,6 +131,18 @@ class DataRegistrationBloc
       final errors = _validateContactForm(currentState);
       final isValid = errors.isEmpty;
 
+      print('=== VALIDACIÓN FORMULARIO DE CONTACTO ===');
+      print('Errores encontrados: $errors');
+      print('Es válido: $isValid');
+      if (errors.isNotEmpty) {
+        print('=== DETALLE DE ERRORES DE CONTACTO ===');
+        errors.forEach((field, message) {
+          print('$field: $message');
+        });
+        print('======================================');
+      }
+      print('========================================');
+
       final newState = currentState.copyWith(
         contactErrors: errors,
         isContactValid: isValid,
@@ -168,6 +180,11 @@ class DataRegistrationBloc
   ) {
     if (state is DataRegistrationData) {
       final currentState = state as DataRegistrationData;
+      print('=== PROCESANDO CAMBIO DE ESTADO ===');
+      print('Estado anterior: ${currentState.inspectionStatus}');
+      print('Nuevo estado: ${event.status}');
+      print('==================================');
+      
       final newState = currentState.copyWith(
         inspectionStatus: event.status,
         inspectionErrors: _clearInspectionError(
@@ -275,8 +292,15 @@ class DataRegistrationBloc
     final isValid = errors.isEmpty;
 
     print('=== VALIDACIÓN COMPLETADA ===');
-    print('Errores: $errors');
-    print('Válido: $isValid');
+    print('Errores encontrados: $errors');
+    print('Es válido: $isValid');
+    if (errors.isNotEmpty) {
+      print('=== DETALLE DE ERRORES ===');
+      errors.forEach((field, message) {
+        print('$field: $message');
+      });
+      print('==========================');
+    }
     print('============================');
 
     emit(currentState.copyWith(
@@ -405,21 +429,32 @@ class DataRegistrationBloc
   Map<String, String> _validateContactForm(DataRegistrationData data) {
     final errors = <String, String>{};
 
+    // Validación de nombres
     if (data.contactNames.trim().isEmpty) {
       errors['names'] = 'Por favor ingrese sus nombres';
+    } else if (data.contactNames.trim().length < 2) {
+      errors['names'] = 'Los nombres deben tener al menos 2 caracteres';
     }
 
+    // Validación de celular
     if (data.contactCellPhone.trim().isEmpty) {
       errors['cellPhone'] = 'Por favor ingrese su número de celular';
-    } else if (data.contactCellPhone.length < 10) {
-      final remaining = 10 - data.contactCellPhone.length;
-      errors['cellPhone'] = 'Faltan $remaining dígitos';
+    } else if (data.contactCellPhone.length != 10) {
+      errors['cellPhone'] = 'El número de celular debe tener exactamente 10 dígitos';
+    } else if (!RegExp(r'^[0-9]{10}$').hasMatch(data.contactCellPhone)) {
+      errors['cellPhone'] = 'El número de celular debe contener solo dígitos';
     }
 
+    // Validación de teléfono fijo
     if (data.contactLandline.trim().isEmpty) {
       errors['landline'] = 'Por favor ingrese su número fijo';
+    } else if (data.contactLandline.length < 7) {
+      errors['landline'] = 'El número fijo debe tener al menos 7 dígitos';
+    } else if (!RegExp(r'^[0-9]+$').hasMatch(data.contactLandline)) {
+      errors['landline'] = 'El número fijo debe contener solo dígitos';
     }
 
+    // Validación de email
     if (data.contactEmail.trim().isEmpty) {
       errors['email'] = 'Por favor ingrese su correo electrónico';
     } else if (!RegExp(
@@ -434,24 +469,51 @@ class DataRegistrationBloc
   Map<String, String> _validateInspectionForm(DataRegistrationData data) {
     final errors = <String, String>{};
 
+    // Validación de ID de incidente
     if (data.inspectionIncidentId.trim().isEmpty) {
       errors['incidentId'] = 'Por favor ingrese el ID del incidente';
+    } else if (!RegExp(r'^[0-9]+$').hasMatch(data.inspectionIncidentId.trim())) {
+      errors['incidentId'] = 'El ID del incidente debe contener solo números';
     }
 
+    // Validación de estado
     if (data.inspectionStatus == null || data.inspectionStatus!.isEmpty) {
       errors['status'] = 'Por favor seleccione un estado';
     }
 
+    // Validación de fecha
     if (data.inspectionDate == null) {
       errors['date'] = 'Por favor seleccione una fecha';
+    } else {
+      final now = DateTime.now();
+      final today = DateTime(now.year, now.month, now.day);
+      if (data.inspectionDate!.isBefore(today.subtract(const Duration(days: 365)))) {
+        errors['date'] = 'La fecha no puede ser anterior a hace un año';
+      } else if (data.inspectionDate!.isAfter(today)) {
+        errors['date'] = 'La fecha no puede ser futura';
+      }
     }
 
+    // Validación de hora
     if (data.inspectionTime.isEmpty) {
       errors['time'] = 'Por favor seleccione una hora';
+    } else if (!RegExp(r'^([01]?[0-9]|2[0-3]):[0-5][0-9]$').hasMatch(data.inspectionTime)) {
+      errors['time'] = 'Formato de hora inválido (HH:MM)';
     }
 
+    // Validación de comentario
     if (data.inspectionComment.trim().isEmpty) {
       errors['comment'] = 'Por favor ingrese un comentario';
+    } else if (data.inspectionComment.trim().length < 10) {
+      errors['comment'] = 'El comentario debe tener al menos 10 caracteres';
+    }
+
+    // Validación de números (lesionados y muertos)
+    if (data.inspectionInjured < 0) {
+      errors['injured'] = 'El número de lesionados no puede ser negativo';
+    }
+    if (data.inspectionDead < 0) {
+      errors['dead'] = 'El número de muertos no puede ser negativo';
     }
 
     return errors;

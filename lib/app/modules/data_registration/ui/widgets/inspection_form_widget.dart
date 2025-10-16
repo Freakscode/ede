@@ -174,16 +174,36 @@ class _InspectionFormWidgetState extends State<InspectionFormWidget> {
     final currentData = state is DataRegistrationData ? state : null;
     final error = currentData?.inspectionErrors['status'];
     
-    return CustomExpandableDropdown<String>(
-      label: 'Estado *',
-      value: currentData?.inspectionStatus,
-      items: _statusOptions,
-      itemBuilder: (item) => item,
-      onChanged: (value) {
-        context.read<DataRegistrationBloc>().add(InspectionFormStatusChanged(value));
-      },
-      validator: (value) => error,
-      hintText: 'Seleccione un estado',
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        CustomExpandableDropdown<String>(
+          label: 'Estado *',
+          value: currentData?.inspectionStatus,
+          items: _statusOptions,
+          itemBuilder: (item) => item,
+          onChanged: (value) {
+            print('=== CAMBIO DE ESTADO ===');
+            print('Nuevo estado seleccionado: $value');
+            print('======================');
+            context.read<DataRegistrationBloc>().add(InspectionFormStatusChanged(value));
+          },
+          hintText: 'Seleccione un estado',
+        ),
+        // Mostrar error por separado
+        if (error != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: Text(
+              error,
+              style: const TextStyle(
+                color: Color(0xFFE53E3E),
+                fontFamily: 'Work Sans',
+                fontSize: 12,
+              ),
+            ),
+          ),
+      ],
     );
   }
 
