@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:caja_herramientas/app/shared/widgets/inputs/custom_text_field.dart';
 import 'package:caja_herramientas/app/shared/widgets/inputs/custom_expandable_dropdown.dart';
 import 'package:caja_herramientas/app/shared/widgets/inputs/custom_date_picker.dart';
@@ -7,8 +8,9 @@ import 'package:caja_herramientas/app/shared/widgets/inputs/custom_time_picker.d
 import 'package:caja_herramientas/app/shared/widgets/text/section_title.dart';
 import 'package:caja_herramientas/app/shared/widgets/info/warning_info_widget.dart';
 import 'package:caja_herramientas/app/shared/widgets/buttons/custom_elevated_button.dart';
-import 'package:caja_herramientas/app/modules/data_registration/models/inspection_data.dart';
-import 'package:caja_herramientas/app/modules/data_registration/services/inspection_storage_service.dart';
+import 'package:caja_herramientas/app/modules/data_registration/bloc/data_registration_bloc.dart';
+import 'package:caja_herramientas/app/modules/data_registration/bloc/events/data_registration_events.dart';
+import 'package:caja_herramientas/app/modules/data_registration/bloc/data_registration_state.dart';
 import 'package:go_router/go_router.dart';
 
 class InspectionFormWidget extends StatefulWidget {
@@ -22,16 +24,9 @@ class InspectionFormWidget extends StatefulWidget {
 
 class _InspectionFormWidgetState extends State<InspectionFormWidget> {
   final _incidentIdController = TextEditingController();
-  final _statusController = TextEditingController();
-  final _dateController = TextEditingController();
-  final _timeController = TextEditingController();
   final _commentController = TextEditingController();
   final _injuredController = TextEditingController();
   final _deadController = TextEditingController();
-
-  String? _selectedStatus;
-  DateTime? _selectedDate;
-  TimeOfDay? _selectedTime;
 
   final List<String> _statusOptions = [
     'En proceso',
@@ -43,9 +38,6 @@ class _InspectionFormWidgetState extends State<InspectionFormWidget> {
   @override
   void dispose() {
     _incidentIdController.dispose();
-    _statusController.dispose();
-    _dateController.dispose();
-    _timeController.dispose();
     _commentController.dispose();
     _injuredController.dispose();
     _deadController.dispose();
@@ -54,204 +46,252 @@ class _InspectionFormWidgetState extends State<InspectionFormWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Form(
-      key: widget.formKey,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Título y subtítulo
-          const SectionTitle(
-            title: 'Registro de datos',
-            subtitle: 'Inspección por riesgo',
-          ),
+    return BlocListener<DataRegistrationBloc, DataRegistrationState>(
+      listener: (context, state) {
+        if (state is InspectionFormSaved) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.message),
+              backgroundColor: Colors.green,
+              duration: const Duration(seconds: 2),
+            ),
+          );
+          context.go('/home');
+        } else if (state is CompleteRegistrationSaved) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.message),
+              backgroundColor: Colors.green,
+              duration: const Duration(seconds: 2),
+            ),
+          );
+          context.go('/home');
+        } else if (state is DataRegistrationError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.message),
+              backgroundColor: Colors.red,
+              duration: const Duration(seconds: 3),
+            ),
+          );
+        }
+      },
+      child: BlocBuilder<DataRegistrationBloc, DataRegistrationState>(
+        builder: (context, state) {
+          return Form(
+            key: widget.formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Título y subtítulo
+                const SectionTitle(
+                  title: 'Registro de datos',
+                  subtitle: 'Inspección por riesgo',
+                ),
 
-          const SizedBox(height: 20),
+                const SizedBox(height: 20),
 
-          // Campo Id Incidente
+                // Campo Id Incidente
+                _buildIncidentIdField(context, state),
 
-          // Campo Estado
-          CustomExpandableDropdown<String>(
-            label: 'Estado *',
-            value: _selectedStatus,
-            items: _statusOptions,
-            itemBuilder: (item) => item,
-            onChanged: (value) {
-              setState(() {
-                _selectedStatus = value;
-              });
-            },
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Por favor seleccione un estado';
-              }
-              return null;
-            },
-            hintText: 'Seleccione un estado',
-          ),
+                const SizedBox(height: 16),
 
-          const SizedBox(height: 16),
+                // Campo Estado
+                _buildStatusField(context, state),
 
-          // Campo Fecha
-          CustomDatePicker(
-            label: 'Fecha *',
-            selectedDate: _selectedDate,
-            onDateSelected: (date) {
-              setState(() {
-                _selectedDate = date;
-              });
-            },
-            validator: (date) {
-              if (date == null) {
-                return 'Por favor seleccione una fecha';
-              }
-              return null;
-            },
-          ),
+                const SizedBox(height: 16),
 
-          const SizedBox(height: 16),
+                // Campo Fecha
+                _buildDateField(context, state),
 
-          // Campo Hora
-          CustomTimePicker(
-            label: 'Hora *',
-            selectedTime: _selectedTime,
-            onTimeSelected: (time) {
-              setState(() {
-                _selectedTime = time;
-              });
-            },
-            validator: (time) {
-              if (time == null) {
-                return 'Por favor seleccione una hora';
-              }
-              return null;
-            },
-          ),
+                const SizedBox(height: 16),
 
-          const SizedBox(height: 16),
+                // Campo Hora
+                _buildTimeField(context, state),
 
-          // Campo Comentario
-          CustomTextField(
-            controller: _commentController,
-            label: 'Comentario *',
-            hintText:
-                'Ingrese un comentario adicional de la inspección realizada...',
-            maxLines: 4,
-            validator: (value) {
-              if (value == null || value.trim().isEmpty) {
-                return 'Por favor ingrese un comentario';
-              }
-              return null;
-            },
-          ),
+                const SizedBox(height: 16),
 
-          const SizedBox(height: 16),
+                // Campo Comentario
+                _buildCommentField(context, state),
 
-          // Campo Número de lesionados
-          CustomTextField(
-            controller: _injuredController,
-            label: 'Número de lesionados',
-            hintText: 'Ingrese número de lesionados',
-            keyboardType: TextInputType.number,
-            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-            validator: (value) {
-              if (value != null && value.isNotEmpty) {
-                final number = int.tryParse(value);
-                if (number == null || number < 0) {
-                  return 'Por favor ingrese un número válido';
-                }
-              }
-              return null;
-            },
-          ),
+                const SizedBox(height: 16),
 
-          const SizedBox(height: 16),
+                // Campo Número de lesionados
+                _buildInjuredField(context, state),
 
-          // Campo Número de muertos
-          CustomTextField(
-            controller: _deadController,
-            label: 'Número de muertos',
-            hintText: 'Ingrese número de muertos',
-            keyboardType: TextInputType.number,
-            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-            validator: (value) {
-              if (value != null && value.isNotEmpty) {
-                final number = int.tryParse(value);
-                if (number == null || number < 0) {
-                  return 'Por favor ingrese un número válido';
-                }
-              }
-              return null;
-            },
-          ),
-          const SizedBox(height: 16),
+                const SizedBox(height: 16),
 
-          CustomTextField(
-            controller: _incidentIdController,
-            label: 'Id Incidente',
-            hintText: 'Ingrese el ID del incidente',
-            keyboardType: TextInputType.number,
-            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-            validator: (value) {
-              if (value == null || value.trim().isEmpty) {
-                return 'Por favor ingrese el ID del incidente';
-              }
-              return null;
-            },
-          ),
+                // Campo Número de muertos
+                _buildDeadField(context, state),
 
-          const SizedBox(height: 24),
+                const SizedBox(height: 24),
 
-          // Widget de advertencia
-          const WarningInfoWidget(
-            title: 'Información',
-            message:
-                'Antes de iniciar la evaluación del riesgo, tenga en cuenta que los resultados son únicamente de carácter orientativo. El DAGRD no asume responsabilidad alguna sobre su uso o interpretación',
-          ),
+                // Widget de advertencia
+                const WarningInfoWidget(
+                  title: 'Información',
+                  message:
+                      'Antes de iniciar la evaluación del riesgo, tenga en cuenta que los resultados son únicamente de carácter orientativo. El DAGRD no asume responsabilidad alguna sobre su uso o interpretación',
+                ),
 
-          const SizedBox(height: 24),
+                const SizedBox(height: 24),
 
-          // Botón Finalizar
-          CustomElevatedButton(
-            text: 'Finalizar',
-            onPressed: () async {
-              if (widget.formKey.currentState!.validate()) {
-                widget.formKey.currentState!.save();
-                
-                // Crear el objeto InspectionData con los datos del formulario
-                final inspectionData = InspectionData(
-                  incidentId: _incidentIdController.text.trim(),
-                  status: _selectedStatus ?? '',
-                  date: _selectedDate ?? DateTime.now(),
-                  time: _selectedTime?.format(context) ?? '',
-                  comment: _commentController.text.trim(),
-                  injured: int.tryParse(_injuredController.text.trim()) ?? 0,
-                  dead: int.tryParse(_deadController.text.trim()) ?? 0,
-                );
-
-                // Guardar en memoria usando el servicio
-                final storageService = InspectionStorageService();
-                await storageService.saveInspection(inspectionData);
-
-                // Mostrar mensaje de éxito
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text(
-                        'Formulario de inspección guardado correctamente',
-                      ),
-                      backgroundColor: Colors.green,
-                      duration: Duration(seconds: 2),
-                    ),
-                  );
-                  
-                  // Navegar a home
-                  context.go('/home');
-                }
-              }
-            },
-          ),
-        ],
+                // Botón Finalizar
+                CustomElevatedButton(
+                  text: 'Finalizar',
+                  onPressed: state is DataRegistrationLoading ? null : () {
+                    // Primero validar el formulario Flutter
+                    if (widget.formKey.currentState!.validate()) {
+                      widget.formKey.currentState!.save();
+                      // Luego disparar la validación del BLoC
+                      context.read<DataRegistrationBloc>().add(const InspectionFormValidated());
+                    }
+                  },
+                  isLoading: state is DataRegistrationLoading,
+                ),
+              ],
+            ),
+          );
+        },
       ),
+    );
+  }
+
+  Widget _buildIncidentIdField(BuildContext context, DataRegistrationState state) {
+    final currentData = state is DataRegistrationData ? state : null;
+    final error = currentData?.inspectionErrors['incidentId'];
+    
+    // Actualizar el controlador si el estado cambió
+    if (currentData != null && _incidentIdController.text != currentData.inspectionIncidentId) {
+      _incidentIdController.text = currentData.inspectionIncidentId;
+    }
+    
+    return CustomTextField(
+      controller: _incidentIdController,
+      label: 'Id Incidente',
+      hintText: 'Ingrese el ID del incidente',
+      keyboardType: TextInputType.number,
+      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+      validator: (value) => error,
+      onChanged: (value) {
+        context.read<DataRegistrationBloc>().add(InspectionFormIncidentIdChanged(value));
+      },
+    );
+  }
+
+  Widget _buildStatusField(BuildContext context, DataRegistrationState state) {
+    final currentData = state is DataRegistrationData ? state : null;
+    final error = currentData?.inspectionErrors['status'];
+    
+    return CustomExpandableDropdown<String>(
+      label: 'Estado *',
+      value: currentData?.inspectionStatus,
+      items: _statusOptions,
+      itemBuilder: (item) => item,
+      onChanged: (value) {
+        context.read<DataRegistrationBloc>().add(InspectionFormStatusChanged(value));
+      },
+      validator: (value) => error,
+      hintText: 'Seleccione un estado',
+    );
+  }
+
+  Widget _buildDateField(BuildContext context, DataRegistrationState state) {
+    final currentData = state is DataRegistrationData ? state : null;
+    final error = currentData?.inspectionErrors['date'];
+    
+    return CustomDatePicker(
+      label: 'Fecha *',
+      selectedDate: currentData?.inspectionDate,
+      onDateSelected: (date) {
+        context.read<DataRegistrationBloc>().add(InspectionFormDateChanged(date));
+      },
+      validator: (date) => error,
+    );
+  }
+
+  Widget _buildTimeField(BuildContext context, DataRegistrationState state) {
+    final currentData = state is DataRegistrationData ? state : null;
+    final error = currentData?.inspectionErrors['time'];
+    
+    return CustomTimePicker(
+      label: 'Hora *',
+      selectedTime: currentData?.inspectionTime.isNotEmpty == true 
+          ? TimeOfDay.fromDateTime(DateTime.parse('2023-01-01 ${currentData!.inspectionTime}:00'))
+          : null,
+      onTimeSelected: (time) {
+        if (time != null) {
+          final timeString = '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
+          context.read<DataRegistrationBloc>().add(InspectionFormTimeChanged(timeString));
+        }
+      },
+      validator: (time) => error,
+    );
+  }
+
+  Widget _buildCommentField(BuildContext context, DataRegistrationState state) {
+    final currentData = state is DataRegistrationData ? state : null;
+    final error = currentData?.inspectionErrors['comment'];
+    
+    // Actualizar el controlador si el estado cambió
+    if (currentData != null && _commentController.text != currentData.inspectionComment) {
+      _commentController.text = currentData.inspectionComment;
+    }
+    
+    return CustomTextField(
+      controller: _commentController,
+      label: 'Comentario *',
+      hintText: 'Ingrese un comentario adicional de la inspección realizada...',
+      maxLines: 4,
+      validator: (value) => error,
+      onChanged: (value) {
+        context.read<DataRegistrationBloc>().add(InspectionFormCommentChanged(value));
+      },
+    );
+  }
+
+  Widget _buildInjuredField(BuildContext context, DataRegistrationState state) {
+    final currentData = state is DataRegistrationData ? state : null;
+    final error = currentData?.inspectionErrors['injured'];
+    
+    // Actualizar el controlador si el estado cambió
+    if (currentData != null && _injuredController.text != currentData.inspectionInjured.toString()) {
+      _injuredController.text = currentData.inspectionInjured.toString();
+    }
+    
+    return CustomTextField(
+      controller: _injuredController,
+      label: 'Número de lesionados',
+      hintText: 'Ingrese número de lesionados',
+      keyboardType: TextInputType.number,
+      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+      validator: (value) => error,
+      onChanged: (value) {
+        final injured = int.tryParse(value) ?? 0;
+        context.read<DataRegistrationBloc>().add(InspectionFormInjuredChanged(injured));
+      },
+    );
+  }
+
+  Widget _buildDeadField(BuildContext context, DataRegistrationState state) {
+    final currentData = state is DataRegistrationData ? state : null;
+    final error = currentData?.inspectionErrors['dead'];
+    
+    // Actualizar el controlador si el estado cambió
+    if (currentData != null && _deadController.text != currentData.inspectionDead.toString()) {
+      _deadController.text = currentData.inspectionDead.toString();
+    }
+    
+    return CustomTextField(
+      controller: _deadController,
+      label: 'Número de muertos',
+      hintText: 'Ingrese número de muertos',
+      keyboardType: TextInputType.number,
+      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+      validator: (value) => error,
+      onChanged: (value) {
+        final dead = int.tryParse(value) ?? 0;
+        context.read<DataRegistrationBloc>().add(InspectionFormDeadChanged(dead));
+      },
     );
   }
 }

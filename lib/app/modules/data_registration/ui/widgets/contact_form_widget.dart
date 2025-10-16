@@ -4,9 +4,9 @@ import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import 'package:caja_herramientas/app/shared/widgets/buttons/custom_elevated_button.dart';
 import 'package:caja_herramientas/app/shared/widgets/inputs/custom_text_field.dart';
 import 'package:caja_herramientas/app/shared/widgets/text/section_title.dart';
-import 'package:caja_herramientas/app/modules/data_registration/bloc/contact_form_bloc.dart';
-import 'package:caja_herramientas/app/modules/data_registration/bloc/events/contact_form_events.dart';
-import 'package:caja_herramientas/app/modules/data_registration/bloc/contact_form_state.dart';
+import 'package:caja_herramientas/app/modules/data_registration/bloc/data_registration_bloc.dart';
+import 'package:caja_herramientas/app/modules/data_registration/bloc/events/data_registration_events.dart';
+import 'package:caja_herramientas/app/modules/data_registration/bloc/data_registration_state.dart';
 
 class ContactFormWidget extends StatefulWidget {
   final GlobalKey<FormState> formKey;
@@ -39,7 +39,7 @@ class _ContactFormWidgetState extends State<ContactFormWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<ContactFormBloc, ContactFormState>(
+    return BlocListener<DataRegistrationBloc, DataRegistrationState>(
       listener: (context, state) {
         if (state is ContactFormSaved) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -50,7 +50,7 @@ class _ContactFormWidgetState extends State<ContactFormWidget> {
             ),
           );
           widget.onNextPressed();
-        } else if (state is ContactFormError) {
+        } else if (state is DataRegistrationError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.message),
@@ -60,7 +60,7 @@ class _ContactFormWidgetState extends State<ContactFormWidget> {
           );
         }
       },
-      child: BlocBuilder<ContactFormBloc, ContactFormState>(
+      child: BlocBuilder<DataRegistrationBloc, DataRegistrationState>(
         builder: (context, state) {
           return Form(
             key: widget.formKey,
@@ -98,12 +98,12 @@ class _ContactFormWidgetState extends State<ContactFormWidget> {
                 // Botón Siguiente
                 CustomElevatedButton(
                   text: 'Siguiente',
-                  onPressed: state is ContactFormLoading ? null : () {
+                  onPressed: state is DataRegistrationLoading ? null : () {
                     // Primero validar el formulario Flutter
                     if (widget.formKey.currentState!.validate()) {
                       widget.formKey.currentState!.save();
                       // Luego disparar la validación del BLoC
-                      context.read<ContactFormBloc>().add(ContactFormValidated());
+                      context.read<DataRegistrationBloc>().add(const ContactFormValidated());
                     }
                   },
                   backgroundColor: DAGRDColors.azulDAGRD,
@@ -111,7 +111,7 @@ class _ContactFormWidgetState extends State<ContactFormWidget> {
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                   borderRadius: 4,
-                  isLoading: state is ContactFormLoading,
+                  isLoading: state is DataRegistrationLoading,
                 ),
               ],
             ),
@@ -121,13 +121,13 @@ class _ContactFormWidgetState extends State<ContactFormWidget> {
     );
   }
 
-  Widget _buildNamesField(BuildContext context, ContactFormState state) {
-    final currentData = state is ContactFormData ? state : null;
-    final error = currentData?.errors['names'];
+  Widget _buildNamesField(BuildContext context, DataRegistrationState state) {
+    final currentData = state is DataRegistrationData ? state : null;
+    final error = currentData?.contactErrors['names'];
     
     // Actualizar el controlador si el estado cambió
-    if (currentData != null && _namesController.text != currentData.names) {
-      _namesController.text = currentData.names;
+    if (currentData != null && _namesController.text != currentData.contactNames) {
+      _namesController.text = currentData.contactNames;
     }
     
     return CustomTextField(
@@ -136,18 +136,18 @@ class _ContactFormWidgetState extends State<ContactFormWidget> {
       hintText: 'Ingrese sus nombres',
       validator: (value) => error,
       onChanged: (value) {
-        context.read<ContactFormBloc>().add(ContactFormNamesChanged(value));
+        context.read<DataRegistrationBloc>().add(ContactFormNamesChanged(value));
       },
     );
   }
 
-  Widget _buildCellPhoneField(BuildContext context, ContactFormState state) {
-    final currentData = state is ContactFormData ? state : null;
-    final error = currentData?.errors['cellPhone'];
+  Widget _buildCellPhoneField(BuildContext context, DataRegistrationState state) {
+    final currentData = state is DataRegistrationData ? state : null;
+    final error = currentData?.contactErrors['cellPhone'];
     
     // Actualizar el controlador si el estado cambió
-    if (currentData != null && _cellPhoneController.text != currentData.cellPhone) {
-      _cellPhoneController.text = currentData.cellPhone;
+    if (currentData != null && _cellPhoneController.text != currentData.contactCellPhone) {
+      _cellPhoneController.text = currentData.contactCellPhone;
     }
     
     return CustomTextField(
@@ -157,18 +157,18 @@ class _ContactFormWidgetState extends State<ContactFormWidget> {
       keyboardType: TextInputType.phone,
       validator: (value) => error,
       onChanged: (value) {
-        context.read<ContactFormBloc>().add(ContactFormCellPhoneChanged(value));
+        context.read<DataRegistrationBloc>().add(ContactFormCellPhoneChanged(value));
       },
     );
   }
 
-  Widget _buildLandlineField(BuildContext context, ContactFormState state) {
-    final currentData = state is ContactFormData ? state : null;
-    final error = currentData?.errors['landline'];
+  Widget _buildLandlineField(BuildContext context, DataRegistrationState state) {
+    final currentData = state is DataRegistrationData ? state : null;
+    final error = currentData?.contactErrors['landline'];
     
     // Actualizar el controlador si el estado cambió
-    if (currentData != null && _landlineController.text != currentData.landline) {
-      _landlineController.text = currentData.landline;
+    if (currentData != null && _landlineController.text != currentData.contactLandline) {
+      _landlineController.text = currentData.contactLandline;
     }
     
     return CustomTextField(
@@ -178,18 +178,18 @@ class _ContactFormWidgetState extends State<ContactFormWidget> {
       keyboardType: TextInputType.phone,
       validator: (value) => error,
       onChanged: (value) {
-        context.read<ContactFormBloc>().add(ContactFormLandlineChanged(value));
+        context.read<DataRegistrationBloc>().add(ContactFormLandlineChanged(value));
       },
     );
   }
 
-  Widget _buildEmailField(BuildContext context, ContactFormState state) {
-    final currentData = state is ContactFormData ? state : null;
-    final error = currentData?.errors['email'];
+  Widget _buildEmailField(BuildContext context, DataRegistrationState state) {
+    final currentData = state is DataRegistrationData ? state : null;
+    final error = currentData?.contactErrors['email'];
     
     // Actualizar el controlador si el estado cambió
-    if (currentData != null && _emailController.text != currentData.email) {
-      _emailController.text = currentData.email;
+    if (currentData != null && _emailController.text != currentData.contactEmail) {
+      _emailController.text = currentData.contactEmail;
     }
     
     return CustomTextField(
@@ -199,7 +199,7 @@ class _ContactFormWidgetState extends State<ContactFormWidget> {
       keyboardType: TextInputType.emailAddress,
       validator: (value) => error,
       onChanged: (value) {
-        context.read<ContactFormBloc>().add(ContactFormEmailChanged(value));
+        context.read<DataRegistrationBloc>().add(ContactFormEmailChanged(value));
       },
     );
   }

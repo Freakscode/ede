@@ -17,7 +17,7 @@ import 'modules/home/bloc/home_bloc.dart';
 import 'modules/home/bloc/home_event.dart';
 import 'modules/auth/bloc/auth_bloc.dart';
 import 'modules/auth/services/auth_service.dart';
-import 'modules/data_registration/bloc/contact_form_bloc.dart';
+import 'modules/data_registration/bloc/data_registration_bloc.dart';
 import '../injection_container.dart' as di;
 import 'config/app_router.dart';
 
@@ -67,9 +67,9 @@ class MyApp extends StatelessWidget {
         BlocProvider<AuthBloc>(
           create: (context) => AuthBloc(authService: AuthService()),
         ),
-        // Contact Form BLoC
-        BlocProvider<ContactFormBloc>(
-          create: (context) => ContactFormBloc(),
+        // Data Registration BLoC (unified)
+        BlocProvider<DataRegistrationBloc>(
+          create: (context) => DataRegistrationBloc(),
         ),
         // EvaluacionGlobalBloc must be last as it depends on all other evaluacion BLoCs
         BlocProvider<EvaluacionGlobalBloc>(
