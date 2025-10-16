@@ -12,6 +12,7 @@ class CustomTextField extends StatelessWidget {
   final Widget? suffixIcon;
   final Widget? prefixIcon;
   final void Function(String)? onChanged;
+  final void Function(String?)? onSaved;
   final int maxLines;
   final List<TextInputFormatter>? inputFormatters;
 
@@ -26,6 +27,7 @@ class CustomTextField extends StatelessWidget {
     this.suffixIcon,
     this.prefixIcon,
     this.onChanged,
+    this.onSaved,
     this.maxLines = 1,
     this.inputFormatters,
   });
@@ -52,6 +54,7 @@ class CustomTextField extends StatelessWidget {
           validator: validator,
           obscureText: obscureText,
           onChanged: onChanged,
+          onSaved: onSaved,
           maxLines: maxLines,
           inputFormatters: inputFormatters,
           style: const TextStyle(

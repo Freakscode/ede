@@ -10,12 +10,10 @@ import 'package:caja_herramientas/app/modules/data_registration/bloc/data_regist
 
 class ContactFormWidget extends StatefulWidget {
   final GlobalKey<FormState> formKey;
-  final VoidCallback onNextPressed;
 
   const ContactFormWidget({
     super.key,
     required this.formKey,
-    required this.onNextPressed,
   });
 
   @override
@@ -41,15 +39,15 @@ class _ContactFormWidgetState extends State<ContactFormWidget> {
   Widget build(BuildContext context) {
     return BlocListener<DataRegistrationBloc, DataRegistrationState>(
       listener: (context, state) {
-        if (state is ContactFormSaved) {
+        if (state is DataRegistrationData && state.showInspectionForm) {
+          // Mostrar mensaje de éxito cuando navega al formulario de inspección
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.message),
+            const SnackBar(
+              content: Text('Datos de contacto guardados correctamente'),
               backgroundColor: Colors.green,
-              duration: const Duration(seconds: 2),
+              duration: Duration(seconds: 2),
             ),
           );
-          widget.onNextPressed();
         } else if (state is DataRegistrationError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -99,9 +97,12 @@ class _ContactFormWidgetState extends State<ContactFormWidget> {
                 CustomElevatedButton(
                   text: 'Siguiente',
                   onPressed: state is DataRegistrationLoading ? null : () {
-                    // Primero validar el formulario Flutter
+                    // Primero validar el formulario Flutter 
+                    print('Validando formulario Flutter');
                     if (widget.formKey.currentState!.validate()) {
+                      print('Formulario validado');
                       widget.formKey.currentState!.save();
+                      print('Guardando formulario');
                       // Luego disparar la validación del BLoC
                       context.read<DataRegistrationBloc>().add(const ContactFormValidated());
                     }
@@ -125,9 +126,13 @@ class _ContactFormWidgetState extends State<ContactFormWidget> {
     final currentData = state is DataRegistrationData ? state : null;
     final error = currentData?.contactErrors['names'];
     
-    // Actualizar el controlador si el estado cambió
+    // Actualizar el controlador si el estado cambió (solo si es diferente para evitar loops)
     if (currentData != null && _namesController.text != currentData.contactNames) {
-      _namesController.text = currentData.contactNames;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (_namesController.text != currentData.contactNames) {
+          _namesController.text = currentData.contactNames;
+        }
+      });
     }
     
     return CustomTextField(
@@ -138,6 +143,11 @@ class _ContactFormWidgetState extends State<ContactFormWidget> {
       onChanged: (value) {
         context.read<DataRegistrationBloc>().add(ContactFormNamesChanged(value));
       },
+      onSaved: (value) {
+        if (value != null) {
+          context.read<DataRegistrationBloc>().add(ContactFormNamesChanged(value));
+        }
+      },
     );
   }
 
@@ -145,9 +155,13 @@ class _ContactFormWidgetState extends State<ContactFormWidget> {
     final currentData = state is DataRegistrationData ? state : null;
     final error = currentData?.contactErrors['cellPhone'];
     
-    // Actualizar el controlador si el estado cambió
+    // Actualizar el controlador si el estado cambió (solo si es diferente para evitar loops)
     if (currentData != null && _cellPhoneController.text != currentData.contactCellPhone) {
-      _cellPhoneController.text = currentData.contactCellPhone;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (_cellPhoneController.text != currentData.contactCellPhone) {
+          _cellPhoneController.text = currentData.contactCellPhone;
+        }
+      });
     }
     
     return CustomTextField(
@@ -159,6 +173,11 @@ class _ContactFormWidgetState extends State<ContactFormWidget> {
       onChanged: (value) {
         context.read<DataRegistrationBloc>().add(ContactFormCellPhoneChanged(value));
       },
+      onSaved: (value) {
+        if (value != null) {
+          context.read<DataRegistrationBloc>().add(ContactFormCellPhoneChanged(value));
+        }
+      },
     );
   }
 
@@ -166,9 +185,13 @@ class _ContactFormWidgetState extends State<ContactFormWidget> {
     final currentData = state is DataRegistrationData ? state : null;
     final error = currentData?.contactErrors['landline'];
     
-    // Actualizar el controlador si el estado cambió
+    // Actualizar el controlador si el estado cambió (solo si es diferente para evitar loops)
     if (currentData != null && _landlineController.text != currentData.contactLandline) {
-      _landlineController.text = currentData.contactLandline;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (_landlineController.text != currentData.contactLandline) {
+          _landlineController.text = currentData.contactLandline;
+        }
+      });
     }
     
     return CustomTextField(
@@ -180,6 +203,11 @@ class _ContactFormWidgetState extends State<ContactFormWidget> {
       onChanged: (value) {
         context.read<DataRegistrationBloc>().add(ContactFormLandlineChanged(value));
       },
+      onSaved: (value) {
+        if (value != null) {
+          context.read<DataRegistrationBloc>().add(ContactFormLandlineChanged(value));
+        }
+      },
     );
   }
 
@@ -187,9 +215,13 @@ class _ContactFormWidgetState extends State<ContactFormWidget> {
     final currentData = state is DataRegistrationData ? state : null;
     final error = currentData?.contactErrors['email'];
     
-    // Actualizar el controlador si el estado cambió
+    // Actualizar el controlador si el estado cambió (solo si es diferente para evitar loops)
     if (currentData != null && _emailController.text != currentData.contactEmail) {
-      _emailController.text = currentData.contactEmail;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (_emailController.text != currentData.contactEmail) {
+          _emailController.text = currentData.contactEmail;
+        }
+      });
     }
     
     return CustomTextField(
@@ -200,6 +232,11 @@ class _ContactFormWidgetState extends State<ContactFormWidget> {
       validator: (value) => error,
       onChanged: (value) {
         context.read<DataRegistrationBloc>().add(ContactFormEmailChanged(value));
+      },
+      onSaved: (value) {
+        if (value != null) {
+          context.read<DataRegistrationBloc>().add(ContactFormEmailChanged(value));
+        }
       },
     );
   }

@@ -6,35 +6,42 @@ import '../models/inspection_data.dart';
 import '../services/inspection_storage_service.dart';
 
 /// BLoC unificado para manejar todo el proceso de registro de datos
-class DataRegistrationBloc extends Bloc<DataRegistrationEvent, DataRegistrationState> {
-  DataRegistrationBloc() : super(const DataRegistrationData(
-    // Datos de contacto iniciales
-    contactNames: '',
-    contactCellPhone: '',
-    contactLandline: '',
-    contactEmail: '',
-    contactErrors: {},
-    isContactValid: false,
-    // Datos de inspección iniciales
-    inspectionIncidentId: '',
-    inspectionStatus: null,
-    inspectionDate: null,
-    inspectionTime: '',
-    inspectionComment: '',
-    inspectionInjured: 0,
-    inspectionDead: 0,
-    inspectionErrors: {},
-    isInspectionValid: false,
-    // Navegación
-    showInspectionForm: false,
-  )) {
+class DataRegistrationBloc
+    extends Bloc<DataRegistrationEvent, DataRegistrationState> {
+  DataRegistrationBloc()
+    : super(
+        const DataRegistrationData(
+          // Datos de contacto iniciales
+          contactNames: '',
+          contactCellPhone: '',
+          contactLandline: '',
+          contactEmail: '',
+          contactErrors: {},
+          isContactValid: false,
+          // Datos de inspección iniciales
+          inspectionIncidentId: '',
+          inspectionStatus: null,
+          inspectionDate: null,
+          inspectionTime: '',
+          inspectionComment: '',
+          inspectionInjured: 0,
+          inspectionDead: 0,
+          inspectionErrors: {},
+          isInspectionValid: false,
+          // Navegación
+          showInspectionForm: false,
+          // Form keys
+          contactFormKey: null,
+          inspectionFormKey: null,
+        ),
+      ) {
     // Eventos de formulario de contacto
     on<ContactFormNamesChanged>(_onContactNamesChanged);
     on<ContactFormCellPhoneChanged>(_onContactCellPhoneChanged);
     on<ContactFormLandlineChanged>(_onContactLandlineChanged);
     on<ContactFormEmailChanged>(_onContactEmailChanged);
     on<ContactFormValidated>(_onContactFormValidated);
-    
+
     // Eventos de formulario de inspección
     on<InspectionFormIncidentIdChanged>(_onInspectionIncidentIdChanged);
     on<InspectionFormStatusChanged>(_onInspectionStatusChanged);
@@ -44,12 +51,16 @@ class DataRegistrationBloc extends Bloc<DataRegistrationEvent, DataRegistrationS
     on<InspectionFormInjuredChanged>(_onInspectionInjuredChanged);
     on<InspectionFormDeadChanged>(_onInspectionDeadChanged);
     on<InspectionFormValidated>(_onInspectionFormValidated);
-    
+
     // Eventos de navegación
     on<NavigateToInspectionForm>(_onNavigateToInspectionForm);
     on<NavigateToContactForm>(_onNavigateToContactForm);
     on<ResetAllForms>(_onResetAllForms);
     on<SaveCompleteRegistration>(_onSaveCompleteRegistration);
+
+    // Eventos para form keys
+    on<SetContactFormKey>(_onSetContactFormKey);
+    on<SetInspectionFormKey>(_onSetInspectionFormKey);
   }
 
   // === MANEJADORES DE FORMULARIO DE CONTACTO ===
@@ -58,6 +69,8 @@ class DataRegistrationBloc extends Bloc<DataRegistrationEvent, DataRegistrationS
     ContactFormNamesChanged event,
     Emitter<DataRegistrationState> emit,
   ) {
+    print('=== _onContactNamesChanged ===');
+    print('Nuevo nombre: "${event.names}"');
     if (state is DataRegistrationData) {
       final currentState = state as DataRegistrationData;
       final newState = currentState.copyWith(
@@ -65,6 +78,9 @@ class DataRegistrationBloc extends Bloc<DataRegistrationEvent, DataRegistrationS
         contactErrors: _clearContactError('names', currentState.contactErrors),
       );
       emit(newState);
+      print('Nombre actualizado en estado');
+    } else {
+      print('Estado no es DataRegistrationData: ${state.runtimeType}');
     }
   }
 
@@ -76,7 +92,10 @@ class DataRegistrationBloc extends Bloc<DataRegistrationEvent, DataRegistrationS
       final currentState = state as DataRegistrationData;
       final newState = currentState.copyWith(
         contactCellPhone: event.cellPhone,
-        contactErrors: _clearContactError('cellPhone', currentState.contactErrors),
+        contactErrors: _clearContactError(
+          'cellPhone',
+          currentState.contactErrors,
+        ),
       );
       emit(newState);
     }
@@ -90,7 +109,10 @@ class DataRegistrationBloc extends Bloc<DataRegistrationEvent, DataRegistrationS
       final currentState = state as DataRegistrationData;
       final newState = currentState.copyWith(
         contactLandline: event.landline,
-        contactErrors: _clearContactError('landline', currentState.contactErrors),
+        contactErrors: _clearContactError(
+          'landline',
+          currentState.contactErrors,
+        ),
       );
       emit(newState);
     }
@@ -114,22 +136,36 @@ class DataRegistrationBloc extends Bloc<DataRegistrationEvent, DataRegistrationS
     ContactFormValidated event,
     Emitter<DataRegistrationState> emit,
   ) {
+    print('=== _onContactFormValidated ===');
     if (state is DataRegistrationData) {
       final currentState = state as DataRegistrationData;
+
+      print('Datos actuales:');
+      print('- Nombres: "${currentState.contactNames}"');
+      print('- Celular: "${currentState.contactCellPhone}"');
+      print('- Fijo: "${currentState.contactLandline}"');
+      print('- Email: "${currentState.contactEmail}"');
+      
       final errors = _validateContactForm(currentState);
       final isValid = errors.isEmpty;
-      
+
+      print('Errores encontrados: $errors');
+      print('¿Formulario válido?: $isValid');
+
       final newState = currentState.copyWith(
         contactErrors: errors,
         isContactValid: isValid,
       );
       emit(newState);
-      
-      // Si el formulario es válido, navegar al formulario de inspección
+
       if (isValid) {
+        print('Formulario válido, navegando...');
         emit(newState.copyWith(showInspectionForm: true));
-        emit(const ContactFormSaved());
+      } else {
+        print('Formulario inválido, no navegando');
       }
+    } else {
+      print('Estado no es DataRegistrationData: ${state.runtimeType}');
     }
   }
 
@@ -143,7 +179,10 @@ class DataRegistrationBloc extends Bloc<DataRegistrationEvent, DataRegistrationS
       final currentState = state as DataRegistrationData;
       final newState = currentState.copyWith(
         inspectionIncidentId: event.incidentId,
-        inspectionErrors: _clearInspectionError('incidentId', currentState.inspectionErrors),
+        inspectionErrors: _clearInspectionError(
+          'incidentId',
+          currentState.inspectionErrors,
+        ),
       );
       emit(newState);
     }
@@ -157,7 +196,10 @@ class DataRegistrationBloc extends Bloc<DataRegistrationEvent, DataRegistrationS
       final currentState = state as DataRegistrationData;
       final newState = currentState.copyWith(
         inspectionStatus: event.status,
-        inspectionErrors: _clearInspectionError('status', currentState.inspectionErrors),
+        inspectionErrors: _clearInspectionError(
+          'status',
+          currentState.inspectionErrors,
+        ),
       );
       emit(newState);
     }
@@ -171,7 +213,10 @@ class DataRegistrationBloc extends Bloc<DataRegistrationEvent, DataRegistrationS
       final currentState = state as DataRegistrationData;
       final newState = currentState.copyWith(
         inspectionDate: event.date,
-        inspectionErrors: _clearInspectionError('date', currentState.inspectionErrors),
+        inspectionErrors: _clearInspectionError(
+          'date',
+          currentState.inspectionErrors,
+        ),
       );
       emit(newState);
     }
@@ -185,7 +230,10 @@ class DataRegistrationBloc extends Bloc<DataRegistrationEvent, DataRegistrationS
       final currentState = state as DataRegistrationData;
       final newState = currentState.copyWith(
         inspectionTime: event.time,
-        inspectionErrors: _clearInspectionError('time', currentState.inspectionErrors),
+        inspectionErrors: _clearInspectionError(
+          'time',
+          currentState.inspectionErrors,
+        ),
       );
       emit(newState);
     }
@@ -199,7 +247,10 @@ class DataRegistrationBloc extends Bloc<DataRegistrationEvent, DataRegistrationS
       final currentState = state as DataRegistrationData;
       final newState = currentState.copyWith(
         inspectionComment: event.comment,
-        inspectionErrors: _clearInspectionError('comment', currentState.inspectionErrors),
+        inspectionErrors: _clearInspectionError(
+          'comment',
+          currentState.inspectionErrors,
+        ),
       );
       emit(newState);
     }
@@ -213,7 +264,10 @@ class DataRegistrationBloc extends Bloc<DataRegistrationEvent, DataRegistrationS
       final currentState = state as DataRegistrationData;
       final newState = currentState.copyWith(
         inspectionInjured: event.injured,
-        inspectionErrors: _clearInspectionError('injured', currentState.inspectionErrors),
+        inspectionErrors: _clearInspectionError(
+          'injured',
+          currentState.inspectionErrors,
+        ),
       );
       emit(newState);
     }
@@ -227,7 +281,10 @@ class DataRegistrationBloc extends Bloc<DataRegistrationEvent, DataRegistrationS
       final currentState = state as DataRegistrationData;
       final newState = currentState.copyWith(
         inspectionDead: event.dead,
-        inspectionErrors: _clearInspectionError('dead', currentState.inspectionErrors),
+        inspectionErrors: _clearInspectionError(
+          'dead',
+          currentState.inspectionErrors,
+        ),
       );
       emit(newState);
     }
@@ -237,21 +294,32 @@ class DataRegistrationBloc extends Bloc<DataRegistrationEvent, DataRegistrationS
     InspectionFormValidated event,
     Emitter<DataRegistrationState> emit,
   ) {
+    print('=== _onInspectionFormValidated ===');
     if (state is DataRegistrationData) {
       final currentState = state as DataRegistrationData;
+      print('Validando formulario de inspección...');
+      
       final errors = _validateInspectionForm(currentState);
       final isValid = errors.isEmpty;
-      
+
+      print('Errores encontrados: $errors');
+      print('¿Formulario válido?: $isValid');
+
       final newState = currentState.copyWith(
         inspectionErrors: errors,
         isInspectionValid: isValid,
       );
       emit(newState);
-      
+
       // Si el formulario es válido, guardar automáticamente
       if (isValid) {
+        print('Formulario válido, iniciando guardado...');
         add(const SaveCompleteRegistration());
+      } else {
+        print('Formulario inválido, no guardando');
       }
+    } else {
+      print('Estado no es DataRegistrationData: ${state.runtimeType}');
     }
   }
 
@@ -281,39 +349,44 @@ class DataRegistrationBloc extends Bloc<DataRegistrationEvent, DataRegistrationS
     ResetAllForms event,
     Emitter<DataRegistrationState> emit,
   ) {
-    emit(const DataRegistrationData(
-      contactNames: '',
-      contactCellPhone: '',
-      contactLandline: '',
-      contactEmail: '',
-      contactErrors: {},
-      isContactValid: false,
-      inspectionIncidentId: '',
-      inspectionStatus: null,
-      inspectionDate: null,
-      inspectionTime: '',
-      inspectionComment: '',
-      inspectionInjured: 0,
-      inspectionDead: 0,
-      inspectionErrors: {},
-      isInspectionValid: false,
-      showInspectionForm: false,
-    ));
+    emit(
+      const DataRegistrationData(
+        contactNames: '',
+        contactCellPhone: '',
+        contactLandline: '',
+        contactEmail: '',
+        contactErrors: {},
+        isContactValid: false,
+        inspectionIncidentId: '',
+        inspectionStatus: null,
+        inspectionDate: null,
+        inspectionTime: '',
+        inspectionComment: '',
+        inspectionInjured: 0,
+        inspectionDead: 0,
+        inspectionErrors: {},
+        isInspectionValid: false,
+        showInspectionForm: false,
+      ),
+    );
   }
 
   void _onSaveCompleteRegistration(
     SaveCompleteRegistration event,
     Emitter<DataRegistrationState> emit,
   ) async {
+    print('=== _onSaveCompleteRegistration ===');
     emit(const DataRegistrationLoading());
-    
+    print('Estado cambiado a DataRegistrationLoading');
+
     try {
       if (state is DataRegistrationData) {
         final currentState = state as DataRegistrationData;
-        
+        print('Guardando datos de inspección...');
+
         // Simular guardado
         await Future.delayed(const Duration(milliseconds: 500));
-        
+
         // Crear los objetos de datos
         final contactData = ContactData(
           names: currentState.contactNames,
@@ -335,14 +408,23 @@ class DataRegistrationBloc extends Bloc<DataRegistrationEvent, DataRegistrationS
         // Guardar en memoria usando el servicio
         final storageService = InspectionStorageService();
         await storageService.saveInspection(inspectionData);
-        
+
         // Aquí podrías guardar también los datos de contacto si tienes un servicio para eso
         print('Contacto guardado: ${contactData.toJson()}');
         print('Inspección guardada: ${inspectionData.toJson()}');
-        
-        emit(const CompleteRegistrationSaved(message: 'Registro completo guardado correctamente'));
+
+        print('Emitiendo CompleteRegistrationSaved...');
+        emit(
+          const CompleteRegistrationSaved(
+            message: 'Registro completo guardado correctamente',
+          ),
+        );
+        print('Estado cambiado a CompleteRegistrationSaved');
+      } else {
+        print('Estado no es DataRegistrationData: ${state.runtimeType}');
       }
     } catch (e) {
+      print('Error al guardar: $e');
       emit(DataRegistrationError('Error al guardar los datos: $e'));
     }
   }
@@ -359,7 +441,8 @@ class DataRegistrationBloc extends Bloc<DataRegistrationEvent, DataRegistrationS
     if (data.contactCellPhone.trim().isEmpty) {
       errors['cellPhone'] = 'Por favor ingrese su número de celular';
     } else if (data.contactCellPhone.length < 10) {
-      errors['cellPhone'] = 'El número de celular debe tener al menos 10 dígitos';
+      final remaining = 10 - data.contactCellPhone.length;
+      errors['cellPhone'] = 'Faltan $remaining dígitos (${data.contactCellPhone.length}/10)';
     }
 
     if (data.contactLandline.trim().isEmpty) {
@@ -368,7 +451,9 @@ class DataRegistrationBloc extends Bloc<DataRegistrationEvent, DataRegistrationS
 
     if (data.contactEmail.trim().isEmpty) {
       errors['email'] = 'Por favor ingrese su correo electrónico';
-    } else if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(data.contactEmail)) {
+    } else if (!RegExp(
+      r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+    ).hasMatch(data.contactEmail)) {
       errors['email'] = 'Por favor ingrese un correo electrónico válido';
     }
 
@@ -403,13 +488,19 @@ class DataRegistrationBloc extends Bloc<DataRegistrationEvent, DataRegistrationS
 
   // === MÉTODOS AUXILIARES ===
 
-  Map<String, String> _clearContactError(String field, Map<String, String> errors) {
+  Map<String, String> _clearContactError(
+    String field,
+    Map<String, String> errors,
+  ) {
     final newErrors = Map<String, String>.from(errors);
     newErrors.remove(field);
     return newErrors;
   }
 
-  Map<String, String> _clearInspectionError(String field, Map<String, String> errors) {
+  Map<String, String> _clearInspectionError(
+    String field,
+    Map<String, String> errors,
+  ) {
     final newErrors = Map<String, String>.from(errors);
     newErrors.remove(field);
     return newErrors;
@@ -444,5 +535,27 @@ class DataRegistrationBloc extends Bloc<DataRegistrationEvent, DataRegistrationS
       );
     }
     return null;
+  }
+
+  // === MANEJADORES DE FORM KEYS ===
+
+  void _onSetContactFormKey(
+    SetContactFormKey event,
+    Emitter<DataRegistrationState> emit,
+  ) {
+    if (state is DataRegistrationData) {
+      final currentState = state as DataRegistrationData;
+      emit(currentState.copyWith(contactFormKey: event.formKey));
+    }
+  }
+
+  void _onSetInspectionFormKey(
+    SetInspectionFormKey event,
+    Emitter<DataRegistrationState> emit,
+  ) {
+    if (state is DataRegistrationData) {
+      final currentState = state as DataRegistrationData;
+      emit(currentState.copyWith(inspectionFormKey: event.formKey));
+    }
   }
 }

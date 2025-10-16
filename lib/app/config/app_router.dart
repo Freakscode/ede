@@ -32,7 +32,7 @@ import 'routes.dart';
 /// Creates and configures the application router with clean architecture
 GoRouter getAppRouter(BuildContext context) {
   return GoRouter(
-    initialLocation: '/data_registration',
+    initialLocation: '/splash',
     routes: [
       GoRoute(
         path: '/splash',
