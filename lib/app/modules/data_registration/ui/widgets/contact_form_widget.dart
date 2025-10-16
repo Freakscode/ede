@@ -99,13 +99,7 @@ class _ContactFormWidgetState extends State<ContactFormWidget> {
         
         if (state is DataRegistrationData && state.showInspectionForm) {
           // Mostrar mensaje de éxito cuando navega al formulario de inspección
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Datos de contacto guardados correctamente'),
-              backgroundColor: Colors.green,
-              duration: Duration(seconds: 2),
-            ),
-          );
+          
         } else if (state is DataRegistrationError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(

@@ -46,7 +46,7 @@ class _InspectionFormWidgetState extends State<InspectionFormWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<DataRegistrationBloc, DataRegistrationState>(
+    return BlocConsumer<DataRegistrationBloc, DataRegistrationState>(
       listener: (context, state) {
         if (state is CompleteRegistrationSaved) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -74,23 +74,8 @@ class _InspectionFormWidgetState extends State<InspectionFormWidget> {
             ),
           );
         }
-        
-        // Forzar actualización de la UI cuando hay errores de validación
-        if (state is DataRegistrationData && state.inspectionErrors.isNotEmpty) {
-          print('=== FORZANDO ACTUALIZACIÓN DE UI ===');
-          print('Errores en estado: ${state.inspectionErrors}');
-          print('====================================');
-          
-          // Forzar reconstrucción del widget
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (mounted) {
-              setState(() {});
-            }
-          });
-        }
       },
-      child: BlocBuilder<DataRegistrationBloc, DataRegistrationState>(
-        builder: (context, state) {
+      builder: (context, state) {
           return Form(
             key: widget.formKey,
             child: Column(
@@ -157,8 +142,7 @@ class _InspectionFormWidgetState extends State<InspectionFormWidget> {
               ],
             ),
           );
-        },
-      ),
+      },
     );
   }
 

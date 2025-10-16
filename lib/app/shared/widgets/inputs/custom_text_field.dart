@@ -36,6 +36,8 @@ class CustomTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final errorMessage = validator?.call(controller.text);
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -53,7 +55,7 @@ class CustomTextField extends StatelessWidget {
         TextFormField(
           controller: controller,
           keyboardType: keyboardType,
-          validator: validator,
+          validator: (value) => null, // No usar validator de Flutter
           obscureText: obscureText,
           onChanged: onChanged,
           onSaved: onSaved,
@@ -78,19 +80,34 @@ class CustomTextField extends StatelessWidget {
             fillColor: DAGRDColors.blancoDAGRD,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: DAGRDColors.grisMedio, width: 1),
+              borderSide: BorderSide(
+                color: errorMessage != null 
+                    ? const Color(0xFFE53E3E) // Rojo para error
+                    : DAGRDColors.grisMedio, 
+                width: 1
+              ),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: DAGRDColors.grisMedio, width: 1),
+              borderSide: BorderSide(
+                color: errorMessage != null 
+                    ? const Color(0xFFE53E3E) // Rojo para error
+                    : DAGRDColors.grisMedio, 
+                width: 1
+              ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: DAGRDColors.azulDAGRD, width: 2),
+              borderSide: BorderSide(
+                color: errorMessage != null 
+                    ? const Color(0xFFE53E3E) // Rojo para error
+                    : DAGRDColors.azulDAGRD, 
+                width: 2
+              ),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: DAGRDColors.error, width: 1),
+              borderSide: const BorderSide(color: Color(0xFFE53E3E), width: 1),
             ),
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             suffixIcon: suffixIcon,
@@ -98,8 +115,22 @@ class CustomTextField extends StatelessWidget {
           ),
         ),
         
+        // Mostrar mensaje de error si existe
+        if (errorMessage != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: Text(
+              errorMessage,
+              style: const TextStyle(
+                color: Color(0xFFE53E3E),
+                fontFamily: 'Work Sans',
+                fontSize: 12,
+              ),
+            ),
+          ),
+        
         // Helper text (contador de dígitos)
-        if (helperText != null)
+        if (helperText != null && errorMessage == null)
           Padding(
             padding: const EdgeInsets.only(top: 4.0),
             child: Text(
