@@ -2,6 +2,7 @@ import 'package:caja_herramientas/app/modules/home/ui/pages/home_forms_screen.da
 import 'package:caja_herramientas/app/modules/home/ui/pages/risk_categories_screen.dart';
 import 'package:caja_herramientas/app/modules/home/ui/pages/settings_screen.dart';
 import 'package:caja_herramientas/app/modules/home/ui/widgets/forms_help_content.dart';
+import 'package:caja_herramientas/app/modules/home/ui/widgets/general_help_content.dart';
 import 'package:caja_herramientas/app/modules/home/ui/widgets/home_main_section.dart';
 import 'package:caja_herramientas/app/modules/home/ui/pages/risk_events_screen.dart';
 import 'package:caja_herramientas/app/modules/home/ui/pages/form_completed_screen.dart';
@@ -67,8 +68,8 @@ class HomeScreen extends StatelessWidget {
           break;
         case 1:
           categoryTitle = "Ayuda Material Educativo";
-          contentTitle = "Material Educativo";
-          content = HomeHelpContent.build(); // Puedes cambiar por EducationalMaterialHelpContent.build()
+          contentTitle = "Ayuda general";
+          content = GeneralHelpContent.build(); // Puedes cambiar por EducationalMaterialHelpContent.build()
           break;
         case 2:
           categoryTitle = "Ayuda Mis Formularios";
@@ -77,8 +78,8 @@ class HomeScreen extends StatelessWidget {
           break;
         case 3:
           categoryTitle = "Ayuda Configuración";
-          contentTitle = "Configuración";
-          content = HomeHelpContent.build(); // Puedes cambiar por SettingsHelpContent.build()
+           contentTitle = "Ayuda general";
+          content = GeneralHelpContent.build();  // Puedes cambiar por SettingsHelpContent.build()
           break;
         default:
           categoryTitle = "Ayuda";
