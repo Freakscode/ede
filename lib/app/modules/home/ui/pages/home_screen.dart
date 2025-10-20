@@ -5,7 +5,9 @@ import 'package:caja_herramientas/app/modules/home/ui/widgets/home_main_section.
 import 'package:caja_herramientas/app/modules/home/ui/pages/risk_events_screen.dart';
 import 'package:caja_herramientas/app/modules/home/ui/pages/form_completed_screen.dart';
 import 'package:caja_herramientas/app/modules/home/ui/widgets/tutorial_overlay.dart';
+import 'package:caja_herramientas/app/modules/home/ui/widgets/home_help_content.dart';
 import 'package:caja_herramientas/app/shared/widgets/layouts/custom_app_bar.dart';
+import 'package:caja_herramientas/app/shared/widgets/dialogs/help_dialog.dart';
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import 'package:caja_herramientas/app/core/icons/app_icons.dart';
 import 'package:flutter/material.dart';
@@ -31,6 +33,15 @@ class HomeScreen extends StatelessWidget {
           child: TutorialPosterOverlay(),
         );
       },
+    );
+  }
+
+  void _showHelpDialog(BuildContext context) {
+    HelpDialog.show(
+      context: context,
+      categoryTitle: "Ayuda Inicio",
+      contentTitle: "Inicio Caja de Herramientas",
+      content: HomeHelpContent.build(),
     );
   }
 
@@ -125,6 +136,9 @@ class HomeScreen extends StatelessWidget {
               showProfile: true,
               onProfile: () {
                 context.go('/login');
+              },
+              onInfo: () {
+                _showHelpDialog(context);
               },
             ),
             body: bodyContent,
