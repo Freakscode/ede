@@ -1,6 +1,7 @@
 import 'package:caja_herramientas/app/modules/home/ui/pages/home_forms_screen.dart';
 import 'package:caja_herramientas/app/modules/home/ui/pages/risk_categories_screen.dart';
 import 'package:caja_herramientas/app/modules/home/ui/pages/settings_screen.dart';
+import 'package:caja_herramientas/app/modules/home/ui/widgets/forms_help_content.dart';
 import 'package:caja_herramientas/app/modules/home/ui/widgets/home_main_section.dart';
 import 'package:caja_herramientas/app/modules/home/ui/pages/risk_events_screen.dart';
 import 'package:caja_herramientas/app/modules/home/ui/pages/form_completed_screen.dart';
@@ -72,7 +73,7 @@ class HomeScreen extends StatelessWidget {
         case 2:
           categoryTitle = "Ayuda Mis Formularios";
           contentTitle = "Mis Formularios";
-          content = HomeHelpContent.build(); // Puedes cambiar por FormsHelpContent.build()
+          content = FormsHelpContent.build(); // Puedes cambiar por FormsHelpContent.build()
           break;
         case 3:
           categoryTitle = "Ayuda Configuración";
