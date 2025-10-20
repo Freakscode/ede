@@ -27,6 +27,12 @@ class CompleteFormDataModel extends Equatable {
   final Map<String, List<String>> evidenceImages; // categoría -> lista de rutas de imágenes
   final Map<String, Map<int, Map<String, String>>> evidenceCoordinates; // categoría -> índice -> coordenadas
   
+  // Datos de Contacto
+  final Map<String, dynamic> contactData; // datos de contacto del usuario
+  
+  // Datos de Inspección
+  final Map<String, dynamic> inspectionData; // datos de inspección del formulario
+  
   final DateTime createdAt;
   final DateTime updatedAt;
   final bool isExplicitlyCompleted; // Indica si el formulario fue explícitamente marcado como completado
@@ -50,6 +56,8 @@ class CompleteFormDataModel extends Equatable {
     this.vulnerabilidadSelectedIntensidad,
     required this.evidenceImages,
     required this.evidenceCoordinates,
+    required this.contactData,
+    required this.inspectionData,
     required this.createdAt,
     required this.updatedAt,
     this.isExplicitlyCompleted = false, // Por defecto, no está explícitamente completado
@@ -74,6 +82,8 @@ class CompleteFormDataModel extends Equatable {
     String? vulnerabilidadSelectedIntensidad,
     Map<String, List<String>>? evidenceImages,
     Map<String, Map<int, Map<String, String>>>? evidenceCoordinates,
+    Map<String, dynamic>? contactData,
+    Map<String, dynamic>? inspectionData,
     DateTime? createdAt,
     DateTime? updatedAt,
     bool? isExplicitlyCompleted,
@@ -97,6 +107,8 @@ class CompleteFormDataModel extends Equatable {
       vulnerabilidadSelectedIntensidad: vulnerabilidadSelectedIntensidad ?? this.vulnerabilidadSelectedIntensidad,
       evidenceImages: evidenceImages ?? this.evidenceImages,
       evidenceCoordinates: evidenceCoordinates ?? this.evidenceCoordinates,
+      contactData: contactData ?? this.contactData,
+      inspectionData: inspectionData ?? this.inspectionData,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       isExplicitlyCompleted: isExplicitlyCompleted ?? this.isExplicitlyCompleted,
@@ -137,6 +149,8 @@ class CompleteFormDataModel extends Equatable {
         category,
         indexMap.map((index, coords) => MapEntry(index.toString(), coords)),
       )),
+      'contactData': contactData,
+      'inspectionData': inspectionData,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
       'isExplicitlyCompleted': isExplicitlyCompleted,
@@ -219,6 +233,12 @@ class CompleteFormDataModel extends Equatable {
               ),
             )
           : {},
+      contactData: json['contactData'] != null 
+          ? Map<String, dynamic>.from(json['contactData'] as Map<String, dynamic>)
+          : {},
+      inspectionData: json['inspectionData'] != null 
+          ? Map<String, dynamic>.from(json['inspectionData'] as Map<String, dynamic>)
+          : {},
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
       isExplicitlyCompleted: json['isExplicitlyCompleted'] as bool? ?? false,
@@ -250,6 +270,8 @@ class CompleteFormDataModel extends Equatable {
     vulnerabilidadSelectedIntensidad,
     evidenceImages,
     evidenceCoordinates,
+    contactData,
+    inspectionData,
     createdAt,
     updatedAt,
     isExplicitlyCompleted,

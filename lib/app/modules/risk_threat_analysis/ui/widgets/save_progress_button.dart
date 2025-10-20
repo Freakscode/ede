@@ -6,6 +6,9 @@ import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import 'package:caja_herramientas/app/shared/services/form_persistence_service.dart';
 import 'package:caja_herramientas/app/shared/models/complete_form_data_model.dart';
 import 'package:caja_herramientas/app/shared/widgets/dialogs/custom_action_dialog.dart';
+import 'package:caja_herramientas/app/modules/auth/services/auth_service.dart';
+import 'package:caja_herramientas/app/modules/data_registration/bloc/data_registration_bloc.dart';
+import 'package:caja_herramientas/app/modules/data_registration/bloc/data_registration_state.dart';
 import '../../bloc/risk_threat_analysis_bloc.dart';
 import '../../bloc/risk_threat_analysis_state.dart';
 import '../../../home/bloc/home_bloc.dart';
@@ -14,8 +17,16 @@ import '../../../home/bloc/home_event.dart';
 class SaveProgressButton extends StatelessWidget {
   final VoidCallback? onPressed;
   final String? text;
+  final Map<String, dynamic>? contactData;
+  final Map<String, dynamic>? inspectionData;
 
-  const SaveProgressButton({super.key, this.onPressed, this.text});
+  const SaveProgressButton({
+    super.key, 
+    this.onPressed, 
+    this.text,
+    this.contactData,
+    this.inspectionData,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -64,12 +75,93 @@ class SaveProgressButton extends StatelessWidget {
     final state = bloc.state;
     final homeBloc = context.read<HomeBloc>();
     final homeState = homeBloc.state;
+    final authService = AuthService();
 
     print('=== SaveProgressButton: Iniciando guardado ===');
     print('Evento seleccionado: ${state.selectedRiskEvent}');
     print('Clasificación seleccionada: ${state.selectedClassification}');
     print('isCreatingNew: ${homeState.isCreatingNew}');
     print('activeFormId: ${homeState.activeFormId}');
+    print('Usuario autenticado: ${authService.isLoggedIn}');
+    print('Usuario actual: ${authService.currentUser?.nombre}');
+
+    // Usar datos pasados como parámetros o consultar del bloc como fallback
+    print('=== PROCESANDO DATOS DE CONTACTO E INSPECCIÓN ===');
+    print('Usuario autenticado: ${authService.isLoggedIn}');
+    print('Usuario actual: ${authService.currentUser?.nombre}');
+    
+    // Determinar datos según el estado de autenticación
+    Map<String, dynamic> contactData = {};
+    Map<String, dynamic> inspectionData = {};
+    
+    if (authService.isLoggedIn) {
+      // Usuario logueado - datos de contacto vienen de la API
+      final user = authService.currentUser;
+      contactData = {
+        'names': user?.nombre ?? '',
+        'cellPhone': user?.cedula ?? '',
+        'landline': '',
+        'email': user?.email ?? '',
+      };
+      print('=== Usuario logueado: Datos de contacto desde API ===');
+      print('Nombre: ${contactData['names']}');
+      print('Cédula: ${contactData['cellPhone']}');
+      print('Email: ${contactData['email']}');
+      
+      // Usuario logueado NO tiene datos de inspección específicos
+      // Los datos de inspección solo existen para usuarios no logueados
+      inspectionData = {};
+      print('=== Usuario logueado: Sin datos de inspección específicos ===');
+      
+    } else {
+      // Usuario no logueado - usar datos pasados como parámetros o consultar del bloc
+      contactData = this.contactData ?? {};
+      inspectionData = this.inspectionData ?? {};
+      
+      print('Datos de contacto pasados: $contactData');
+      print('Datos de inspección pasados: $inspectionData');
+      
+      // Si no se pasaron datos como parámetros, consultar del bloc como fallback
+      if (contactData.isEmpty) {
+        final dataRegistrationBloc = context.read<DataRegistrationBloc>();
+        final dataRegistrationState = dataRegistrationBloc.state;
+        
+        if (dataRegistrationState is DataRegistrationData) {
+          contactData = {
+            'names': dataRegistrationState.contactNames,
+            'cellPhone': dataRegistrationState.contactCellPhone,
+            'landline': dataRegistrationState.contactLandline,
+            'email': dataRegistrationState.contactEmail,
+          };
+          print('=== Fallback: Datos de contacto desde formulario ===');
+        }
+      }
+      
+      // Si no se pasaron datos de inspección como parámetros, consultar del bloc como fallback
+      if (inspectionData.isEmpty) {
+        final dataRegistrationBloc = context.read<DataRegistrationBloc>();
+        final dataRegistrationState = dataRegistrationBloc.state;
+        
+        if (dataRegistrationState is DataRegistrationData) {
+          inspectionData = {
+            'incidentId': dataRegistrationState.inspectionIncidentId,
+            'status': dataRegistrationState.inspectionStatus,
+            'date': dataRegistrationState.inspectionDate,
+            'time': dataRegistrationState.inspectionTime,
+            'comment': dataRegistrationState.inspectionComment,
+            'injured': dataRegistrationState.inspectionInjured,
+            'dead': dataRegistrationState.inspectionDead,
+          };
+          print('=== Fallback: Datos de inspección desde formulario ===');
+        }
+      }
+    }
+    
+    print('=== Datos finales a guardar ===');
+    print('Contacto: $contactData');
+    print('Inspección: $inspectionData');
+
+    print('=== Procediendo con guardado incluyendo datos de contacto ===');
 
     try {
       final persistenceService = FormPersistenceService();
@@ -79,16 +171,15 @@ class SaveProgressButton extends StatelessWidget {
       print('FormData obtenido: $formData');
       print('EvidenceImages: ${formData['evidenceImages']}');
       print('EvidenceCoordinates: ${formData['evidenceCoordinates']}');
-      print('EvidenceCoordinates type: ${formData['evidenceCoordinates'].runtimeType}');
+      print(
+        'EvidenceCoordinates type: ${formData['evidenceCoordinates'].runtimeType}',
+      );
 
-      // Validar si hay imágenes sin georeferenciar
-      if (_hasUngeoreferencedImages(state)) {
-        _showUngeoreferencedImagesDialog(context);
-        return;
-      }
+      // Sin validaciones - proceder directamente con el guardado
 
       // Convertir colores a valores enteros para serialización
-      final colorsData = formData['subClassificationColors'] as Map<String, Color>? ?? {};
+      final colorsData =
+          formData['subClassificationColors'] as Map<String, Color>? ?? {};
       final serializableColors = <String, Color>{};
       colorsData.forEach((key, value) {
         serializableColors[key] = value;
@@ -104,11 +195,17 @@ class SaveProgressButton extends StatelessWidget {
 
       // Si estamos creando un nuevo formulario, siempre crear uno nuevo
       if (homeState.isCreatingNew || homeState.activeFormId == null) {
-        print('SaveProgressButton: Creando nuevo formulario (isCreatingNew: ${homeState.isCreatingNew})');
-        
+        print(
+          'SaveProgressButton: Creando nuevo formulario (isCreatingNew: ${homeState.isCreatingNew})',
+        );
+
         completeForm = CompleteFormDataModel(
           id: formId,
           eventName: state.selectedRiskEvent,
+          // Datos de contacto asociados al formulario
+          contactData: contactData,
+          // Datos de inspección asociados al formulario
+          inspectionData: inspectionData,
           amenazaSelections:
               state.selectedClassification.toLowerCase() == 'amenaza'
               ? (formData['dynamicSelections'] ?? {})
@@ -170,12 +267,18 @@ class SaveProgressButton extends StatelessWidget {
         );
       } else {
         // Estamos editando un formulario existente
-        print('SaveProgressButton: Editando formulario existente ${homeState.activeFormId}');
-        
+        print(
+          'SaveProgressButton: Editando formulario existente ${homeState.activeFormId}',
+        );
+
         // Obtener el formulario existente por ID
-        final existingForm = await persistenceService.getCompleteForm(homeState.activeFormId!);
+        final existingForm = await persistenceService.getCompleteForm(
+          homeState.activeFormId!,
+        );
         if (existingForm == null) {
-          throw Exception('No se encontró el formulario existente con ID: ${homeState.activeFormId}');
+          throw Exception(
+            'No se encontró el formulario existente con ID: ${homeState.activeFormId}',
+          );
         }
 
         completeForm = existingForm;
@@ -188,8 +291,9 @@ class SaveProgressButton extends StatelessWidget {
             amenazaScores:
                 formData['subClassificationScores'] ??
                 completeForm.amenazaScores,
-            amenazaColors:
-                serializableColors.isNotEmpty ? serializableColors : completeForm.amenazaColors,
+            amenazaColors: serializableColors.isNotEmpty
+                ? serializableColors
+                : completeForm.amenazaColors,
             amenazaProbabilidadSelections:
                 formData['probabilidadSelections'] ??
                 completeForm.amenazaProbabilidadSelections,
@@ -202,6 +306,8 @@ class SaveProgressButton extends StatelessWidget {
             amenazaSelectedIntensidad:
                 formData['selectedIntensidad'] ??
                 completeForm.amenazaSelectedIntensidad,
+            contactData: contactData,
+            inspectionData: inspectionData,
             evidenceImages: state.evidenceImages,
             evidenceCoordinates: state.evidenceCoordinates,
             updatedAt: now,
@@ -215,8 +321,9 @@ class SaveProgressButton extends StatelessWidget {
             vulnerabilidadScores:
                 formData['subClassificationScores'] ??
                 completeForm.vulnerabilidadScores,
-            vulnerabilidadColors:
-                serializableColors.isNotEmpty ? serializableColors : completeForm.vulnerabilidadColors,
+            vulnerabilidadColors: serializableColors.isNotEmpty
+                ? serializableColors
+                : completeForm.vulnerabilidadColors,
             vulnerabilidadProbabilidadSelections:
                 formData['probabilidadSelections'] ??
                 completeForm.vulnerabilidadProbabilidadSelections,
@@ -229,6 +336,8 @@ class SaveProgressButton extends StatelessWidget {
             vulnerabilidadSelectedIntensidad:
                 formData['selectedIntensidad'] ??
                 completeForm.vulnerabilidadSelectedIntensidad,
+            contactData: contactData,
+            inspectionData: inspectionData,
             evidenceImages: state.evidenceImages,
             evidenceCoordinates: state.evidenceCoordinates,
             updatedAt: now,
@@ -249,11 +358,33 @@ class SaveProgressButton extends StatelessWidget {
           onRightButtonPressed: () async {
             print('=== SaveProgressButton: Usuario confirmó guardado ===');
             print('Formulario a guardar: ${completeForm.id}');
-            
+
             try {
               // Guardar formulario completo
               await persistenceService.saveCompleteForm(completeForm);
               print('SaveProgressButton: Formulario guardado en base de datos');
+              
+              // === LOGGING DETALLADO PARA DEVTOOLS ===
+              print('=== DATOS GUARDADOS EN SQLITE ===');
+              print('ID del formulario: ${completeForm.id}');
+              print('Evento: ${completeForm.eventName}');
+              print('Datos de contacto: ${completeForm.contactData}');
+              print('Datos de inspección: ${completeForm.inspectionData}');
+              print('Fecha de creación: ${completeForm.createdAt}');
+              print('Fecha de actualización: ${completeForm.updatedAt}');
+              print('==================================');
+              
+              // Verificar que se guardó correctamente
+              final savedForm = await persistenceService.getCompleteForm(completeForm.id);
+              if (savedForm != null) {
+                print('=== VERIFICACIÓN DE GUARDADO ===');
+                print('Formulario recuperado: ${savedForm.id}');
+                print('Contacto guardado: ${savedForm.contactData}');
+                print('Inspección guardada: ${savedForm.inspectionData}');
+                print('===============================');
+              } else {
+                print('ERROR: No se pudo recuperar el formulario guardado');
+              }
 
               // Establecer como formulario activo
               await persistenceService.setActiveFormId(completeForm.id);
@@ -261,8 +392,12 @@ class SaveProgressButton extends StatelessWidget {
 
               // Si era un formulario nuevo, actualizar el estado del HomeBloc
               if (homeState.isCreatingNew) {
-                homeBloc.add(SetActiveFormId(completeForm.id, isCreatingNew: false));
-                print('SaveProgressButton: Actualizando HomeBloc - isCreatingNew: false');
+                homeBloc.add(
+                  SetActiveFormId(completeForm.id, isCreatingNew: false),
+                );
+                print(
+                  'SaveProgressButton: Actualizando HomeBloc - isCreatingNew: false',
+                );
               }
 
               print(
@@ -272,10 +407,10 @@ class SaveProgressButton extends StatelessWidget {
               Navigator.of(context).pop();
 
               if (context.mounted) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
                     content: Text('Progreso guardado exitosamente'),
-        duration: Duration(seconds: 2),
+                    duration: Duration(seconds: 2),
                     backgroundColor: Colors.green,
                   ),
                 );
@@ -283,7 +418,7 @@ class SaveProgressButton extends StatelessWidget {
             } catch (e) {
               print('SaveProgressButton: Error en onRightButtonPressed - $e');
               Navigator.of(context).pop();
-              
+
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
@@ -306,54 +441,9 @@ class SaveProgressButton extends StatelessWidget {
             content: Text('Error al guardar progreso: $e'),
             duration: const Duration(seconds: 3),
             backgroundColor: Colors.red,
-      ),
-    );
-  }
-    }
-  }
-
-  /// Verifica si hay imágenes sin georeferenciar
-  bool _hasUngeoreferencedImages(RiskThreatAnalysisState state) {
-    final evidenceImages = state.evidenceImages;
-    final evidenceCoordinates = state.evidenceCoordinates;
-
-    // Verificar cada categoría (amenaza, vulnerabilidad)
-    for (final category in evidenceImages.keys) {
-      final images = evidenceImages[category] ?? [];
-      final coordinates = evidenceCoordinates[category] ?? {};
-
-      // Si hay imágenes pero no todas tienen coordenadas
-      if (images.isNotEmpty) {
-        for (int i = 0; i < images.length; i++) {
-          if (!coordinates.containsKey(i)) {
-            print('Imagen sin georeferenciar encontrada: $category - índice $i');
-            return true;
-          }
-        }
+          ),
+        );
       }
     }
-
-    return false;
   }
-
-  /// Muestra el diálogo de advertencia para imágenes sin georeferenciar
-  void _showUngeoreferencedImagesDialog(BuildContext context) {
-    CustomActionDialog.show(
-      context: context,
-      title: 'Imágenes sin georeferenciar',
-      message: 'Debes georeferenciar todas las imágenes antes de poder guardar el formulario. Por favor, agrega las coordenadas a todas las imágenes.',
-      leftButtonText: 'Cancelar',
-      leftButtonIcon: Icons.close,
-      rightButtonText: 'Revisar',
-      rightButtonIcon: Icons.photo_camera,
-      onLeftButtonPressed: () {
-        Navigator.of(context).pop();
-      },
-      onRightButtonPressed: () {
-        Navigator.of(context).pop();
-      },
-    );
-  }
-
-
 }
