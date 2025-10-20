@@ -78,7 +78,7 @@ class HomeScreen extends StatelessWidget {
           break;
         case 3:
           categoryTitle = "Ayuda Configuración";
-           contentTitle = "Ayuda general";
+          contentTitle = "Ayuda general";
           content = GeneralHelpContent.build();  // Puedes cambiar por SettingsHelpContent.build()
           break;
         default:
