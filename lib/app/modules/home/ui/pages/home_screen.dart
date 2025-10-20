@@ -37,11 +37,60 @@ class HomeScreen extends StatelessWidget {
   }
 
   void _showHelpDialog(BuildContext context) {
+    final state = context.read<HomeBloc>().state;
+    
+    String categoryTitle;
+    String contentTitle;
+    Widget content;
+    
+    // Determinar el contenido según la pantalla actual
+    if (state.mostrarEventosRiesgo) {
+      categoryTitle = "Ayuda Eventos de Riesgo";
+      contentTitle = "Eventos de Riesgo";
+      content = HomeHelpContent.build(); // Puedes cambiar por RiskEventsHelpContent.build()
+    } else if (state.mostrarCategoriasRiesgo) {
+      categoryTitle = "Ayuda Categorías de Riesgo";
+      contentTitle = "Categorías de Riesgo";
+      content = HomeHelpContent.build(); // Puedes cambiar por RiskCategoriesHelpContent.build()
+    } else if (state.mostrarFormularioCompletado) {
+      categoryTitle = "Ayuda Formulario Completado";
+      contentTitle = "Formulario Completado";
+      content = HomeHelpContent.build(); // Puedes cambiar por FormCompletedHelpContent.build()
+    } else {
+      // Según el tab seleccionado
+      switch (state.selectedIndex) {
+        case 0:
+          categoryTitle = "Ayuda Inicio";
+          contentTitle = "Inicio Caja de Herramientas";
+          content = HomeHelpContent.build();
+          break;
+        case 1:
+          categoryTitle = "Ayuda Material Educativo";
+          contentTitle = "Material Educativo";
+          content = HomeHelpContent.build(); // Puedes cambiar por EducationalMaterialHelpContent.build()
+          break;
+        case 2:
+          categoryTitle = "Ayuda Mis Formularios";
+          contentTitle = "Mis Formularios";
+          content = HomeHelpContent.build(); // Puedes cambiar por FormsHelpContent.build()
+          break;
+        case 3:
+          categoryTitle = "Ayuda Configuración";
+          contentTitle = "Configuración";
+          content = HomeHelpContent.build(); // Puedes cambiar por SettingsHelpContent.build()
+          break;
+        default:
+          categoryTitle = "Ayuda";
+          contentTitle = "Ayuda";
+          content = HomeHelpContent.build();
+      }
+    }
+    
     HelpDialog.show(
       context: context,
-      categoryTitle: "Ayuda Inicio",
-      contentTitle: "Inicio Caja de Herramientas",
-      content: HomeHelpContent.build(),
+      categoryTitle: categoryTitle,
+      contentTitle: contentTitle,
+      content: content,
     );
   }
 
@@ -60,10 +109,8 @@ class HomeScreen extends StatelessWidget {
         } else if (navigationData!['showRiskEvents'] == true) {
           // Si viene de data registration, resetear formularios y mostrar RiskEventsScreen
           if (navigationData!['resetForNewForm'] == true) {
-            print('=== CONFIGURANDO HOME PARA RiskEventsScreen DESDE DATA REGISTRATION ===');
             bloc.add(ResetAllForNewForm());
             bloc.add(HomeShowRiskEventsSection());
-            print('=== RiskEventsScreen CONFIGURADO SIN DELAY ===');
           } else {
             bloc.add(HomeShowRiskEventsSection());
           }
