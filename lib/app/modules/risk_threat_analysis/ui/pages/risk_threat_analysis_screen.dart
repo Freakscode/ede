@@ -11,11 +11,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../bloc/risk_threat_analysis_bloc.dart';
-import '../../bloc/risk_threat_analysis_event.dart';
+import '../../bloc/events/risk_threat_analysis_event.dart';
 import '../../bloc/risk_threat_analysis_state.dart';
 import '../widgets/home_navigation_type.dart';
 import '../../../home/bloc/home_bloc.dart';
+import '../../../home/bloc/home_event.dart' as home_events;
 import 'package:caja_herramientas/app/shared/services/form_persistence_service.dart';
+import 'package:caja_herramientas/app/shared/models/complete_form_data_model.dart';
 
 class RiskThreatAnalysisScreen extends StatefulWidget {
   final String? selectedEvent;
@@ -126,8 +128,13 @@ class RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
           // FORZAR reset completo del bloc
           bloc.add(ResetDropdowns());
           
+          // RESETEAR EL ACTIVE FORMID EN HOMEBLOC PRIMERO
+          final homeBloc = context.read<HomeBloc>();
+          print('Reseteando activeFormId en HomeBloc a null...');
+          homeBloc.add(home_events.SetActiveFormId('', isCreatingNew: true));
+          
           // Esperar un poco más para asegurar que el reset se complete
-          Future.delayed(const Duration(milliseconds: 100), () {
+          Future.delayed(const Duration(milliseconds: 100), () async {
             print('RiskThreatAnalysisScreen: Estado DESPUÉS del reset - ${bloc.state.toString()}');
             
             // Después del reset, establecer el evento y clasificación para el nuevo formulario
@@ -140,6 +147,33 @@ class RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
               bloc.add(ChangeBottomNavIndex(navIndex));
               bloc.add(SelectClassification(classificationName));
               print('RiskThreatAnalysisScreen: Clasificación establecida después del reset: $classificationName');
+            }
+            
+            // CREAR Y GUARDAR FORMULARIO COMPLETO NUEVO
+            await _createAndSaveNewCompleteForm(eventFromNavData ?? '', context);
+            
+            // FORZAR ACTUALIZACIÓN DEL ESTADO DEL HOMEBLOC
+            // Esperar un poco más para asegurar que el evento se procese
+            await Future.delayed(const Duration(milliseconds: 200));
+            
+            // Verificar el estado después de crear el formulario
+            final homeBloc = context.read<HomeBloc>();
+            final currentState = homeBloc.state;
+            print('Estado del HomeBloc después de crear formulario:');
+            print('  - activeFormId: ${currentState.activeFormId}');
+            print('  - isCreatingNew: ${currentState.isCreatingNew}');
+            
+            // Si el activeFormId no se actualizó, forzar la actualización
+            if (currentState.activeFormId == null || currentState.activeFormId!.contains('complete_')) {
+              print('⚠️  activeFormId no se actualizó correctamente, forzando actualización...');
+              final persistenceService = FormPersistenceService();
+              final currentActiveFormId = await persistenceService.getActiveFormId();
+              print('Formulario activo en base de datos: $currentActiveFormId');
+              
+              if (currentActiveFormId != null) {
+                print('Enviando SetActiveFormId nuevamente...');
+                homeBloc.add(home_events.SetActiveFormId(currentActiveFormId, isCreatingNew: false));
+              }
             }
           });
           
@@ -258,6 +292,8 @@ class RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
         print('  - Amenaza Selected Prob: ${completeForm.amenazaSelectedProbabilidad}');
         print('  - Amenaza Selected Int: ${completeForm.amenazaSelectedIntensidad}');
         print('  - Vulnerabilidad: ${completeForm.vulnerabilidadSelections}');
+        print('  - EvidenceImages: ${completeForm.evidenceImages}');
+        print('  - EvidenceCoordinates: ${completeForm.evidenceCoordinates}');
         
         // Obtener la clasificación actual del navigationData
         final classification = widget.navigationData?['classification'] as String? ?? 'amenaza';
@@ -275,6 +311,8 @@ class RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
             'intensidadSelections': completeForm.amenazaIntensidadSelections,
             'selectedProbabilidad': completeForm.amenazaSelectedProbabilidad,
             'selectedIntensidad': completeForm.amenazaSelectedIntensidad,
+            'evidenceImages': completeForm.evidenceImages,
+            'evidenceCoordinates': completeForm.evidenceCoordinates,
           };
           print('Cargando datos de AMENAZA');
         } else if (classification.toLowerCase() == 'vulnerabilidad') {
@@ -286,6 +324,8 @@ class RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
             'intensidadSelections': completeForm.vulnerabilidadIntensidadSelections,
             'selectedProbabilidad': completeForm.vulnerabilidadSelectedProbabilidad,
             'selectedIntensidad': completeForm.vulnerabilidadSelectedIntensidad,
+            'evidenceImages': completeForm.evidenceImages,
+            'evidenceCoordinates': completeForm.evidenceCoordinates,
           };
           print('Cargando datos de VULNERABILIDAD');
         } else {
@@ -298,6 +338,8 @@ class RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
             'intensidadSelections': completeForm.amenazaIntensidadSelections,
             'selectedProbabilidad': completeForm.amenazaSelectedProbabilidad,
             'selectedIntensidad': completeForm.amenazaSelectedIntensidad,
+            'evidenceImages': completeForm.evidenceImages,
+            'evidenceCoordinates': completeForm.evidenceCoordinates,
           };
           print('Cargando datos de AMENAZA (fallback)');
         }
@@ -355,12 +397,16 @@ class RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
           'intensidadSelections': completeForm.amenazaIntensidadSelections,
           'selectedProbabilidad': completeForm.amenazaSelectedProbabilidad,
           'selectedIntensidad': completeForm.amenazaSelectedIntensidad,
+          'evidenceImages': completeForm.evidenceImages,
+          'evidenceCoordinates': completeForm.evidenceCoordinates,
         };
         
         print('Datos combinados cargados para resultados finales:');
         print('  - Amenaza probabilidad: ${completeForm.amenazaProbabilidadSelections}');
         print('  - Amenaza intensidad: ${completeForm.amenazaIntensidadSelections}');
         print('  - Vulnerabilidad: ${completeForm.vulnerabilidadSelections}');
+        print('  - EvidenceImages: ${completeForm.evidenceImages}');
+        print('  - EvidenceCoordinates: ${completeForm.evidenceCoordinates}');
         
         // Cargar datos combinados en el bloc
         bloc.loadExistingFormData(
@@ -376,6 +422,74 @@ class RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
       print('=== FIN _loadCompleteFormDataForFinalResults DEBUG ===');
     } catch (e) {
       print('Error al cargar formulario completo para resultados finales: $e');
+      print('Stack trace: ${StackTrace.current}');
+    }
+  }
+
+  /// Crea y guarda un nuevo formulario completo en la base de datos
+  Future<void> _createAndSaveNewCompleteForm(String eventName, BuildContext context) async {
+    try {
+      print('=== _createAndSaveNewCompleteForm DEBUG ===');
+      print('Evento: $eventName');
+      
+      // Generar ID único para el formulario
+      final formId = '${eventName}_${DateTime.now().millisecondsSinceEpoch}';
+      
+      // Crear formulario completo vacío
+      final newCompleteForm = CompleteFormDataModel(
+        id: formId,
+        eventName: eventName,
+        amenazaSelections: {},
+        amenazaScores: {},
+        amenazaColors: {},
+        amenazaProbabilidadSelections: {},
+        amenazaIntensidadSelections: {},
+        amenazaSelectedProbabilidad: null,
+        amenazaSelectedIntensidad: null,
+        vulnerabilidadSelections: {},
+        vulnerabilidadScores: {},
+        vulnerabilidadColors: {},
+        vulnerabilidadProbabilidadSelections: {},
+        vulnerabilidadIntensidadSelections: {},
+        vulnerabilidadSelectedProbabilidad: null,
+        vulnerabilidadSelectedIntensidad: null,
+        contactData: {},
+        inspectionData: {},
+        evidenceImages: {},
+        evidenceCoordinates: {},
+        isExplicitlyCompleted: false,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      );
+      
+      // Guardar en la base de datos
+      final persistenceService = FormPersistenceService();
+      await persistenceService.saveCompleteForm(newCompleteForm);
+      
+          // Establecer como formulario activo en HomeBloc INMEDIATAMENTE
+          final homeBloc = context.read<HomeBloc>();
+          print('Enviando SetActiveFormId al HomeBloc con formId: $formId');
+          homeBloc.add(home_events.SetActiveFormId(formId, isCreatingNew: false));
+          
+          // También establecer como formulario activo en la base de datos
+          await persistenceService.setActiveFormId(formId);
+          
+          // VERIFICAR INMEDIATAMENTE que se estableció correctamente
+          final currentState = homeBloc.state;
+          print('Verificación inmediata del HomeBloc:');
+          print('  - activeFormId: ${currentState.activeFormId}');
+          print('  - isCreatingNew: ${currentState.isCreatingNew}');
+      
+      // Verificar que se estableció correctamente
+      final currentActiveFormId = await persistenceService.getActiveFormId();
+      print('Formulario activo en base de datos: $currentActiveFormId');
+      
+      print('Formulario completo creado y guardado con ID: $formId');
+      print('Formulario activo establecido en HomeBloc y base de datos');
+      print('=== FIN _createAndSaveNewCompleteForm DEBUG ===');
+      
+    } catch (e) {
+      print('Error al crear formulario completo: $e');
       print('Stack trace: ${StackTrace.current}');
     }
   }

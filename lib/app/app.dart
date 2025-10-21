@@ -15,6 +15,8 @@ import 'modules/evaluacion/presentation/bloc/evaluacion_global_bloc.dart';
 import 'modules/risk_threat_analysis/bloc/risk_threat_analysis_bloc.dart';
 import 'modules/home/bloc/home_bloc.dart';
 import 'modules/home/bloc/home_event.dart';
+import 'modules/auth/bloc/auth_bloc.dart';
+import 'modules/data_registration/bloc/data_registration_bloc.dart';
 import '../injection_container.dart' as di;
 import 'config/app_router.dart';
 
@@ -60,6 +62,14 @@ class MyApp extends StatelessWidget {
         BlocProvider<HomeBloc>(
           create: (context) => di.sl<HomeBloc>()..add(HomeCheckAndShowTutorial()),
         ),
+        // Auth BLoC
+        BlocProvider<AuthBloc>(
+          create: (context) => di.sl<AuthBloc>(),
+        ),
+        // Data Registration BLoC (unified)
+        BlocProvider<DataRegistrationBloc>(
+          create: (context) => DataRegistrationBloc(),
+        ),
         // EvaluacionGlobalBloc must be last as it depends on all other evaluacion BLoCs
         BlocProvider<EvaluacionGlobalBloc>(
           create: (context) => EvaluacionGlobalBloc(
@@ -78,13 +88,42 @@ class MyApp extends StatelessWidget {
         builder: (context) {
           return MaterialApp.router(
             title: AppConstants.appName,
-            
             routerConfig: getAppRouter(context),
             debugShowCheckedModeBanner: false,
-            theme: AppTheme.theme,
+            theme: AppTheme.theme.copyWith(
+              pageTransitionsTheme: PageTransitionsTheme(
+                builders: {
+                  TargetPlatform.android: _FadePageTransitionsBuilder(),
+                  TargetPlatform.iOS: _FadePageTransitionsBuilder(),
+                },
+              ),
+            ),
           );
         },
       ),
+    );
+  }
+}
+
+/// Transición personalizada de fade suave
+class _FadePageTransitionsBuilder extends PageTransitionsBuilder {
+  const _FadePageTransitionsBuilder();
+
+  @override
+  Widget buildTransitions<T extends Object?>(
+    PageRoute<T> route,
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) {
+    return FadeTransition(
+      opacity: animation.drive(
+        Tween<double>(begin: 0.0, end: 1.0).chain(
+          CurveTween(curve: Curves.easeInOut),
+        ),
+      ),
+      child: child,
     );
   }
 }

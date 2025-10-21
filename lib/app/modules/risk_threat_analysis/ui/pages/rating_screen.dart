@@ -6,11 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../bloc/risk_threat_analysis_bloc.dart';
-import '../../bloc/risk_threat_analysis_event.dart';
+import '../../bloc/events/risk_threat_analysis_event.dart';
 import '../../bloc/risk_threat_analysis_state.dart';
 import '../widgets/progress_bar_widget.dart';
 import '../widgets/navigation_buttons_widget.dart';
 import '../widgets/save_progress_button.dart';
+import '../widgets/threat_levels_dialog.dart';
 import 'risk_threat_analysis_screen.dart';
 
 class RatingScreen extends StatefulWidget {
@@ -94,7 +95,7 @@ class _RatingScreenState extends State<RatingScreen> {
               // Título dinámico basado en la clasificación seleccionada
               BlocBuilder<RiskThreatAnalysisBloc, RiskThreatAnalysisState>(
                 builder: (context, state) {
-                  final subtitle = state.selectedClassification == 'amenaza' 
+                  final subtitle = state.selectedClassification.toLowerCase().trim() == 'amenaza' 
                     ? 'Calificación de la Amenaza'
                     : 'Calificación de la Vulnerabilidad';
                   
@@ -129,7 +130,7 @@ class _RatingScreenState extends State<RatingScreen> {
               // Botón dinámico basado en la clasificación seleccionada
               BlocBuilder<RiskThreatAnalysisBloc, RiskThreatAnalysisState>(
                 builder: (context, state) {
-                  final buttonText = state.selectedClassification == 'amenaza' 
+                  final buttonText = state.selectedClassification.toLowerCase().trim() == 'amenaza' 
                     ? 'Factor de Amenaza'
                     : 'Factor de Vulnerabilidad';
                   
@@ -195,7 +196,7 @@ class _RatingScreenState extends State<RatingScreen> {
                 ),
                 child: InkWell(
                   onTap: () {
-                    // Acción para ver niveles de amenaza
+                    ThreatLevelsDialog.show(context);
                   },
                   borderRadius: BorderRadius.circular(6),
                   child: Row(
@@ -213,7 +214,7 @@ class _RatingScreenState extends State<RatingScreen> {
                       Expanded(
                         child: BlocBuilder<RiskThreatAnalysisBloc, RiskThreatAnalysisState>(
                           builder: (context, state) {
-                            final displayText = state.selectedClassification == 'amenaza' 
+                            final displayText = state.selectedClassification.toLowerCase().trim() == 'amenaza' 
                               ? 'Ver Niveles de Amenaza'
                               : 'Ver Niveles de Vulnerabilidad';
                             
@@ -260,7 +261,7 @@ class _RatingScreenState extends State<RatingScreen> {
                       Expanded(
                         flex: 2,
                         child: Text(
-                          state.selectedClassification == 'amenaza' 
+                          state.selectedClassification.toLowerCase().trim() == 'amenaza' 
                             ? 'Calificación Amenaza'
                             : 'Calificación Vulnerabilidad',
                           maxLines: 2,

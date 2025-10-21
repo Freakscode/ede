@@ -21,6 +21,9 @@ class AppRoutes {
   // User management routes
   static const String profile = '/profile';
   static const String settings = '/settings';
+  
+  // WebView routes
+  static const String sirmedPortal = '/sirmed_portal';
 }
 
 /// Route names for navigation
@@ -46,4 +49,7 @@ class RouteNames {
   // User management routes
   static const String profile = 'profile';
   static const String settings = 'settings';
+  
+  // WebView routes
+  static const String sirmedPortal = 'sirmedPortal';
 }

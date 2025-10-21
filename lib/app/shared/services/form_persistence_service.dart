@@ -206,7 +206,21 @@ class FormPersistenceService {
   Future<void> saveCompleteForm(CompleteFormDataModel form) async {
     final db = await database;
     
-    final formDataJson = jsonEncode(form.toJson());
+    print('=== DEBUG saveCompleteForm ===');
+    print('Form ID: ${form.id}');
+    print('EvidenceImages: ${form.evidenceImages}');
+    print('EvidenceCoordinates: ${form.evidenceCoordinates}');
+    
+    String formDataJson;
+    try {
+      formDataJson = jsonEncode(form.toJson());
+      print('Serialización exitosa');
+    } catch (e) {
+      print('Error en serialización: $e');
+      print('toJson result: ${form.toJson()}');
+      rethrow;
+    }
+    
     final now = DateTime.now().toIso8601String();
     
     await db.insert(

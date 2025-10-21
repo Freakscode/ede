@@ -63,7 +63,15 @@ class HomeState extends Equatable {
     bool? isCreatingNew,
     Map<String, Map<String, dynamic>>? savedRiskEventModels,
   }) {
-    return HomeState(
+    print('=== HomeState copyWith DEBUG ===');
+    print('Estado actual:');
+    print('  - activeFormId: $activeFormId');
+    print('  - isCreatingNew: $isCreatingNew');
+    print('Parámetros recibidos:');
+    print('  - activeFormId: $activeFormId');
+    print('  - isCreatingNew: $isCreatingNew');
+    
+    final newState = HomeState(
       selectedIndex: selectedIndex ?? this.selectedIndex,
       mostrarEventosRiesgo: mostrarEventosRiesgo ?? this.mostrarEventosRiesgo,
       mostrarCategoriasRiesgo: mostrarCategoriasRiesgo ?? this.mostrarCategoriasRiesgo,
@@ -82,6 +90,13 @@ class HomeState extends Equatable {
       isCreatingNew: isCreatingNew ?? this.isCreatingNew,
       savedRiskEventModels: savedRiskEventModels ?? this.savedRiskEventModels,
     );
+    
+    print('Nuevo estado:');
+    print('  - activeFormId: ${newState.activeFormId}');
+    print('  - isCreatingNew: ${newState.isCreatingNew}');
+    print('=== FIN HomeState copyWith DEBUG ===');
+    
+    return newState;
   }
 
   @override

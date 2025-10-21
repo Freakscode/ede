@@ -24,6 +24,10 @@ class RiskThreatAnalysisState {
   
   // Control para mostrar FinalRiskResultsScreen
   final bool showFinalResults;
+  
+  // Evidencias separadas por categoría
+  final Map<String, List<String>> evidenceImages; // categoría -> lista de rutas de imágenes
+  final Map<String, Map<int, Map<String, String>>> evidenceCoordinates; // categoría -> índice -> coordenadas
 
   const RiskThreatAnalysisState({
     this.isProbabilidadDropdownOpen = false,
@@ -41,6 +45,8 @@ class RiskThreatAnalysisState {
     this.subClassificationColors = const {},
     this.isLoading = false,
     this.showFinalResults = false,
+    this.evidenceImages = const {},
+    this.evidenceCoordinates = const {},
   });
 
   RiskThreatAnalysisState copyWith({
@@ -59,6 +65,8 @@ class RiskThreatAnalysisState {
     Map<String, Color>? subClassificationColors,
     bool? isLoading,
     bool? showFinalResults,
+    Map<String, List<String>>? evidenceImages,
+    Map<String, Map<int, Map<String, String>>>? evidenceCoordinates,
   }) {
     return RiskThreatAnalysisState(
       isProbabilidadDropdownOpen: isProbabilidadDropdownOpen ?? this.isProbabilidadDropdownOpen,
@@ -76,6 +84,8 @@ class RiskThreatAnalysisState {
       subClassificationColors: subClassificationColors ?? this.subClassificationColors,
       isLoading: isLoading ?? this.isLoading,
       showFinalResults: showFinalResults ?? this.showFinalResults,
+      evidenceImages: evidenceImages ?? this.evidenceImages,
+      evidenceCoordinates: evidenceCoordinates ?? this.evidenceCoordinates,
     );
   }
 }
