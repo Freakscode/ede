@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'user_api_model.dart';
 
 /// Modelo de usuario
 /// Entidad de dominio para representar un usuario del sistema
@@ -94,6 +95,31 @@ class UserModel extends Equatable {
   /// Lógica de negocio: ¿Puede acceder a funciones generales?
   bool get canAccessGeneralFeatures => isValid;
 
+  /// Obtener todos los usuarios DAGRD simulados
+  static List<UserModel> get simulatedDagrdUsers {
+    return simulatedUsers.where((user) => user.isDagrdUser).toList();
+  }
+
+  /// Obtener usuario DAGRD simulado por índice
+  static UserModel? getSimulatedDagrdUserByIndex(int index) {
+    final dagrdUsers = simulatedDagrdUsers;
+    if (index >= 0 && index < dagrdUsers.length) {
+      return dagrdUsers[index];
+    }
+    return null;
+  }
+
+  /// Obtener usuario DAGRD simulado basado en cédula (para consistencia)
+  static UserModel getSimulatedDagrdUserByCedula(String cedula) {
+    final dagrdUsers = simulatedDagrdUsers;
+    if (dagrdUsers.isEmpty) {
+      return simulatedUsers.first; // Fallback
+    }
+    
+    final cedulaHash = cedula.trim().hashCode.abs();
+    return dagrdUsers[cedulaHash % dagrdUsers.length];
+  }
+
   /// Factory method: Crear usuario DAGRD
   static UserModel createDagrdUser({
     required String cedula,
@@ -126,6 +152,56 @@ class UserModel extends Equatable {
       nombre: nombre,
       isDagrdUser: false,
       email: email,
+      telefono: telefono,
+    );
+  }
+
+  /// Factory method: Crear usuario desde UserApiModel
+  static UserModel fromUserApiModel(UserApiModel userApi) {
+    return UserModel(
+      cedula: userApi.identificacion,
+      nombre: userApi.nombreCompleto,
+      isDagrdUser: userApi.isDagrdUser,
+      cargo: userApi.profesion,
+      dependencia: userApi.isDagrdUser ? 'DAGRD' : null,
+      email: userApi.email,
+      telefono: userApi.telefonoPrincipal,
+    );
+  }
+
+  /// Factory method: Crear usuario desde respuesta de API (método legacy)
+  static UserModel fromApiResponse(Map<String, dynamic> apiData) {
+    final userData = apiData['user'];
+    final personaData = userData['persona'];
+    final roles = userData['roles'] as List<dynamic>;
+    
+    // Determinar si es usuario DAGRD basado en los roles
+    final isDagrdUser = roles.any((role) => 
+      role['name'] == 'Bombero' || 
+      role['display_name'] == 'Bombero'
+    );
+    
+    // Obtener nombre completo
+    final nombreCompleto = personaData['nombre_completo'] ?? 
+                          '${personaData['nombres']['nombre1'] ?? ''} ${personaData['apellidos']['apellido1'] ?? ''}'.trim();
+    
+    // Obtener cargo (profesión)
+    final cargo = personaData['profesion'];
+    
+    // Obtener teléfono (primer teléfono si existe)
+    String? telefono;
+    final telefonos = personaData['telefonos'] as List<dynamic>?;
+    if (telefonos != null && telefonos.isNotEmpty) {
+      telefono = telefonos.first['numero'] ?? telefonos.first['telefono'];
+    }
+    
+    return UserModel(
+      cedula: personaData['identificacion'] ?? userData['code'] ?? '',
+      nombre: nombreCompleto,
+      isDagrdUser: isDagrdUser,
+      cargo: cargo,
+      dependencia: isDagrdUser ? 'DAGRD' : null,
+      email: userData['email'],
       telefono: telefono,
     );
   }
