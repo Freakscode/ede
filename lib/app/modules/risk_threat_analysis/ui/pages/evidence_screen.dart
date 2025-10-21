@@ -396,21 +396,19 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
         );
 
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Imagen agregada exitosamente'),
-              backgroundColor: Colors.green,
-            ),
+          CustomSnackBar.showSuccess(
+            context,
+            title: 'Imagen agregada exitosamente',
+            message: 'La imagen ha sido agregada exitosamente.',
           );
         }
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error al seleccionar imagen: ${e.toString()}'),
-            backgroundColor: Colors.red,
-          ),
+        CustomSnackBar.showError(
+          context,
+          title: 'Error al seleccionar imagen',
+          message: 'Error al seleccionar imagen: ${e.toString()}',
         );
       }
     }
@@ -440,21 +438,19 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
         );
 
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Foto tomada exitosamente'),
-              backgroundColor: Colors.green,
-            ),
+          CustomSnackBar.showSuccess(
+            context,
+            title: 'Foto tomada exitosamente',
+            message: 'La foto ha sido tomada exitosamente.',
           );
         }
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error al tomar foto: ${e.toString()}'),
-            backgroundColor: Colors.red,
-          ),
+        CustomSnackBar.showError(
+          context,
+          title: 'Error al tomar foto',
+          message: 'Error al tomar foto: ${e.toString()}',
         );
       }
     }
@@ -524,7 +520,6 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
             ),
           );
 
-          
           CustomSnackBar.showSuccess(
             context,
             title: 'Ubicación guardada',
