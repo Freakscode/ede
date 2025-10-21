@@ -9,6 +9,7 @@ import 'package:caja_herramientas/app/modules/home/bloc/home_bloc.dart';
 import 'package:caja_herramientas/app/modules/home/bloc/home_event.dart';
 import 'package:caja_herramientas/app/modules/home/bloc/home_state.dart';
 import 'package:caja_herramientas/app/modules/auth/bloc/auth_bloc.dart';
+import 'package:caja_herramientas/app/modules/auth/bloc/auth_state.dart';
 import 'package:caja_herramientas/app/modules/auth/bloc/events/auth_events.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -241,29 +242,36 @@ class SettingsScreen extends StatelessWidget {
 
             const SizedBox(height: 14),
 
-            // Sección Sesión
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFFE5E5E5)),
-              ),
-              child: Column(
-                children: [
-                  // Cerrar Sesión
-                  _buildSettingsTile(
-                    context: context,
-                    icon: AppIcons.signOut,
-                    iconColor: Colors.red,
-                    title: 'Cerrar Sesión',
-                    subtitle: 'Salir de tu cuenta actual',
-                    onTap: () {
-                      _showLogoutDialog(context);
-                    },
-                  ),
-                ],
-              ),
+            // Sección Sesión (solo si está autenticado)
+            BlocBuilder<AuthBloc, AuthState>(
+              builder: (context, authState) {
+                if (authState is AuthAuthenticated) {
+                  return Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: const Color(0xFFE5E5E5)),
+                    ),
+                    child: Column(
+                      children: [
+                        // Cerrar Sesión
+                        _buildSettingsTile(
+                          context: context,
+                          icon: AppIcons.signOut,
+                          iconColor: Colors.red,
+                          title: 'Cerrar Sesión',
+                          subtitle: 'Salir de tu cuenta actual',
+                          onTap: () {
+                            _showLogoutDialog(context);
+                          },
+                        ),
+                      ],
+                    ),
+                  );
+                }
+                return const SizedBox.shrink(); // No mostrar nada si no está autenticado
+              },
             ),
           ],
         );
