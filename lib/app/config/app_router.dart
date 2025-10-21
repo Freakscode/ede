@@ -8,7 +8,7 @@ import 'package:caja_herramientas/app/modules/risk_threat_analysis/ui/pages/fina
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../modules/auth/presentation/pages/login_screen.dart';
+import '../modules/auth/ui/pages/login_screen.dart';
 import '../modules/splash/presentation/pages/splash_screen.dart';
 import '../modules/home/ui/pages/home_screen.dart' as home;
 import '../modules/home/ui/pages/home_forms_screen.dart';
@@ -25,6 +25,7 @@ import '../modules/evaluacion/presentation/pages/sect_7/habitabilidad_page.dart'
 import '../modules/evaluacion/presentation/pages/sect_8/acciones_page.dart';
 import '../modules/evaluacion/presentation/pages/resumen_evaluacion_page.dart';
 import '../modules/data_registration/ui/pages/data_registration_screen.dart';
+import '../modules/webview/presentation/presentation.dart';
 
 // Routes
 import 'routes.dart';
@@ -76,6 +77,12 @@ GoRouter getAppRouter(BuildContext context) {
       GoRoute(
         path: '/data_registration',
         builder: (context, state) => const DataRegistrationScreen(),
+      ),
+      
+      // WebView - Portal SIRMED
+      GoRoute(
+        path: '/sirmed_portal',
+        builder: (context, state) => const SirmedPortalScreen(),
       ),
       
 

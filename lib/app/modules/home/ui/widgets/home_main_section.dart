@@ -81,7 +81,7 @@ class _HomeMainSectionState extends State<HomeMainSection> {
           const SizedBox(height: 48),
           GestureDetector(
             onTap: () {
-              context.go('/login');
+              context.go('/sirmed_portal');
             },
             child: Container(
               width: double.infinity,
