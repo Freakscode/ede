@@ -12,20 +12,10 @@ class AuthService implements AuthInterface {
   UserModel? _currentUser;
   
   @override
-  UserModel? get currentUser {
-    print('=== DEBUG AUTH SERVICE - currentUser ===');
-    print('_currentUser: $_currentUser');
-    return _currentUser;
-  }
+  UserModel? get currentUser => _currentUser;
   
   @override
-  bool get isLoggedIn {
-    final result = _currentUser != null;
-    print('=== DEBUG AUTH SERVICE - isLoggedIn ===');
-    print('_currentUser: $_currentUser');
-    print('isLoggedIn: $result');
-    return result;
-  }
+  bool get isLoggedIn => _currentUser != null;
   
   @override
   bool get isDagrdUser => _currentUser?.isDagrdUser ?? false;
@@ -33,34 +23,33 @@ class AuthService implements AuthInterface {
   @override
   Future<AuthResult> login(String cedula, String password) async {
     try {
-      // TEMPORAL: Siempre loguear como usuario DAGRD
-      print('=== LOGIN TEMPORAL - USUARIO DAGRD ===');
-      print('Cédula ingresada: ${cedula.trim()}');
-      print('Contraseña ingresada: ${password.trim()}');
-      
       // Simular delay de red
       await Future.delayed(const Duration(seconds: 1));
       
-      // Obtener el primer usuario DAGRD disponible
-      final dagrdUser = UserModel.simulatedUsers.firstWhere(
-        (user) => user.isDagrdUser,
-        orElse: () => UserModel.simulatedUsers.first, // Fallback al primer usuario
-      );
+      // Simularse validación de credenciales
+      if (cedula.trim().isEmpty || password.trim().isEmpty) {
+        return AuthResult.failure(
+          message: 'La cédula y contraseña son requeridas',
+          errorType: AuthErrorType.invalidCredentials,
+        );
+      }
       
-      print('Usuario asignado: ${dagrdUser.nombre}, isDagrdUser: ${dagrdUser.isDagrdUser}');
+      // Obtener usuario DAGRD simulado usando los nuevos métodos helper
+      final selectedUser = UserModel.getSimulatedDagrdUserByCedula(cedula);
       
-      // Login exitoso como DAGRD
-      _currentUser = dagrdUser;
+      // Guardar usuario actual
+      _currentUser = selectedUser;
       
       return AuthResult.success(
-        message: 'Login exitoso como usuario DAGRD',
-        user: dagrdUser,
+        message: 'Login exitoso (modo simulación)',
+        user: selectedUser,
       );
       
+    
+      
     } catch (e) {
-      print('Error en login temporal: $e');
       return AuthResult.failure(
-        message: 'Error inesperado durante el login',
+        message: 'Error inesperado durante el login simulado',
         errorType: AuthErrorType.unknown,
       );
     }

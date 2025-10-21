@@ -16,7 +16,6 @@ import 'modules/risk_threat_analysis/bloc/risk_threat_analysis_bloc.dart';
 import 'modules/home/bloc/home_bloc.dart';
 import 'modules/home/bloc/home_event.dart';
 import 'modules/auth/bloc/auth_bloc.dart';
-import 'modules/auth/services/auth_service.dart';
 import 'modules/data_registration/bloc/data_registration_bloc.dart';
 import '../injection_container.dart' as di;
 import 'config/app_router.dart';
@@ -65,7 +64,7 @@ class MyApp extends StatelessWidget {
         ),
         // Auth BLoC
         BlocProvider<AuthBloc>(
-          create: (context) => AuthBloc(authService: AuthService()),
+          create: (context) => di.sl<AuthBloc>(),
         ),
         // Data Registration BLoC (unified)
         BlocProvider<DataRegistrationBloc>(

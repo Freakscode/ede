@@ -10,7 +10,8 @@ import 'app/core/network/network_info.dart';
 
 // Features - Auth
 import 'app/modules/auth/data/repositories_impl/auth_repository_implementation.dart';
-import 'app/modules/auth/domain/repositories/auth_repository.dart';
+import 'app/modules/auth/domain/repositories/auth_repository_interface.dart';
+import 'app/modules/auth/bloc/auth_bloc.dart';
 
 // Features - Evaluacion
 import 'app/modules/evaluacion/data/repositories_impl/evaluacion_repository_impl.dart';
@@ -23,7 +24,6 @@ import 'app/modules/evaluacion/presentation/bloc/form/habitabilidad/habitabilida
 import 'app/modules/evaluacion/presentation/bloc/form/acciones/acciones_bloc.dart';
 import 'app/modules/evaluacion/presentation/bloc/form/evaluacionDanos/evaluacion_danos_bloc.dart';
 import 'app/modules/evaluacion/presentation/bloc/form/descripcionEdificacion/descripcion_edificacion_bloc.dart';
-import 'app/modules/evaluacion/presentation/bloc/evaluacion_global_bloc.dart';
 
 // Risk Threat Analysis
 import 'app/modules/risk_threat_analysis/bloc/risk_threat_analysis_bloc.dart';
@@ -73,6 +73,7 @@ Future<void> initializeDependencies() async {
   sl.registerFactory(() => DescripcionEdificacionBloc());
   sl.registerFactory(() => RiskThreatAnalysisBloc());
   sl.registerFactory(() => HomeBloc());
+  sl.registerFactory(() => AuthBloc(authRepository: sl()));
   
   // Note: EvaluacionGlobalBloc is created directly in MultiBlocProvider 
   // since it requires access to other BLoC instances from context
