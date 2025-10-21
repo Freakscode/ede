@@ -49,17 +49,16 @@ class HomeScreen extends StatelessWidget {
     if (state.mostrarEventosRiesgo) {
       categoryTitle = "Ayuda Eventos de Riesgo";
       contentTitle = "Eventos de Riesgo";
-      content = HomeHelpContent.build(); // Puedes cambiar por RiskEventsHelpContent.build()
+      content = HomeHelpContent.build(); 
     } else if (state.mostrarCategoriasRiesgo) {
       categoryTitle = "Ayuda Categorías de Riesgo";
       contentTitle = "Categorías de Riesgo";
-      content = HomeHelpContent.build(); // Puedes cambiar por RiskCategoriesHelpContent.build()
+      content = HomeHelpContent.build(); 
     } else if (state.mostrarFormularioCompletado) {
       categoryTitle = "Ayuda Formulario Completado";
       contentTitle = "Formulario Completado";
-      content = HomeHelpContent.build(); // Puedes cambiar por FormCompletedHelpContent.build()
+      content = HomeHelpContent.build(); 
     } else {
-      // Según el tab seleccionado
       switch (state.selectedIndex) {
         case 0:
           categoryTitle = "Ayuda Inicio";
@@ -69,17 +68,17 @@ class HomeScreen extends StatelessWidget {
         case 1:
           categoryTitle = "Ayuda Material Educativo";
           contentTitle = "Ayuda general";
-          content = GeneralHelpContent.build(); // Puedes cambiar por EducationalMaterialHelpContent.build()
+          content = GeneralHelpContent.build(); 
           break;
         case 2:
           categoryTitle = "Ayuda Mis Formularios";
           contentTitle = "Mis Formularios";
-          content = FormsHelpContent.build(); // Puedes cambiar por FormsHelpContent.build()
+          content = FormsHelpContent.build(); 
           break;
         case 3:
           categoryTitle = "Ayuda Configuración";
           contentTitle = "Ayuda general";
-          content = GeneralHelpContent.build();  // Puedes cambiar por SettingsHelpContent.build()
+          content = GeneralHelpContent.build();  
           break;
         default:
           categoryTitle = "Ayuda";
