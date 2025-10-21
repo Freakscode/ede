@@ -2,6 +2,7 @@ import 'package:caja_herramientas/app/core/constants/app_assets.dart';
 import 'package:caja_herramientas/app/core/icons/app_icons.dart';
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import 'package:caja_herramientas/app/shared/widgets/buttons/custom_elevated_button.dart';
+import 'package:caja_herramientas/app/shared/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -30,23 +31,21 @@ class _LoginScreenState extends State<LoginScreen> {
       listener: (context, state) {
         if (state is AuthAuthenticated) {
           // Mostrar mensaje de éxito
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.message),
-              backgroundColor: Colors.green,
-              duration: const Duration(seconds: 2),
-            ),
+          CustomSnackBar.showSuccess(
+            context,
+            title: 'Login exitoso',
+            message: state.message,
+            duration: const Duration(seconds: 2),
           );
           // Navegar a home
           context.go('/home');
         } else if (state is AuthError) {
           // Mostrar mensaje de error
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.message),
-              backgroundColor: Colors.red,
-              duration: const Duration(seconds: 3),
-            ),
+          CustomSnackBar.showError(
+            context,
+            title: 'Error de login',
+            message: state.message,
+            duration: const Duration(seconds: 3),
           );
         }
       },

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import 'package:caja_herramientas/app/core/icons/app_icons.dart';
+import 'package:caja_herramientas/app/shared/widgets/widgets.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../bloc/home_bloc.dart';
@@ -208,31 +209,28 @@ class FormCompletedScreen extends StatelessWidget {
 
   void _handleDownload(BuildContext context) {
     // TODO: Implementar lógica de descarga
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Funcionalidad de descarga en desarrollo'),
-        backgroundColor: Colors.orange,
-      ),
+    CustomSnackBar.showWarning(
+      context,
+      title: 'Funcionalidad en desarrollo',
+      message: 'La funcionalidad de descarga está en desarrollo',
     );
   }
 
   void _handleAssociateToSIRE(BuildContext context) {
     // TODO: Implementar lógica de asociación a SIRE
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Funcionalidad de asociación a SIRE en desarrollo'),
-        backgroundColor: Colors.orange,
-      ),
+    CustomSnackBar.showWarning(
+      context,
+      title: 'Funcionalidad en desarrollo',
+      message: 'La funcionalidad de asociación a SIRE está en desarrollo',
     );
   }
 
   void _handleSendEmail(BuildContext context) {
     // TODO: Implementar lógica de envío por correo
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Funcionalidad de envío por correo en desarrollo'),
-        backgroundColor: Colors.orange,
-      ),
+    CustomSnackBar.showWarning(
+      context,
+      title: 'Funcionalidad en desarrollo',
+      message: 'La funcionalidad de envío por correo está en desarrollo',
     );
   }
 }

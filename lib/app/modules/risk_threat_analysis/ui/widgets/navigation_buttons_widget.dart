@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import 'package:caja_herramientas/app/shared/widgets/dialogs/custom_action_dialog.dart';
+import 'package:caja_herramientas/app/shared/widgets/widgets.dart';
 import 'package:caja_herramientas/app/shared/services/form_persistence_service.dart';
 import 'package:caja_herramientas/app/shared/models/complete_form_data_model.dart';
 import 'package:caja_herramientas/app/modules/auth/services/auth_service.dart';
@@ -157,13 +158,10 @@ class NavigationButtonsWidget extends StatelessWidget {
                                 homeBloc.add(LoadForms());
 
                                 // Mostrar mensaje de éxito
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text(
-                                      'Formulario completado exitosamente',
-                                    ),
-                                    backgroundColor: Colors.green,
-                                  ),
+                                CustomSnackBar.showSuccess(
+                                  context,
+                                  title: 'Formulario completado',
+                                  message: 'El formulario ha sido completado exitosamente',
                                 );
 
                                 // Navegar a la pantalla de formulario completado
@@ -428,11 +426,10 @@ class NavigationButtonsWidget extends StatelessWidget {
     } catch (e) {
       print('Error al guardar avance antes de finalizar: $e');
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error al guardar avance: $e'),
-            backgroundColor: Colors.red,
-          ),
+        CustomSnackBar.showError(
+          context,
+          title: 'Error al guardar',
+          message: 'Error al guardar avance: $e',
         );
       }
     }

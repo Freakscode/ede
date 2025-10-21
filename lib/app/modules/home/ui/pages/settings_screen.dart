@@ -1,4 +1,5 @@
 import 'package:caja_herramientas/app/core/icons/app_icons.dart';
+import 'package:caja_herramientas/app/shared/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -176,11 +177,10 @@ class SettingsScreen extends StatelessWidget {
                     child: TextButton(
                       onPressed: () {
                         context.read<HomeBloc>().add(HomeClearData());
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Datos limpiados correctamente'),
-                            backgroundColor: DAGRDColors.azulDAGRD,
-                          ),
+                        CustomSnackBar.showSuccess(
+                          context,
+                          title: 'Datos limpiados',
+                          message: 'Los datos han sido limpiados correctamente',
                         );
                       },
                       child: const Text(
@@ -352,22 +352,20 @@ class SettingsScreen extends StatelessWidget {
       context.read<AuthBloc>().add(const AuthLogoutRequested());
       
       // Mostrar mensaje de confirmación
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Sesión cerrada exitosamente'),
-          backgroundColor: DAGRDColors.azulDAGRD,
-        ),
+      CustomSnackBar.showSuccess(
+        context,
+        title: 'Sesión cerrada',
+        message: 'La sesión ha sido cerrada exitosamente',
       );
       
       // Navegar a la pantalla de login
       context.go('/login');
     } catch (e) {
       // Mostrar error si algo falla
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error al cerrar sesión: $e'),
-          backgroundColor: Colors.red,
-        ),
+      CustomSnackBar.showError(
+        context,
+        title: 'Error al cerrar sesión',
+        message: 'Error al cerrar sesión: $e',
       );
     }
   }

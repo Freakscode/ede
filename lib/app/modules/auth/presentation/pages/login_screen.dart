@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:caja_herramientas/app/shared/widgets/widgets.dart';
 import '../../bloc/auth_bloc.dart';
 import '../../bloc/auth_state.dart';
 import '../../bloc/events/auth_events.dart';
@@ -49,11 +50,10 @@ class _LoginScreenState extends State<LoginScreen> {
               context.go('/home');
             } else if (state is AuthError) {
               // Mostrar error
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.message),
-                  backgroundColor: Colors.red,
-                ),
+              CustomSnackBar.showError(
+                context,
+                title: 'Error de autenticación',
+                message: state.message,
               );
             }
           },
