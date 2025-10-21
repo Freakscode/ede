@@ -49,4 +49,10 @@ class DAGRDColors {
   static const Color warning = Color(0xFFD69E2E);
   static const Color error = Color(0xFFE53E3E);
   static const Color info = Color(0xFF3182CE);
+
+  /// Colores para niveles de amenaza/vulnerabilidad
+  static const Color nivelBajo = Color(0xFF22C55E);      // Verde
+  static const Color nivelMedioBajo = Color(0xFFFDE047); // Amarillo
+  static const Color nivelMedioAlto = Color(0xFFFB923C); // Naranja
+  static const Color nivelAlto = Color(0xFFFF0000);      // Rojo
 }
