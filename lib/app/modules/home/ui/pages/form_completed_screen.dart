@@ -5,6 +5,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../bloc/home_bloc.dart';
 import '../../bloc/home_event.dart';
+import '../../../auth/bloc/auth_bloc.dart';
+import '../../../auth/bloc/auth_state.dart';
 
 class FormCompletedScreen extends StatelessWidget {
   const FormCompletedScreen({super.key});
@@ -83,39 +85,53 @@ class FormCompletedScreen extends StatelessWidget {
 
           const SizedBox(height: 14),
 
-          // Botón Asociar a SIRE
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: DAGRDColors.amarDAGRD,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                padding: const EdgeInsets.symmetric(vertical: 14),
-              ),
-              onPressed: () => _handleAssociateToSIRE(context),
-              icon: SvgPicture.asset(
-                AppIcons.link,
-                width: 29,
-                height: 27,
-                colorFilter: const ColorFilter.mode(
-                  DAGRDColors.negroDAGRD,
-                  BlendMode.srcIn,
-                ),
-              ),
-              label: const Text(
-                'Asociar a SIRE',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: DAGRDColors.negroDAGRD,
-                  fontFamily: 'Work Sans',
-                  fontWeight: FontWeight.w500,
-                  fontSize: 14,
-                  height: 24 / 14,
-                ),
-              ),
-            ),
+          // Botón Asociar a SIRE - Solo visible si el usuario está logueado
+          BlocBuilder<AuthBloc, AuthState>(
+            builder: (context, authState) {
+              // Solo mostrar el botón si el usuario está autenticado
+              if (authState is AuthAuthenticated) {
+                return Column(
+                  children: [
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: DAGRDColors.amarDAGRD,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                        ),
+                        onPressed: () => _handleAssociateToSIRE(context),
+                        icon: SvgPicture.asset(
+                          AppIcons.link,
+                          width: 29,
+                          height: 27,
+                          colorFilter: const ColorFilter.mode(
+                            DAGRDColors.negroDAGRD,
+                            BlendMode.srcIn,
+                          ),
+                        ),
+                        label: const Text(
+                          'Asociar a SIRE',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: DAGRDColors.negroDAGRD,
+                            fontFamily: 'Work Sans',
+                            fontWeight: FontWeight.w500,
+                            fontSize: 14,
+                            height: 24 / 14,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                  ],
+                );
+              }
+              // Si no está autenticado, no mostrar nada (retornar widget vacío)
+              return const SizedBox.shrink();
+            },
           ),
 
           const SizedBox(height: 14),
