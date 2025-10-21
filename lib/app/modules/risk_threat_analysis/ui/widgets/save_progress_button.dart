@@ -11,8 +11,8 @@ import 'package:caja_herramientas/app/modules/data_registration/bloc/data_regist
 import 'package:caja_herramientas/app/modules/data_registration/bloc/data_registration_state.dart';
 import '../../bloc/risk_threat_analysis_bloc.dart';
 import '../../bloc/risk_threat_analysis_state.dart';
-import '../../../home/bloc/home_bloc.dart';
-import '../../../home/bloc/home_event.dart';
+import '../../../home/presentation/bloc/home_bloc.dart';
+import '../../../home/presentation/bloc/home_event.dart';
 
 class SaveProgressButton extends StatelessWidget {
   final VoidCallback? onPressed;
@@ -393,7 +393,7 @@ class SaveProgressButton extends StatelessWidget {
               // Si era un formulario nuevo, actualizar el estado del HomeBloc
               if (homeState.isCreatingNew) {
                 homeBloc.add(
-                  SetActiveFormId(completeForm.id, isCreatingNew: false),
+                      SetActiveFormId(formId: completeForm.id, isCreatingNew: false),
                 );
                 print(
                   'SaveProgressButton: Actualizando HomeBloc - isCreatingNew: false',

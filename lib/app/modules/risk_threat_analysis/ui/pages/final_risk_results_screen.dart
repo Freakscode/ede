@@ -6,7 +6,7 @@ import '../widgets/risk_matrix_widget.dart';
 import '../widgets/widgets.dart';
 import 'package:caja_herramientas/app/shared/models/risk_event_model.dart';
 import 'package:caja_herramientas/app/shared/models/risk_event_factory.dart';
-import '../../../home/bloc/home_bloc.dart';
+import '../../../home/presentation/bloc/home_bloc.dart';
 
 class FinalRiskResultsScreen extends StatelessWidget {
   final String eventName;
@@ -104,12 +104,10 @@ class FinalRiskResultsScreen extends StatelessWidget {
         
         // También imprimir datos guardados en HomeBloc para verificación
         final homeBloc = context.read<HomeBloc>();
-        final amenazaData = homeBloc.getSavedRiskEventModel(state.selectedRiskEvent, 'amenaza');
-        final vulnerabilidadData = homeBloc.getSavedRiskEventModel(state.selectedRiskEvent, 'vulnerabilidad');
+        // TODO: Implementar método getSavedRiskEventModel en HomeBloc
         
         print('\n=== DATOS PERSISTIDOS ===');
-        print('Amenaza guardada: ${amenazaData != null ? "SÍ" : "NO"}');
-        print('Vulnerabilidad guardada: ${vulnerabilidadData != null ? "SÍ" : "NO"}');
+        print('Datos guardados: Verificar implementación en HomeBloc');
         print('=== FIN EVALUACIÓN ===');
         return SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 28),

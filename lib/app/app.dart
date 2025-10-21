@@ -13,8 +13,8 @@ import 'modules/evaluacion/presentation/bloc/form/evaluacionDanos/evaluacion_dan
 import 'modules/evaluacion/presentation/bloc/form/descripcionEdificacion/descripcion_edificacion_bloc.dart';
 import 'modules/evaluacion/presentation/bloc/evaluacion_global_bloc.dart';
 import 'modules/risk_threat_analysis/bloc/risk_threat_analysis_bloc.dart';
-import 'modules/home/bloc/home_bloc.dart';
-import 'modules/home/bloc/home_event.dart';
+import 'modules/home/presentation/bloc/home_bloc.dart';
+import 'modules/home/presentation/bloc/home_event.dart';
 import 'modules/auth/bloc/auth_bloc.dart';
 import 'modules/data_registration/bloc/data_registration_bloc.dart';
 import '../injection_container.dart' as di;

@@ -10,8 +10,8 @@ import 'package:caja_herramientas/app/modules/auth/services/auth_service.dart';
 import '../../bloc/risk_threat_analysis_bloc.dart';
 import '../../bloc/events/risk_threat_analysis_event.dart';
 import '../../bloc/risk_threat_analysis_state.dart';
-import '../../../home/bloc/home_bloc.dart';
-import '../../../home/bloc/home_event.dart';
+import '../../../home/presentation/bloc/home_bloc.dart';
+import '../../../home/presentation/bloc/home_event.dart';
 import 'home_navigation_type.dart';
 
 class NavigationButtonsWidget extends StatelessWidget {
@@ -382,7 +382,7 @@ class NavigationButtonsWidget extends StatelessWidget {
 
       // Actualizar estado del HomeBloc
       if (homeState.isCreatingNew) {
-        homeBloc.add(SetActiveFormId(completeForm.id, isCreatingNew: false));
+            homeBloc.add(SetActiveFormId(formId: completeForm.id, isCreatingNew: false));
       }
 
       print('Avance guardado exitosamente');
@@ -392,17 +392,17 @@ class NavigationButtonsWidget extends StatelessWidget {
 
       context.read<HomeBloc>().add(
         SaveRiskEventModel(
-          state.selectedRiskEvent,
-          state.selectedClassification.toLowerCase(),
-          formDataForBloc,
+          eventName: state.selectedRiskEvent,
+          classificationType: state.selectedClassification.toLowerCase(),
+          evaluationData: formDataForBloc,
         ),
       );
 
       // Marcar como completada
       context.read<HomeBloc>().add(
         MarkEvaluationCompleted(
-          state.selectedRiskEvent,
-          state.selectedClassification.toLowerCase(),
+          eventName: state.selectedRiskEvent,
+          classificationType: state.selectedClassification.toLowerCase(),
         ),
       );
 

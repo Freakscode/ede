@@ -28,8 +28,16 @@ import 'app/modules/evaluacion/presentation/bloc/form/descripcionEdificacion/des
 // Risk Threat Analysis
 import 'app/modules/risk_threat_analysis/bloc/risk_threat_analysis_bloc.dart';
 
-// Home
-import 'app/modules/home/bloc/home_bloc.dart';
+// Home Module - Clean Architecture
+import 'app/modules/home/domain/repositories/home_repository_interface.dart';
+import 'app/modules/home/data/repositories/home_repository_implementation.dart';
+import 'app/modules/home/domain/use_cases/get_home_state_usecase.dart';
+import 'app/modules/home/domain/use_cases/update_home_state_usecase.dart';
+import 'app/modules/home/domain/use_cases/manage_forms_usecase.dart';
+import 'app/modules/home/domain/use_cases/manage_tutorial_usecase.dart';
+import 'app/modules/home/presentation/bloc/home_bloc.dart';
+
+import 'app/shared/services/form_persistence_service.dart';
 
 final GetIt sl = GetIt.instance;
 
@@ -51,6 +59,9 @@ Future<void> initializeDependencies() async {
   // Data sources
   // TODO: Register data sources here when moved
 
+  // Services
+  sl.registerLazySingleton(() => FormPersistenceService());
+
   // Repositories - now with correct interfaces and implementations
   sl.registerLazySingleton<AuthRepository>(
     () => AuthRepositoryImplementation(
@@ -62,6 +73,20 @@ Future<void> initializeDependencies() async {
     () => EvaluacionRepositoryImpl(),
   );
 
+  // Home Repository
+  sl.registerLazySingleton<HomeRepositoryInterface>(
+    () => HomeRepositoryImplementation(
+      prefs: sl(),
+      formPersistenceService: sl(),
+    ),
+  );
+
+  // Use Cases
+  sl.registerLazySingleton(() => GetHomeStateUseCase(sl()));
+  sl.registerLazySingleton(() => UpdateHomeStateUseCase(sl()));
+  sl.registerLazySingleton(() => ManageFormsUseCase(sl()));
+  sl.registerLazySingleton(() => ManageTutorialUseCase(sl()));
+
   // BLoCs
   sl.registerFactory(() => EvaluacionBloc(repository: sl()));
   sl.registerFactory(() => EdificacionBloc());
@@ -72,8 +97,15 @@ Future<void> initializeDependencies() async {
   sl.registerFactory(() => EvaluacionDanosBloc());
   sl.registerFactory(() => DescripcionEdificacionBloc());
   sl.registerFactory(() => RiskThreatAnalysisBloc());
-  sl.registerFactory(() => HomeBloc());
   sl.registerFactory(() => AuthBloc(authRepository: sl()));
+  
+  // Home BLoC with Clean Architecture
+  sl.registerFactory(() => HomeBloc(
+    getHomeStateUseCase: sl(),
+    updateHomeStateUseCase: sl(),
+    manageFormsUseCase: sl(),
+    manageTutorialUseCase: sl(),
+  ));
   
   // Note: EvaluacionGlobalBloc is created directly in MultiBlocProvider 
   // since it requires access to other BLoC instances from context
