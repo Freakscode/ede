@@ -15,14 +15,4 @@ class WebViewRepositoryImplementation implements WebViewRepositoryInterface {
         throw Exception('Tipo de WebView no soportado: $webViewType');
     }
   }
-
-  @override
-  bool isUrlAllowed(String url, List<String> allowedDomains) {
-    return allowedDomains.any((domain) => url.contains(domain));
-  }
-
-  @override
-  List<String> getDefaultAllowedDomains() {
-    return ['medellin.gov.co'];
-  }
 }
