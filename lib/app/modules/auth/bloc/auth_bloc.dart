@@ -1,8 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../domain/repositories/auth_repository_interface.dart';
 import '../domain/usecases/login_usecase.dart';
-import '../models/auth_result.dart';
-import '../models/login_request_model.dart';
+import '../domain/entities/auth_result_entity.dart';
+import '../data/models/login_request_model.dart';
 import 'events/auth_events.dart';
 import 'auth_state.dart';
 
@@ -165,54 +165,36 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
-  /// Métodos de conveniencia para verificar permisos
-  Future<bool> canAccessDagrdFeatures() async {
-    final user = await _authRepository.getCurrentUser();
-    return user?.canAccessDagrdFeatures ?? false;
-  }
-
-  Future<bool> canAccessGeneralFeatures() async {
-    final user = await _authRepository.getCurrentUser();
-    return user?.canAccessGeneralFeatures ?? false;
-  }
-
-  Future<bool> canAccessFeature(String feature) async {
-    final user = await _authRepository.getCurrentUser();
-    if (user == null) return false;
-    
-    switch (feature.toLowerCase()) {
-      case 'risk_analysis':
-      case 'evaluation':
-      case 'data_registration':
-        return user.canAccessDagrdFeatures;
-      case 'view_reports':
-      case 'basic_info':
-        return user.canAccessGeneralFeatures;
-      default:
-        return false;
+  /// Métodos de conveniencia para acceder a información del usuario
+  bool canAccessDagrdFeatures() {
+    final state = this.state;
+    if (state is AuthAuthenticated) {
+      return state.user.canAccessDagrdFeatures;
     }
+    return false;
   }
 
-  /// Obtener información del usuario actual
-  Future<Map<String, dynamic>?> getUserInfo() async {
-    try {
-      final user = await _authRepository.getCurrentUser();
-      if (user == null) return null;
-      
-      return {
-        'loggedIn': true,
-        'cedula': user.cedula,
-        'nombre': user.nombre,
-        'isDagrdUser': user.isDagrdUser,
-        'cargo': user.cargo,
-        'dependencia': user.dependencia,
-        'email': user.email,
-        'telefono': user.telefono,
-        'canAccessDagrdFeatures': user.canAccessDagrdFeatures,
-        'canAccessGeneralFeatures': user.canAccessGeneralFeatures,
-      };
-    } catch (e) {
-      return null;
+  bool canAccessGeneralFeatures() {
+    final state = this.state;
+    if (state is AuthAuthenticated) {
+      return state.user.canAccessGeneralFeatures;
     }
+    return false;
+  }
+
+  bool canAccessFeature(String feature) {
+    final state = this.state;
+    if (state is AuthAuthenticated) {
+      return state.user.canAccessDagrdFeatures;
+    }
+    return false;
+  }
+
+  String? getUserInfo() {
+    final state = this.state;
+    if (state is AuthAuthenticated) {
+      return '${state.user.nombre} (${state.user.cedula})';
+    }
+    return null;
   }
 }

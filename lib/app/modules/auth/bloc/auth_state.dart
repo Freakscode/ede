@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
-import '../models/user_model.dart';
-import '../models/auth_result.dart';
+import '../domain/entities/user_entity.dart';
+import '../domain/entities/auth_result_entity.dart';
 
 /// Estados del módulo de autenticación
 abstract class AuthState extends Equatable {
@@ -28,7 +28,7 @@ class AuthLoading extends AuthState {
 
 /// Estado de autenticación exitosa
 class AuthAuthenticated extends AuthState {
-  final UserModel user;
+  final UserEntity user;
   final String message;
 
   const AuthAuthenticated({
@@ -91,7 +91,7 @@ class AuthError extends AuthState {
 class AuthPermissionChecked extends AuthState {
   final String feature;
   final bool hasPermission;
-  final UserModel? user;
+  final UserEntity? user;
 
   const AuthPermissionChecked({
     required this.feature,

@@ -1,9 +1,10 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../domain/repositories/auth_repository_interface.dart';
-import '../../models/user_model.dart';
-import '../../models/auth_result.dart';
-import '../../models/login_request_model.dart';
+import '../../domain/entities/user_entity.dart';
+import '../../domain/entities/auth_result_entity.dart';
+import '../models/user_model.dart';
+import '../models/login_request_model.dart';
 
 /// Implementación del repositorio de autenticación
 /// Maneja la persistencia local y las llamadas a la API
@@ -11,21 +12,20 @@ class AuthRepositoryImplementation implements AuthRepository {
   final SharedPreferences sharedPreferences;
   static const String _tokenKey = 'auth_token';
   static const String _userKey = 'auth_user';
-  // static const String _apiUrl = 'https://sire.alcaldiabogota.gov.co/api/auth/login';
 
   AuthRepositoryImplementation({
     required this.sharedPreferences,
   });
 
   @override
-  Future<AuthResult> login(LoginRequestModel loginRequest) async {
+  Future<AuthResultEntity> login(LoginRequestModel loginRequest) async {
     try {
       // Simular delay de red
       await Future.delayed(const Duration(seconds: 1));
       
       // Simular validación de credenciales
       if (loginRequest.cedula.isEmpty || loginRequest.password.isEmpty) {
-        return AuthResult.failure(
+        return AuthResultEntity.failure(
           message: 'La cédula y contraseña son requeridas',
           errorType: AuthErrorType.invalidCredentials,
         );
@@ -39,63 +39,14 @@ class AuthRepositoryImplementation implements AuthRepository {
       
       // Guardar datos localmente
       await saveToken(simulatedToken);
-      await saveUser(selectedUser);
+      await saveUser(selectedUser.toEntity());
       
-      return AuthResult.success(
+      return AuthResultEntity.success(
         message: 'Login exitoso (modo simulación)',
-        user: selectedUser,
+        user: selectedUser.toEntity(),
       );
-      
-      // TODO: Cuando esté disponible el endpoint, descomentar el código de la API
-      /*
-      // Realizar llamada a la API
-      final response = await http.post(
-        Uri.parse(_apiUrl),
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        body: json.encode(loginRequest.toHttpJson()),
-      );
-      
-      print('Respuesta API: ${response.statusCode}');
-      
-      if (response.statusCode == 200) {
-        // Parsear respuesta
-        final loginResponse = LoginResponseModel.fromJson(
-          json.decode(response.body) as Map<String, dynamic>
-        );
-        
-        if (loginResponse.isSuccess && loginResponse.data != null) {
-          // Crear usuario desde la respuesta
-          final userApi = loginResponse.data!.user;
-          final user = UserModel.fromUserApiModel(userApi);
-          
-          // Guardar datos localmente
-          await saveToken(loginResponse.data!.token);
-          await saveUser(user);
-          
-          print('Login exitoso: ${user.nombre}');
-          
-          return AuthResult.success(
-            message: loginResponse.message,
-            user: user,
-          );
-        } else {
-          return AuthResult.failure(
-            message: loginResponse.message,
-            errorType: AuthErrorType.invalidCredentials,
-          );
-        }
-      } else {
-        return AuthResult.failure(
-          message: 'Error del servidor: ${response.statusCode}',
-          errorType: AuthErrorType.serverError,
-        );
-      }
-      */
     } catch (e) {
-      return AuthResult.failure(
+      return AuthResultEntity.failure(
         message: 'Error inesperado durante el login simulado',
         errorType: AuthErrorType.unknown,
       );
@@ -127,7 +78,7 @@ class AuthRepositoryImplementation implements AuthRepository {
   }
 
   @override
-  Future<UserModel?> getCurrentUser() async {
+  Future<UserEntity?> getCurrentUser() async {
     try {
       final userJson = sharedPreferences.getString(_userKey);
       print('AuthRepository: getCurrentUser() - userJson: $userJson');
@@ -135,15 +86,8 @@ class AuthRepositoryImplementation implements AuthRepository {
         final userMap = json.decode(userJson) as Map<String, dynamic>;
         print('AuthRepository: getCurrentUser() - userMap: $userMap');
         // Reconstruir usuario desde JSON guardado
-        final user = UserModel(
-          cedula: userMap['cedula'] ?? '',
-          nombre: userMap['nombre'] ?? '',
-          isDagrdUser: userMap['isDagrdUser'] ?? false,
-          cargo: userMap['cargo'],
-          dependencia: userMap['dependencia'],
-          email: userMap['email'],
-          telefono: userMap['telefono'],
-        );
+        final userModel = UserModel.fromJson(userMap);
+        final user = userModel.toEntity();
         print('AuthRepository: getCurrentUser() - user reconstruido: $user');
         return user;
       }
@@ -156,16 +100,9 @@ class AuthRepositoryImplementation implements AuthRepository {
   }
 
   @override
-  Future<void> saveUser(UserModel user) async {
-    final userMap = {
-      'cedula': user.cedula,
-      'nombre': user.nombre,
-      'isDagrdUser': user.isDagrdUser,
-      'cargo': user.cargo,
-      'dependencia': user.dependencia,
-      'email': user.email,
-      'telefono': user.telefono,
-    };
+  Future<void> saveUser(UserEntity user) async {
+    final userModel = UserModel.fromEntity(user);
+    final userMap = userModel.toJson();
     await sharedPreferences.setString(_userKey, json.encode(userMap));
   }
 

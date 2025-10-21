@@ -1,50 +1,50 @@
+import '../entities/auth_result_entity.dart';
 import '../repositories/auth_repository_interface.dart';
-import '../../models/auth_result.dart';
-import '../../models/login_request_model.dart';
+import '../../data/models/login_request_model.dart';
 
-/// Caso de uso para el login
-/// Encapsula la lógica de negocio del proceso de autenticación
+/// Caso de uso para login
 class LoginUseCase {
-  final AuthRepository repository;
-  
-  LoginUseCase(this.repository);
-  
-  /// Ejecutar el proceso de login
-  Future<AuthResult> execute(LoginRequestModel loginRequest) async {
-    try {
-      // Validaciones de negocio
-      if (loginRequest.cedula.isEmpty) {
-        return AuthResult.failure(
-          message: 'La cédula es requerida',
-          errorType: AuthErrorType.invalidCredentials,
-        );
-      }
-      
-      if (loginRequest.password.isEmpty) {
-        return AuthResult.failure(
-          message: 'La contraseña es requerida',
-          errorType: AuthErrorType.invalidCredentials,
-        );
-      }
-      
-      // Llamar al repositorio
-      final result = await repository.login(loginRequest);
-      
-      return result;
-    } catch (e) {
-      return AuthResult.failure(
-        message: 'Error inesperado durante el login',
-        errorType: AuthErrorType.unknown,
+  final AuthRepository _authRepository;
+
+  LoginUseCase(this._authRepository);
+
+  /// Ejecutar login
+  Future<AuthResultEntity> execute(LoginRequestModel loginRequest) async {
+    // Validaciones de negocio
+    if (loginRequest.cedula.isEmpty) {
+      return AuthResultEntity.failure(
+        message: 'La cédula es requerida',
+        errorType: AuthErrorType.invalidCredentials,
       );
     }
+
+    if (loginRequest.password.isEmpty) {
+      return AuthResultEntity.failure(
+        message: 'La contraseña es requerida',
+        errorType: AuthErrorType.invalidCredentials,
+      );
+    }
+
+    if (loginRequest.cedula.length < 6) {
+      return AuthResultEntity.failure(
+        message: 'La cédula debe tener al menos 6 caracteres',
+        errorType: AuthErrorType.invalidCredentials,
+      );
+    }
+
+    // Delegar al repositorio
+    return await _authRepository.login(loginRequest);
   }
-  
-  /// Ejecutar login con credenciales simples
-  Future<AuthResult> executeWithCredentials(String cedula, String password) async {
+
+  /// Ejecutar login con credenciales directas
+  Future<AuthResultEntity> executeWithCredentials({
+    required String cedula,
+    required String password,
+  }) async {
     final loginRequest = LoginRequestModel.fromCredentials(
       cedula: cedula,
       password: password,
     );
-    return execute(loginRequest);
+    return await execute(loginRequest);
   }
 }
