@@ -116,7 +116,9 @@ class AuthRepositoryImplementation implements AuthRepository {
   Future<bool> isLoggedIn() async {
     final token = await getToken();
     final user = await getCurrentUser();
-    return token != null && token.isNotEmpty && user != null;
+    final result = token != null && token.isNotEmpty && user != null;
+    print('AuthRepository: isLoggedIn() - token: $token, user: $user, result: $result');
+    return result;
   }
 
   @override
@@ -128,10 +130,12 @@ class AuthRepositoryImplementation implements AuthRepository {
   Future<UserModel?> getCurrentUser() async {
     try {
       final userJson = sharedPreferences.getString(_userKey);
+      print('AuthRepository: getCurrentUser() - userJson: $userJson');
       if (userJson != null) {
         final userMap = json.decode(userJson) as Map<String, dynamic>;
+        print('AuthRepository: getCurrentUser() - userMap: $userMap');
         // Reconstruir usuario desde JSON guardado
-        return UserModel(
+        final user = UserModel(
           cedula: userMap['cedula'] ?? '',
           nombre: userMap['nombre'] ?? '',
           isDagrdUser: userMap['isDagrdUser'] ?? false,
@@ -140,9 +144,13 @@ class AuthRepositoryImplementation implements AuthRepository {
           email: userMap['email'],
           telefono: userMap['telefono'],
         );
+        print('AuthRepository: getCurrentUser() - user reconstruido: $user');
+        return user;
       }
+      print('AuthRepository: getCurrentUser() - userJson es null');
       return null;
     } catch (e) {
+      print('AuthRepository: getCurrentUser() - error: $e');
       return null;
     }
   }
