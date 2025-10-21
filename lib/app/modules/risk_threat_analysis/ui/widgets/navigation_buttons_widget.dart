@@ -187,7 +187,7 @@ class NavigationButtonsWidget extends StatelessWidget {
                                 'Antes de finalizar, revisa el formulario. Algunas variables aún no han sido evaluadas',
                             leftButtonText: 'Cancelar ',
                             leftButtonIcon: Icons.close,
-                            rightButtonText: 'Revisar ',
+                            rightButtonText: 'Revisar 2',
                             rightButtonIcon: Icons.edit,
                             onRightButtonPressed: () {
                               Navigator.of(context).pop();

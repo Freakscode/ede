@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:caja_herramientas/app/core/icons/app_icons.dart';
 import 'package:caja_herramientas/app/shared/services/form_persistence_service.dart';
+import '../../bloc/home_bloc.dart';
 import '../../bloc/home_state.dart';
 
 class ResultsRiskSectionWidget extends StatelessWidget {
@@ -17,22 +19,63 @@ class ResultsRiskSectionWidget extends StatelessWidget {
 
   /// Verifica si tanto Amenaza como Vulnerabilidad están completadas al 100%
   Future<bool> _isBothCompleted() async {
-    if (homeState.activeFormId == null) return false;
+    print('=== _isBothCompleted DEBUG ===');
+    print('homeState.activeFormId: ${homeState.activeFormId}');
+    print('selectedEvent: $selectedEvent');
+    
+    if (homeState.activeFormId == null) {
+      print('activeFormId es null - retornando false');
+      return false;
+    }
     
     try {
       final persistenceService = FormPersistenceService();
       final completeForm = await persistenceService.getCompleteForm(homeState.activeFormId!);
       
-      if (completeForm == null) return false;
+      print('completeForm encontrado: ${completeForm != null}');
+      
+      if (completeForm == null) {
+        print('completeForm es null - retornando false');
+        return false;
+      }
+      
+      // VERIFICACIÓN ADICIONAL: El formulario debe ser para el evento actual
+      if (completeForm.eventName != selectedEvent) {
+        print('El formulario es para un evento diferente: ${completeForm.eventName} vs $selectedEvent - retornando false');
+        return false;
+      }
+      
+      // VERIFICACIÓN ADICIONAL: Si estamos creando un nuevo formulario, el formulario debe estar vacío
+      if (homeState.isCreatingNew && 
+          (completeForm.amenazaProbabilidadSelections.isNotEmpty || 
+           completeForm.amenazaIntensidadSelections.isNotEmpty || 
+           completeForm.vulnerabilidadSelections.isNotEmpty)) {
+        print('⚠️  Estamos creando un nuevo formulario pero el formulario tiene datos - retornando false');
+        print('  - amenazaProbabilidadSelections: ${completeForm.amenazaProbabilidadSelections.isNotEmpty}');
+        print('  - amenazaIntensidadSelections: ${completeForm.amenazaIntensidadSelections.isNotEmpty}');
+        print('  - vulnerabilidadSelections: ${completeForm.vulnerabilidadSelections.isNotEmpty}');
+        return false;
+      }
       
       // Verificar si Amenaza está completa
       final amenazaCompleted = completeForm.amenazaProbabilidadSelections.isNotEmpty && 
                               completeForm.amenazaIntensidadSelections.isNotEmpty;
       
+      print('amenazaProbabilidadSelections: ${completeForm.amenazaProbabilidadSelections}');
+      print('amenazaIntensidadSelections: ${completeForm.amenazaIntensidadSelections}');
+      print('amenazaCompleted: $amenazaCompleted');
+      
       // Verificar si Vulnerabilidad está completa (tiene al menos una subclasificación con datos)
       final vulnerabilidadCompleted = completeForm.vulnerabilidadSelections.isNotEmpty;
       
-      return amenazaCompleted && vulnerabilidadCompleted;
+      print('vulnerabilidadSelections: ${completeForm.vulnerabilidadSelections}');
+      print('vulnerabilidadCompleted: $vulnerabilidadCompleted');
+      
+      final bothCompleted = amenazaCompleted && vulnerabilidadCompleted;
+      print('bothCompleted: $bothCompleted');
+      print('=== FIN _isBothCompleted DEBUG ===');
+      
+      return bothCompleted;
     } catch (e) {
       print('Error al verificar completitud: $e');
       return false;
@@ -41,10 +84,13 @@ class ResultsRiskSectionWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<bool>(
-      future: _isBothCompleted(),
-      builder: (context, snapshot) {
-        final bothCompleted = snapshot.data ?? false;
+    return BlocBuilder<HomeBloc, HomeState>(
+      builder: (context, homeState) {
+        return FutureBuilder<bool>(
+          future: _isBothCompleted(),
+          builder: (context, snapshot) {
+            final bothCompleted = snapshot.data ?? false;
+            print('ResultsRiskSectionWidget - bothCompleted: $bothCompleted');
     
     return GestureDetector(
       onTap: bothCompleted ? () {
@@ -134,6 +180,8 @@ class ResultsRiskSectionWidget extends StatelessWidget {
         ),
       ),
     );
+          },
+        );
       },
     );
   }
