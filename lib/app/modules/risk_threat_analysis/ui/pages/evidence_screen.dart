@@ -1,5 +1,6 @@
 import 'package:caja_herramientas/app/modules/risk_threat_analysis/ui/widgets/navigation_buttons_widget.dart';
 import 'package:caja_herramientas/app/modules/risk_threat_analysis/ui/widgets/progress_bar_widget.dart';
+import 'package:caja_herramientas/app/shared/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
@@ -162,7 +163,11 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
     );
   }
 
-  Widget _buildImageThumbnail(String imagePath, int index, RiskThreatAnalysisState state) {
+  Widget _buildImageThumbnail(
+    String imagePath,
+    int index,
+    RiskThreatAnalysisState state,
+  ) {
     return Container(
       // width: 200,
       decoration: BoxDecoration(
@@ -220,8 +225,12 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
                       height: 18, // height: 18px
                       padding: const EdgeInsets.all(2), // padding: 2px
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(9999), // border-radius: 9999px
-                        color: const Color(0x99EF4444), // background: rgba(239, 68, 68, 0.60)
+                        borderRadius: BorderRadius.circular(
+                          9999,
+                        ), // border-radius: 9999px
+                        color: const Color(
+                          0x99EF4444,
+                        ), // background: rgba(239, 68, 68, 0.60)
                       ),
                       child: const Icon(
                         Icons.close,
@@ -253,20 +262,26 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
                   ),
                 ),
                 const SizedBox(height: 8),
-                
+
                 // Mostrar botón "Georreferenciar imagen" si no hay coordenadas
                 Builder(
                   builder: (context) {
-                    final currentCoordinates = _getCurrentCategoryCoordinates(state)[index];
+                    final currentCoordinates = _getCurrentCategoryCoordinates(
+                      state,
+                    )[index];
                     if (currentCoordinates == null) {
                       return SizedBox(
                         width: double.infinity,
                         height: 48, // height: 48px
                         child: ElevatedButton.icon(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF232B48), // background: var(--AzulDAGRD, #232B48)
+                            backgroundColor: const Color(
+                              0xFF232B48,
+                            ), // background: var(--AzulDAGRD, #232B48)
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(4), // border-radius: 4px
+                              borderRadius: BorderRadius.circular(
+                                4,
+                              ), // border-radius: 4px
                             ),
                             padding: const EdgeInsets.symmetric(
                               horizontal: 10, // padding: 8px 10px
@@ -275,7 +290,8 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
                           ),
                           onPressed: () => _showLocationDialog(index, state),
                           icon: const Icon(
-                            Icons.location_on_outlined, // icono de ubicación outline
+                            Icons
+                                .location_on_outlined, // icono de ubicación outline
                             color: Colors.white,
                             size: 20,
                           ),
@@ -292,56 +308,58 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
                       );
                     } else {
                       return Row(
-                    children: [
-                      // Campo de texto con coordenadas
-                      Expanded(
-                        child: Container(
-                          height: 40, // height: 40px
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16, // padding: 8px 16px (lateral)
-                            vertical: 8, // padding: 8px 16px (vertical)
-                          ),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: const Color(0xFFD1D5DB)),
-                            borderRadius: BorderRadius.circular(4),
-                            color: Colors.white,
-                          ),
-                          child: Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              '${currentCoordinates['lat']}, ${currentCoordinates['lng']}',
-                              style: const TextStyle(
-                                color: Color(0xFF374151),
-                                fontFamily: 'Work Sans',
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
+                        children: [
+                          // Campo de texto con coordenadas
+                          Expanded(
+                            child: Container(
+                              height: 40, // height: 40px
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16, // padding: 8px 16px (lateral)
+                                vertical: 8, // padding: 8px 16px (vertical)
+                              ),
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: const Color(0xFFD1D5DB),
+                                ),
+                                borderRadius: BorderRadius.circular(4),
+                                color: Colors.white,
+                              ),
+                              child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  '${currentCoordinates['lat']}, ${currentCoordinates['lng']}',
+                                  style: const TextStyle(
+                                    color: Color(0xFF374151),
+                                    fontFamily: 'Work Sans',
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      ),
-                      // Separación de 18px
-                      const SizedBox(width: 18),
-                      // Botón de ubicación separado
-                      GestureDetector(
-                        onTap: () => _showLocationDialog(index, state),
-                        child: Container(
-                          height: 40,
-                          width: 40,
-                          decoration: BoxDecoration(
-                            color: const Color(
-                              0xFF232B48,
-                            ), // Fondo azul para el botón
-                            borderRadius: BorderRadius.circular(4),
+                          // Separación de 18px
+                          const SizedBox(width: 18),
+                          // Botón de ubicación separado
+                          GestureDetector(
+                            onTap: () => _showLocationDialog(index, state),
+                            child: Container(
+                              height: 40,
+                              width: 40,
+                              decoration: BoxDecoration(
+                                color: const Color(
+                                  0xFF232B48,
+                                ), // Fondo azul para el botón
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: const Icon(
+                                Icons.location_on,
+                                color: Colors.white,
+                                size: 20,
+                              ),
+                            ),
                           ),
-                          child: const Icon(
-                            Icons.location_on,
-                            color: Colors.white,
-                            size: 20,
-                          ),
-                        ),
-                      ),
-                    ],
+                        ],
                       );
                     }
                   },
@@ -469,7 +487,6 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
     );
   }
 
-
   /// Muestra el diálogo de ubicación
   // Métodos helper para obtener datos de la categoría actual
   List<String> _getCurrentCategoryImages(RiskThreatAnalysisState state) {
@@ -477,14 +494,18 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
     return state.evidenceImages[category] ?? [];
   }
 
-  Map<int, Map<String, String>> _getCurrentCategoryCoordinates(RiskThreatAnalysisState state) {
+  Map<int, Map<String, String>> _getCurrentCategoryCoordinates(
+    RiskThreatAnalysisState state,
+  ) {
     final category = state.selectedClassification.toLowerCase();
     return state.evidenceCoordinates[category] ?? {};
   }
 
   void _showLocationDialog(int imageIndex, RiskThreatAnalysisState state) {
-    final currentCoordinates = _getCurrentCategoryCoordinates(state)[imageIndex];
-    
+    final currentCoordinates = _getCurrentCategoryCoordinates(
+      state,
+    )[imageIndex];
+
     showDialog(
       context: context,
       builder: (context) => LocationDialog(
@@ -502,12 +523,12 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
               lng: lng,
             ),
           );
+
           
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Ubicación guardada exitosamente'),
-              backgroundColor: Colors.green,
-            ),
+          CustomSnackBar.showSuccess(
+            context,
+            title: 'Ubicación guardada',
+            message: 'La imagen ha sido referenciada exitosamente.',
           );
         },
       ),
