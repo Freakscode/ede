@@ -9,7 +9,6 @@ import 'package:go_router/go_router.dart';
 import '../../bloc/auth_bloc.dart';
 import '../../bloc/auth_state.dart';
 import '../../bloc/events/auth_events.dart';
-import '../../widgets/auth_debug_widget.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -315,7 +314,6 @@ class _LoginScreenState extends State<LoginScreen> {
                             const SizedBox(height: 24),
 
                             // Widget de debug temporal
-                            const AuthDebugWidget(),
                           ],
                         ),
                       ),
