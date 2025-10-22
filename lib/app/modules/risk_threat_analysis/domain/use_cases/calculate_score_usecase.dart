@@ -27,21 +27,28 @@ class CalculateScoreUseCase {
 
   /// Obtener datos de una subclasificación específica
   Map<String, dynamic> _getSubClassificationData(String subClassificationId, Map<String, dynamic> formData) {
-    // Buscar en amenaza
-    if (formData.containsKey('amenazaProbabilidadSelections') && 
-        subClassificationId == 'probabilidad') {
-      return Map<String, dynamic>.from(formData['amenazaProbabilidadSelections'] ?? {});
-    }
-    
-    if (formData.containsKey('amenazaIntensidadSelections') && 
-        subClassificationId == 'intensidad') {
-      return Map<String, dynamic>.from(formData['amenazaIntensidadSelections'] ?? {});
-    }
-    
-    // Buscar en vulnerabilidad
+    // Buscar en las selecciones dinámicas (vulnerabilidad)
     if (formData.containsKey('vulnerabilidadSelections')) {
       final vulnerabilidadData = Map<String, dynamic>.from(formData['vulnerabilidadSelections'] ?? {});
-      return vulnerabilidadData[subClassificationId] ?? {};
+      if (vulnerabilidadData.containsKey(subClassificationId)) {
+        return Map<String, dynamic>.from(vulnerabilidadData[subClassificationId] ?? {});
+      }
+    }
+    
+    // Buscar en amenaza probabilidad (usar el ID real)
+    if (formData.containsKey('amenazaProbabilidadSelections')) {
+      final probabilidadData = Map<String, dynamic>.from(formData['amenazaProbabilidadSelections'] ?? {});
+      if (probabilidadData.containsKey(subClassificationId)) {
+        return Map<String, dynamic>.from(probabilidadData);
+      }
+    }
+    
+    // Buscar en amenaza intensidad (usar el ID real)
+    if (formData.containsKey('amenazaIntensidadSelections')) {
+      final intensidadData = Map<String, dynamic>.from(formData['amenazaIntensidadSelections'] ?? {});
+      if (intensidadData.containsKey(subClassificationId)) {
+        return Map<String, dynamic>.from(intensidadData);
+      }
     }
 
     return {};

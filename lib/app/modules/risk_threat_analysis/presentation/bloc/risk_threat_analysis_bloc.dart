@@ -537,37 +537,20 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
 
   /// Método de compatibilidad temporal
   Color getThreatBackgroundColor() {
-    try {
-      final formData = getCurrentFormData();
-      final globalScoreInfo = _calculateGlobalScoreUseCase.getGlobalScoreInfo(formData);
-      return globalScoreInfo['finalColor'] ?? Colors.grey;
-    } catch (e) {
-      return Colors.grey;
-    }
+    // TODO: Implementar usando casos de uso
+    return Colors.grey;
   }
 
   /// Método de compatibilidad temporal
   String getFormattedThreatRating() {
-    try {
-      final formData = getCurrentFormData();
-      final globalScoreInfo = _calculateGlobalScoreUseCase.getGlobalScoreInfo(formData);
-      return globalScoreInfo['finalLevel'] ?? 'N/A';
-    } catch (e) {
-      return 'N/A';
-    }
+    // TODO: Implementar usando casos de uso
+    return 'N/A';
   }
 
   /// Método de compatibilidad temporal
   Color getThreatTextColor() {
-    try {
-      final formData = getCurrentFormData();
-      final globalScoreInfo = _calculateGlobalScoreUseCase.getGlobalScoreInfo(formData);
-      final color = globalScoreInfo['finalColor'] ?? Colors.grey;
-      // Retornar color de texto basado en el color de fondo
-      return color == Colors.grey ? Colors.black : Colors.white;
-    } catch (e) {
-      return Colors.black;
-    }
+    // TODO: Implementar usando casos de uso
+    return Colors.black;
   }
 
   /// Método de compatibilidad temporal

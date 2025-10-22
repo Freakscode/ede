@@ -87,11 +87,11 @@ class CalculateGlobalScoreUseCase {
 
   /// Obtener nivel de riesgo basado en score global
   String getGlobalRiskLevel(double score) {
-    if (score <= 1.5) return 'Muy Bajo';
-    if (score <= 2.5) return 'Bajo';
-    if (score <= 3.5) return 'Medio';
-    if (score <= 4.5) return 'Alto';
-    return 'Muy Alto';
+    if (score <= 1.5) return 'BAJO';
+    if (score <= 2.5) return 'MEDIO BAJO';
+    if (score <= 3.5) return 'MEDIO';
+    if (score <= 4.5) return 'ALTO';
+    return 'ALTO';
   }
 
   /// Obtener información completa del score global
