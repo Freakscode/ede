@@ -85,13 +85,19 @@ class CalculateGlobalScoreUseCase {
     return Colors.deepPurple;
   }
 
-  /// Obtener nivel de riesgo basado en score global
+  /// Obtener nivel de riesgo basado en score global (usando las reglas originales)
   String getGlobalRiskLevel(double score) {
-    if (score <= 1.5) return 'BAJO';
-    if (score <= 2.5) return 'MEDIO BAJO';
-    if (score <= 3.5) return 'MEDIO';
-    if (score <= 4.5) return 'ALTO';
-    return 'ALTO';
+    if (score >= 1.0 && score <= 1.75) {
+      return 'BAJO';
+    } else if (score > 1.75 && score <= 2.5) {
+      return 'MEDIO - BAJO';
+    } else if (score > 2.5 && score <= 3.25) {
+      return 'MEDIO - ALTO';
+    } else if (score > 3.25 && score <= 4.0) {
+      return 'ALTO';
+    } else {
+      return 'SIN CALIFICAR';
+    }
   }
 
   /// Obtener información completa del score global

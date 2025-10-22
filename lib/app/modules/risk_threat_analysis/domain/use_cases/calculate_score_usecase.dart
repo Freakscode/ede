@@ -103,13 +103,19 @@ class CalculateScoreUseCase {
     return Colors.deepPurple;
   }
 
-  /// Calcular nivel de riesgo basado en score
+  /// Calcular nivel de riesgo basado en score (usando las reglas originales)
   String scoreToRiskLevel(double score) {
-    if (score <= 1.5) return 'Muy Bajo';
-    if (score <= 2.5) return 'Bajo';
-    if (score <= 3.5) return 'Medio';
-    if (score <= 4.5) return 'Alto';
-    return 'Muy Alto';
+    if (score >= 1.0 && score <= 1.75) {
+      return 'BAJO';
+    } else if (score > 1.75 && score <= 2.5) {
+      return 'MEDIO - BAJO';
+    } else if (score > 2.5 && score <= 3.25) {
+      return 'MEDIO - ALTO';
+    } else if (score > 3.25 && score <= 4.0) {
+      return 'ALTO';
+    } else {
+      return 'SIN CALIFICAR';
+    }
   }
 }
 

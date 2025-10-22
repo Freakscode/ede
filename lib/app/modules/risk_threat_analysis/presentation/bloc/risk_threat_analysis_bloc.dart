@@ -537,20 +537,59 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
 
   /// Método de compatibilidad temporal
   Color getThreatBackgroundColor() {
-    // TODO: Implementar usando casos de uso
-    return Colors.grey;
+    try {
+      final formData = getCurrentFormData();
+      final globalScoreInfo = _calculateGlobalScoreUseCase.getGlobalScoreInfo(formData);
+      final score = globalScoreInfo['finalScore'] ?? 0.0;
+      
+      // Si no hay score (0.0), devolver el color de borde específico
+      if (score == 0.0) {
+        return const Color(0xFFD1D5DB); // #D1D5DB
+      }
+      
+      return globalScoreInfo['finalColor'] ?? const Color(0xFFD1D5DB);
+    } catch (e) {
+      return const Color(0xFFD1D5DB); // #D1D5DB
+    }
   }
 
   /// Método de compatibilidad temporal
   String getFormattedThreatRating() {
-    // TODO: Implementar usando casos de uso
-    return 'N/A';
+    try {
+      final formData = getCurrentFormData();
+      final globalScoreInfo = _calculateGlobalScoreUseCase.getGlobalScoreInfo(formData);
+      final score = globalScoreInfo['finalScore'] ?? 0.0;
+      final level = globalScoreInfo['finalLevel'] ?? 'SIN CALIFICAR';
+      
+      if (score == 0.0) {
+        return 'SIN CALIFICAR';
+      }
+      
+      // Formatear el score a 1 decimal y agregar el nivel
+      return '${score.toStringAsFixed(1)} $level';
+    } catch (e) {
+      return 'SIN CALIFICAR';
+    }
   }
 
   /// Método de compatibilidad temporal
   Color getThreatTextColor() {
-    // TODO: Implementar usando casos de uso
-    return Colors.black;
+    try {
+      final formData = getCurrentFormData();
+      final globalScoreInfo = _calculateGlobalScoreUseCase.getGlobalScoreInfo(formData);
+      final score = globalScoreInfo['finalScore'] ?? 0.0;
+      
+      // Si no hay score (0.0), devolver negro para texto sobre fondo gris
+      if (score == 0.0) {
+        return Colors.black;
+      }
+      
+      final color = globalScoreInfo['finalColor'] ?? Colors.grey;
+      // Retornar color de texto basado en el color de fondo
+      return color == Colors.grey ? Colors.black : Colors.white;
+    } catch (e) {
+      return Colors.black;
+    }
   }
 
   /// Método de compatibilidad temporal
@@ -575,9 +614,13 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
   bool shouldShowScoreContainer(String subClassificationId) {
     try {
       final formData = getCurrentFormData();
+      print('shouldShowScoreContainer - subClassificationId: $subClassificationId');
+      print('shouldShowScoreContainer - formData: $formData');
       final score = _calculateScoreUseCase.execute(subClassificationId, formData);
+      print('shouldShowScoreContainer - score: $score');
       return score > 0.0;
     } catch (e) {
+      print('shouldShowScoreContainer - error: $e');
       return false;
     }
   }
