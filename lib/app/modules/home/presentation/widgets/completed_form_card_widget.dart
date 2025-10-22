@@ -12,6 +12,7 @@ class CompletedFormCardWidget extends StatelessWidget {
   final VoidCallback onSendEmail;
   final VoidCallback onDelete;
   final Future<Map<String, double>> Function(String) getFormProgress;
+  final bool isUserAuthenticated;
 
   const CompletedFormCardWidget({
     super.key,
@@ -21,6 +22,7 @@ class CompletedFormCardWidget extends StatelessWidget {
     required this.onSendEmail,
     required this.onDelete,
     required this.getFormProgress,
+    this.isUserAuthenticated = false,
   });
 
   @override
@@ -93,35 +95,43 @@ class CompletedFormCardWidget extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        'Completado: ${form.formattedLastModified}',
-                        style: const TextStyle(
-                          color: Color(0xFFC6C6C6),
-                          fontFamily: 'Work Sans',
-                          fontWeight: FontWeight.w400,
-                          fontSize: 14,
-                          height: 16 / 14,
+                      Expanded(
+                        child: Text(
+                          'Completado: ${form.formattedLastModified}',
+                          style: const TextStyle(
+                            color: Color(0xFFC6C6C6),
+                            fontFamily: 'Work Sans',
+                            fontWeight: FontWeight.w400,
+                            fontSize: 14,
+                            height: 16 / 14,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      Container(
-                        height: 32,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                        ),
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFE8EDFF),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          form.riskEvent ?? '',
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            color: Color(0xFF2563EB),
-                            fontFamily: 'Work Sans',
-                            fontWeight: FontWeight.w500,
-                            fontSize: 12,
-                            height: 16 / 12,
+                      const SizedBox(width: 8),
+                      Flexible(
+                        child: Container(
+                          height: 32,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                          ),
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFE8EDFF),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            form.riskEvent ?? '',
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              color: Color(0xFF2563EB),
+                              fontFamily: 'Work Sans',
+                              fontWeight: FontWeight.w500,
+                              fontSize: 12,
+                              height: 16 / 12,
+                            ),
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ),
@@ -142,17 +152,18 @@ class CompletedFormCardWidget extends StatelessWidget {
                   
                   const SizedBox(height: 8),
                   
-                  // Botón Asociar a SIRE
-                  ActionButtonWidget(
-                    title: 'Asociar a SIRE',
-                    icon: Icons.link_outlined,
-                    backgroundColor: const Color(0xFFFCD34D), // Amarillo
-                    textColor: const Color(0xFF1E1E1E), // Gris oscuro
-                    iconColor: const Color(0xFF1E1E1E), // Gris oscuro
-                    onTap: onAssociateToSIRE,
-                  ),
-                  
-                  const SizedBox(height: 8),
+                  // Botón Asociar a SIRE - Solo visible si el usuario está autenticado
+                  if (isUserAuthenticated) ...[
+                    ActionButtonWidget(
+                      title: 'Asociar a SIRE',
+                      icon: Icons.link_outlined,
+                      backgroundColor: const Color(0xFFFCD34D), // Amarillo
+                      textColor: const Color(0xFF1E1E1E), // Gris oscuro
+                      iconColor: const Color(0xFF1E1E1E), // Gris oscuro
+                      onTap: onAssociateToSIRE,
+                    ),
+                    const SizedBox(height: 8),
+                  ],
                   
                   // Botón Enviar por correo
                   ActionButtonWidget(

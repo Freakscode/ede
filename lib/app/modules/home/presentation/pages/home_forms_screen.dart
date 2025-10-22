@@ -8,6 +8,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../presentation/bloc/home_bloc.dart';
 import '../../presentation/bloc/home_event.dart';
 import '../../presentation/bloc/home_state.dart';
+import 'package:caja_herramientas/app/modules/auth/bloc/auth_bloc.dart';
+import 'package:caja_herramientas/app/modules/auth/bloc/auth_state.dart';
 import '../../domain/entities/form_navigation_data.dart';
 import '../../domain/entities/form_entity.dart';
 import '../../../../shared/models/form_data_model.dart';
@@ -431,13 +433,18 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
                   return Column(
                     children: [
                       if (index > 0) const SizedBox(height: 16),
-                      CompletedFormCardWidget(
-                        form: form,
-                        onDownload: () => _showMessage(context, 'Funcionalidad de descarga en desarrollo'),
-                        onAssociateToSIRE: () => _showMessage(context, 'Funcionalidad de asociación a SIRE en desarrollo'),
-                        onSendEmail: () => _showMessage(context, 'Funcionalidad de envío por email en desarrollo'),
-                        onDelete: () => _deleteForm(context, form.id, form.title),
-                        getFormProgress: _getFormProgress,
+                      BlocBuilder<AuthBloc, AuthState>(
+                        builder: (context, authState) {
+                          return CompletedFormCardWidget(
+                            form: form,
+                            onDownload: () => _showMessage(context, 'Funcionalidad de descarga en desarrollo'),
+                            onAssociateToSIRE: () => _showMessage(context, 'Funcionalidad de asociación a SIRE en desarrollo'),
+                            onSendEmail: () => _showMessage(context, 'Funcionalidad de envío por email en desarrollo'),
+                            onDelete: () => _deleteForm(context, form.id, form.title),
+                            getFormProgress: _getFormProgress,
+                            isUserAuthenticated: authState is AuthAuthenticated,
+                          );
+                        },
                       ),
                     ],
                   );
