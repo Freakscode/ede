@@ -1,0 +1,21 @@
+// Exportar widgets de presentación
+export 'home_main_section.dart';
+export 'action_button_widget.dart';
+export 'category_card.dart';
+export 'event_card.dart';
+export 'form_card_completed.dart';
+export 'form_card_in_progress.dart';
+export 'home_help_content.dart';
+export 'forms_help_content.dart';
+export 'general_help_content.dart';
+export 'rating_help_content.dart';
+export 'categories_help_content.dart';
+export 'home_tool_card.dart';
+export 'menu_card.dart';
+export 'results_risk_section_widget.dart';
+export 'tutorial_overlay.dart';
+export 'completed_form_card_widget.dart';
+export 'label_bubble.dart';
+export 'lines_painter.dart';
+export 'tutorial_models.dart';
+export 'risk_events.dart';

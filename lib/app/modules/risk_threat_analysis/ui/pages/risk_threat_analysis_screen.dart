@@ -14,8 +14,8 @@ import '../../bloc/risk_threat_analysis_bloc.dart';
 import '../../bloc/events/risk_threat_analysis_event.dart';
 import '../../bloc/risk_threat_analysis_state.dart';
 import '../widgets/home_navigation_type.dart';
-import '../../../home/bloc/home_bloc.dart';
-import '../../../home/bloc/home_event.dart' as home_events;
+import '../../../home/presentation/bloc/home_bloc.dart';
+import '../../../home/presentation/bloc/home_event.dart' as home_events;
 import 'package:caja_herramientas/app/shared/services/form_persistence_service.dart';
 import 'package:caja_herramientas/app/shared/models/complete_form_data_model.dart';
 
@@ -131,7 +131,7 @@ class RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
           // RESETEAR EL ACTIVE FORMID EN HOMEBLOC PRIMERO
           final homeBloc = context.read<HomeBloc>();
           print('Reseteando activeFormId en HomeBloc a null...');
-          homeBloc.add(home_events.SetActiveFormId('', isCreatingNew: true));
+          homeBloc.add(home_events.SetActiveFormId(formId: '', isCreatingNew: true));
           
           // Esperar un poco más para asegurar que el reset se complete
           Future.delayed(const Duration(milliseconds: 100), () async {
@@ -172,7 +172,7 @@ class RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
               
               if (currentActiveFormId != null) {
                 print('Enviando SetActiveFormId nuevamente...');
-                homeBloc.add(home_events.SetActiveFormId(currentActiveFormId, isCreatingNew: false));
+                homeBloc.add(home_events.SetActiveFormId(formId: currentActiveFormId, isCreatingNew: false));
               }
             }
           });
@@ -193,9 +193,9 @@ class RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
           bloc.add(SelectClassification(classificationName));
         }
         
-        final homeBloc = context.read<HomeBloc>();
-        final savedData = homeBloc.getSavedRiskEventModel(eventFromNavData ?? '', classificationName ?? '');
-        bloc.loadExistingFormData(eventFromNavData ?? '', classificationName ?? '', savedData);
+        // TODO: Implementar método getSavedRiskEventModel en HomeBloc
+        // Por ahora, cargar datos vacíos
+        bloc.loadExistingFormData(eventFromNavData ?? '', classificationName ?? '', null);
       }
     }
   }
@@ -469,7 +469,7 @@ class RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
           // Establecer como formulario activo en HomeBloc INMEDIATAMENTE
           final homeBloc = context.read<HomeBloc>();
           print('Enviando SetActiveFormId al HomeBloc con formId: $formId');
-          homeBloc.add(home_events.SetActiveFormId(formId, isCreatingNew: false));
+          homeBloc.add(home_events.SetActiveFormId(formId: formId, isCreatingNew: false));
           
           // También establecer como formulario activo en la base de datos
           await persistenceService.setActiveFormId(formId);

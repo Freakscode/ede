@@ -9,7 +9,7 @@ class RiskEventFactory {
       id: 'movimiento_en_masa',
       name: 'Movimiento en Masa',
       description: 'Análisis de riesgo para movimientos en masa, deslizamientos y procesos gravitacionales',
-      iconAsset: 'assets/icons/caja_herramientas/movimiento_masa.svg',
+      iconAsset: 'assets/icons/caja_herramientas/Movimiento en masa.svg',
       createdAt: DateTime.now(),
       classifications: [
         // AMENAZA
@@ -145,7 +145,7 @@ class RiskEventFactory {
       id: 'inundacion',
       name: 'Inundación',
       description: 'Análisis de riesgo para inundaciones y encharcamientos',
-      iconAsset: 'assets/icons/caja_herramientas/inundacion.svg',
+      iconAsset: 'assets/icons/caja_herramientas/Inundación.svg',
       createdAt: DateTime.now(),
       classifications: [
         RiskClassification(
@@ -235,7 +235,7 @@ class RiskEventFactory {
       id: 'avenida_torrencial',
       name: 'Avenida Torrencial',
       description: 'Análisis de riesgo para avenidas torrenciales y flujos de detritos',
-      iconAsset: 'assets/icons/caja_herramientas/avenida_torrencial.svg',
+      iconAsset: 'assets/icons/caja_herramientas/Avenidas torrenciales.svg',
       createdAt: DateTime.now(),
       classifications: [
         RiskClassification(
@@ -324,7 +324,7 @@ class RiskEventFactory {
       id: 'estructural',
       name: 'Estructural',
       description: 'Análisis de riesgo para eventos relacionados con fallas estructurales en edificaciones e infraestructura',
-      iconAsset: 'assets/icons/caja_herramientas/estructural.svg',
+      iconAsset: 'assets/icons/caja_herramientas/Estructural.svg',
       createdAt: DateTime.now(),
       classifications: [
         RiskClassification(
@@ -409,7 +409,7 @@ class RiskEventFactory {
       id: 'otros',
       name: 'Otros',
       description: 'Análisis de riesgo para eventos no clasificados en las categorías principales',
-      iconAsset: 'assets/icons/caja_herramientas/otros.svg',
+      iconAsset: 'assets/icons/caja_herramientas/Question.svg',
       createdAt: DateTime.now(),
       classifications: [
         RiskClassification(
