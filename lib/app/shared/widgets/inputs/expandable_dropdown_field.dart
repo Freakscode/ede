@@ -44,10 +44,21 @@ class ExpandableDropdownField extends StatefulWidget {
 class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
   final Map<String, bool> _expandedCategories = {};
 
+  // Método helper para obtener las selecciones correctas según la subclasificación
+  Map<String, String> _getSelectionsForSubClassification(RiskThreatAnalysisState state) {
+    if (widget.subClassificationId == 'probabilidad') {
+      return state.probabilidadSelections;
+    } else if (widget.subClassificationId == 'intensidad') {
+      return state.intensidadSelections;
+    } else {
+      return state.dynamicSelections[widget.subClassificationId] ?? {};
+    }
+  }
+
   // Método helper para obtener el valor numérico del nivel seleccionado
   int _getSelectedLevelValue(String categoryTitle, RiskThreatAnalysisState state) {
-    final dropdownSelections = state.dynamicSelections[widget.subClassificationId] ?? {};
-    final selectedLevel = dropdownSelections[categoryTitle];
+    final selections = _getSelectionsForSubClassification(state);
+    final selectedLevel = selections[categoryTitle];
     if (selectedLevel == null) return 0;
     
     // Si es "No Aplica", devolver -1 para diferenciarlo
@@ -68,8 +79,8 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
 
   // Método helper para obtener el valor de display (NA o número)
   String _getDisplayValue(String categoryTitle, RiskThreatAnalysisState state) {
-    final dropdownSelections = state.dynamicSelections[widget.subClassificationId] ?? {};
-    final selectedLevel = dropdownSelections[categoryTitle];
+    final selections = _getSelectionsForSubClassification(state);
+    final selectedLevel = selections[categoryTitle];
     
     if (selectedLevel == 'NA') {
       return 'NA';
@@ -267,7 +278,7 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
                     _getDisplayValue(category.title, state),
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: (state.dynamicSelections[widget.subClassificationId]?[category.title] != null) 
+                      color: (_getSelectionsForSubClassification(state)[category.title] != null) 
                           ? const Color(0xFF1E1E1E)
                           : const Color(0xFFD1D5DB),
                       fontFamily: 'Work Sans',
@@ -335,14 +346,26 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
               const Spacer(),
               TextButton(
                 onPressed: () {
-                  // Marcar esta categoría como "No Aplica"
-                  context.read<RiskThreatAnalysisBloc>().add(
-                    UpdateDynamicSelection(
+                  // Marcar esta categoría como "No Aplica" usando el evento correcto
+                  final bloc = context.read<RiskThreatAnalysisBloc>();
+                  
+                  if (widget.subClassificationId == 'probabilidad') {
+                    bloc.add(UpdateProbabilidadSelection(
+                      category: category.title,
+                      selection: 'NA',
+                    ));
+                  } else if (widget.subClassificationId == 'intensidad') {
+                    bloc.add(UpdateIntensidadSelection(
+                      category: category.title,
+                      selection: 'NA',
+                    ));
+                  } else {
+                    bloc.add(UpdateDynamicSelection(
                       subClassificationId: widget.subClassificationId,
                       category: category.title,
                       selection: 'NA',
-                    ),
-                  );
+                    ));
+                  }
                   
                   // Notificar la selección si hay callback
                   if (widget.onSelectionChanged != null) {
@@ -561,8 +584,8 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
   }
 
   Widget _buildLevelButton(String level, String categoryTitle, RiskThreatAnalysisState state) {
-    final dropdownSelections = state.dynamicSelections[widget.subClassificationId] ?? {};
-    final currentSelection = dropdownSelections[categoryTitle];
+    final selections = _getSelectionsForSubClassification(state);
+    final currentSelection = selections[categoryTitle];
     
     // Si está marcado como NA, ningún botón debe aparecer como seleccionado
     bool isSelected = currentSelection == level && currentSelection != 'NA';
@@ -591,23 +614,49 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
         
         // Si el nivel ya está seleccionado, deseleccionarlo
         if (currentSelection == level && currentSelection != 'NA') {
-          // Enviar evento para deseleccionar
-          context.read<RiskThreatAnalysisBloc>().add(
-            UpdateDynamicSelection(
+          // Enviar evento para deseleccionar usando el evento correcto
+          final bloc = context.read<RiskThreatAnalysisBloc>();
+          
+          if (widget.subClassificationId == 'probabilidad') {
+            bloc.add(UpdateProbabilidadSelection(
+              category: categoryTitle,
+              selection: '',
+            ));
+          } else if (widget.subClassificationId == 'intensidad') {
+            bloc.add(UpdateIntensidadSelection(
+              category: categoryTitle,
+              selection: '',
+            ));
+          } else {
+            bloc.add(UpdateDynamicSelection(
               subClassificationId: widget.subClassificationId,
               category: categoryTitle,
               selection: '',
-            ),
-          );
+            ));
+          }
         } else {
           // Seleccionar el nuevo nivel (esto también limpia el estado NA si existía)
-          context.read<RiskThreatAnalysisBloc>().add(
-            UpdateDynamicSelection(
+          final bloc = context.read<RiskThreatAnalysisBloc>();
+          
+          // Usar el evento correcto según la subclasificación
+          if (widget.subClassificationId == 'probabilidad') {
+            bloc.add(UpdateProbabilidadSelection(
+              category: categoryTitle,
+              selection: level,
+            ));
+          } else if (widget.subClassificationId == 'intensidad') {
+            bloc.add(UpdateIntensidadSelection(
+              category: categoryTitle,
+              selection: level,
+            ));
+          } else {
+            // Para otras subclasificaciones (vulnerabilidad), usar UpdateDynamicSelection
+            bloc.add(UpdateDynamicSelection(
               subClassificationId: widget.subClassificationId,
               category: categoryTitle,
               selection: level,
-            ),
-          );
+            ));
+          }
           
           // Notificar la selección si hay callback
           if (widget.onSelectionChanged != null) {

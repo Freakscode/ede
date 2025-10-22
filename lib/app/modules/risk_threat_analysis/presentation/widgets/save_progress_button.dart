@@ -84,6 +84,20 @@ class SaveProgressButton extends StatelessWidget {
     print('activeFormId: ${homeState.activeFormId}');
     print('Usuario autenticado: ${authService.isLoggedIn}');
     print('Usuario actual: ${authService.currentUser?.nombre}');
+    
+    // Verificar que tenemos datos mínimos para guardar
+    if (state.selectedRiskEvent.isEmpty || state.selectedClassification.isEmpty) {
+      print('ERROR: No hay datos suficientes para guardar');
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('No hay datos suficientes para guardar'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+      return;
+    }
 
     // Usar datos pasados como parámetros o consultar del bloc como fallback
     print('=== PROCESANDO DATOS DE CONTACTO E INSPECCIÓN ===');
@@ -171,19 +185,15 @@ class SaveProgressButton extends StatelessWidget {
       print('FormData obtenido: $formData');
       print('EvidenceImages: ${formData['evidenceImages']}');
       print('EvidenceCoordinates: ${formData['evidenceCoordinates']}');
-      print(
-        'EvidenceCoordinates type: ${formData['evidenceCoordinates'].runtimeType}',
-      );
-
-      // Sin validaciones - proceder directamente con el guardado
-
-      // Convertir colores a valores enteros para serialización
-      final colorsData =
-          formData['subClassificationColors'] as Map<String, Color>? ?? {};
+      
+      // Convertir colores a valores serializables
+      final colorsData = formData['subClassificationColors'] as Map<String, Color>? ?? {};
       final serializableColors = <String, Color>{};
       colorsData.forEach((key, value) {
         serializableColors[key] = value;
       });
+      
+      print('Colores serializados: ${serializableColors.length}');
 
       // Crear ID único para el formulario completo
       final formId =
@@ -199,15 +209,14 @@ class SaveProgressButton extends StatelessWidget {
           'SaveProgressButton: Creando nuevo formulario (isCreatingNew: ${homeState.isCreatingNew})',
         );
 
+        // Crear formulario con datos actuales
         completeForm = CompleteFormDataModel(
           id: formId,
           eventName: state.selectedRiskEvent,
-          // Datos de contacto asociados al formulario
           contactData: contactData,
-          // Datos de inspección asociados al formulario
           inspectionData: inspectionData,
-          amenazaSelections:
-              state.selectedClassification.toLowerCase() == 'amenaza'
+          // Datos de amenaza
+          amenazaSelections: state.selectedClassification.toLowerCase() == 'amenaza'
               ? (formData['dynamicSelections'] ?? {})
               : {},
           amenazaScores: state.selectedClassification.toLowerCase() == 'amenaza'
@@ -216,50 +225,33 @@ class SaveProgressButton extends StatelessWidget {
           amenazaColors: state.selectedClassification.toLowerCase() == 'amenaza'
               ? serializableColors
               : {},
-          amenazaProbabilidadSelections:
-              state.selectedClassification.toLowerCase() == 'amenaza'
+          amenazaProbabilidadSelections: state.selectedClassification.toLowerCase() == 'amenaza'
               ? (formData['probabilidadSelections'] ?? {})
               : {},
-          amenazaIntensidadSelections:
-              state.selectedClassification.toLowerCase() == 'amenaza'
+          amenazaIntensidadSelections: state.selectedClassification.toLowerCase() == 'amenaza'
               ? (formData['intensidadSelections'] ?? {})
               : {},
-          amenazaSelectedProbabilidad:
-              state.selectedClassification.toLowerCase() == 'amenaza'
-              ? formData['selectedProbabilidad']
-              : null,
-          amenazaSelectedIntensidad:
-              state.selectedClassification.toLowerCase() == 'amenaza'
-              ? formData['selectedIntensidad']
-              : null,
-          vulnerabilidadSelections:
-              state.selectedClassification.toLowerCase() == 'vulnerabilidad'
+          amenazaSelectedProbabilidad: null,
+          amenazaSelectedIntensidad: null,
+          // Datos de vulnerabilidad
+          vulnerabilidadSelections: state.selectedClassification.toLowerCase() == 'vulnerabilidad'
               ? (formData['dynamicSelections'] ?? {})
               : {},
-          vulnerabilidadScores:
-              state.selectedClassification.toLowerCase() == 'vulnerabilidad'
+          vulnerabilidadScores: state.selectedClassification.toLowerCase() == 'vulnerabilidad'
               ? (formData['subClassificationScores'] ?? {})
               : {},
-          vulnerabilidadColors:
-              state.selectedClassification.toLowerCase() == 'vulnerabilidad'
+          vulnerabilidadColors: state.selectedClassification.toLowerCase() == 'vulnerabilidad'
               ? serializableColors
               : {},
-          vulnerabilidadProbabilidadSelections:
-              state.selectedClassification.toLowerCase() == 'vulnerabilidad'
+          vulnerabilidadProbabilidadSelections: state.selectedClassification.toLowerCase() == 'vulnerabilidad'
               ? (formData['probabilidadSelections'] ?? {})
               : {},
-          vulnerabilidadIntensidadSelections:
-              state.selectedClassification.toLowerCase() == 'vulnerabilidad'
+          vulnerabilidadIntensidadSelections: state.selectedClassification.toLowerCase() == 'vulnerabilidad'
               ? (formData['intensidadSelections'] ?? {})
               : {},
-          vulnerabilidadSelectedProbabilidad:
-              state.selectedClassification.toLowerCase() == 'vulnerabilidad'
-              ? formData['selectedProbabilidad']
-              : null,
-          vulnerabilidadSelectedIntensidad:
-              state.selectedClassification.toLowerCase() == 'vulnerabilidad'
-              ? formData['selectedIntensidad']
-              : null,
+          vulnerabilidadSelectedProbabilidad: null,
+          vulnerabilidadSelectedIntensidad: null,
+          // Datos de evidencia
           evidenceImages: state.evidenceImages,
           evidenceCoordinates: state.evidenceCoordinates,
           createdAt: now,

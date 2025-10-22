@@ -1071,6 +1071,13 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
         'vulnerabilidadSelections': state.dynamicSelections,
         'selectedRiskEvent': state.selectedRiskEvent,
         'selectedClassification': state.selectedClassification,
+        'subClassificationScores': state.subClassificationScores,
+        'subClassificationColors': state.subClassificationColors,
+        'evidenceImages': state.evidenceImages,
+        'evidenceCoordinates': state.evidenceCoordinates,
+        'probabilidadSelections': state.probabilidadSelections,
+        'intensidadSelections': state.intensidadSelections,
+        'dynamicSelections': state.dynamicSelections,
       };
     } catch (e) {
       return {};
