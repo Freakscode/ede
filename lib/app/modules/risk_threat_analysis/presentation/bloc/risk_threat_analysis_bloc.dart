@@ -12,6 +12,9 @@ import '../../domain/use_cases/save_risk_analysis_usecase.dart';
 import '../../domain/use_cases/load_risk_analysis_usecase.dart';
 import '../../domain/use_cases/validate_form_usecase.dart';
 import '../../domain/use_cases/calculate_rating_usecase.dart';
+import '../../domain/use_cases/calculate_score_usecase.dart';
+import '../../domain/use_cases/validate_unqualified_variables_usecase.dart';
+import '../../domain/use_cases/calculate_global_score_usecase.dart';
 import 'risk_threat_analysis_event.dart';
 import 'risk_threat_analysis_state.dart';
 
@@ -22,16 +25,25 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
   final LoadRiskAnalysisUseCase _loadRiskAnalysisUseCase;
   final ValidateFormUseCase _validateFormUseCase;
   final CalculateRatingUseCase _calculateRatingUseCase;
+  final CalculateScoreUseCase _calculateScoreUseCase;
+  final ValidateUnqualifiedVariablesUseCase _validateUnqualifiedVariablesUseCase;
+  final CalculateGlobalScoreUseCase _calculateGlobalScoreUseCase;
 
   RiskThreatAnalysisBloc({
     required SaveRiskAnalysisUseCase saveRiskAnalysisUseCase,
     required LoadRiskAnalysisUseCase loadRiskAnalysisUseCase,
     required ValidateFormUseCase validateFormUseCase,
     required CalculateRatingUseCase calculateRatingUseCase,
+    required CalculateScoreUseCase calculateScoreUseCase,
+    required ValidateUnqualifiedVariablesUseCase validateUnqualifiedVariablesUseCase,
+    required CalculateGlobalScoreUseCase calculateGlobalScoreUseCase,
   }) : _saveRiskAnalysisUseCase = saveRiskAnalysisUseCase,
        _loadRiskAnalysisUseCase = loadRiskAnalysisUseCase,
        _validateFormUseCase = validateFormUseCase,
        _calculateRatingUseCase = calculateRatingUseCase,
+       _calculateScoreUseCase = calculateScoreUseCase,
+       _validateUnqualifiedVariablesUseCase = validateUnqualifiedVariablesUseCase,
+       _calculateGlobalScoreUseCase = calculateGlobalScoreUseCase,
        super(RiskThreatAnalysisState.initial()) {
     
     // Registrar todos los event handlers
@@ -410,8 +422,9 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
 
   /// Método de compatibilidad temporal
   List<RiskSubClassification> getCurrentSubClassifications() {
-    // Usar RiskEventFactory para obtener datos reales
-    final riskEvent = RiskEventFactory.createMovimientoEnMasa();
+    // Usar el evento seleccionado dinámicamente
+    final riskEvent = RiskEventFactory.getEventByName(state.selectedRiskEvent) ??
+        RiskEventFactory.createMovimientoEnMasa();
     
     // Buscar la clasificación actual
     final classification = riskEvent.classifications.firstWhere(
@@ -442,8 +455,9 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
 
   /// Método de compatibilidad temporal
   List<dynamic> getCategoriesForCurrentSubClassification(String subClassificationId) {
-    // Usar RiskEventFactory para obtener datos reales
-    final riskEvent = RiskEventFactory.createMovimientoEnMasa();
+    // Usar el evento seleccionado dinámicamente
+    final riskEvent = RiskEventFactory.getEventByName(state.selectedRiskEvent) ??
+        RiskEventFactory.createMovimientoEnMasa();
     
     // Buscar la clasificación actual
     final classification = riskEvent.classifications.firstWhere(
@@ -483,7 +497,8 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
 
   /// Método de compatibilidad temporal para obtener subclasificaciones de amenaza
   List<RiskSubClassification> getAmenazaSubClassifications() {
-    final riskEvent = RiskEventFactory.createMovimientoEnMasa();
+    final riskEvent = RiskEventFactory.getEventByName(state.selectedRiskEvent) ??
+        RiskEventFactory.createMovimientoEnMasa();
     final amenazaClassification = riskEvent.classifications.firstWhere(
       (c) => c.name.toLowerCase() == 'amenaza',
       orElse: () => riskEvent.classifications.first,
@@ -495,7 +510,8 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
 
   /// Método de compatibilidad temporal para obtener subclasificaciones de vulnerabilidad
   List<RiskSubClassification> getVulnerabilidadSubClassifications() {
-    final riskEvent = RiskEventFactory.createMovimientoEnMasa();
+    final riskEvent = RiskEventFactory.getEventByName(state.selectedRiskEvent) ??
+        RiskEventFactory.createMovimientoEnMasa();
     final vulnerabilidadClassification = riskEvent.classifications.firstWhere(
       (c) => c.name.toLowerCase() == 'vulnerabilidad',
       orElse: () => riskEvent.classifications.first,
@@ -521,20 +537,37 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
 
   /// Método de compatibilidad temporal
   Color getThreatBackgroundColor() {
-    // TODO: Implementar usando casos de uso
-    return Colors.grey;
+    try {
+      final formData = getCurrentFormData();
+      final globalScoreInfo = _calculateGlobalScoreUseCase.getGlobalScoreInfo(formData);
+      return globalScoreInfo['finalColor'] ?? Colors.grey;
+    } catch (e) {
+      return Colors.grey;
+    }
   }
 
   /// Método de compatibilidad temporal
   String getFormattedThreatRating() {
-    // TODO: Implementar usando casos de uso
-    return 'N/A';
+    try {
+      final formData = getCurrentFormData();
+      final globalScoreInfo = _calculateGlobalScoreUseCase.getGlobalScoreInfo(formData);
+      return globalScoreInfo['finalLevel'] ?? 'N/A';
+    } catch (e) {
+      return 'N/A';
+    }
   }
 
   /// Método de compatibilidad temporal
   Color getThreatTextColor() {
-    // TODO: Implementar usando casos de uso
-    return Colors.black;
+    try {
+      final formData = getCurrentFormData();
+      final globalScoreInfo = _calculateGlobalScoreUseCase.getGlobalScoreInfo(formData);
+      final color = globalScoreInfo['finalColor'] ?? Colors.grey;
+      // Retornar color de texto basado en el color de fondo
+      return color == Colors.grey ? Colors.black : Colors.white;
+    } catch (e) {
+      return Colors.black;
+    }
   }
 
   /// Método de compatibilidad temporal
@@ -547,45 +580,79 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
 
   /// Método de compatibilidad temporal
   bool hasUnqualifiedVariables() {
-    // TODO: Implementar usando casos de uso
-    return false;
+    try {
+      final formData = getCurrentFormData();
+      return _validateUnqualifiedVariablesUseCase.execute(formData);
+    } catch (e) {
+      return false;
+    }
   }
 
   /// Método de compatibilidad temporal
   bool shouldShowScoreContainer(String subClassificationId) {
-    // TODO: Implementar usando casos de uso
-    return false;
+    try {
+      final formData = getCurrentFormData();
+      final score = _calculateScoreUseCase.execute(subClassificationId, formData);
+      return score > 0.0;
+    } catch (e) {
+      return false;
+    }
   }
 
   /// Método de compatibilidad temporal
   double getSubClassificationScore(String subClassificationId) {
-    // TODO: Implementar usando casos de uso
-    return 0.0;
+    try {
+      final formData = getCurrentFormData();
+      return _calculateScoreUseCase.execute(subClassificationId, formData);
+    } catch (e) {
+      return 0.0;
+    }
   }
 
   /// Método de compatibilidad temporal
   Color getSubClassificationColor(String subClassificationId) {
-    // TODO: Implementar usando casos de uso
-    return Colors.grey;
+    try {
+      final formData = getCurrentFormData();
+      final score = _calculateScoreUseCase.execute(subClassificationId, formData);
+      return _calculateScoreUseCase.scoreToColor(score);
+    } catch (e) {
+      return Colors.grey;
+    }
   }
 
   /// Método de compatibilidad temporal
   Map<String, dynamic> getCurrentFormData() {
-    // TODO: Implementar usando casos de uso
-    return {};
+    try {
+      return {
+        'amenazaProbabilidadSelections': state.probabilidadSelections,
+        'amenazaIntensidadSelections': state.intensidadSelections,
+        'vulnerabilidadSelections': state.dynamicSelections,
+        'selectedRiskEvent': state.selectedRiskEvent,
+        'selectedClassification': state.selectedClassification,
+      };
+    } catch (e) {
+      return {};
+    }
   }
-
 
   /// Método de compatibilidad temporal
   double calculateAmenazaGlobalScore() {
-    // TODO: Implementar usando casos de uso
-    return 0.0;
+    try {
+      final formData = getCurrentFormData();
+      return _calculateGlobalScoreUseCase.calculateAmenazaGlobalScore(formData);
+    } catch (e) {
+      return 0.0;
+    }
   }
 
   /// Método de compatibilidad temporal
   double calculateVulnerabilidadFinalScore() {
-    // TODO: Implementar usando casos de uso
-    return 0.0;
+    try {
+      final formData = getCurrentFormData();
+      return _calculateGlobalScoreUseCase.calculateVulnerabilidadGlobalScore(formData);
+    } catch (e) {
+      return 0.0;
+    }
   }
 
   // ========== HELPER METHODS ==========

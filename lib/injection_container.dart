@@ -31,6 +31,9 @@ import 'app/modules/risk_threat_analysis/domain/use_cases/save_risk_analysis_use
 import 'app/modules/risk_threat_analysis/domain/use_cases/load_risk_analysis_usecase.dart';
 import 'app/modules/risk_threat_analysis/domain/use_cases/validate_form_usecase.dart';
 import 'app/modules/risk_threat_analysis/domain/use_cases/calculate_rating_usecase.dart';
+import 'app/modules/risk_threat_analysis/domain/use_cases/calculate_score_usecase.dart';
+import 'app/modules/risk_threat_analysis/domain/use_cases/validate_unqualified_variables_usecase.dart';
+import 'app/modules/risk_threat_analysis/domain/use_cases/calculate_global_score_usecase.dart';
 import 'app/modules/risk_threat_analysis/domain/repositories/risk_analysis_repository_interface.dart';
 import 'app/modules/risk_threat_analysis/data/repositories/risk_analysis_repository_implementation.dart';
 
@@ -103,6 +106,9 @@ Future<void> initializeDependencies() async {
   sl.registerLazySingleton(() => LoadRiskAnalysisUseCase(sl()));
   sl.registerLazySingleton(() => ValidateFormUseCase(sl()));
   sl.registerLazySingleton(() => CalculateRatingUseCase(sl()));
+  sl.registerLazySingleton(() => CalculateScoreUseCase(sl()));
+  sl.registerLazySingleton(() => ValidateUnqualifiedVariablesUseCase(sl()));
+  sl.registerLazySingleton(() => CalculateGlobalScoreUseCase(sl(), sl()));
 
   // BLoCs
   sl.registerFactory(() => EvaluacionBloc(repository: sl()));
@@ -118,6 +124,9 @@ Future<void> initializeDependencies() async {
     loadRiskAnalysisUseCase: sl(),
     validateFormUseCase: sl(),
     calculateRatingUseCase: sl(),
+    calculateScoreUseCase: sl(),
+    validateUnqualifiedVariablesUseCase: sl(),
+    calculateGlobalScoreUseCase: sl(),
   ));
   sl.registerFactory(() => AuthBloc(authRepository: sl()));
   

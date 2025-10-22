@@ -121,7 +121,7 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            widget.value ?? widget.hint,
+                            (widget.value != null && widget.value!.isNotEmpty) ? widget.value! : widget.hint,
                             style: const TextStyle(
                               color: Colors.black,
                               fontFamily: 'Work Sans',
