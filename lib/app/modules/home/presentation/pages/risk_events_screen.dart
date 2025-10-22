@@ -67,9 +67,13 @@ class RiskEventsScreen extends StatelessWidget {
                     iconAsset: riskEvent.iconAsset,
                     title: riskEvent.name,
                     onTap: () {
+                      print('=== RiskEventsScreen: Evento seleccionado ===');
+                      print('Evento: ${riskEvent.name}');
+                      print('IconAsset: ${riskEvent.iconAsset}');
                       homeBloc.add(
                         SelectRiskEvent(riskEvent.name),
                       );
+                      print('=== RiskEventsScreen: Evento enviado al HomeBloc ===');
                     },
                   );
                 },

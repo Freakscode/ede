@@ -31,8 +31,8 @@ class UpdateHomeStateUseCase {
       return false;
     }
     
-    // Validar que el evento seleccionado no esté vacío
-    if (homeState.selectedRiskEvent.isEmpty) {
+    // Validar que el evento seleccionado no esté vacío SOLO si estamos mostrando categorías
+    if (homeState.showRiskCategories && homeState.selectedRiskEvent.isEmpty) {
       return false;
     }
     
@@ -50,10 +50,8 @@ class UpdateHomeStateUseCase {
     }
     
     // Validar que el formulario activo sea consistente
-    if (homeState.isCreatingNew && homeState.activeFormId != null) {
-      return false;
-    }
-    
+    // Si estamos creando nuevo, puede tener o no activeFormId
+    // Si no estamos creando nuevo, debe tener activeFormId
     if (!homeState.isCreatingNew && homeState.activeFormId == null) {
       return false;
     }

@@ -133,6 +133,13 @@ class HomeScreen extends StatelessWidget {
         }
       },
         builder: (context, state) {
+          print('=== HomeScreen: Rebuild ===');
+          print('showRiskEvents: ${state.showRiskEvents}');
+          print('showRiskCategories: ${state.showRiskCategories}');
+          print('showFormCompleted: ${state.showFormCompleted}');
+          print('selectedRiskEvent: ${state.selectedRiskEvent}');
+          print('activeFormId: ${state.activeFormId}');
+          
           Widget bodyContent;
           // Widget bodyContent = const RiskCategoriesScreen();
           if (state.showRiskEvents) {
@@ -176,7 +183,8 @@ class HomeScreen extends StatelessWidget {
                 } else if (state.showRiskEvents) {
                   context.read<HomeBloc>().add(HomeResetRiskSections());
                 } else if (state.showFormCompleted) {
-                  // Volver a la pantalla de formularios
+                  // Volver a la pantalla de formularios y resetear estado
+                  context.read<HomeBloc>().add(HomeResetRiskSections());
                   context.read<HomeBloc>().add(HomeNavBarTapped(2));
                 }
               },
