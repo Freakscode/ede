@@ -16,11 +16,33 @@ class CalculateGlobalScoreUseCase {
   /// Ejecutar el caso de uso para calcular score global de amenaza
   double calculateAmenazaGlobalScore(Map<String, dynamic> formData) {
     try {
-      // Calcular score de probabilidad
-      final probabilidadScore = _calculateScoreUseCase.execute('probabilidad', formData);
+      // Buscar en amenaza probabilidad
+      final probabilidadSelections = Map<String, dynamic>.from(
+        formData['amenazaProbabilidadSelections'] ?? {}
+      );
       
-      // Calcular score de intensidad
-      final intensidadScore = _calculateScoreUseCase.execute('intensidad', formData);
+      // Buscar en amenaza intensidad
+      final intensidadSelections = Map<String, dynamic>.from(
+        formData['amenazaIntensidadSelections'] ?? {}
+      );
+      
+      double probabilidadScore = 0.0;
+      double intensidadScore = 0.0;
+      
+      // Calcular score de probabilidad si hay datos
+      if (probabilidadSelections.isNotEmpty) {
+        probabilidadScore = _calculateAverageFromSelections(probabilidadSelections);
+      }
+      
+      // Calcular score de intensidad si hay datos
+      if (intensidadSelections.isNotEmpty) {
+        intensidadScore = _calculateAverageFromSelections(intensidadSelections);
+      }
+      
+      // Si ambos son 0, no hay calificaciones
+      if (probabilidadScore == 0.0 && intensidadScore == 0.0) {
+        return 0.0;
+      }
       
       // Calcular score global (promedio ponderado)
       // Probabilidad tiene peso 0.6, Intensidad tiene peso 0.4
@@ -97,6 +119,48 @@ class CalculateGlobalScoreUseCase {
       return 'ALTO';
     } else {
       return 'SIN CALIFICAR';
+    }
+  }
+
+  /// Calcular promedio de selecciones
+  double _calculateAverageFromSelections(Map<String, dynamic> selections) {
+    if (selections.isEmpty) return 0.0;
+    
+    double totalScore = 0.0;
+    int count = 0;
+    
+    for (final value in selections.values) {
+      if (value is String && value != 'No Aplica' && value != 'NA') {
+        final score = _levelToScore(value);
+        if (score > 0) {
+          totalScore += score;
+          count++;
+        }
+      }
+    }
+    
+    return count > 0 ? totalScore / count : 0.0;
+  }
+  
+  /// Convertir nivel de texto a score numérico
+  double _levelToScore(String level) {
+    switch (level.toLowerCase()) {
+      case 'muy bajo':
+        return 1.0;
+      case 'bajo':
+        return 2.0;
+      case 'medio bajo':
+        return 2.5;
+      case 'medio':
+        return 3.0;
+      case 'medio alto':
+        return 3.5;
+      case 'alto':
+        return 4.0;
+      case 'muy alto':
+        return 5.0;
+      default:
+        return 0.0;
     }
   }
 
