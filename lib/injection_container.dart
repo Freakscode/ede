@@ -26,7 +26,13 @@ import 'app/modules/evaluacion/presentation/bloc/form/evaluacionDanos/evaluacion
 import 'app/modules/evaluacion/presentation/bloc/form/descripcionEdificacion/descripcion_edificacion_bloc.dart';
 
 // Risk Threat Analysis
-import 'app/modules/risk_threat_analysis/bloc/risk_threat_analysis_bloc.dart';
+import 'app/modules/risk_threat_analysis/presentation/bloc/risk_threat_analysis_bloc.dart';
+import 'app/modules/risk_threat_analysis/domain/use_cases/save_risk_analysis_usecase.dart';
+import 'app/modules/risk_threat_analysis/domain/use_cases/load_risk_analysis_usecase.dart';
+import 'app/modules/risk_threat_analysis/domain/use_cases/validate_form_usecase.dart';
+import 'app/modules/risk_threat_analysis/domain/use_cases/calculate_rating_usecase.dart';
+import 'app/modules/risk_threat_analysis/domain/repositories/risk_analysis_repository_interface.dart';
+import 'app/modules/risk_threat_analysis/data/repositories/risk_analysis_repository_implementation.dart';
 
 // Home Module - Clean Architecture
 import 'app/modules/home/domain/repositories/home_repository_interface.dart';
@@ -81,11 +87,22 @@ Future<void> initializeDependencies() async {
     ),
   );
 
+  // Risk Threat Analysis Repository
+  sl.registerLazySingleton<RiskAnalysisRepositoryInterface>(
+    () => RiskAnalysisRepositoryImplementation(prefs: sl()),
+  );
+
   // Use Cases
   sl.registerLazySingleton(() => GetHomeStateUseCase(sl()));
   sl.registerLazySingleton(() => UpdateHomeStateUseCase(sl()));
   sl.registerLazySingleton(() => ManageFormsUseCase(sl()));
   sl.registerLazySingleton(() => ManageTutorialUseCase(sl()));
+  
+  // Risk Threat Analysis Use Cases
+  sl.registerLazySingleton(() => SaveRiskAnalysisUseCase(sl()));
+  sl.registerLazySingleton(() => LoadRiskAnalysisUseCase(sl()));
+  sl.registerLazySingleton(() => ValidateFormUseCase(sl()));
+  sl.registerLazySingleton(() => CalculateRatingUseCase(sl()));
 
   // BLoCs
   sl.registerFactory(() => EvaluacionBloc(repository: sl()));
@@ -96,7 +113,12 @@ Future<void> initializeDependencies() async {
   sl.registerFactory(() => AccionesBloc());
   sl.registerFactory(() => EvaluacionDanosBloc());
   sl.registerFactory(() => DescripcionEdificacionBloc());
-  sl.registerFactory(() => RiskThreatAnalysisBloc());
+  sl.registerFactory(() => RiskThreatAnalysisBloc(
+    saveRiskAnalysisUseCase: sl(),
+    loadRiskAnalysisUseCase: sl(),
+    validateFormUseCase: sl(),
+    calculateRatingUseCase: sl(),
+  ));
   sl.registerFactory(() => AuthBloc(authRepository: sl()));
   
   // Home BLoC with Clean Architecture

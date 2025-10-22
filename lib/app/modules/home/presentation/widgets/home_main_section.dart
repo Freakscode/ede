@@ -7,8 +7,8 @@ import 'package:caja_herramientas/app/modules/home/presentation/widgets/home_too
 import 'package:caja_herramientas/app/modules/home/presentation/bloc/home_bloc.dart';
 import 'package:caja_herramientas/app/modules/home/presentation/bloc/home_event.dart';
 import 'package:caja_herramientas/app/shared/widgets/dialogs/forms_in_progress_dialog.dart';
-import 'package:caja_herramientas/app/modules/risk_threat_analysis/bloc/risk_threat_analysis_bloc.dart';
-import 'package:caja_herramientas/app/modules/risk_threat_analysis/bloc/events/risk_threat_analysis_event.dart'
+import 'package:caja_herramientas/app/modules/risk_threat_analysis/presentation/bloc/risk_threat_analysis_bloc.dart';
+import 'package:caja_herramientas/app/modules/risk_threat_analysis/presentation/bloc/risk_threat_analysis_event.dart'
     as risk_events;
 import 'package:caja_herramientas/app/modules/auth/bloc/auth_bloc.dart';
 import 'package:caja_herramientas/app/modules/auth/bloc/auth_state.dart';

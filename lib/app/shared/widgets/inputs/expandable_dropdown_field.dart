@@ -4,9 +4,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:caja_herramientas/app/shared/models/models.dart';
-import 'package:caja_herramientas/app/modules/risk_threat_analysis/bloc/risk_threat_analysis_bloc.dart';
-import 'package:caja_herramientas/app/modules/risk_threat_analysis/bloc/events/risk_threat_analysis_event.dart';
-import 'package:caja_herramientas/app/modules/risk_threat_analysis/bloc/risk_threat_analysis_state.dart';
+import 'package:caja_herramientas/app/modules/risk_threat_analysis/presentation/bloc/risk_threat_analysis_bloc.dart';
+import 'package:caja_herramientas/app/modules/risk_threat_analysis/presentation/bloc/risk_threat_analysis_event.dart';
+import 'package:caja_herramientas/app/modules/risk_threat_analysis/presentation/bloc/risk_threat_analysis_state.dart';
 
 class ExpandableDropdownField extends StatefulWidget {
   final String hint;
@@ -122,12 +122,8 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
                         children: [
                           Text(
                             widget.value ?? widget.hint,
-                            style: TextStyle(
-                              color: widget.isSelected
-                                  ? const Color(0xFF1E1E1E)
-                                  : (widget.value != null
-                                        ? (widget.textColor ?? const Color(0xFF1E1E1E))
-                                        : const Color(0xFF1E1E1E)),
+                            style: const TextStyle(
+                              color: Colors.black,
                               fontFamily: 'Work Sans',
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
@@ -146,8 +142,6 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
                         
                         final score = bloc.getSubClassificationScore(widget.subClassificationId);
                         final color = bloc.getSubClassificationColor(widget.subClassificationId);
-                        
-
                         
                         return Container(
                           width: 50,
@@ -339,7 +333,11 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
                 onPressed: () {
                   // Marcar esta categoría como "No Aplica"
                   context.read<RiskThreatAnalysisBloc>().add(
-                    UpdateDynamicSelection(widget.subClassificationId, category.title, 'NA'),
+                    UpdateDynamicSelection(
+                      subClassificationId: widget.subClassificationId,
+                      category: category.title,
+                      selection: 'NA',
+                    ),
                   );
                   
                   // Notificar la selección si hay callback
@@ -591,12 +589,20 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
         if (currentSelection == level && currentSelection != 'NA') {
           // Enviar evento para deseleccionar
           context.read<RiskThreatAnalysisBloc>().add(
-            UpdateDynamicSelection(widget.subClassificationId, categoryTitle, ''),
+            UpdateDynamicSelection(
+              subClassificationId: widget.subClassificationId,
+              category: categoryTitle,
+              selection: '',
+            ),
           );
         } else {
           // Seleccionar el nuevo nivel (esto también limpia el estado NA si existía)
           context.read<RiskThreatAnalysisBloc>().add(
-            UpdateDynamicSelection(widget.subClassificationId, categoryTitle, level),
+            UpdateDynamicSelection(
+              subClassificationId: widget.subClassificationId,
+              category: categoryTitle,
+              selection: level,
+            ),
           );
           
           // Notificar la selección si hay callback

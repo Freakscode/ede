@@ -3,8 +3,8 @@
 
 import 'dart:async';
 
-import 'package:caja_herramientas/app/modules/risk_threat_analysis/ui/pages/risk_threat_analysis_screen.dart';
-import 'package:caja_herramientas/app/modules/risk_threat_analysis/ui/pages/final_risk_results_screen.dart';
+import 'package:caja_herramientas/app/modules/risk_threat_analysis/presentation/pages/risk_threat_analysis_screen.dart';
+import 'package:caja_herramientas/app/modules/risk_threat_analysis/presentation/pages/final_risk_results_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 

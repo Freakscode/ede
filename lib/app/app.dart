@@ -12,7 +12,7 @@ import 'modules/evaluacion/presentation/bloc/form/acciones/acciones_bloc.dart';
 import 'modules/evaluacion/presentation/bloc/form/evaluacionDanos/evaluacion_danos_bloc.dart';
 import 'modules/evaluacion/presentation/bloc/form/descripcionEdificacion/descripcion_edificacion_bloc.dart';
 import 'modules/evaluacion/presentation/bloc/evaluacion_global_bloc.dart';
-import 'modules/risk_threat_analysis/bloc/risk_threat_analysis_bloc.dart';
+import 'modules/risk_threat_analysis/presentation/bloc/risk_threat_analysis_bloc.dart';
 import 'modules/home/presentation/bloc/home_bloc.dart';
 import 'modules/home/presentation/bloc/home_event.dart';
 import 'modules/auth/bloc/auth_bloc.dart';

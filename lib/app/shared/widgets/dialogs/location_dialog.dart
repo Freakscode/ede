@@ -2,9 +2,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:caja_herramientas/app/modules/risk_threat_analysis/bloc/risk_threat_analysis_bloc.dart';
-import 'package:caja_herramientas/app/modules/risk_threat_analysis/bloc/risk_threat_analysis_state.dart';
-import 'package:caja_herramientas/app/modules/risk_threat_analysis/bloc/events/risk_threat_analysis_event.dart';
+import 'package:caja_herramientas/app/modules/risk_threat_analysis/presentation/bloc/risk_threat_analysis_bloc.dart';
+import 'package:caja_herramientas/app/modules/risk_threat_analysis/presentation/bloc/risk_threat_analysis_state.dart';
+import 'package:caja_herramientas/app/modules/risk_threat_analysis/presentation/bloc/risk_threat_analysis_event.dart';
 
 class LocationDialog extends StatefulWidget {
   final Function(String lat, String lng)? onLocationSelected;
@@ -520,7 +520,10 @@ class _LocationDialogState extends State<LocationDialog> {
     // Usar el bloc existente para obtener ubicación
     if (widget.imageIndex != null) {
       context.read<RiskThreatAnalysisBloc>().add(
-        GetCurrentLocationForImage(widget.imageIndex!),
+        GetCurrentLocationForImage(
+          imageIndex: widget.imageIndex!,
+          category: widget.category ?? '',
+        ),
       );
     }
   }
@@ -535,8 +538,7 @@ class _LocationDialogState extends State<LocationDialog> {
         UpdateEvidenceCoordinates(
           category: widget.category!,
           imageIndex: widget.imageIndex!,
-          lat: lat,
-          lng: lng,
+          coordinates: {'lat': lat, 'lng': lng},
         ),
       );
     }
