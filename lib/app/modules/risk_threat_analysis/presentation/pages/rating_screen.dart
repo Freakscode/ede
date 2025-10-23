@@ -13,6 +13,7 @@ import '../widgets/progress_bar_widget.dart';
 import '../widgets/navigation_buttons_widget.dart';
 import '../widgets/save_progress_button.dart';
 import '../widgets/threat_levels_dialog.dart';
+import 'risk_threat_analysis_screen.dart';
 
 class RatingScreen extends StatefulWidget {
   final Map<String, dynamic>? navigationData;
@@ -25,6 +26,34 @@ class RatingScreen extends StatefulWidget {
 
 class _RatingScreenState extends State<RatingScreen> {
   
+  // Función para hacer scroll inteligente - solo si es necesario
+  void _smartScrollToDropdown(BuildContext context, GlobalKey dropdownKey) {
+    final parentState = context.findAncestorStateOfType<RiskThreatAnalysisScreenState>();
+    if (parentState != null && parentState.scrollController.hasClients) {
+      // Obtener la posición del dropdown
+      final RenderBox? dropdownRenderBox = dropdownKey.currentContext?.findRenderObject() as RenderBox?;
+      if (dropdownRenderBox != null) {
+        final dropdownPosition = dropdownRenderBox.localToGlobal(Offset.zero);
+        final screenHeight = MediaQuery.of(context).size.height;
+        final dropdownHeight = dropdownRenderBox.size.height;
+        
+        // Verificar si el dropdown está parcialmente fuera de la pantalla
+        final isPartiallyOffScreen = dropdownPosition.dy + dropdownHeight > screenHeight * 0.8;
+        
+        if (isPartiallyOffScreen) {
+          // Hacer scroll mínimo para hacer visible el dropdown
+          final currentScrollPosition = parentState.scrollController.offset;
+          final targetPosition = currentScrollPosition + (dropdownPosition.dy + dropdownHeight - screenHeight * 0.8);
+          
+          parentState.scrollController.animateTo(
+            targetPosition.clamp(0.0, parentState.scrollController.position.maxScrollExtent),
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+          );
+        }
+      }
+    }
+  }
   
   @override
   void initState() {
@@ -151,9 +180,12 @@ class _RatingScreenState extends State<RatingScreen> {
                       final index = entry.key;
                       final subClassification = entry.value;
                       
+                      final dropdownKey = GlobalKey(debugLabel: 'dropdown_${subClassification.id}');
+                      
                       return Column(
                         children: [
                           ExpandableDropdownField(
+                            key: dropdownKey,
                             hint: subClassification.name,
                             value: bloc.getValueForSubClassification(subClassification.id),
                             isSelected: bloc.getIsSelectedForSubClassification(subClassification.id),
@@ -161,6 +193,10 @@ class _RatingScreenState extends State<RatingScreen> {
                             subClassificationId: subClassification.id,
                             onTap: () {
                               bloc.handleDropdownTap(subClassification.id);
+                              // Usar scroll inteligente solo si es necesario
+                              WidgetsBinding.instance.addPostFrameCallback((_) {
+                                _smartScrollToDropdown(context, dropdownKey);
+                              });
                             },
                             onSelectionChanged: (category, level) {
                               bloc.handleSelectionChanged(subClassification.id, category, level);
