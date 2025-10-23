@@ -199,6 +199,18 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     Emitter<RiskThreatAnalysisState> emit,
   ) async {
     try {
+      print('=== RiskThreatAnalysisBloc: SelectClassification ===');
+      print('Clasificación anterior: ${state.selectedClassification ?? ''}');
+      print('Clasificación nueva: ${event.classification}');
+      
+      // Obtener información más detallada del stack trace
+      final stackTrace = StackTrace.current.toString();
+      final lines = stackTrace.split('\n');
+      print('Primeras 3 líneas del stack trace:');
+      for (int i = 0; i < 3 && i < lines.length; i++) {
+        print('  ${i + 1}: ${lines[i]}');
+      }
+      
       emit(state.copyWith(selectedClassification: event.classification));
     } catch (e) {
       emit(state.setError('Error al seleccionar clasificación: $e'));
@@ -261,23 +273,102 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     Emitter<RiskThreatAnalysisState> emit,
   ) async {
     try {
+      print('=== DEBUG _onLoadFormData ===');
+      print('eventName: ${event.eventName}');
+      print('classificationType: ${event.classificationType}');
+      print('evaluationData is null: ${event.evaluationData == null}');
+      if (event.evaluationData != null) {
+        print('evaluationData keys: ${event.evaluationData!.keys.toList()}');
+      }
+      
       emit(state.setLoading(true));
       
       // Si hay datos de evaluación específicos, cargarlos directamente
       if (event.evaluationData != null) {
         print('=== CARGANDO DATOS ESPECÍFICOS DEL FORMULARIO ===');
-        print('evaluationData: ${event.evaluationData}');
+        print('evaluationData keys: ${event.evaluationData!.keys.toList()}');
+        
+        // Mapear correctamente los datos del CompleteFormDataModel al estado del BLoC
+        final evaluationData = event.evaluationData!;
+        
+        // Mapear selecciones de amenaza - usar las claves correctas
+        final probabilidadSelections = Map<String, String>.from(
+          evaluationData['probabilidadSelections'] ?? evaluationData['amenazaProbabilidadSelections'] ?? {}
+        );
+        final intensidadSelections = Map<String, String>.from(
+          evaluationData['intensidadSelections'] ?? evaluationData['amenazaIntensidadSelections'] ?? {}
+        );
+        
+        // Mapear selecciones de vulnerabilidad - usar las claves correctas
+        final dynamicSelections = Map<String, Map<String, String>>.from(
+          evaluationData['dynamicSelections'] ?? evaluationData['vulnerabilidadSelections'] ?? {}
+        );
+        
+        // Mapear scores combinados
+        final Map<String, double> combinedScores = {};
+        
+        // Mapear scores - combinar scores de amenaza y vulnerabilidad
+        if (evaluationData['amenazaScores'] != null) {
+          final amenazaScores = Map<String, dynamic>.from(evaluationData['amenazaScores']);
+          amenazaScores.forEach((key, value) {
+            combinedScores[key] = (value is double) ? value : (value as num).toDouble();
+          });
+        }
+        
+        if (evaluationData['vulnerabilidadScores'] != null) {
+          final vulnerabilidadScores = Map<String, dynamic>.from(evaluationData['vulnerabilidadScores']);
+          vulnerabilidadScores.forEach((key, value) {
+            combinedScores[key] = (value is double) ? value : (value as num).toDouble();
+          });
+        }
+        
+        // Fallback a subClassificationScores si no hay scores separados
+        if (evaluationData['subClassificationScores'] != null && combinedScores.isEmpty) {
+          final subClassificationScores = Map<String, dynamic>.from(evaluationData['subClassificationScores']);
+          subClassificationScores.forEach((key, value) {
+            combinedScores[key] = (value is double) ? value : (value as num).toDouble();
+          });
+        }
+        
+        // Los colores se calculan dinámicamente basándose en los scores, no se guardan
+        // No necesitamos mapear colores desde evaluationData
+        
+        print('Mapeo de datos:');
+        print('- probabilidadSelections: $probabilidadSelections');
+        print('- intensidadSelections: $intensidadSelections');
+        print('- dynamicSelections: $dynamicSelections');
+        print('- combinedScores: $combinedScores');
+        print('- combinedColors: (se calculan dinámicamente)');
+        print('- evidenceImages: ${evaluationData['evidenceImages']}');
+        print('- evidenceCoordinates: ${evaluationData['evidenceCoordinates']}');
+        
+        // Debug específico para scores
+        print('=== DEBUG SCORES ===');
+        print('amenazaScores from evaluationData: ${evaluationData['amenazaScores']}');
+        print('vulnerabilidadScores from evaluationData: ${evaluationData['vulnerabilidadScores']}');
+        print('subClassificationScores from evaluationData: ${evaluationData['subClassificationScores']}');
+        print('combinedScores final: $combinedScores');
+        print('=== END DEBUG SCORES ===');
+        
+        // Verificar si los datos están vacíos
+        if (probabilidadSelections.isEmpty && intensidadSelections.isEmpty && dynamicSelections.isEmpty) {
+          print('⚠️ ADVERTENCIA: Todos los datos de selección están vacíos');
+        }
         
         emit(state.copyWith(
           selectedRiskEvent: event.eventName,
           selectedClassification: event.classificationType,
-          probabilidadSelections: event.evaluationData!['probabilidadSelections'] ?? {},
-          intensidadSelections: event.evaluationData!['intensidadSelections'] ?? {},
-          dynamicSelections: event.evaluationData!['dynamicSelections'] ?? {},
-          subClassificationScores: event.evaluationData!['subClassificationScores'] ?? {},
-          subClassificationColors: event.evaluationData!['subClassificationColors'] ?? {},
-          evidenceImages: event.evaluationData!['evidenceImages'] ?? [],
-          evidenceCoordinates: event.evaluationData!['evidenceCoordinates'] ?? {},
+          probabilidadSelections: probabilidadSelections,
+          intensidadSelections: intensidadSelections,
+          dynamicSelections: dynamicSelections,
+          subClassificationScores: combinedScores,
+          subClassificationColors: {}, // Los colores se calculan dinámicamente basándose en los scores
+          evidenceImages: evaluationData['evidenceImages'] != null 
+            ? Map<String, List<String>>.from(evaluationData['evidenceImages']) 
+            : {},
+          evidenceCoordinates: evaluationData['evidenceCoordinates'] != null 
+            ? Map<String, Map<int, Map<String, String>>>.from(evaluationData['evidenceCoordinates']) 
+            : {},
           isLoading: false,
           error: null,
         ));
@@ -452,12 +543,12 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
   /// Método de compatibilidad temporal
   List<RiskSubClassification> getCurrentSubClassifications() {
     // Usar el evento seleccionado dinámicamente
-    final riskEvent = RiskEventFactory.getEventByName(state.selectedRiskEvent) ??
+    final riskEvent = RiskEventFactory.getEventByName(state.selectedRiskEvent ?? '') ??
         RiskEventFactory.createMovimientoEnMasa();
     
     // Buscar la clasificación actual
     final classification = riskEvent.classifications.firstWhere(
-      (c) => c.name.toLowerCase() == state.selectedClassification.toLowerCase(),
+      (c) => c.name.toLowerCase() == (state.selectedClassification ?? '').toLowerCase(),
       orElse: () => riskEvent.classifications.first,
     );
     
@@ -480,12 +571,12 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
   /// Método de compatibilidad temporal
   List<dynamic> getCategoriesForCurrentSubClassification(String subClassificationId) {
     // Usar el evento seleccionado dinámicamente
-    final riskEvent = RiskEventFactory.getEventByName(state.selectedRiskEvent) ??
+    final riskEvent = RiskEventFactory.getEventByName(state.selectedRiskEvent ?? '') ??
         RiskEventFactory.createMovimientoEnMasa();
     
     // Buscar la clasificación actual
     final classification = riskEvent.classifications.firstWhere(
-      (c) => c.name.toLowerCase() == state.selectedClassification.toLowerCase(),
+      (c) => c.name.toLowerCase() == (state.selectedClassification ?? '').toLowerCase(),
       orElse: () => riskEvent.classifications.first,
     );
     
@@ -521,7 +612,7 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
 
   /// Método de compatibilidad temporal para obtener subclasificaciones de amenaza
   List<RiskSubClassification> getAmenazaSubClassifications() {
-    final riskEvent = RiskEventFactory.getEventByName(state.selectedRiskEvent) ??
+    final riskEvent = RiskEventFactory.getEventByName(state.selectedRiskEvent ?? '') ??
         RiskEventFactory.createMovimientoEnMasa();
     final amenazaClassification = riskEvent.classifications.firstWhere(
       (c) => c.name.toLowerCase() == 'amenaza',
@@ -534,7 +625,7 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
 
   /// Método de compatibilidad temporal para obtener subclasificaciones de vulnerabilidad
   List<RiskSubClassification> getVulnerabilidadSubClassifications() {
-    final riskEvent = RiskEventFactory.getEventByName(state.selectedRiskEvent) ??
+    final riskEvent = RiskEventFactory.getEventByName(state.selectedRiskEvent ?? '') ??
         RiskEventFactory.createMovimientoEnMasa();
     final vulnerabilidadClassification = riskEvent.classifications.firstWhere(
       (c) => c.name.toLowerCase() == 'vulnerabilidad',
@@ -569,10 +660,10 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
       double score;
       Color color;
       
-      if (state.selectedClassification.toLowerCase() == 'amenaza') {
+      if ((state.selectedClassification ?? '').toLowerCase() == 'amenaza') {
         score = globalScoreInfo['amenazaScore'] ?? 0.0;
         color = globalScoreInfo['amenazaColor'] ?? const Color(0xFFD1D5DB);
-      } else if (state.selectedClassification.toLowerCase() == 'vulnerabilidad') {
+      } else if ((state.selectedClassification ?? '').toLowerCase() == 'vulnerabilidad') {
         score = globalScoreInfo['vulnerabilidadScore'] ?? 0.0;
         color = globalScoreInfo['vulnerabilidadColor'] ?? const Color(0xFFD1D5DB);
       } else {
@@ -601,10 +692,10 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
       double score;
       String level;
       
-      if (state.selectedClassification.toLowerCase() == 'amenaza') {
+      if ((state.selectedClassification ?? '').toLowerCase() == 'amenaza') {
         score = globalScoreInfo['amenazaScore'] ?? 0.0;
         level = globalScoreInfo['amenazaLevel'] ?? 'SIN CALIFICAR';
-      } else if (state.selectedClassification.toLowerCase() == 'vulnerabilidad') {
+      } else if ((state.selectedClassification ?? '').toLowerCase() == 'vulnerabilidad') {
         score = globalScoreInfo['vulnerabilidadScore'] ?? 0.0;
         level = globalScoreInfo['vulnerabilidadLevel'] ?? 'SIN CALIFICAR';
       } else {
@@ -633,10 +724,10 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
       double score;
       Color color;
       
-      if (state.selectedClassification.toLowerCase() == 'amenaza') {
+      if ((state.selectedClassification ?? '').toLowerCase() == 'amenaza') {
         score = globalScoreInfo['amenazaScore'] ?? 0.0;
         color = globalScoreInfo['amenazaColor'] ?? Colors.grey;
-      } else if (state.selectedClassification.toLowerCase() == 'vulnerabilidad') {
+      } else if ((state.selectedClassification ?? '').toLowerCase() == 'vulnerabilidad') {
         score = globalScoreInfo['vulnerabilidadScore'] ?? 0.0;
         color = globalScoreInfo['vulnerabilidadColor'] ?? Colors.grey;
       } else {
@@ -646,7 +737,7 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
       
       // Si no hay score (0.0), devolver negro para texto sobre fondo gris
       if (score == 0.0) {
-        return Colors.black;
+    return Colors.black;
       }
       
       // Retornar color de texto basado en el color de fondo
@@ -659,16 +750,18 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
   /// Método de compatibilidad temporal
   void loadExistingFormData() {
     add(LoadFormData(
-      eventName: state.selectedRiskEvent,
-      classificationType: state.selectedClassification,
+      eventName: state.selectedRiskEvent ?? '',
+      classificationType: state.selectedClassification ?? '',
     ));
   }
 
   /// Método de compatibilidad temporal
   bool hasUnqualifiedVariables() {
     try {
+      print('=== DEBUG hasUnqualifiedVariables - INICIO ===');
+      print('selectedClassification ANTES: ${state.selectedClassification ?? ''}');
+      
       final formData = getCurrentFormData();
-      print('=== DEBUG hasUnqualifiedVariables ===');
       print('FormData keys: ${formData.keys.toList()}');
       print('amenazaProbabilidadSelections: ${formData['amenazaProbabilidadSelections']}');
       print('amenazaIntensidadSelections: ${formData['amenazaIntensidadSelections']}');
@@ -677,29 +770,215 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
       
       final result = _validateUnqualifiedVariablesUseCase.execute(formData);
       print('hasUnqualifiedVariables result: $result');
-      print('=== END DEBUG ===');
+      print('selectedClassification DESPUÉS: ${state.selectedClassification ?? ''}');
+      print('=== END DEBUG hasUnqualifiedVariables ===');
       
       return result;
     } catch (e) {
       print('Error in hasUnqualifiedVariables: $e');
-      return false;
+    return false;
     }
   }
+
 
   /// Método de compatibilidad temporal - Restaurar funcionalidad original
   bool shouldShowScoreContainer(String subClassificationId) {
     final score = getSubClassificationScore(subClassificationId);
+    print('shouldShowScoreContainer - subClassificationId: $subClassificationId, score: $score');
     return score > 0;
   }
 
-  /// Método de compatibilidad temporal - Restaurar funcionalidad original
+  /// Método centralizado para obtener score de subclasificación
   double getSubClassificationScore(String subClassificationId) {
-    return state.subClassificationScores[subClassificationId] ?? 0.0;
+    final score = state.subClassificationScores[subClassificationId] ?? 0.0;
+    print('getSubClassificationScore - subClassificationId: $subClassificationId, score: $score, allScores: ${state.subClassificationScores}');
+    return score;
+  }
+
+  /// Método centralizado para obtener el rating numérico de una selección
+  int getRatingFromSelection(String? selectedLevel) {
+    if (selectedLevel == null || selectedLevel.isEmpty) return 0;
+
+    // Si es "No Aplica", devolver -1 para diferenciarlo
+    if (selectedLevel == 'NA') return -1;
+
+    if (selectedLevel.contains('BAJO') && !selectedLevel.contains('MEDIO')) {
+      return 1;
+    } else if (selectedLevel.contains('MEDIO') && selectedLevel.contains('ALTO')) {
+      return 3;
+    } else if (selectedLevel.contains('MEDIO')) {
+      return 2;
+    } else if (selectedLevel.contains('ALTO')) {
+      return 4;
+    }
+    return 0;
+  }
+
+  /// Método centralizado para obtener el color basado en el rating
+  Color getColorFromRating(int rating) {
+    switch (rating) {
+      case -1:
+        return const Color(0xFF6B7280); // Gris más oscuro para "No Aplica"
+      case 1:
+        return Colors.green;
+      case 2:
+        return Colors.yellow;
+      case 3:
+        return Colors.orange;
+      case 4:
+        return Colors.red;
+      default:
+        return const Color(0xFF9CA3AF); // Gris para sin calificar
+    }
+  }
+
+  /// Método centralizado para obtener la selección de una categoría
+  String? getSelectionForCategory(String subClassificationId, String categoryTitle) {
+    if (subClassificationId == 'probabilidad') {
+      return state.probabilidadSelections[categoryTitle];
+    } else if (subClassificationId == 'intensidad') {
+      return state.intensidadSelections[categoryTitle];
+    } else {
+      // Para vulnerabilidad, usar dynamicSelections
+      final selections = state.dynamicSelections[subClassificationId] ?? {};
+      return selections[categoryTitle];
+    }
+  }
+
+  /// Método centralizado para calcular el score de una sección
+  String calculateSectionScore(String subClassificationId) {
+    final categories = getCategoriesForCurrentSubClassification(subClassificationId);
+    final validRatings = <int>[];
+    
+    for (final category in categories) {
+      final selection = getSelectionForCategory(subClassificationId, category.title);
+      final rating = getRatingFromSelection(selection);
+      
+      // Excluir 0 (sin calificar) y -1 (NA)
+      if (rating > 0) {
+        validRatings.add(rating);
+      }
+    }
+
+    if (validRatings.isEmpty) return '0,00';
+
+    final average = validRatings.reduce((a, b) => a + b) / validRatings.length;
+    return average.toStringAsFixed(2).replaceAll('.', ',');
+  }
+
+  /// Método centralizado para obtener items de una subclasificación
+  List<Map<String, dynamic>> getItemsForSubClassification(String subClassificationId) {
+    final categories = getCategoriesForCurrentSubClassification(subClassificationId);
+    final items = <Map<String, dynamic>>[];
+    
+    for (final category in categories) {
+      final selection = getSelectionForCategory(subClassificationId, category.title);
+      final rating = getRatingFromSelection(selection);
+      final color = getColorFromRating(rating);
+
+      String title = category.title;
+      if (rating == -1) {
+        title = '${category.title} - No Aplica';
+      } else if (rating == 0) {
+        title = '${category.title} - Sin calificar';
+      }
+
+      items.add({'rating': rating, 'title': title, 'color': color});
+    }
+    
+    return items;
+  }
+
+  /// Método centralizado para obtener evidencias de una categoría
+  List<String> getEvidenceImagesForCategory(String category) {
+    return state.evidenceImages[category.toLowerCase()] ?? [];
+  }
+
+  /// Método centralizado para obtener coordenadas de evidencias de una categoría
+  Map<int, Map<String, String>> getEvidenceCoordinatesForCategory(String category) {
+    return state.evidenceCoordinates[category.toLowerCase()] ?? {};
+  }
+
+  /// Método centralizado para verificar si una categoría tiene evidencias
+  bool hasEvidenceForCategory(String category) {
+    final images = getEvidenceImagesForCategory(category);
+    return images.isNotEmpty;
+  }
+
+  /// Método centralizado para obtener el número de evidencias de una categoría
+  int getEvidenceCountForCategory(String category) {
+    return getEvidenceImagesForCategory(category).length;
+  }
+
+  /// Método centralizado para obtener el porcentaje de completado de una categoría
+  double getCompletionPercentageForCategory(String category) {
+    final subClassifications = getCurrentSubClassifications();
+    if (subClassifications.isEmpty) return 0.0;
+    
+    int totalCategories = 0;
+    int completedCategories = 0;
+    
+    for (final subClassification in subClassifications) {
+      final categories = getCategoriesForCurrentSubClassification(subClassification.id);
+      totalCategories += categories.length;
+      
+      if (subClassification.id == 'probabilidad') {
+        completedCategories += state.probabilidadSelections.length;
+      } else if (subClassification.id == 'intensidad') {
+        completedCategories += state.intensidadSelections.length;
+      } else {
+        final selections = state.dynamicSelections[subClassification.id] ?? {};
+        completedCategories += selections.length;
+      }
+    }
+    
+    return totalCategories > 0 ? completedCategories / totalCategories : 0.0;
+  }
+
+  /// Método centralizado para verificar si una categoría está completa
+  bool isCategoryComplete(String category) {
+    final hasSelections = getCompletionPercentageForCategory(category) > 0.0;
+    final hasEvidence = hasEvidenceForCategory(category);
+    return hasSelections && hasEvidence;
+  }
+
+  /// Método centralizado para obtener el estado de una categoría
+  Map<String, dynamic> getCategoryStatus(String category) {
+    final hasSelections = getCompletionPercentageForCategory(category) > 0.0;
+    final hasEvidence = hasEvidenceForCategory(category);
+    final isComplete = hasSelections && hasEvidence;
+    final evidenceCount = getEvidenceCountForCategory(category);
+    final completionPercentage = getCompletionPercentageForCategory(category);
+    
+    return {
+      'isComplete': isComplete,
+      'hasSelections': hasSelections,
+      'hasEvidence': hasEvidence,
+      'evidenceCount': evidenceCount,
+      'completionPercentage': completionPercentage,
+    };
+  }
+
+  /// Método centralizado para obtener datos optimizados para widgets
+  Map<String, dynamic> getOptimizedDataForWidgets() {
+    return {
+      'selectedRiskEvent': state.selectedRiskEvent ?? '',
+      'selectedClassification': state.selectedClassification ?? '',
+      'currentBottomNavIndex': state.currentBottomNavIndex,
+      'isLoading': state.isLoading,
+      'amenazaStatus': getCategoryStatus('amenaza'),
+      'vulnerabilidadStatus': getCategoryStatus('vulnerabilidad'),
+      'totalEvidenceCount': state.evidenceImages.values.fold(0, (sum, images) => sum + images.length),
+    };
   }
 
   /// Método de compatibilidad temporal - Restaurar funcionalidad original
   Color getSubClassificationColor(String subClassificationId) {
-    return state.subClassificationColors[subClassificationId] ?? Colors.transparent;
+    // Calcular el color basándose en el score en lugar de usar colores guardados
+    final score = getSubClassificationScore(subClassificationId);
+    final color = _scoreToColor(score);
+    print('getSubClassificationColor - subClassificationId: $subClassificationId, score: $score, calculatedColor: $color');
+    return color;
   }
 
 
@@ -739,8 +1018,8 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
 
   /// Obtener tipo de cálculo (del código original)
   String _getCalculationType(String subClassificationId) {
-    final eventName = state.selectedRiskEvent;
-    final classification = state.selectedClassification;
+    final eventName = state.selectedRiskEvent ?? '';
+    final classification = state.selectedClassification ?? '';
     
     RiskEventModel? currentEvent;
     switch (eventName) {
@@ -800,7 +1079,7 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
 
   /// Calcular con variable crítica (del código original)
   double _calculateWithCriticalVariable(String subClassificationId, Map<String, String> selections) {
-    final eventName = state.selectedRiskEvent;
+    final eventName = state.selectedRiskEvent ?? '';
     
     if (eventName == 'Movimiento en Masa') {
       if (subClassificationId == 'probabilidad') {
@@ -841,7 +1120,7 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
       if (eventModel == null) return _calculateSimpleAverage(subClassificationId, selections);
       
       final classification = eventModel.classifications
-          .where((c) => c.id == state.selectedClassification)
+          .where((c) => c.name.toLowerCase() == (state.selectedClassification ?? '').toLowerCase())
           .firstOrNull;
       if (classification == null) return _calculateSimpleAverage(subClassificationId, selections);
       
@@ -873,7 +1152,7 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
 
   /// Obtener modelo de evento actual (del código original)
   RiskEventModel? _getCurrentEventModel() {
-    final eventName = state.selectedRiskEvent;
+    final eventName = state.selectedRiskEvent ?? '';
     
     switch (eventName) {
       case 'Movimiento en Masa':
@@ -954,12 +1233,15 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
   /// Método de compatibilidad temporal
   Map<String, dynamic> getCurrentFormData() {
     try {
-      return {
+      print('=== DEBUG getCurrentFormData ===');
+      print('selectedClassification: ${state.selectedClassification ?? ''}');
+      
+      final formData = {
         'amenazaProbabilidadSelections': state.probabilidadSelections,
         'amenazaIntensidadSelections': state.intensidadSelections,
         'vulnerabilidadSelections': state.dynamicSelections,
-        'selectedRiskEvent': state.selectedRiskEvent,
-        'selectedClassification': state.selectedClassification,
+        'selectedRiskEvent': state.selectedRiskEvent ?? '',
+        'selectedClassification': state.selectedClassification ?? '',
         'subClassificationScores': state.subClassificationScores,
         'subClassificationColors': state.subClassificationColors,
         'evidenceImages': state.evidenceImages,
@@ -968,6 +1250,9 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
         'intensidadSelections': state.intensidadSelections,
         'dynamicSelections': state.dynamicSelections,
       };
+      
+      print('=== END DEBUG getCurrentFormData ===');
+      return formData;
     } catch (e) {
       return {};
     }

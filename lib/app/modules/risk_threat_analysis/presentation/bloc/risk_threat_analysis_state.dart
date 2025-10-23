@@ -12,8 +12,8 @@ class RiskThreatAnalysisState extends Equatable {
   final int currentBottomNavIndex;
   final Map<String, String> probabilidadSelections;
   final Map<String, String> intensidadSelections;
-  final String selectedRiskEvent;
-  final String selectedClassification;
+  final String? selectedRiskEvent;
+  final String? selectedClassification;
   
   // Estado genérico para dropdowns dinámicos
   final Map<String, bool> dropdownOpenStates;
@@ -45,8 +45,8 @@ class RiskThreatAnalysisState extends Equatable {
     this.currentBottomNavIndex = 0,
     this.probabilidadSelections = const {},
     this.intensidadSelections = const {},
-    this.selectedRiskEvent = 'Movimiento en Masa',
-    this.selectedClassification = 'amenaza',
+    this.selectedRiskEvent,
+    this.selectedClassification,
     this.dropdownOpenStates = const {},
     this.dynamicSelections = const {},
     this.subClassificationScores = const {},
@@ -77,8 +77,8 @@ class RiskThreatAnalysisState extends Equatable {
   /// Convertir a entidad de dominio
   RiskAnalysisEntity toEntity() {
     return RiskAnalysisEntity(
-      eventName: selectedRiskEvent,
-      classificationType: selectedClassification,
+      eventName: selectedRiskEvent ?? '',
+      classificationType: selectedClassification ?? '',
       selections: {
         ...probabilidadSelections,
         ...intensidadSelections,
@@ -170,10 +170,10 @@ class RiskThreatAnalysisState extends Equatable {
   bool get allDropdownsClosed => !hasOpenDropdown;
 
   /// ¿Es un análisis de amenaza?
-  bool get isAmenaza => selectedClassification.toLowerCase() == 'amenaza';
+  bool get isAmenaza => selectedClassification?.toLowerCase() == 'amenaza';
 
   /// ¿Es un análisis de vulnerabilidad?
-  bool get isVulnerabilidad => selectedClassification.toLowerCase() == 'vulnerabilidad';
+  bool get isVulnerabilidad => selectedClassification?.toLowerCase() == 'vulnerabilidad';
 
   /// ¿Tiene evidencias?
   bool get hasEvidence => evidenceImages.isNotEmpty;

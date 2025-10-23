@@ -47,7 +47,7 @@ class ResultsRiskSectionWidget extends StatelessWidget {
       
       // Restaurar clasificación original
       if (currentClassification != riskBloc.state.selectedClassification) {
-        riskBloc.add(SelectClassification(currentClassification));
+        riskBloc.add(SelectClassification(currentClassification ?? ''));
       }
       
       final bothCompleted = amenazaCompleted && vulnerabilidadCompleted;

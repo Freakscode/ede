@@ -40,7 +40,7 @@ class ThreatLevelsDialog extends StatelessWidget {
             // Header fijo
             BlocBuilder<RiskThreatAnalysisBloc, RiskThreatAnalysisState>(
               builder: (context, state) {
-                final title = state.selectedClassification.toLowerCase().trim() == 'amenaza'
+                final title = (state.selectedClassification ?? '').toLowerCase().trim() == 'amenaza'
                     ? 'Niveles de Amenaza'
                     : 'Niveles de Vulnerabilidad';
                 
@@ -76,7 +76,7 @@ class ThreatLevelsDialog extends StatelessWidget {
               child: SingleChildScrollView(
                 child: BlocBuilder<RiskThreatAnalysisBloc, RiskThreatAnalysisState>(
                   builder: (context, state) {
-                    final levels = state.selectedClassification.toLowerCase().trim() == 'amenaza'
+                    final levels = (state.selectedClassification ?? '').toLowerCase().trim() == 'amenaza'
                         ? _getThreatLevels()
                         : _getVulnerabilityLevels();
                     

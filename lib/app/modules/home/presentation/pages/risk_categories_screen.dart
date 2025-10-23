@@ -3,13 +3,12 @@ import 'package:caja_herramientas/app/modules/home/presentation/widgets/risk_cat
 import 'package:caja_herramientas/app/modules/home/presentation/bloc/home_bloc.dart';
 import 'package:caja_herramientas/app/modules/home/presentation/bloc/home_state.dart';
 import 'package:caja_herramientas/app/modules/home/presentation/bloc/home_event.dart';
+import 'package:caja_herramientas/app/modules/risk_threat_analysis/presentation/bloc/risk_threat_analysis_bloc.dart';
+import 'package:caja_herramientas/app/modules/risk_threat_analysis/presentation/bloc/risk_threat_analysis_event.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:caja_herramientas/app/modules/risk_threat_analysis/presentation/bloc/risk_threat_analysis_bloc.dart';
-import 'package:caja_herramientas/app/modules/risk_threat_analysis/presentation/bloc/risk_threat_analysis_event.dart';
-
 
 class RiskCategoriesScreen extends StatefulWidget {
   const RiskCategoriesScreen({super.key});
@@ -19,7 +18,6 @@ class RiskCategoriesScreen extends StatefulWidget {
 }
 
 class _RiskCategoriesScreenState extends State<RiskCategoriesScreen> {
-
   // Método para determinar el estado de una categoría
   CategoryState _getCategoryState(
     String classification,
@@ -28,7 +26,8 @@ class _RiskCategoriesScreenState extends State<RiskCategoriesScreen> {
   ) {
     final isAmenaza = classification.toLowerCase() == 'amenaza';
     final isVulnerabilidad = classification.toLowerCase() == 'vulnerabilidad';
-    final isEditMode = homeState.activeFormId != null && !homeState.isCreatingNew;
+    final isEditMode =
+        homeState.activeFormId != null && !homeState.isCreatingNew;
 
     if (isAmenaza) {
       return _getAmenazaState(context);
@@ -42,19 +41,36 @@ class _RiskCategoriesScreenState extends State<RiskCategoriesScreen> {
   // Estado específico para Amenaza
   CategoryState _getAmenazaState(BuildContext context) {
     bool isCompleted = false;
-    
+    bool isInProgress = false;
+
     try {
       final riskBloc = context.read<RiskThreatAnalysisBloc>();
-      final hasUnqualified = riskBloc.hasUnqualifiedVariables();
-      final hasEvidence = riskBloc.state.evidenceImages.isNotEmpty;
-      isCompleted = !hasUnqualified && hasEvidence;
+      final state = riskBloc.state;
+
+      // Verificar si hay datos básicos
+      final hasProbabilidadSelections = state.probabilidadSelections.isNotEmpty;
+      final hasIntensidadSelections = state.intensidadSelections.isNotEmpty;
+      final hasEvidence = state.evidenceImages.isNotEmpty;
+
+      // Lógica simplificada: está completa si tiene datos y evidencia
+      isCompleted =
+          (hasProbabilidadSelections || hasIntensidadSelections) && hasEvidence;
+
+      // Está en progreso si tiene algunos datos pero no está completa
+      isInProgress =
+          (hasProbabilidadSelections ||
+              hasIntensidadSelections ||
+              hasEvidence) &&
+          !isCompleted;
     } catch (e) {
       isCompleted = false;
+      isInProgress = false;
     }
 
     return CategoryState(
       isAvailable: true,
       isCompleted: isCompleted,
+      isInProgress: isInProgress,
     );
   }
 
@@ -78,31 +94,33 @@ class _RiskCategoriesScreenState extends State<RiskCategoriesScreen> {
   ) {
     final isAvailable = homeState.activeFormId != null;
     bool isCompleted = false;
+    bool isInProgress = false;
 
     if (isAvailable) {
       try {
         final riskBloc = context.read<RiskThreatAnalysisBloc>();
-        final currentClassification = riskBloc.state.selectedClassification;
-        
-        if (currentClassification != 'vulnerabilidad') {
-          riskBloc.add(const SelectClassification('vulnerabilidad'));
-        }
-        
-        final hasUnqualified = riskBloc.hasUnqualifiedVariables();
-        final hasEvidence = riskBloc.state.evidenceImages.isNotEmpty;
-        isCompleted = !hasUnqualified && hasEvidence;
-        
-        if (currentClassification != 'vulnerabilidad') {
-          riskBloc.add(SelectClassification(currentClassification));
-        }
+        final state = riskBloc.state;
+
+        // Verificar si hay selecciones de vulnerabilidad
+        final hasVulnerabilidadSelections = state.dynamicSelections.isNotEmpty;
+        final hasEvidence = state.evidenceImages.isNotEmpty;
+
+        // Lógica simplificada: está completa si tiene datos de vulnerabilidad y evidencia
+        isCompleted = hasVulnerabilidadSelections && hasEvidence;
+
+        // Verificar si está en progreso (tiene algunas selecciones pero no está completa)
+        isInProgress =
+            (hasVulnerabilidadSelections || hasEvidence) && !isCompleted;
       } catch (e) {
         isCompleted = false;
+        isInProgress = false;
       }
     }
 
     return CategoryState(
       isAvailable: isAvailable,
       isCompleted: isCompleted,
+      isInProgress: isInProgress,
       disabledMessage: isAvailable ? null : 'No hay formulario activo',
     );
   }
@@ -113,7 +131,7 @@ class _RiskCategoriesScreenState extends State<RiskCategoriesScreen> {
     BuildContext context,
   ) {
     bool amenazaCompleted = false;
-    
+
     try {
       final riskBloc = context.read<RiskThreatAnalysisBloc>();
       final hasUnqualifiedAmenaza = riskBloc.hasUnqualifiedVariables();
@@ -125,40 +143,41 @@ class _RiskCategoriesScreenState extends State<RiskCategoriesScreen> {
 
     final isAvailable = amenazaCompleted && homeState.activeFormId != null;
     bool isCompleted = false;
+    bool isInProgress = false;
     String? disabledMessage;
 
     if (!isAvailable) {
-      disabledMessage = amenazaCompleted 
+      disabledMessage = amenazaCompleted
           ? 'No hay formulario activo'
           : 'Complete primero la calificación de Amenaza';
     } else {
       try {
         final riskBloc = context.read<RiskThreatAnalysisBloc>();
-        final currentClassification = riskBloc.state.selectedClassification;
-        
-        if (currentClassification != 'vulnerabilidad') {
-          riskBloc.add(const SelectClassification('vulnerabilidad'));
-        }
-        
-        final hasUnqualified = riskBloc.hasUnqualifiedVariables();
-        final hasEvidence = riskBloc.state.evidenceImages.isNotEmpty;
-        isCompleted = !hasUnqualified && hasEvidence;
-        
-        if (currentClassification != 'vulnerabilidad') {
-          riskBloc.add(SelectClassification(currentClassification));
-        }
+        final state = riskBloc.state;
+
+        // Verificar si hay selecciones de vulnerabilidad
+        final hasVulnerabilidadSelections = state.dynamicSelections.isNotEmpty;
+        final hasEvidence = state.evidenceImages.isNotEmpty;
+
+        // Lógica simplificada: está completa si tiene datos de vulnerabilidad y evidencia
+        isCompleted = hasVulnerabilidadSelections && hasEvidence;
+
+        // Verificar si está en progreso (tiene algunas selecciones pero no está completa)
+        isInProgress =
+            (hasVulnerabilidadSelections || hasEvidence) && !isCompleted;
       } catch (e) {
         isCompleted = false;
+        isInProgress = false;
       }
     }
 
     return CategoryState(
       isAvailable: isAvailable,
       isCompleted: isCompleted,
+      isInProgress: isInProgress,
       disabledMessage: disabledMessage,
     );
   }
-
 
   // Navegar a la categoría seleccionada
   void _navigateToCategory(
@@ -176,6 +195,13 @@ class _RiskCategoriesScreenState extends State<RiskCategoriesScreen> {
         eventName: selectedEvent,
       ),
     );
+
+    // Configurar el RiskThreatAnalysisBloc ANTES de navegar
+    final riskBloc = context.read<RiskThreatAnalysisBloc>();
+    
+    // Configurar evento y clasificación inmediatamente
+    riskBloc.add(UpdateSelectedRiskEvent(selectedEvent));
+    riskBloc.add(SelectClassification(classification.toLowerCase()));
 
     final navigationData = <String, dynamic>{
       'event': selectedEvent,
@@ -196,24 +222,29 @@ class _RiskCategoriesScreenState extends State<RiskCategoriesScreen> {
     context.go('/risk_threat_analysis', extra: navigationData);
   }
 
-
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<HomeBloc, HomeState>(
       builder: (context, homeState) {
         final selectedEvent = homeState.selectedRiskEvent;
         final homeBloc = context.read<HomeBloc>();
-        final classifications = homeBloc.getEventClassifications(selectedEvent);
+        final classifications = homeBloc.getEventClassifications(
+          selectedEvent ?? '',
+        );
 
         // Crear mapas de estados para cada categoría
         final categoryStates = <String, CategoryState>{};
         for (final classification in classifications) {
-          categoryStates[classification] = _getCategoryState(classification, homeState, context);
+          categoryStates[classification] = _getCategoryState(
+            classification,
+            homeState,
+            context,
+          );
         }
 
         return RiskCategoriesContent(
           classifications: classifications,
-          selectedEvent: selectedEvent,
+          selectedEvent: selectedEvent ?? '',
           categoryStates: categoryStates,
           onCategoryTap: _navigateToCategory,
           homeState: homeState,

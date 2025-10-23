@@ -70,7 +70,7 @@ class _RatingScreenState extends State<RatingScreen> {
         // Solo resetear si es explícitamente un formulario nuevo o reset forzado
         if (forceReset || isNewForm) {
           // Formulario nuevo o reset forzado - Reseteando estado
-          context.read<RiskThreatAnalysisBloc>().add(const ResetState());
+          // context.read<RiskThreatAnalysisBloc>().add(const ResetState()); // COMENTADO: No resetear estado al navegar
         } else if (isEditMode) {
           // Si es modo edición, cargar datos existentes
           final eventToSet = data['event'] as String?;
@@ -118,7 +118,7 @@ class _RatingScreenState extends State<RatingScreen> {
               // Título dinámico basado en la clasificación seleccionada
               BlocBuilder<RiskThreatAnalysisBloc, RiskThreatAnalysisState>(
                 builder: (context, state) {
-                  final subtitle = state.selectedClassification.toLowerCase().trim() == 'amenaza' 
+                  final subtitle = (state.selectedClassification ?? '').toLowerCase().trim() == 'amenaza' 
                     ? 'Calificación de la Amenaza'
                     : 'Calificación de la Vulnerabilidad';
                   
@@ -153,7 +153,7 @@ class _RatingScreenState extends State<RatingScreen> {
               // Botón dinámico basado en la clasificación seleccionada
               BlocBuilder<RiskThreatAnalysisBloc, RiskThreatAnalysisState>(
                 builder: (context, state) {
-                  final buttonText = state.selectedClassification.toLowerCase().trim() == 'amenaza' 
+                  final buttonText = (state.selectedClassification ?? '').toLowerCase().trim() == 'amenaza' 
                     ? 'Factor de Amenaza'
                     : 'Factor de Vulnerabilidad';
                   
@@ -243,7 +243,7 @@ class _RatingScreenState extends State<RatingScreen> {
                       Expanded(
                         child: BlocBuilder<RiskThreatAnalysisBloc, RiskThreatAnalysisState>(
                           builder: (context, state) {
-                            final displayText = state.selectedClassification.toLowerCase().trim() == 'amenaza' 
+                            final displayText = (state.selectedClassification ?? '').toLowerCase().trim() == 'amenaza' 
                               ? 'Ver Niveles de Amenaza'
                               : 'Ver Niveles de Vulnerabilidad';
                             
@@ -290,7 +290,7 @@ class _RatingScreenState extends State<RatingScreen> {
                       Expanded(
                         flex: 2,
                         child: Text(
-                          state.selectedClassification.toLowerCase().trim() == 'amenaza' 
+                          (state.selectedClassification ?? '').toLowerCase().trim() == 'amenaza' 
                             ? 'Calificación Amenaza'
                             : 'Calificación Vulnerabilidad',
                           maxLines: 2,

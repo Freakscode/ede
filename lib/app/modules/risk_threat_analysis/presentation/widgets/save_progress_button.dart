@@ -78,15 +78,15 @@ class SaveProgressButton extends StatelessWidget {
     final authService = AuthService();
 
     print('=== SaveProgressButton: Iniciando guardado ===');
-    print('Evento seleccionado: ${state.selectedRiskEvent}');
-    print('Clasificación seleccionada: ${state.selectedClassification}');
+    print('Evento seleccionado: ${state.selectedRiskEvent ?? ''}');
+    print('Clasificación seleccionada: ${state.selectedClassification ?? ''}');
     print('isCreatingNew: ${homeState.isCreatingNew}');
     print('activeFormId: ${homeState.activeFormId}');
     print('Usuario autenticado: ${authService.isLoggedIn}');
     print('Usuario actual: ${authService.currentUser?.nombre}');
     
     // Verificar que tenemos datos mínimos para guardar
-    if (state.selectedRiskEvent.isEmpty || state.selectedClassification.isEmpty) {
+    if ((state.selectedRiskEvent ?? '').isEmpty || (state.selectedClassification ?? '').isEmpty) {
       print('ERROR: No hay datos suficientes para guardar');
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -197,7 +197,7 @@ class SaveProgressButton extends StatelessWidget {
 
       // Crear ID único para el formulario completo
       final formId =
-          '${state.selectedRiskEvent}_complete_${DateTime.now().millisecondsSinceEpoch}';
+          '${state.selectedRiskEvent ?? ''}_complete_${DateTime.now().millisecondsSinceEpoch}';
       print('FormID generado: $formId');
 
       CompleteFormDataModel completeForm;
@@ -212,41 +212,41 @@ class SaveProgressButton extends StatelessWidget {
         // Crear formulario con datos actuales
         completeForm = CompleteFormDataModel(
           id: formId,
-          eventName: state.selectedRiskEvent,
+          eventName: state.selectedRiskEvent ?? '',
           contactData: contactData,
           inspectionData: inspectionData,
           // Datos de amenaza
-          amenazaSelections: state.selectedClassification.toLowerCase() == 'amenaza'
+          amenazaSelections: (state.selectedClassification ?? '').toLowerCase() == 'amenaza'
               ? (formData['dynamicSelections'] ?? {})
               : {},
-          amenazaScores: state.selectedClassification.toLowerCase() == 'amenaza'
+          amenazaScores: (state.selectedClassification ?? '').toLowerCase() == 'amenaza'
               ? (formData['subClassificationScores'] ?? {})
               : {},
-          amenazaColors: state.selectedClassification.toLowerCase() == 'amenaza'
+          amenazaColors: (state.selectedClassification ?? '').toLowerCase() == 'amenaza'
               ? serializableColors
               : {},
-          amenazaProbabilidadSelections: state.selectedClassification.toLowerCase() == 'amenaza'
+          amenazaProbabilidadSelections: (state.selectedClassification ?? '').toLowerCase() == 'amenaza'
               ? (formData['probabilidadSelections'] ?? {})
               : {},
-          amenazaIntensidadSelections: state.selectedClassification.toLowerCase() == 'amenaza'
+          amenazaIntensidadSelections: (state.selectedClassification ?? '').toLowerCase() == 'amenaza'
               ? (formData['intensidadSelections'] ?? {})
               : {},
           amenazaSelectedProbabilidad: null,
           amenazaSelectedIntensidad: null,
           // Datos de vulnerabilidad
-          vulnerabilidadSelections: state.selectedClassification.toLowerCase() == 'vulnerabilidad'
+          vulnerabilidadSelections: (state.selectedClassification ?? '').toLowerCase() == 'vulnerabilidad'
               ? (formData['dynamicSelections'] ?? {})
               : {},
-          vulnerabilidadScores: state.selectedClassification.toLowerCase() == 'vulnerabilidad'
+          vulnerabilidadScores: (state.selectedClassification ?? '').toLowerCase() == 'vulnerabilidad'
               ? (formData['subClassificationScores'] ?? {})
               : {},
-          vulnerabilidadColors: state.selectedClassification.toLowerCase() == 'vulnerabilidad'
+          vulnerabilidadColors: (state.selectedClassification ?? '').toLowerCase() == 'vulnerabilidad'
               ? serializableColors
               : {},
-          vulnerabilidadProbabilidadSelections: state.selectedClassification.toLowerCase() == 'vulnerabilidad'
+          vulnerabilidadProbabilidadSelections: (state.selectedClassification ?? '').toLowerCase() == 'vulnerabilidad'
               ? (formData['probabilidadSelections'] ?? {})
               : {},
-          vulnerabilidadIntensidadSelections: state.selectedClassification.toLowerCase() == 'vulnerabilidad'
+          vulnerabilidadIntensidadSelections: (state.selectedClassification ?? '').toLowerCase() == 'vulnerabilidad'
               ? (formData['intensidadSelections'] ?? {})
               : {},
           vulnerabilidadSelectedProbabilidad: null,
@@ -276,7 +276,7 @@ class SaveProgressButton extends StatelessWidget {
         completeForm = existingForm;
 
         // Actualizar según la clasificación actual
-        if (state.selectedClassification.toLowerCase() == 'amenaza') {
+        if ((state.selectedClassification ?? '').toLowerCase() == 'amenaza') {
           completeForm = completeForm.copyWith(
             amenazaSelections:
                 formData['dynamicSelections'] ?? completeForm.amenazaSelections,
@@ -304,7 +304,7 @@ class SaveProgressButton extends StatelessWidget {
             evidenceCoordinates: state.evidenceCoordinates,
             updatedAt: now,
           );
-        } else if (state.selectedClassification.toLowerCase() ==
+        } else if ((state.selectedClassification ?? '').toLowerCase() ==
             'vulnerabilidad') {
           completeForm = completeForm.copyWith(
             vulnerabilidadSelections:
@@ -393,7 +393,7 @@ class SaveProgressButton extends StatelessWidget {
               }
 
               print(
-                'SaveProgressButton: Formulario completo guardado exitosamente - ${completeForm.id} (${state.selectedClassification})',
+                'SaveProgressButton: Formulario completo guardado exitosamente - ${completeForm.id} (${state.selectedClassification ?? ''})',
               );
 
               Navigator.of(context).pop();

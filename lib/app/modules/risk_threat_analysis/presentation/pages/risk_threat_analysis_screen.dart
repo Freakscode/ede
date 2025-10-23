@@ -53,7 +53,6 @@ class RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
   }
 
   void _processNavigationData() {
-    
     final bloc = context.read<RiskThreatAnalysisBloc>();
     
     // Actualizar el evento seleccionado si es diferente
@@ -69,7 +68,6 @@ class RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
       final classificationName = widget.navigationData!['classification'] as String?;
       final directToResults = widget.navigationData!['directToResults'] as bool? ?? false;
 
-      
       // Verificar primero si es un formulario nuevo para evitar cargar datos existentes
       final loadSavedForm = widget.navigationData!['loadSavedForm'] as bool? ?? false;
       final formId = widget.navigationData!['formId'] as String?;
@@ -107,7 +105,10 @@ class RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
         if (classificationName != null) {
           final navIndex = directToResults ? 2 : 0;
           bloc.add(ChangeBottomNavIndex(navIndex));
-          bloc.add(SelectClassification(classificationName));
+          // Solo cambiar clasificación si es diferente a la actual
+          if (bloc.state.selectedClassification != classificationName) {
+            bloc.add(SelectClassification(classificationName));
+          }
         }
         
         _loadFormFromSQLite(formId, bloc);
@@ -127,7 +128,10 @@ class RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
         if (classificationName != null) {
           final navIndex = directToResults ? 2 : 0;
           bloc.add(ChangeBottomNavIndex(navIndex));
-          bloc.add(SelectClassification(classificationName));
+          // Solo cambiar clasificación si es diferente a la actual
+          if (bloc.state.selectedClassification != classificationName) {
+            bloc.add(SelectClassification(classificationName));
+          }
         }
         
         // Cargar datos usando eventos
@@ -149,7 +153,7 @@ class RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
             RatingScreen(navigationData: widget.navigationData),
             const EvidenceScreen(),
             const RatingResultsScreen(),
-            FinalRiskResultsScreen(eventName: state.selectedRiskEvent),
+            FinalRiskResultsScreen(eventName: state.selectedRiskEvent ?? ''),
           ];
           
           return Scaffold(
@@ -343,7 +347,10 @@ class RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
       if (classificationName != null) {
         final navIndex = directToResults ? 2 : 0;
         bloc.add(ChangeBottomNavIndex(navIndex));
-        bloc.add(SelectClassification(classificationName));
+        // Solo cambiar clasificación si es diferente a la actual
+        if (bloc.state.selectedClassification != classificationName) {
+          bloc.add(SelectClassification(classificationName));
+        }
       }
     });
   }

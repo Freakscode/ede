@@ -36,7 +36,7 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
           child: Column(
             children: [
               Text(
-                'Evidencia Fotográfica - ${state.selectedClassification.toUpperCase()}',
+                'Evidencia Fotográfica - ${(state.selectedClassification ?? '').toUpperCase()}',
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   color: Color(0xFF232B48),
@@ -390,7 +390,7 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
       if (image != null) {
         context.read<RiskThreatAnalysisBloc>().add(
           AddEvidenceImage(
-            category: state.selectedClassification.toLowerCase(),
+            category: (state.selectedClassification ?? '').toLowerCase(),
             imagePath: image.path,
           ),
         );
@@ -432,7 +432,7 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
       if (image != null) {
         context.read<RiskThreatAnalysisBloc>().add(
           AddEvidenceImage(
-            category: state.selectedClassification.toLowerCase(),
+            category: (state.selectedClassification ?? '').toLowerCase(),
             imagePath: image.path,
           ),
         );
@@ -459,7 +459,7 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
   void _removeImage(int index, RiskThreatAnalysisState state) {
     context.read<RiskThreatAnalysisBloc>().add(
       RemoveEvidenceImage(
-        category: state.selectedClassification.toLowerCase(),
+        category: (state.selectedClassification ?? '').toLowerCase(),
         imageIndex: index,
       ),
     );
@@ -484,17 +484,17 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
   }
 
   /// Muestra el diálogo de ubicación
-  // Métodos helper para obtener datos de la categoría actual
+  // Métodos helper para obtener datos de la categoría actual usando métodos centralizados
   List<String> _getCurrentCategoryImages(RiskThreatAnalysisState state) {
-    final category = state.selectedClassification.toLowerCase();
-    return state.evidenceImages[category] ?? [];
+    final bloc = context.read<RiskThreatAnalysisBloc>();
+    return bloc.getEvidenceImagesForCategory(state.selectedClassification ?? '');
   }
 
   Map<int, Map<String, String>> _getCurrentCategoryCoordinates(
     RiskThreatAnalysisState state,
   ) {
-    final category = state.selectedClassification.toLowerCase();
-    return state.evidenceCoordinates[category] ?? {};
+    final bloc = context.read<RiskThreatAnalysisBloc>();
+    return bloc.getEvidenceCoordinatesForCategory(state.selectedClassification ?? '');
   }
 
   void _showLocationDialog(int imageIndex, RiskThreatAnalysisState state) {
@@ -508,12 +508,12 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
         initialLat: currentCoordinates?['lat'],
         initialLng: currentCoordinates?['lng'],
         imageIndex: imageIndex,
-        category: state.selectedClassification.toLowerCase(),
+        category: (state.selectedClassification ?? '').toLowerCase(),
         onLocationSelected: (lat, lng) {
           // Actualizar coordenadas en el bloc
           context.read<RiskThreatAnalysisBloc>().add(
             UpdateEvidenceCoordinates(
-              category: state.selectedClassification.toLowerCase(),
+              category: (state.selectedClassification ?? '').toLowerCase(),
               imageIndex: imageIndex,
               coordinates: {'lat': lat, 'lng': lng},
             ),

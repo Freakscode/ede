@@ -71,7 +71,7 @@ class RatingResultsScreen extends StatelessWidget {
         
         // Construir items para esta subclasificación
         final items = _buildItemsForSubClassification(bloc, state, subClassification.id);
-        final score = _calculateSectionScore(items);
+        final score = bloc.calculateSectionScore(subClassification.id);
         
         return Column(
           children: [
@@ -92,97 +92,17 @@ class RatingResultsScreen extends StatelessWidget {
     RiskThreatAnalysisState state,
     String subClassificationId,
   ) {
-    // Usar la misma lógica que el RatingScreen para obtener categorías
-    try {
-      final categories = bloc.getCategoriesForCurrentSubClassification(subClassificationId);
-      final items = <Map<String, dynamic>>[];
-      
-      // Crear items basados en las categorías obtenidas del BLoC
-      for (final category in categories) {
-        // Buscar la selección según el tipo de subclasificación
-        String? selection;
-        if (subClassificationId == 'probabilidad') {
-          selection = state.probabilidadSelections[category.title];
-        } else if (subClassificationId == 'intensidad') {
-          selection = state.intensidadSelections[category.title];
-        } else {
-          // Para vulnerabilidad, usar dynamicSelections
-          final selections = state.dynamicSelections[subClassificationId] ?? {};
-          selection = selections[category.title];
-        }
-
-        final rating = _getRatingFromSelection(selection);
-        final color = _getColorFromRating(rating);
-
-        String title = category.title;
-        if (rating == -1) {
-          title = '${category.title} - No Aplica';
-        } else if (rating == 0) {
-          title = '${category.title} - Sin calificar';
-        }
-
-        items.add({'rating': rating, 'title': title, 'color': color});
-      }
-      
-      return items;
-    } catch (e) {
-      print('Error al obtener items para subclasificación $subClassificationId: $e');
-      return [];
-    }
+    // Usar el método centralizado del BLoC para obtener items
+    return bloc.getItemsForSubClassification(subClassificationId);
   }
 
 
 
 
-  int _getRatingFromSelection(String? selectedLevel) {
-    if (selectedLevel == null || selectedLevel.isEmpty) return 0;
-
-    // Si es "No Aplica", devolver -1 para diferenciarlo
-    if (selectedLevel == 'NA') return -1;
-
-    if (selectedLevel.contains('BAJO') && !selectedLevel.contains('MEDIO')) {
-      return 1;
-    } else if (selectedLevel.contains('MEDIO') &&
-        selectedLevel.contains('ALTO')) {
-      return 3;
-    } else if (selectedLevel.contains('MEDIO')) {
-      return 2;
-    } else if (selectedLevel.contains('ALTO')) {
-      return 4;
-    }
-    return 0;
-  }
-
-  Color _getColorFromRating(int rating) {
-    switch (rating) {
-      case -1:
-        return const Color(0xFF6B7280); // Gris más oscuro para "No Aplica"
-      case 1:
-        return Colors.green;
-      case 2:
-        return Colors.yellow;
-      case 3:
-        return Colors.orange;
-      case 4:
-        return Colors.red;
-      default:
-        return const Color(0xFF9CA3AF); // Gris para sin calificar
-    }
-  }
-
-  String _calculateSectionScore(List<Map<String, dynamic>> items) {
-    final validRatings = items
-        .where(
-          (item) => item['rating'] != 0 && item['rating'] != -1,
-        ) // Excluir 0 (sin calificar) y -1 (NA)
-        .map((item) => item['rating'] as int)
-        .toList();
-
-    if (validRatings.isEmpty) return '0,00';
-
-    final average = validRatings.reduce((a, b) => a + b) / validRatings.length;
-    return average.toStringAsFixed(2).replaceAll('.', ',');
-  }
+  // Métodos eliminados - ahora se usan los métodos centralizados del BLoC
+  // _getRatingFromSelection -> bloc.getRatingFromSelection
+  // _getColorFromRating -> bloc.getColorFromRating  
+  // _calculateSectionScore -> bloc.calculateSectionScore
 
   Widget _buildThreatRatingCard(
     BuildContext context,
@@ -191,7 +111,7 @@ class RatingResultsScreen extends StatelessWidget {
     final bloc = context.read<RiskThreatAnalysisBloc>();
 
     // Determinar el título basado en la clasificación
-    final title = state.selectedClassification.toLowerCase() == 'amenaza'
+    final title = (state.selectedClassification ?? '').toLowerCase() == 'amenaza'
         ? 'Calificación Amenaza'
         : 'Calificación Vulnerabilidad';
 

@@ -32,7 +32,7 @@ class UpdateHomeStateUseCase {
     }
     
     // Validar que el evento seleccionado no esté vacío SOLO si estamos mostrando categorías
-    if (homeState.showRiskCategories && homeState.selectedRiskEvent.isEmpty) {
+    if (homeState.showRiskCategories && (homeState.selectedRiskEvent?.isEmpty ?? true)) {
       return false;
     }
     

@@ -35,7 +35,7 @@ class GetHomeStateUseCase {
     }
     
     // Validar que el evento seleccionado no esté vacío
-    if (homeState.selectedRiskEvent.isEmpty) {
+    if (homeState.selectedRiskEvent?.isEmpty ?? true) {
       return false;
     }
     

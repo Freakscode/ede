@@ -1,3 +1,5 @@
+import 'package:caja_herramientas/app/shared/models/risk_event_factory.dart';
+
 /// Caso de uso para validar variables no calificadas
 /// Encapsula la lógica de negocio para verificar variables críticas sin calificar
 class ValidateUnqualifiedVariablesUseCase {
@@ -44,19 +46,15 @@ class ValidateUnqualifiedVariablesUseCase {
     );
     print('intensidadSelections: $intensidadSelections');
 
-    // Lista de variables críticas para probabilidad
-    final criticalProbabilidadVariables = [
-      'Características Geotécnicas',
-      'Antecedentes',
-      'Evidencias de Materialización o Reactivación'
-    ];
-
-    // Lista de variables críticas para intensidad
-    final criticalIntensidadVariables = [
-      'Potencial de Daño en Edificaciones',
-      'Capacidad de Generar Pérdida de Vidas Humanas',
-      'Alteración del Funcionamiento de Líneas Vitales y Espacio Público'
-    ];
+    // Obtener las variables críticas dinámicamente desde RiskEventFactory
+    final selectedEvent = formData['selectedRiskEvent'] as String? ?? '';
+    print('selectedEvent: $selectedEvent');
+    
+    final criticalProbabilidadVariables = _getDynamicProbabilidadVariables(selectedEvent);
+    final criticalIntensidadVariables = _getDynamicIntensidadVariables(selectedEvent);
+    
+    print('criticalProbabilidadVariables (dinámico): $criticalProbabilidadVariables');
+    print('criticalIntensidadVariables (dinámico): $criticalIntensidadVariables');
 
     // Verificar si alguna variable crítica no está calificada
     for (final variable in criticalProbabilidadVariables) {
@@ -183,5 +181,65 @@ class ValidateUnqualifiedVariablesUseCase {
     }
 
     return unqualifiedVariables;
+  }
+
+  /// Obtener variables críticas de probabilidad dinámicamente desde RiskEventFactory
+  List<String> _getDynamicProbabilidadVariables(String eventName) {
+    try {
+      final eventModel = RiskEventFactory.getEventByName(eventName);
+      if (eventModel == null) return [];
+      
+      // Buscar la clasificación de amenaza
+      final amenazaClassification = eventModel.classifications
+          .where((c) => c.id.toLowerCase() == 'amenaza')
+          .firstOrNull;
+      
+      if (amenazaClassification == null) return [];
+      
+      // Buscar la subclasificación de probabilidad
+      final probabilidadSubClassification = amenazaClassification.subClassifications
+          .where((s) => s.id == 'probabilidad')
+          .firstOrNull;
+      
+      if (probabilidadSubClassification == null) return [];
+      
+      // Obtener los títulos de las categorías
+      return probabilidadSubClassification.categories
+          .map((category) => category.title)
+          .toList();
+    } catch (e) {
+      print('Error getting dynamic probabilidad variables: $e');
+      return [];
+    }
+  }
+
+  /// Obtener variables críticas de intensidad dinámicamente desde RiskEventFactory
+  List<String> _getDynamicIntensidadVariables(String eventName) {
+    try {
+      final eventModel = RiskEventFactory.getEventByName(eventName);
+      if (eventModel == null) return [];
+      
+      // Buscar la clasificación de amenaza
+      final amenazaClassification = eventModel.classifications
+          .where((c) => c.id.toLowerCase() == 'amenaza')
+          .firstOrNull;
+      
+      if (amenazaClassification == null) return [];
+      
+      // Buscar la subclasificación de intensidad
+      final intensidadSubClassification = amenazaClassification.subClassifications
+          .where((s) => s.id == 'intensidad')
+          .firstOrNull;
+      
+      if (intensidadSubClassification == null) return [];
+      
+      // Obtener los títulos de las categorías
+      return intensidadSubClassification.categories
+          .map((category) => category.title)
+          .toList();
+    } catch (e) {
+      print('Error getting dynamic intensidad variables: $e');
+      return [];
+    }
   }
 }

@@ -197,8 +197,8 @@ class NavigationButtonsWidget extends StatelessWidget {
                         }
 
                         // Si estamos en amenaza o vulnerabilidad, guardar avance y mostrar diálogo de confirmación
-                        if (state.selectedClassification.toLowerCase() == 'amenaza' ||
-                            state.selectedClassification.toLowerCase() == 'vulnerabilidad') {
+                        if ((state.selectedClassification ?? '').toLowerCase() == 'amenaza' ||
+                            (state.selectedClassification ?? '').toLowerCase() == 'vulnerabilidad') {
                           // Guardar avance antes de finalizar
                           await _saveProgressBeforeFinalize(context, state, riskBloc);
                         }
@@ -259,8 +259,8 @@ class NavigationButtonsWidget extends StatelessWidget {
   ) async {
     try {
       print('=== GUARDANDO AVANCE ANTES DE FINALIZAR ===');
-      print('Clasificación: ${state.selectedClassification}');
-      print('Evento: ${state.selectedRiskEvent}');
+      print('Clasificación: ${state.selectedClassification ?? ''}');
+      print('Evento: ${state.selectedRiskEvent ?? ''}');
 
       final homeBloc = context.read<HomeBloc>();
       final homeState = homeBloc.state;
@@ -296,39 +296,39 @@ class NavigationButtonsWidget extends StatelessWidget {
       
       if (homeState.isCreatingNew || homeState.activeFormId == null) {
         // Crear nuevo formulario
-        final formId = '${state.selectedRiskEvent}_complete_${now.millisecondsSinceEpoch}';
+        final formId = '${state.selectedRiskEvent ?? ''}_complete_${now.millisecondsSinceEpoch}';
         completeForm = CompleteFormDataModel(
           id: formId,
-          eventName: state.selectedRiskEvent,
+          eventName: state.selectedRiskEvent ?? '',
           contactData: contactData,
           inspectionData: inspectionData,
-          amenazaSelections: state.selectedClassification.toLowerCase() == 'amenaza' 
+          amenazaSelections: (state.selectedClassification ?? '').toLowerCase() == 'amenaza' 
               ? (formData['dynamicSelections'] ?? {}) : {},
-          amenazaScores: state.selectedClassification.toLowerCase() == 'amenaza'
+          amenazaScores: (state.selectedClassification ?? '').toLowerCase() == 'amenaza'
               ? (formData['subClassificationScores'] ?? {}) : {},
-          amenazaColors: state.selectedClassification.toLowerCase() == 'amenaza'
+          amenazaColors: (state.selectedClassification ?? '').toLowerCase() == 'amenaza'
               ? (formData['subClassificationColors'] ?? {}) : {},
-          amenazaProbabilidadSelections: state.selectedClassification.toLowerCase() == 'amenaza'
+          amenazaProbabilidadSelections: (state.selectedClassification ?? '').toLowerCase() == 'amenaza'
               ? (formData['probabilidadSelections'] ?? {}) : {},
-          amenazaIntensidadSelections: state.selectedClassification.toLowerCase() == 'amenaza'
+          amenazaIntensidadSelections: (state.selectedClassification ?? '').toLowerCase() == 'amenaza'
               ? (formData['intensidadSelections'] ?? {}) : {},
-          amenazaSelectedProbabilidad: state.selectedClassification.toLowerCase() == 'amenaza'
+          amenazaSelectedProbabilidad: (state.selectedClassification ?? '').toLowerCase() == 'amenaza'
               ? formData['selectedProbabilidad'] : null,
-          amenazaSelectedIntensidad: state.selectedClassification.toLowerCase() == 'amenaza'
+          amenazaSelectedIntensidad: (state.selectedClassification ?? '').toLowerCase() == 'amenaza'
               ? formData['selectedIntensidad'] : null,
-          vulnerabilidadSelections: state.selectedClassification.toLowerCase() == 'vulnerabilidad'
+          vulnerabilidadSelections: (state.selectedClassification ?? '').toLowerCase() == 'vulnerabilidad'
               ? (formData['dynamicSelections'] ?? {}) : {},
-          vulnerabilidadScores: state.selectedClassification.toLowerCase() == 'vulnerabilidad'
+          vulnerabilidadScores: (state.selectedClassification ?? '').toLowerCase() == 'vulnerabilidad'
               ? (formData['subClassificationScores'] ?? {}) : {},
-          vulnerabilidadColors: state.selectedClassification.toLowerCase() == 'vulnerabilidad'
+          vulnerabilidadColors: (state.selectedClassification ?? '').toLowerCase() == 'vulnerabilidad'
               ? (formData['subClassificationColors'] ?? {}) : {},
-          vulnerabilidadProbabilidadSelections: state.selectedClassification.toLowerCase() == 'vulnerabilidad'
+          vulnerabilidadProbabilidadSelections: (state.selectedClassification ?? '').toLowerCase() == 'vulnerabilidad'
               ? (formData['probabilidadSelections'] ?? {}) : {},
-          vulnerabilidadIntensidadSelections: state.selectedClassification.toLowerCase() == 'vulnerabilidad'
+          vulnerabilidadIntensidadSelections: (state.selectedClassification ?? '').toLowerCase() == 'vulnerabilidad'
               ? (formData['intensidadSelections'] ?? {}) : {},
-          vulnerabilidadSelectedProbabilidad: state.selectedClassification.toLowerCase() == 'vulnerabilidad'
+          vulnerabilidadSelectedProbabilidad: (state.selectedClassification ?? '').toLowerCase() == 'vulnerabilidad'
               ? formData['selectedProbabilidad'] : null,
-          vulnerabilidadSelectedIntensidad: state.selectedClassification.toLowerCase() == 'vulnerabilidad'
+          vulnerabilidadSelectedIntensidad: (state.selectedClassification ?? '').toLowerCase() == 'vulnerabilidad'
               ? formData['selectedIntensidad'] : null,
           evidenceImages: state.evidenceImages,
           evidenceCoordinates: state.evidenceCoordinates,
@@ -343,7 +343,7 @@ class NavigationButtonsWidget extends StatelessWidget {
         }
         
         completeForm = existingForm;
-        if (state.selectedClassification.toLowerCase() == 'amenaza') {
+        if ((state.selectedClassification ?? '').toLowerCase() == 'amenaza') {
           completeForm = completeForm.copyWith(
             amenazaSelections: formData['dynamicSelections'] ?? completeForm.amenazaSelections,
             amenazaScores: formData['subClassificationScores'] ?? completeForm.amenazaScores,
@@ -358,7 +358,7 @@ class NavigationButtonsWidget extends StatelessWidget {
             evidenceCoordinates: state.evidenceCoordinates,
             updatedAt: now,
           );
-        } else if (state.selectedClassification.toLowerCase() == 'vulnerabilidad') {
+        } else if ((state.selectedClassification ?? '').toLowerCase() == 'vulnerabilidad') {
           completeForm = completeForm.copyWith(
             vulnerabilidadSelections: formData['dynamicSelections'] ?? completeForm.vulnerabilidadSelections,
             vulnerabilidadScores: formData['subClassificationScores'] ?? completeForm.vulnerabilidadScores,
@@ -392,8 +392,8 @@ class NavigationButtonsWidget extends StatelessWidget {
 
       context.read<HomeBloc>().add(
         SaveRiskEventModel(
-          eventName: state.selectedRiskEvent,
-          classificationType: state.selectedClassification.toLowerCase(),
+          eventName: state.selectedRiskEvent ?? '',
+          classificationType: (state.selectedClassification ?? '').toLowerCase(),
           evaluationData: formDataForBloc,
         ),
       );
@@ -401,8 +401,8 @@ class NavigationButtonsWidget extends StatelessWidget {
       // Marcar como completada
       context.read<HomeBloc>().add(
         MarkEvaluationCompleted(
-          eventName: state.selectedRiskEvent,
-          classificationType: state.selectedClassification.toLowerCase(),
+          eventName: state.selectedRiskEvent ?? '',
+          classificationType: (state.selectedClassification ?? '').toLowerCase(),
         ),
       );
 
@@ -410,14 +410,14 @@ class NavigationButtonsWidget extends StatelessWidget {
       CustomActionDialog.show(
         context: context,
         title: 'Finalizar formulario',
-        message: '¿Está seguro que desea finalizar el formulario para la categoría de ${state.selectedClassification}?',
+        message: '¿Está seguro que desea finalizar el formulario para la categoría de ${state.selectedClassification ?? ''}?',
         leftButtonText: 'Revisar',
         leftButtonIcon: Icons.close,
         rightButtonText: 'Finalizar',
         rightButtonIcon: Icons.check,
         onRightButtonPressed: () {
           // NO limpiar datos - solo navegar sin resetear el estado
-          final navigationData = state.selectedClassification.toLowerCase() == 'amenaza'
+          final navigationData = (state.selectedClassification ?? '').toLowerCase() == 'amenaza'
               ? {'showRiskCategories': true}
               : homeNavigationType.toNavigationData(tabIndex: homeTabIndex);
           

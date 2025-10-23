@@ -62,25 +62,12 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
     String categoryTitle,
     RiskThreatAnalysisState state,
   ) {
+    final bloc = context.read<RiskThreatAnalysisBloc>();
     final selections = _getSelectionsForSubClassification(state);
     final selectedLevel = selections[categoryTitle];
-    if (selectedLevel == null) return 0;
-
-    // Si es "No Aplica", devolver -1 para diferenciarlo
-    if (selectedLevel == 'NA') return -1;
-
-    // Mapear los niveles a sus valores numéricos
-    if (selectedLevel.contains('BAJO') && !selectedLevel.contains('MEDIO')) {
-      return 1;
-    } else if (selectedLevel.contains('MEDIO') &&
-        selectedLevel.contains('ALTO')) {
-      return 3;
-    } else if (selectedLevel.contains('MEDIO')) {
-      return 2;
-    } else if (selectedLevel.contains('ALTO')) {
-      return 4;
-    }
-    return 0;
+    
+    // Usar el método centralizado del BLoC
+    return bloc.getRatingFromSelection(selectedLevel);
   }
 
   // Método helper para obtener el valor de display (NA o número)

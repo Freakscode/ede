@@ -13,7 +13,7 @@ class HomeEntity extends Equatable {
   final bool notificationsEnabled;
   final bool darkModeEnabled;
   final String selectedLanguage;
-  final String selectedRiskEvent;
+  final String? selectedRiskEvent;
   final String? selectedRiskCategory;
   final Map<String, bool> completedEvaluations;
   final List<FormEntity> savedForms;
@@ -32,7 +32,7 @@ class HomeEntity extends Equatable {
     this.notificationsEnabled = true,
     this.darkModeEnabled = false,
     this.selectedLanguage = 'Español',
-    this.selectedRiskEvent = 'Movimiento en Masa',
+    this.selectedRiskEvent,
     this.selectedRiskCategory,
     this.completedEvaluations = const {},
     this.savedForms = const [],

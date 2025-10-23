@@ -70,20 +70,41 @@ class RiskCategoriesContainer extends StatelessWidget {
 
   // Construir el ícono trailing según el estado
   Widget? _buildTrailingIcon(CategoryState categoryState) {
-    if (categoryState.isCompleted) {
-      return SizedBox(
-        width: 24,
-        height: 24,
-        child: SvgPicture.asset(AppIcons.checkCircle, width: 24, height: 24),
-      );
-    } else if (!categoryState.isAvailable) {
+    if (!categoryState.isAvailable) {
       return const Icon(
         Icons.lock_outlined,
         color: DAGRDColors.grisMedio,
         size: 16,
       );
     }
-    return null;
+    
+    if (categoryState.isCompleted) {
+      // Si está completa: mostrar checkmark
+      return SizedBox(
+        width: 24,
+        height: 24,
+        child: SvgPicture.asset(AppIcons.checkCircle, width: 24, height: 24),
+      );
+    } else if (categoryState.isInProgress) {
+      // Si está en progreso: mostrar icono de borrador
+       return SizedBox(
+        width: 18,
+        height: 17,
+        child: SvgPicture.asset(
+          AppIcons.borrar,
+          width: 18,
+          height: 17,
+          colorFilter: const ColorFilter.mode(
+            Color(0xFF2563EB), // Azul informativo
+            BlendMode.srcIn,
+          ),
+        ),
+      );
+     
+    } else {
+      // Si no está iniciada: mostrar icono de borrar
+       return SizedBox.shrink();
+    }
   }
 
   // Mostrar mensaje cuando la categoría está deshabilitada
@@ -104,11 +125,13 @@ class RiskCategoriesContainer extends StatelessWidget {
 class CategoryState {
   final bool isAvailable;
   final bool isCompleted;
+  final bool isInProgress;
   final String? disabledMessage;
   
   const CategoryState({
     required this.isAvailable,
     required this.isCompleted,
+    this.isInProgress = false,
     this.disabledMessage,
   });
 }

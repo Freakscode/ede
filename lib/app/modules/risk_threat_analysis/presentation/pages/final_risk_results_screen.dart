@@ -22,10 +22,10 @@ class FinalRiskResultsScreen extends StatelessWidget {
       builder: (context, state) {
         // PRINT DINÁMICO DEL ESTADO EN FINAL RISK RESULTS
         print('=== EVALUACIÓN COMPLETA DE RIESGO ===');
-        print('Evento = ${state.selectedRiskEvent}');
+        print('Evento = ${state.selectedRiskEvent ?? ''}');
         
         // Obtener datos dinámicamente basados en el evento
-        final riskEvent = _getRiskEventByName(state.selectedRiskEvent);
+        final riskEvent = _getRiskEventByName(state.selectedRiskEvent ?? '');
         if (riskEvent != null) {
           // Datos de Amenaza
           final amenazaClassification = riskEvent.classifications.firstWhere(
@@ -40,9 +40,10 @@ class FinalRiskResultsScreen extends StatelessWidget {
           double amenazaGeneralScore = 0.0;
           int amenazaSubClassCount = 0;
           
-          // Mostrar cada subclasificación de Amenaza
+          // Mostrar cada subclasificación de Amenaza usando métodos centralizados
+          final bloc = context.read<RiskThreatAnalysisBloc>();
           for (final subClass in amenazaClassification.subClassifications) {
-            final score = state.subClassificationScores[subClass.id] ?? 0.0;
+            final score = bloc.getSubClassificationScore(subClass.id);
             print('Calificación de ${subClass.name} = ${score.toStringAsFixed(2)}');
             
             if (score > 0) {
@@ -50,13 +51,13 @@ class FinalRiskResultsScreen extends StatelessWidget {
               amenazaSubClassCount++;
             }
             
-            // Mostrar secciones de esta subclasificación
-            final selections = state.dynamicSelections[subClass.id] ?? {};
-            if (selections.isNotEmpty) {
+            // Mostrar secciones de esta subclasificación usando método centralizado
+            final items = bloc.getItemsForSubClassification(subClass.id);
+            if (items.isNotEmpty) {
               print('Calificaciones de cada sección de ${subClass.name}:');
-              selections.forEach((section, level) {
-                print('  - $section = $level');
-              });
+              for (final item in items) {
+                print('  - ${item['title']} = ${item['rating']}');
+              }
             }
           }
           
@@ -77,9 +78,9 @@ class FinalRiskResultsScreen extends StatelessWidget {
           double vulnerabilidadGeneralScore = 0.0;
           int vulnerabilidadSubClassCount = 0;
           
-          // Mostrar cada subclasificación de Vulnerabilidad
+          // Mostrar cada subclasificación de Vulnerabilidad usando métodos centralizados
           for (final subClass in vulnerabilidadClassification.subClassifications) {
-            final score = state.subClassificationScores[subClass.id] ?? 0.0;
+            final score = bloc.getSubClassificationScore(subClass.id);
             print('Calificación de ${subClass.name} = ${score.toStringAsFixed(2)}');
             
             if (score > 0) {
@@ -87,13 +88,13 @@ class FinalRiskResultsScreen extends StatelessWidget {
               vulnerabilidadSubClassCount++;
             }
             
-            // Mostrar secciones de esta subclasificación
-            final selections = state.dynamicSelections[subClass.id] ?? {};
-            if (selections.isNotEmpty) {
+            // Mostrar secciones de esta subclasificación usando método centralizado
+            final items = bloc.getItemsForSubClassification(subClass.id);
+            if (items.isNotEmpty) {
               print('Calificaciones de cada sección de ${subClass.name}:');
-              selections.forEach((section, level) {
-                print('  - $section = $level');
-              });
+              for (final item in items) {
+                print('  - ${item['title']} = ${item['rating']}');
+              }
             }
           }
           
@@ -302,7 +303,7 @@ class FinalRiskResultsScreen extends StatelessWidget {
     RiskThreatAnalysisState state,
   ) {
     final items = <Map<String, dynamic>>[];
-    final selectedEvent = state.selectedRiskEvent;
+    final selectedEvent = state.selectedRiskEvent ?? '';
 
     final riskEvent = _getRiskEventByName(selectedEvent);
     if (riskEvent != null) {
@@ -340,7 +341,7 @@ class FinalRiskResultsScreen extends StatelessWidget {
     RiskThreatAnalysisState state,
   ) {
     final items = <Map<String, dynamic>>[];
-    final selectedEvent = state.selectedRiskEvent;
+    final selectedEvent = state.selectedRiskEvent ?? '';
 
     final riskEvent = _getRiskEventByName(selectedEvent);
     if (riskEvent != null) {
@@ -378,7 +379,7 @@ class FinalRiskResultsScreen extends StatelessWidget {
     RiskThreatAnalysisState state,
   ) {
     final sections = <Map<String, dynamic>>[];
-    final selectedEvent = state.selectedRiskEvent;
+    final selectedEvent = state.selectedRiskEvent ?? '';
 
     final riskEvent = _getRiskEventByName(selectedEvent);
     if (riskEvent != null) {
@@ -412,7 +413,7 @@ class FinalRiskResultsScreen extends StatelessWidget {
     String subClassificationId,
   ) {
     final items = <Map<String, dynamic>>[];
-    final selectedEvent = state.selectedRiskEvent;
+    final selectedEvent = state.selectedRiskEvent ?? '';
 
     final riskEvent = _getRiskEventByName(selectedEvent);
     if (riskEvent != null) {

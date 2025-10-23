@@ -12,10 +12,11 @@ import 'package:caja_herramientas/app/modules/auth/bloc/auth_bloc.dart';
 import 'package:caja_herramientas/app/modules/auth/bloc/auth_state.dart';
 import '../../domain/entities/form_navigation_data.dart';
 import '../../domain/entities/form_entity.dart';
-import '../../../../shared/models/form_data_model.dart';
 import '../../../../shared/services/form_persistence_service.dart';
 import '../../../../shared/models/risk_event_factory.dart';
 import '../../../../shared/models/complete_form_data_model.dart';
+import 'package:caja_herramientas/app/modules/risk_threat_analysis/presentation/bloc/risk_threat_analysis_bloc.dart';
+import 'package:caja_herramientas/app/modules/risk_threat_analysis/presentation/bloc/risk_threat_analysis_event.dart';
 
 class HomeFormsScreen extends StatefulWidget {
   const HomeFormsScreen({super.key});
@@ -466,17 +467,57 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
       final completeForm = await persistenceService.getCompleteForm(form.id);
 
       if (completeForm != null) {
+        print('=== DEBUG _navigateToForm ===');
+        print('completeForm.id: ${completeForm.id}');
+        print('completeForm.eventName: ${completeForm.eventName}');
+        print('completeForm.amenazaProbabilidadSelections: ${completeForm.amenazaProbabilidadSelections}');
+        print('completeForm.amenazaIntensidadSelections: ${completeForm.amenazaIntensidadSelections}');
+        print('completeForm.vulnerabilidadSelections: ${completeForm.vulnerabilidadSelections}');
+        print('completeForm.evidenceImages: ${completeForm.evidenceImages}');
+        print('completeForm.amenazaScores: ${completeForm.amenazaScores}');
+        print('completeForm.vulnerabilidadScores: ${completeForm.vulnerabilidadScores}');
+        print('completeForm.amenazaColors: ${completeForm.amenazaColors}');
+        print('completeForm.vulnerabilidadColors: ${completeForm.vulnerabilidadColors}');
+        
         // Establecer el formulario como activo antes de navegar
         await persistenceService.setActiveFormId(completeForm.id);
 
         // Check if widget is still mounted before using context
         if (!mounted) return;
 
-        // Get bloc reference before async gap
+        // Get bloc references before async gap
         final homeBloc = context.read<HomeBloc>();
+        final riskBloc = context.read<RiskThreatAnalysisBloc>();
+
+        // Determinar la clasificación basándose en los datos disponibles
+        // Priorizar amenaza primero, ya que es el flujo natural de creación
+        String classificationType = 'amenaza'; // Por defecto
+        
+        // Si hay datos de amenaza (probabilidad o intensidad), usar amenaza
+        if (completeForm.amenazaProbabilidadSelections.isNotEmpty || 
+            completeForm.amenazaIntensidadSelections.isNotEmpty) {
+          classificationType = 'amenaza';
+        }
+        // Solo usar vulnerabilidad si hay datos específicos de vulnerabilidad Y amenaza está completa
+        else if (completeForm.vulnerabilidadSelections.isNotEmpty) {
+          classificationType = 'vulnerabilidad';
+        }
+
+        // Cargar los datos específicos del formulario en el RiskThreatAnalysisBloc
+        final evaluationData = completeForm.toJson();
+        print('=== ENVIANDO DATOS AL BLOC ===');
+        print('eventName: ${completeForm.eventName}');
+        print('classificationType: $classificationType');
+        print('evaluationData keys: ${evaluationData.keys.toList()}');
+        
+        riskBloc.add(LoadFormData(
+          eventName: completeForm.eventName,
+          classificationType: classificationType,
+          evaluationData: evaluationData,
+        ));
 
         // Marcar como editar (no crear nuevo)
-            homeBloc.add(SetActiveFormId(formId: completeForm.id, isCreatingNew: false));
+        homeBloc.add(SetActiveFormId(formId: completeForm.id, isCreatingNew: false));
 
         // Navegar a la pantalla de categorías para ver el progreso y continuar
         homeBloc.add(

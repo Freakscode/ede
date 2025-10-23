@@ -16,7 +16,7 @@ class ProgressBarWidget extends StatelessWidget {
         final progress = _calculateProgress(context, state);
         
         // Texto dinámico según la clasificación
-        final classificationName = state.selectedClassification == 'amenaza' 
+        final classificationName = (state.selectedClassification ?? '') == 'amenaza' 
           ? 'Amenaza' 
           : 'Vulnerabilidad';
         final progressText = '${(progress * 100).toInt()}% $classificationName completada';
@@ -64,10 +64,10 @@ class ProgressBarWidget extends StatelessWidget {
       print('DEBUG: _calculateProgress called with selectedClassification = ${state.selectedClassification}');
       
       // Para ambas clasificaciones (amenaza y vulnerabilidad): calcular basado en subclasificaciones
-      if (state.selectedClassification.toLowerCase().trim() == 'amenaza') {
+      if ((state.selectedClassification ?? '').toLowerCase().trim() == 'amenaza') {
         print('DEBUG: calculating amenaza progress');
         return _calculateAmenazaProgress(context, state);
-      } else if (state.selectedClassification.toLowerCase().trim() == 'vulnerabilidad') {
+      } else if ((state.selectedClassification ?? '').toLowerCase().trim() == 'vulnerabilidad') {
         print('DEBUG: calculating vulnerabilidad progress');
         return _calculateVulnerabilidadProgress(context, state);
       }
