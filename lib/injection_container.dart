@@ -107,8 +107,8 @@ Future<void> initializeDependencies() async {
   sl.registerLazySingleton(() => ValidateFormUseCase(sl()));
   sl.registerLazySingleton(() => CalculateRatingUseCase(sl()));
   sl.registerLazySingleton(() => CalculateScoreUseCase(sl()));
-  sl.registerLazySingleton(() => ValidateUnqualifiedVariablesUseCase(sl()));
-  sl.registerLazySingleton(() => CalculateGlobalScoreUseCase(sl(), sl()));
+  sl.registerLazySingleton(() => ValidateUnqualifiedVariablesUseCase());
+  sl.registerLazySingleton(() => CalculateGlobalScoreUseCase(sl()));
 
   // BLoCs
   sl.registerFactory(() => EvaluacionBloc(repository: sl()));

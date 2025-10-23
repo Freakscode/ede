@@ -151,14 +151,16 @@ class UpdateSelectedRiskEvent extends RiskThreatAnalysisEvent {
 class LoadFormData extends RiskThreatAnalysisEvent {
   final String eventName;
   final String classificationType;
+  final Map<String, dynamic>? evaluationData;
 
   const LoadFormData({
     required this.eventName,
     required this.classificationType,
+    this.evaluationData,
   });
 
   @override
-  List<Object?> get props => [eventName, classificationType];
+  List<Object?> get props => [eventName, classificationType, evaluationData];
 }
 
 /// Evento para guardar datos de formulario

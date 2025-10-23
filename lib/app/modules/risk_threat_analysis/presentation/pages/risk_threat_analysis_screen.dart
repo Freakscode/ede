@@ -228,10 +228,36 @@ class RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
         // Obtener la clasificación actual del navigationData
         final classification = widget.navigationData?['classification'] as String? ?? 'amenaza';
         
-        // Cargar datos en el bloc
+        // Preparar datos específicos según la clasificación
+        Map<String, dynamic> formData = {};
+        
+        if (classification.toLowerCase() == 'amenaza') {
+          formData = {
+            'probabilidadSelections': completeForm.amenazaProbabilidadSelections,
+            'intensidadSelections': completeForm.amenazaIntensidadSelections,
+            'dynamicSelections': completeForm.amenazaSelections,
+            'subClassificationScores': completeForm.amenazaScores,
+            'subClassificationColors': completeForm.amenazaColors,
+            'evidenceImages': completeForm.evidenceImages,
+            'evidenceCoordinates': completeForm.evidenceCoordinates,
+          };
+        } else if (classification.toLowerCase() == 'vulnerabilidad') {
+          formData = {
+            'probabilidadSelections': completeForm.vulnerabilidadProbabilidadSelections,
+            'intensidadSelections': completeForm.vulnerabilidadIntensidadSelections,
+            'dynamicSelections': completeForm.vulnerabilidadSelections,
+            'subClassificationScores': completeForm.vulnerabilidadScores,
+            'subClassificationColors': completeForm.vulnerabilidadColors,
+            'evidenceImages': completeForm.evidenceImages,
+            'evidenceCoordinates': completeForm.evidenceCoordinates,
+          };
+        }
+        
+        // Cargar datos específicos en el bloc
         bloc.add(LoadFormData(
           eventName: completeForm.eventName,
           classificationType: classification,
+          evaluationData: formData, // Pasar los datos específicos
         ));
         
         // Formulario cargado exitosamente

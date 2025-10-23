@@ -416,10 +416,14 @@ class NavigationButtonsWidget extends StatelessWidget {
         rightButtonText: 'Finalizar',
         rightButtonIcon: Icons.check,
         onRightButtonPressed: () {
+          // NO limpiar datos - solo navegar sin resetear el estado
           final navigationData = state.selectedClassification.toLowerCase() == 'amenaza'
               ? {'showRiskCategories': true}
               : homeNavigationType.toNavigationData(tabIndex: homeTabIndex);
+          
+          // Navegar sin resetear el estado del formulario
           context.go('/home', extra: navigationData);
+          Navigator.of(context).pop(); // Cerrar el diálogo
         },
       );
 

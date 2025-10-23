@@ -263,7 +263,28 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     try {
       emit(state.setLoading(true));
       
-      // Cargar datos usando el caso de uso
+      // Si hay datos de evaluación específicos, cargarlos directamente
+      if (event.evaluationData != null) {
+        print('=== CARGANDO DATOS ESPECÍFICOS DEL FORMULARIO ===');
+        print('evaluationData: ${event.evaluationData}');
+        
+        emit(state.copyWith(
+          selectedRiskEvent: event.eventName,
+          selectedClassification: event.classificationType,
+          probabilidadSelections: event.evaluationData!['probabilidadSelections'] ?? {},
+          intensidadSelections: event.evaluationData!['intensidadSelections'] ?? {},
+          dynamicSelections: event.evaluationData!['dynamicSelections'] ?? {},
+          subClassificationScores: event.evaluationData!['subClassificationScores'] ?? {},
+          subClassificationColors: event.evaluationData!['subClassificationColors'] ?? {},
+          evidenceImages: event.evaluationData!['evidenceImages'] ?? [],
+          evidenceCoordinates: event.evaluationData!['evidenceCoordinates'] ?? {},
+          isLoading: false,
+          error: null,
+        ));
+        return;
+      }
+      
+      // Cargar datos usando el caso de uso (comportamiento original)
       final entity = await _loadRiskAnalysisUseCase.execute(
         event.eventName,
         event.classificationType,
@@ -543,14 +564,28 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     try {
       final formData = getCurrentFormData();
       final globalScoreInfo = _calculateGlobalScoreUseCase.getGlobalScoreInfo(formData);
-      final score = globalScoreInfo['finalScore'] ?? 0.0;
+      
+      // Determinar qué score usar según la clasificación actual
+      double score;
+      Color color;
+      
+      if (state.selectedClassification.toLowerCase() == 'amenaza') {
+        score = globalScoreInfo['amenazaScore'] ?? 0.0;
+        color = globalScoreInfo['amenazaColor'] ?? const Color(0xFFD1D5DB);
+      } else if (state.selectedClassification.toLowerCase() == 'vulnerabilidad') {
+        score = globalScoreInfo['vulnerabilidadScore'] ?? 0.0;
+        color = globalScoreInfo['vulnerabilidadColor'] ?? const Color(0xFFD1D5DB);
+      } else {
+        score = globalScoreInfo['finalScore'] ?? 0.0;
+        color = globalScoreInfo['finalColor'] ?? const Color(0xFFD1D5DB);
+      }
       
       // Si no hay score (0.0), devolver el color de borde específico
       if (score == 0.0) {
         return const Color(0xFFD1D5DB); // #D1D5DB
       }
       
-      return globalScoreInfo['finalColor'] ?? const Color(0xFFD1D5DB);
+      return color;
     } catch (e) {
       return const Color(0xFFD1D5DB); // #D1D5DB
     }
@@ -561,8 +596,21 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     try {
       final formData = getCurrentFormData();
       final globalScoreInfo = _calculateGlobalScoreUseCase.getGlobalScoreInfo(formData);
-      final score = globalScoreInfo['finalScore'] ?? 0.0;
-      final level = globalScoreInfo['finalLevel'] ?? 'SIN CALIFICAR';
+      
+      // Determinar qué score usar según la clasificación actual
+      double score;
+      String level;
+      
+      if (state.selectedClassification.toLowerCase() == 'amenaza') {
+        score = globalScoreInfo['amenazaScore'] ?? 0.0;
+        level = globalScoreInfo['amenazaLevel'] ?? 'SIN CALIFICAR';
+      } else if (state.selectedClassification.toLowerCase() == 'vulnerabilidad') {
+        score = globalScoreInfo['vulnerabilidadScore'] ?? 0.0;
+        level = globalScoreInfo['vulnerabilidadLevel'] ?? 'SIN CALIFICAR';
+      } else {
+        score = globalScoreInfo['finalScore'] ?? 0.0;
+        level = globalScoreInfo['finalLevel'] ?? 'SIN CALIFICAR';
+      }
       
       if (score == 0.0) {
         return 'SIN CALIFICAR';
@@ -580,14 +628,27 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     try {
       final formData = getCurrentFormData();
       final globalScoreInfo = _calculateGlobalScoreUseCase.getGlobalScoreInfo(formData);
-      final score = globalScoreInfo['finalScore'] ?? 0.0;
+      
+      // Determinar qué score usar según la clasificación actual
+      double score;
+      Color color;
+      
+      if (state.selectedClassification.toLowerCase() == 'amenaza') {
+        score = globalScoreInfo['amenazaScore'] ?? 0.0;
+        color = globalScoreInfo['amenazaColor'] ?? Colors.grey;
+      } else if (state.selectedClassification.toLowerCase() == 'vulnerabilidad') {
+        score = globalScoreInfo['vulnerabilidadScore'] ?? 0.0;
+        color = globalScoreInfo['vulnerabilidadColor'] ?? Colors.grey;
+      } else {
+        score = globalScoreInfo['finalScore'] ?? 0.0;
+        color = globalScoreInfo['finalColor'] ?? Colors.grey;
+      }
       
       // Si no hay score (0.0), devolver negro para texto sobre fondo gris
       if (score == 0.0) {
-    return Colors.black;
+        return Colors.black;
       }
       
-      final color = globalScoreInfo['finalColor'] ?? Colors.grey;
       // Retornar color de texto basado en el color de fondo
       return color == Colors.grey ? Colors.black : Colors.white;
     } catch (e) {
@@ -607,8 +668,20 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
   bool hasUnqualifiedVariables() {
     try {
       final formData = getCurrentFormData();
-      return _validateUnqualifiedVariablesUseCase.execute(formData);
+      print('=== DEBUG hasUnqualifiedVariables ===');
+      print('FormData keys: ${formData.keys.toList()}');
+      print('amenazaProbabilidadSelections: ${formData['amenazaProbabilidadSelections']}');
+      print('amenazaIntensidadSelections: ${formData['amenazaIntensidadSelections']}');
+      print('vulnerabilidadSelections: ${formData['vulnerabilidadSelections']}');
+      print('selectedClassification: ${formData['selectedClassification']}');
+      
+      final result = _validateUnqualifiedVariablesUseCase.execute(formData);
+      print('hasUnqualifiedVariables result: $result');
+      print('=== END DEBUG ===');
+      
+      return result;
     } catch (e) {
+      print('Error in hasUnqualifiedVariables: $e');
       return false;
     }
   }

@@ -5,11 +5,9 @@ import 'calculate_score_usecase.dart';
 /// Caso de uso para calcular scores globales de amenaza y vulnerabilidad
 /// Encapsula la lógica de negocio para cálculos de puntuación global
 class CalculateGlobalScoreUseCase {
-  final RiskAnalysisRepositoryInterface _repository;
   final CalculateScoreUseCase _calculateScoreUseCase;
 
   const CalculateGlobalScoreUseCase(
-    this._repository,
     this._calculateScoreUseCase,
   );
 
@@ -57,11 +55,16 @@ class CalculateGlobalScoreUseCase {
   /// Ejecutar el caso de uso para calcular score global de vulnerabilidad
   double calculateVulnerabilidadGlobalScore(Map<String, dynamic> formData) {
     try {
+      print('=== DEBUG calculateVulnerabilidadGlobalScore ===');
+      print('formData keys: ${formData.keys.toList()}');
+      
       final vulnerabilidadSelections = Map<String, dynamic>.from(
         formData['vulnerabilidadSelections'] ?? {}
       );
+      print('vulnerabilidadSelections: $vulnerabilidadSelections');
 
       if (vulnerabilidadSelections.isEmpty) {
+        print('vulnerabilidadSelections is empty, returning 0.0');
         return 0.0;
       }
 
@@ -70,15 +73,22 @@ class CalculateGlobalScoreUseCase {
 
       // Calcular score para cada subclasificación de vulnerabilidad
       for (final subClassificationId in vulnerabilidadSelections.keys) {
+        print('Processing subClassificationId: $subClassificationId');
         final score = _calculateScoreUseCase.execute(subClassificationId, formData);
+        print('Score for $subClassificationId: $score');
         if (score > 0) {
           totalScore += score;
           count++;
         }
       }
 
-      return count > 0 ? totalScore / count : 0.0;
+      final result = count > 0 ? totalScore / count : 0.0;
+      print('Final vulnerabilidad score: $result (totalScore: $totalScore, count: $count)');
+      print('=== END DEBUG calculateVulnerabilidadGlobalScore ===');
+      
+      return result;
     } catch (e) {
+      print('Error in calculateVulnerabilidadGlobalScore: $e');
       return 0.0;
     }
   }
@@ -167,11 +177,19 @@ class CalculateGlobalScoreUseCase {
   /// Obtener información completa del score global
   Map<String, dynamic> getGlobalScoreInfo(Map<String, dynamic> formData) {
     try {
+      print('=== DEBUG getGlobalScoreInfo ===');
+      print('formData keys: ${formData.keys.toList()}');
+      print('selectedClassification: ${formData['selectedClassification']}');
+      
       final amenazaScore = calculateAmenazaGlobalScore(formData);
       final vulnerabilidadScore = calculateVulnerabilidadGlobalScore(formData);
       final finalScore = calculateFinalRiskScore(formData);
 
-      return {
+      print('amenazaScore: $amenazaScore');
+      print('vulnerabilidadScore: $vulnerabilidadScore');
+      print('finalScore: $finalScore');
+
+      final result = {
         'amenazaScore': amenazaScore,
         'vulnerabilidadScore': vulnerabilidadScore,
         'finalScore': finalScore,
@@ -182,7 +200,13 @@ class CalculateGlobalScoreUseCase {
         'vulnerabilidadLevel': getGlobalRiskLevel(vulnerabilidadScore),
         'finalLevel': getGlobalRiskLevel(finalScore),
       };
+      
+      print('getGlobalScoreInfo result: $result');
+      print('=== END DEBUG getGlobalScoreInfo ===');
+      
+      return result;
     } catch (e) {
+      print('Error in getGlobalScoreInfo: $e');
       return {
         'amenazaScore': 0.0,
         'vulnerabilidadScore': 0.0,
