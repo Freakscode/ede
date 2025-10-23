@@ -42,18 +42,22 @@ class _RatingScreenState extends State<RatingScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Solo procesar navigationData si es la primera vez que se carga la pantalla
+      // No resetear cuando se navega entre pestañas
       if (widget.navigationData != null) {
         final data = widget.navigationData!;
         final forceReset = data['forceReset'] as bool? ?? false;
         final isNewForm = data['isNewForm'] as bool? ?? false;
         final isEditMode = data['isEditMode'] as bool? ?? false;
         
-        // Si es modo edición, cargar datos existentes
-        if (isEditMode && !forceReset && !isNewForm) {
+        // Solo resetear si es explícitamente un formulario nuevo o reset forzado
+        if (forceReset || isNewForm) {
+          // Formulario nuevo o reset forzado - Reseteando estado
+          context.read<RiskThreatAnalysisBloc>().add(const ResetState());
+        } else if (isEditMode) {
+          // Si es modo edición, cargar datos existentes
           final eventToSet = data['event'] as String?;
           final classificationToSet = data['classification'] as String?;
-          
-          // Modo edición - Cargando datos existentes
           
           if (eventToSet != null) {
             context.read<RiskThreatAnalysisBloc>().add(
@@ -66,17 +70,10 @@ class _RatingScreenState extends State<RatingScreen> {
               SelectClassification(classificationToSet)
             );
           }
-        } else {
-          // Para cualquier otro caso (formulario nuevo, reset forzado, o sin navigationData específico)
-          // Formulario nuevo o reset forzado - Reseteando estado
-          // Resetear completamente el estado para una nueva calificación
-          context.read<RiskThreatAnalysisBloc>().add(const ResetState());
         }
-      } else {
-        // Si no hay navigationData, es un formulario nuevo - resetear
-        // Sin navigationData - Formulario nuevo - Reseteando estado
-        context.read<RiskThreatAnalysisBloc>().add(const ResetState());
+        // Si no hay flags específicos, NO resetear - mantener el estado actual
       }
+      // Si no hay navigationData, NO resetear - mantener el estado actual
     });
   }
 
