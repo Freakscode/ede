@@ -1,5 +1,3 @@
-import '../repositories/risk_analysis_repository_interface.dart';
-
 /// Caso de uso para validar variables no calificadas
 /// Encapsula la lógica de negocio para verificar variables críticas sin calificar
 class ValidateUnqualifiedVariablesUseCase {
@@ -87,26 +85,40 @@ class ValidateUnqualifiedVariablesUseCase {
 
   /// Verificar variables no calificadas en vulnerabilidad
   bool _checkVulnerabilidadUnqualifiedVariables(Map<String, dynamic> formData) {
+    print('=== DEBUG _checkVulnerabilidadUnqualifiedVariables ===');
+    
     final vulnerabilidadSelections = Map<String, dynamic>.from(
       formData['vulnerabilidadSelections'] ?? {}
     );
+    print('vulnerabilidadSelections: $vulnerabilidadSelections');
 
-    // Lista de variables críticas para vulnerabilidad
-    final criticalVulnerabilidadVariables = [
-      'Exposición',
-      'Fragilidad',
-      'Resistencia'
+    // Las subclasificaciones de vulnerabilidad según RiskEventFactory
+    final criticalVulnerabilidadSubClassifications = [
+      'fragilidad_fisica',
+      'fragilidad_personas',
+      'exposicion'
     ];
 
-    // Verificar si alguna variable crítica no está calificada
-    for (final variable in criticalVulnerabilidadVariables) {
-      if (!vulnerabilidadSelections.containsKey(variable) || 
-          vulnerabilidadSelections[variable] == null ||
-          vulnerabilidadSelections[variable] == '') {
+    // Verificar si alguna subclasificación crítica no está calificada
+    for (final subClassificationId in criticalVulnerabilidadSubClassifications) {
+      print('Checking vulnerabilidad subClassification: $subClassificationId');
+      
+      if (!vulnerabilidadSelections.containsKey(subClassificationId) || 
+          vulnerabilidadSelections[subClassificationId] == null ||
+          vulnerabilidadSelections[subClassificationId] == '') {
+        print('Subclasificación vulnerabilidad no calificada: $subClassificationId');
+        return true;
+      }
+      
+      // Verificar que la subclasificación tenga al menos una categoría calificada
+      final subClassificationData = vulnerabilidadSelections[subClassificationId];
+      if (subClassificationData is Map && subClassificationData.isEmpty) {
+        print('Subclasificación vulnerabilidad vacía: $subClassificationId');
         return true;
       }
     }
 
+    print('Todas las subclasificaciones de vulnerabilidad están calificadas');
     return false;
   }
 
