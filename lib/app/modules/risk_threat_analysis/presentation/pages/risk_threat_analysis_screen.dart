@@ -76,14 +76,7 @@ class RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
       final forceReset = widget.navigationData!['forceReset'] as bool? ?? false;
       final isNewForm = widget.navigationData!['isNewForm'] as bool? ?? false;
       
-      print('=== RiskThreatAnalysisScreen Navigation Decision ===');
-      print('navigationData completo: ${widget.navigationData}');
-      print('loadSavedForm: $loadSavedForm');
-      print('formId: $formId');
-      print('forceReset: $forceReset');
-      print('isNewForm: $isNewForm');
-      print('classificationName: $classificationName');
-      print('eventFromNavData: $eventFromNavData');
+      // Procesando datos de navegación
       
       // PRIORIDAD 1: Navegación a FinalRiskResultsScreen
       if (finalResults && targetIndex != null) {
@@ -105,7 +98,7 @@ class RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
       // PRIORIDAD 2: Procesar según el tipo de formulario
       if (loadSavedForm && formId != null) {
         // Cargar formulario desde SQLite (continuar formulario existente)
-        print('DECISIÓN: Cargar formulario guardado desde SQLite');
+        // Cargando formulario guardado
         
         // Establecer evento y clasificación ANTES de cargar datos
         if (eventFromNavData != null && eventFromNavData.isNotEmpty) {
@@ -120,44 +113,12 @@ class RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
         _loadFormFromSQLite(formId, bloc);
         
         } else if (forceReset || isNewForm) {
-          // Formulario nuevo - resetear completamente el RiskThreatAnalysisBloc
-          print('DECISIÓN: Formulario nuevo - reset completo del bloc');
-          print('RiskThreatAnalysisScreen: Estado ANTES del reset - ${bloc.state.toString()}');
-          
-          // FORZAR reset completo del bloc
-          bloc.add(ResetDropdowns());
-          
-          // RESETEAR EL ACTIVE FORMID EN HOMEBLOC PRIMERO
-          final homeBloc = context.read<HomeBloc>();
-          print('Reseteando activeFormId en HomeBloc a null...');
-          homeBloc.add(home_events.SetActiveFormId(formId: '', isCreatingNew: true));
-          
-          // Esperar un poco más para asegurar que el reset se complete
-          Future.delayed(const Duration(milliseconds: 100), () async {
-            print('RiskThreatAnalysisScreen: Estado DESPUÉS del reset - ${bloc.state.toString()}');
-            
-            // Después del reset, establecer el evento y clasificación para el nuevo formulario
-            if (eventFromNavData != null && eventFromNavData.isNotEmpty) {
-              bloc.add(UpdateSelectedRiskEvent(eventFromNavData));
-              print('RiskThreatAnalysisScreen: Evento establecido después del reset: $eventFromNavData');
-            }
-            if (classificationName != null) {
-              final navIndex = directToResults ? 2 : 0;
-              bloc.add(ChangeBottomNavIndex(navIndex));
-              bloc.add(SelectClassification(classificationName));
-              print('RiskThreatAnalysisScreen: Clasificación establecida después del reset: $classificationName');
-            }
-            
-            // NO CREAR FORMULARIO AUTOMÁTICAMENTE
-            // El formulario solo se creará cuando el usuario presione "Guardar" o "Finalizar"
-            print('RiskThreatAnalysisScreen: Navegación desde Categories Screen - NO creando formulario automáticamente');
-          });
-          
-          print('RiskThreatAnalysisScreen: ResetDropdowns ejecutado');
+          // Formulario nuevo - reset completo
+          _handleNewFormReset(bloc, eventFromNavData, classificationName, directToResults);
         
       } else {
         // Cargar datos existentes desde HomeBloc (comportamiento anterior)
-        print('DECISIÓN: Cargar datos desde HomeBloc (comportamiento anterior)');
+        // Cargando datos existentes
         
         // Establecer evento y clasificación ANTES de cargar datos
         if (eventFromNavData != null && eventFromNavData.isNotEmpty) {
@@ -169,8 +130,7 @@ class RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
           bloc.add(SelectClassification(classificationName));
         }
         
-        // TODO: Implementar método getSavedRiskEventModel en HomeBloc
-        // Por ahora, cargar datos vacíos usando eventos
+        // Cargar datos usando eventos
         bloc.add(LoadFormData(
           eventName: eventFromNavData ?? '',
           classificationType: classificationName ?? '',
@@ -257,91 +217,27 @@ class RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
   /// Carga un formulario guardado desde SQLite
   Future<void> _loadFormFromSQLite(String formId, RiskThreatAnalysisBloc bloc) async {
     try {
-      print('=== _loadFormFromSQLite DEBUG ===');
-      print('FormId: $formId');
+      // Cargando formulario desde SQLite
       
       final persistenceService = FormPersistenceService();
       final completeForm = await persistenceService.getCompleteForm(formId);
       
       if (completeForm != null) {
-        print('CompleteForm encontrado:');
-        print('  - EventName: ${completeForm.eventName}');
-        print('  - Amenaza Probabilidad: ${completeForm.amenazaProbabilidadSelections}');
-        print('  - Amenaza Intensidad: ${completeForm.amenazaIntensidadSelections}');
-        print('  - Amenaza Selected Prob: ${completeForm.amenazaSelectedProbabilidad}');
-        print('  - Amenaza Selected Int: ${completeForm.amenazaSelectedIntensidad}');
-        print('  - Vulnerabilidad: ${completeForm.vulnerabilidadSelections}');
-        print('  - EvidenceImages: ${completeForm.evidenceImages}');
-        print('  - EvidenceCoordinates: ${completeForm.evidenceCoordinates}');
+        // Formulario encontrado, procesando datos
         
         // Obtener la clasificación actual del navigationData
         final classification = widget.navigationData?['classification'] as String? ?? 'amenaza';
-        print('Classification a cargar: $classification');
         
-        Map<String, dynamic> formData;
-        
-        // Cargar datos según la clasificación actual
-        if (classification.toLowerCase() == 'amenaza') {
-          formData = {
-            'dynamicSelections': completeForm.amenazaSelections,
-            'subClassificationScores': completeForm.amenazaScores,
-            'subClassificationColors': completeForm.amenazaColors,
-            'probabilidadSelections': completeForm.amenazaProbabilidadSelections,
-            'intensidadSelections': completeForm.amenazaIntensidadSelections,
-            'selectedProbabilidad': completeForm.amenazaSelectedProbabilidad,
-            'selectedIntensidad': completeForm.amenazaSelectedIntensidad,
-            'evidenceImages': completeForm.evidenceImages,
-            'evidenceCoordinates': completeForm.evidenceCoordinates,
-          };
-          print('Cargando datos de AMENAZA');
-        } else if (classification.toLowerCase() == 'vulnerabilidad') {
-          formData = {
-            'dynamicSelections': completeForm.vulnerabilidadSelections,
-            'subClassificationScores': completeForm.vulnerabilidadScores,
-            'subClassificationColors': completeForm.vulnerabilidadColors,
-            'probabilidadSelections': completeForm.vulnerabilidadProbabilidadSelections,
-            'intensidadSelections': completeForm.vulnerabilidadIntensidadSelections,
-            'selectedProbabilidad': completeForm.vulnerabilidadSelectedProbabilidad,
-            'selectedIntensidad': completeForm.vulnerabilidadSelectedIntensidad,
-            'evidenceImages': completeForm.evidenceImages,
-            'evidenceCoordinates': completeForm.evidenceCoordinates,
-          };
-          print('Cargando datos de VULNERABILIDAD');
-        } else {
-          // Fallback a amenaza
-          formData = {
-            'dynamicSelections': completeForm.amenazaSelections,
-            'subClassificationScores': completeForm.amenazaScores,
-            'subClassificationColors': completeForm.amenazaColors,
-            'probabilidadSelections': completeForm.amenazaProbabilidadSelections,
-            'intensidadSelections': completeForm.amenazaIntensidadSelections,
-            'selectedProbabilidad': completeForm.amenazaSelectedProbabilidad,
-            'selectedIntensidad': completeForm.amenazaSelectedIntensidad,
-            'evidenceImages': completeForm.evidenceImages,
-            'evidenceCoordinates': completeForm.evidenceCoordinates,
-          };
-          print('Cargando datos de AMENAZA (fallback)');
-        }
-        
-        print('FormData preparado: $formData');
-        
-        // Cargar datos en el bloc - pasar los datos en el formato esperado
-        // final dataWithEvaluationWrapper = {
-        //   'evaluationData': formData,
-        // };
-        print('Enviando a loadExistingFormData...');
+        // Cargar datos en el bloc
         bloc.add(LoadFormData(
           eventName: completeForm.eventName,
           classificationType: classification,
         ));
         
-        print('Formulario completo cargado desde SQLite: $formId');
-        print('Evento: ${completeForm.eventName}');
-        print('Clasificación: $classification');
+        // Formulario cargado exitosamente
       } else {
-        print('No se encontró el formulario completo con ID: $formId');
+        // Formulario no encontrado
       }
-      print('=== FIN _loadFormFromSQLite DEBUG ===');
     } catch (e) {
       print('Error al cargar formulario completo desde SQLite: $e');
       print('Stack trace: ${StackTrace.current}');
@@ -351,15 +247,13 @@ class RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
   /// Carga datos completos del formulario para mostrar en resultados finales
   void _loadCompleteFormDataForFinalResults(String formId, RiskThreatAnalysisBloc bloc) async {
     try {
-      print('=== _loadCompleteFormDataForFinalResults DEBUG ===');
-      print('Cargando formulario completo para resultados finales: $formId');
+      // Cargando formulario para resultados finales
       
       final persistenceService = FormPersistenceService();
       final completeForm = await persistenceService.getCompleteForm(formId);
       
       if (completeForm != null) {
-        print('Formulario completo encontrado para resultados finales');
-        print('Evento: ${completeForm.eventName}');
+        // Formulario encontrado para resultados finales
         
         // Combinar datos de Amenaza y Vulnerabilidad para mostrar en resultados finales
         // final combinedData = <String, dynamic>{
@@ -383,12 +277,7 @@ class RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
         //   'evidenceCoordinates': completeForm.evidenceCoordinates,
         // };
         
-        print('Datos combinados cargados para resultados finales:');
-        print('  - Amenaza probabilidad: ${completeForm.amenazaProbabilidadSelections}');
-        print('  - Amenaza intensidad: ${completeForm.amenazaIntensidadSelections}');
-        print('  - Vulnerabilidad: ${completeForm.vulnerabilidadSelections}');
-        print('  - EvidenceImages: ${completeForm.evidenceImages}');
-        print('  - EvidenceCoordinates: ${completeForm.evidenceCoordinates}');
+        // Datos combinados cargados para resultados finales
         
         // Cargar datos combinados en el bloc
         bloc.add(LoadFormData(
@@ -396,15 +285,41 @@ class RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
           classificationType: 'final_results',
         ));
         
-        print('Datos cargados exitosamente en el bloc para resultados finales');
+        // Datos cargados exitosamente
       } else {
-        print('No se encontró el formulario completo para resultados finales con ID: $formId');
+        // Formulario no encontrado para resultados finales
       }
-      print('=== FIN _loadCompleteFormDataForFinalResults DEBUG ===');
     } catch (e) {
       print('Error al cargar formulario completo para resultados finales: $e');
       print('Stack trace: ${StackTrace.current}');
     }
+  }
+
+  /// Maneja el reset completo para formularios nuevos
+  void _handleNewFormReset(
+    RiskThreatAnalysisBloc bloc,
+    String? eventFromNavData,
+    String? classificationName,
+    bool directToResults,
+  ) {
+    // Resetear completamente el bloc
+    bloc.add(const ResetDropdowns());
+    
+    // Resetear el activeFormId en HomeBloc
+    final homeBloc = context.read<HomeBloc>();
+    homeBloc.add(home_events.SetActiveFormId(formId: '', isCreatingNew: true));
+    
+    // Establecer evento y clasificación después del reset
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (eventFromNavData != null && eventFromNavData.isNotEmpty) {
+        bloc.add(UpdateSelectedRiskEvent(eventFromNavData));
+      }
+      if (classificationName != null) {
+        final navIndex = directToResults ? 2 : 0;
+        bloc.add(ChangeBottomNavIndex(navIndex));
+        bloc.add(SelectClassification(classificationName));
+      }
+    });
   }
 
 }

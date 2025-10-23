@@ -53,7 +53,7 @@ class _RatingScreenState extends State<RatingScreen> {
           final eventToSet = data['event'] as String?;
           final classificationToSet = data['classification'] as String?;
           
-          print('RatingScreen: Modo edición - Cargando datos existentes - event: $eventToSet, classification: $classificationToSet');
+          // Modo edición - Cargando datos existentes
           
           if (eventToSet != null) {
             context.read<RiskThreatAnalysisBloc>().add(
@@ -68,13 +68,13 @@ class _RatingScreenState extends State<RatingScreen> {
           }
         } else {
           // Para cualquier otro caso (formulario nuevo, reset forzado, o sin navigationData específico)
-          print('RatingScreen: Formulario nuevo o reset forzado - Reseteando estado completamente');
+          // Formulario nuevo o reset forzado - Reseteando estado
           // Resetear completamente el estado para una nueva calificación
           context.read<RiskThreatAnalysisBloc>().add(const ResetState());
         }
       } else {
         // Si no hay navigationData, es un formulario nuevo - resetear
-        print('RatingScreen: Sin navigationData - Formulario nuevo - Reseteando estado completamente');
+        // Sin navigationData - Formulario nuevo - Reseteando estado
         context.read<RiskThreatAnalysisBloc>().add(const ResetState());
       }
     });
