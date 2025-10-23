@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:caja_herramientas/app/modules/home/presentation/widgets/risk_categories_header.dart';
 import 'package:caja_herramientas/app/modules/home/presentation/widgets/risk_categories_container.dart';
 import 'package:caja_herramientas/app/modules/home/presentation/widgets/risk_info_container.dart';
-import 'package:caja_herramientas/app/modules/home/presentation/widgets/risk_completion_progress.dart';
 import 'package:caja_herramientas/app/modules/home/presentation/widgets/results_risk_section_widget.dart';
 import 'package:caja_herramientas/app/modules/home/presentation/bloc/home_state.dart';
 
@@ -25,29 +24,17 @@ class RiskCategoriesContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final completedCategories = categoryStates.values
-        .where((state) => state.isCompleted)
-        .length;
-    final totalCategories = classifications.length;
-
     return SingleChildScrollView(
       child: Padding(
         padding: EdgeInsets.zero,
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const RiskCategoriesHeader(),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Progreso de completitud
-                  RiskCompletionProgress(
-                    completedCategories: completedCategories,
-                    totalCategories: totalCategories,
-                    selectedEvent: selectedEvent,
-                  ),
-                  const SizedBox(height: 20),
                   
                   // Contenedor de categorías
                   RiskCategoriesContainer(
