@@ -4,15 +4,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../domain/entities/risk_analysis_entity.dart';
-import 'package:caja_herramientas/app/shared/models/dropdown_category.dart';
 import 'package:caja_herramientas/app/shared/models/risk_event_factory.dart';
 import 'package:caja_herramientas/app/shared/models/risk_model_adapter.dart';
 import 'package:caja_herramientas/app/shared/models/risk_event_model.dart';
 import '../../domain/use_cases/save_risk_analysis_usecase.dart';
 import '../../domain/use_cases/load_risk_analysis_usecase.dart';
-import '../../domain/use_cases/validate_form_usecase.dart';
-import '../../domain/use_cases/calculate_rating_usecase.dart';
-import '../../domain/use_cases/calculate_score_usecase.dart';
 import '../../domain/use_cases/validate_unqualified_variables_usecase.dart';
 import '../../domain/use_cases/calculate_global_score_usecase.dart';
 import 'risk_threat_analysis_event.dart';
@@ -23,25 +19,16 @@ import 'risk_threat_analysis_state.dart';
 class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAnalysisState> {
   final SaveRiskAnalysisUseCase _saveRiskAnalysisUseCase;
   final LoadRiskAnalysisUseCase _loadRiskAnalysisUseCase;
-  final ValidateFormUseCase _validateFormUseCase;
-  final CalculateRatingUseCase _calculateRatingUseCase;
-  final CalculateScoreUseCase _calculateScoreUseCase;
   final ValidateUnqualifiedVariablesUseCase _validateUnqualifiedVariablesUseCase;
   final CalculateGlobalScoreUseCase _calculateGlobalScoreUseCase;
 
   RiskThreatAnalysisBloc({
     required SaveRiskAnalysisUseCase saveRiskAnalysisUseCase,
     required LoadRiskAnalysisUseCase loadRiskAnalysisUseCase,
-    required ValidateFormUseCase validateFormUseCase,
-    required CalculateRatingUseCase calculateRatingUseCase,
-    required CalculateScoreUseCase calculateScoreUseCase,
     required ValidateUnqualifiedVariablesUseCase validateUnqualifiedVariablesUseCase,
     required CalculateGlobalScoreUseCase calculateGlobalScoreUseCase,
   }) : _saveRiskAnalysisUseCase = saveRiskAnalysisUseCase,
        _loadRiskAnalysisUseCase = loadRiskAnalysisUseCase,
-       _validateFormUseCase = validateFormUseCase,
-       _calculateRatingUseCase = calculateRatingUseCase,
-       _calculateScoreUseCase = calculateScoreUseCase,
        _validateUnqualifiedVariablesUseCase = validateUnqualifiedVariablesUseCase,
        _calculateGlobalScoreUseCase = calculateGlobalScoreUseCase,
        super(RiskThreatAnalysisState.initial()) {
@@ -52,6 +39,7 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     on<SelectProbabilidad>(_onSelectProbabilidad);
     on<SelectIntensidad>(_onSelectIntensidad);
     on<ResetDropdowns>(_onResetDropdowns);
+    on<ResetState>(_onResetState);
     on<ChangeBottomNavIndex>(_onChangeBottomNavIndex);
     on<UpdateProbabilidadSelection>(_onUpdateProbabilidadSelection);
     on<UpdateIntensidadSelection>(_onUpdateIntensidadSelection);
@@ -141,6 +129,18 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
       ));
     } catch (e) {
       emit(state.setError('Error al resetear dropdowns: $e'));
+    }
+  }
+
+  Future<void> _onResetState(
+    ResetState event,
+    Emitter<RiskThreatAnalysisState> emit,
+  ) async {
+    try {
+      // Resetear completamente el estado a su estado inicial
+      emit(RiskThreatAnalysisState.initial());
+    } catch (e) {
+      emit(state.setError('Error al resetear estado: $e'));
     }
   }
 
@@ -629,193 +629,9 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     return state.subClassificationColors[subClassificationId] ?? Colors.transparent;
   }
 
-  /// Verificar si hay variables críticas calificadas
-  bool _hasCriticalVariablesQualified(String subClassificationId) {
-    final dynamicSelections = state.dynamicSelections[subClassificationId];
-    if (dynamicSelections == null || dynamicSelections.isEmpty) {
-      return false;
-    }
 
-    // Obtener variables críticas según la subclasificación
-    final criticalVariables = _getCriticalVariablesForSubClassification(subClassificationId);
-    
-    // Verificar si al menos una variable crítica está calificada
-    for (final criticalVar in criticalVariables) {
-      if (dynamicSelections.containsKey(criticalVar) && 
-          dynamicSelections[criticalVar] != null && 
-          dynamicSelections[criticalVar].toString().isNotEmpty &&
-          dynamicSelections[criticalVar] != 'No Aplica') {
-        return true;
-      }
-    }
-    
-    return false;
-  }
 
-  /// Calcular score basado en variables críticas con pesos
-  double _calculateScoreBasedOnCriticalVariables(String subClassificationId) {
-    final dynamicSelections = state.dynamicSelections[subClassificationId];
-    if (dynamicSelections == null || dynamicSelections.isEmpty) {
-      return 0.0;
-    }
 
-    // Verificar condición especial dinámicamente según el evento seleccionado
-    final specialCondition = _getSpecialConditionForEvent(state.selectedRiskEvent, subClassificationId);
-    if (specialCondition != null) {
-      final specialValue = dynamicSelections[specialCondition['variable']];
-      if (specialValue != null && specialValue.toString() == specialCondition['triggerValue']) {
-        return specialCondition['resultValue'].toDouble(); // Retornar valor especial directamente
-      }
-    }
-
-    // Obtener variables críticas con sus pesos según la subclasificación
-    final criticalVariablesWithWeights = _getCriticalVariablesWithWeights(subClassificationId);
-    
-    double totalWeightedScore = 0.0;
-    double totalWeight = 0.0;
-
-    // Calcular promedio ponderado
-    for (final entry in criticalVariablesWithWeights.entries) {
-      final variable = entry.key;
-      final weight = entry.value;
-      
-      if (dynamicSelections.containsKey(variable) && 
-          dynamicSelections[variable] != null && 
-          dynamicSelections[variable].toString().isNotEmpty &&
-          dynamicSelections[variable] != 'No Aplica') {
-        
-        final value = _levelToScore(dynamicSelections[variable].toString());
-        if (value > 0) {
-          totalWeightedScore += (value * weight);
-          totalWeight += weight;
-        }
-      }
-    }
-
-    return totalWeight > 0 ? totalWeightedScore / totalWeight : 0.0;
-  }
-
-  /// Obtener variables críticas según la subclasificación
-  List<String> _getCriticalVariablesForSubClassification(String subClassificationId) {
-    // Mapear subclasificaciones a sus variables críticas
-    if (subClassificationId.toLowerCase().contains('probabilidad')) {
-      return [
-        'Características Geotécnicas',
-        'Antecedentes',
-        'Evidencias de Materialización o Reactivación'
-      ];
-    } else if (subClassificationId.toLowerCase().contains('intensidad')) {
-      return [
-        'Potencial de Daño en Edificaciones',
-        'Capacidad de Generar Pérdida de Vidas Humanas'
-      ];
-    } else {
-      // Para vulnerabilidad
-      return [
-        'Exposición',
-        'Fragilidad',
-        'Resistencia'
-      ];
-    }
-  }
-
-  /// Obtener variables críticas con sus pesos según la subclasificación y evento seleccionado
-  Map<String, double> _getCriticalVariablesWithWeights(String subClassificationId) {
-    // Obtener el evento seleccionado dinámicamente
-    final riskEvent = RiskEventFactory.getEventByName(state.selectedRiskEvent) ??
-        RiskEventFactory.createMovimientoEnMasa();
-    
-    // Buscar la clasificación actual
-    final classification = riskEvent.classifications.firstWhere(
-      (c) => c.name.toLowerCase() == state.selectedClassification.toLowerCase(),
-      orElse: () => riskEvent.classifications.first,
-    );
-    
-    // Buscar la subclasificación específica
-    final subClassification = classification.subClassifications.firstWhere(
-      (sc) => sc.id == subClassificationId,
-      orElse: () => classification.subClassifications.first,
-    );
-    
-    // Obtener pesos dinámicamente desde las categorías de la subclasificación
-    final weightsMap = <String, double>{};
-    for (final category in subClassification.categories) {
-      // Los pesos deben estar definidos en el modelo de datos
-      // Por ahora usar pesos por defecto basados en el nombre de la categoría
-      weightsMap[category.title] = _getDefaultWeightForCategory(category.title);
-    }
-    
-    return weightsMap;
-  }
-
-  /// Obtener peso por defecto para una categoría específica
-  double _getDefaultWeightForCategory(String categoryTitle) {
-    // Mapear categorías a sus pesos específicos según el evento
-    switch (categoryTitle) {
-      case 'Características Geotécnicas':
-        return 15.0;
-      case 'Antecedentes':
-        return 20.0;
-      case 'Evidencias de Materialización o Reactivación':
-        return 15.0;
-      case 'Intervención Antrópica':
-        return 10.0;
-      case 'Manejo de Aguas de Lluvia':
-        return 10.0;
-      case 'Condiciones Hidrogeológicas':
-        return 30.0;
-      case 'Potencial de Daño en Edificaciones':
-        return 40.0;
-      case 'Capacidad de Generar Pérdida de Vidas Humanas':
-        return 30.0;
-      case 'Potencial de Daño en Infraestructura':
-        return 30.0;
-      case 'Exposición':
-        return 33.33;
-      case 'Fragilidad':
-        return 33.33;
-      case 'Resistencia':
-        return 33.34;
-      default:
-        return 10.0; // Peso por defecto
-    }
-  }
-
-  /// Obtener condición especial para un evento y subclasificación específicos
-  Map<String, dynamic>? _getSpecialConditionForEvent(String eventName, String subClassificationId) {
-    // Condiciones especiales por evento y subclasificación
-    if (eventName.toLowerCase().contains('movimiento en masa') && 
-        subClassificationId.toLowerCase().contains('probabilidad')) {
-      return {
-        'variable': 'Evidencias de Materialización o Reactivación',
-        'triggerValue': '4',
-        'resultValue': 4.0,
-      };
-    }
-    
-    // Agregar más condiciones especiales para otros eventos aquí
-    // if (eventName.toLowerCase().contains('otro evento') && ...) {
-    //   return { ... };
-    // }
-    
-    return null; // No hay condición especial para este evento/subclasificación
-  }
-
-  /// Convertir nivel numérico a score (1=1.0, 2=2.0, 3=3.0, 4=4.0)
-  double _levelToScore(String level) {
-    switch (level) {
-      case '1':
-        return 1.0;
-      case '2':
-        return 2.0;
-      case '3':
-        return 3.0;
-      case '4':
-        return 4.0;
-      default:
-        return 0.0;
-    }
-  }
 
   /// Convertir score a color (del código original)
   Color _scoreToColor(double score) {

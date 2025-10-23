@@ -46,13 +46,14 @@ class _RatingScreenState extends State<RatingScreen> {
         final data = widget.navigationData!;
         final forceReset = data['forceReset'] as bool? ?? false;
         final isNewForm = data['isNewForm'] as bool? ?? false;
+        final isEditMode = data['isEditMode'] as bool? ?? false;
         
-        // Solo procesar navigationData si NO es un formulario nuevo
-        if (!forceReset && !isNewForm) {
+        // Si es modo edición, cargar datos existentes
+        if (isEditMode && !forceReset && !isNewForm) {
           final eventToSet = data['event'] as String?;
           final classificationToSet = data['classification'] as String?;
           
-          print('RatingScreen: Procesando navigationData - event: $eventToSet, classification: $classificationToSet');
+          print('RatingScreen: Modo edición - Cargando datos existentes - event: $eventToSet, classification: $classificationToSet');
           
           if (eventToSet != null) {
             context.read<RiskThreatAnalysisBloc>().add(
@@ -66,8 +67,15 @@ class _RatingScreenState extends State<RatingScreen> {
             );
           }
         } else {
-          print('RatingScreen: Formulario nuevo detectado - NO procesando navigationData');
+          // Para cualquier otro caso (formulario nuevo, reset forzado, o sin navigationData específico)
+          print('RatingScreen: Formulario nuevo o reset forzado - Reseteando estado completamente');
+          // Resetear completamente el estado para una nueva calificación
+          context.read<RiskThreatAnalysisBloc>().add(const ResetState());
         }
+      } else {
+        // Si no hay navigationData, es un formulario nuevo - resetear
+        print('RatingScreen: Sin navigationData - Formulario nuevo - Reseteando estado completamente');
+        context.read<RiskThreatAnalysisBloc>().add(const ResetState());
       }
     });
   }

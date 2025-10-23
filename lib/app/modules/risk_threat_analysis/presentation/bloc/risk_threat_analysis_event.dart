@@ -52,6 +52,11 @@ class ResetDropdowns extends RiskThreatAnalysisEvent {
   const ResetDropdowns();
 }
 
+/// Evento para resetear completamente el estado
+class ResetState extends RiskThreatAnalysisEvent {
+  const ResetState();
+}
+
 // ========== SELECCIONES ==========
 
 /// Evento para seleccionar probabilidad

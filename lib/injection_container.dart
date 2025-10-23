@@ -122,9 +122,6 @@ Future<void> initializeDependencies() async {
   sl.registerFactory(() => RiskThreatAnalysisBloc(
     saveRiskAnalysisUseCase: sl(),
     loadRiskAnalysisUseCase: sl(),
-    validateFormUseCase: sl(),
-    calculateRatingUseCase: sl(),
-    calculateScoreUseCase: sl(),
     validateUnqualifiedVariablesUseCase: sl(),
     calculateGlobalScoreUseCase: sl(),
   ));
