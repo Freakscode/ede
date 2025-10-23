@@ -202,11 +202,14 @@ class _RiskCategoriesScreenState extends State<RiskCategoriesScreen> {
     // Configurar evento y clasificación inmediatamente
     riskBloc.add(UpdateSelectedRiskEvent(selectedEvent));
     riskBloc.add(SelectClassification(classification.toLowerCase()));
+    
+    // SIEMPRE ir al RatingScreen (índice 0) desde RiskCategoriesScreen
+    riskBloc.add(ChangeBottomNavIndex(0));
 
     final navigationData = <String, dynamic>{
       'event': selectedEvent,
       'classification': classification.toLowerCase(),
-      'directToResults': isCompleted,
+      'targetIndex': 0, // SIEMPRE RatingScreen
       'source': 'RiskCategoriesScreen',
     };
 
