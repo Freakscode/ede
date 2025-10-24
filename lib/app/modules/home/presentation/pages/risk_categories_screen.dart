@@ -196,12 +196,18 @@ class _RiskCategoriesScreenState extends State<RiskCategoriesScreen> {
             // Crear mapas de estados para cada categoría
             final categoryStates = <String, CategoryState>{};
             for (final classification in classifications) {
+              // Obtener el progreso desde navigationData o desde el estado guardado
+              Map<String, double>? progressData = homeState.navigationData?.progressData;
+              if (progressData == null && homeState.activeFormId != null) {
+                progressData = homeState.getFormProgress(homeState.activeFormId!);
+              }
+              
               final state = _getCategoryState(
                 classification,
                 homeState,
                 context,
                 riskState,
-                homeState.navigationData?.progressData, // Pasar el progreso desde navigationData
+                progressData,
               );
               categoryStates[classification] = state;
             }

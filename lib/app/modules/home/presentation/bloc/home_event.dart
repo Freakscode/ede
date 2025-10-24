@@ -163,6 +163,20 @@ class SetActiveFormId extends HomeEvent {
   List<Object?> get props => [formId, isCreatingNew];
 }
 
+/// Evento para establecer el progreso de un formulario
+class SetFormProgress extends HomeEvent {
+  final String formId;
+  final Map<String, double> progressData;
+
+  const SetFormProgress({
+    required this.formId,
+    required this.progressData,
+  });
+
+  @override
+  List<Object?> get props => [formId, progressData];
+}
+
 /// Evento para guardar un modelo de evento de riesgo
 class SaveRiskEventModel extends HomeEvent {
   final String eventName;

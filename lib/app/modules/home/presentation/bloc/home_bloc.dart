@@ -45,6 +45,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<LoadFormForEditing>(_onLoadFormForEditing);
     on<CompleteForm>(_onCompleteForm);
     on<SetActiveFormId>(_onSetActiveFormId);
+    on<SetFormProgress>(_onSetFormProgress);
     on<SaveRiskEventModel>(_onSaveRiskEventModel);
     on<ResetAllForNewForm>(_onResetAllForNewForm);
     on<MarkEvaluationCompleted>(_onMarkEvaluationCompleted);
@@ -389,6 +390,17 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       emit(HomeState.fromEntity(updatedEntity));
     } catch (e) {
       emit(state.copyWith(error: 'Error al establecer formulario activo: $e'));
+    }
+  }
+
+  Future<void> _onSetFormProgress(SetFormProgress event, Emitter<HomeState> emit) async {
+    try {
+      final updatedProgressData = Map<String, Map<String, double>>.from(state.formProgressData);
+      updatedProgressData[event.formId] = event.progressData;
+      
+      emit(state.copyWith(formProgressData: updatedProgressData));
+    } catch (e) {
+      emit(state.copyWith(error: 'Error al establecer progreso del formulario: $e'));
     }
   }
 
