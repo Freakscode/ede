@@ -75,12 +75,6 @@ GoRouter getAppRouter(BuildContext context) {
         },
       ),
       
-      // Risk Categories - Categorías de riesgo (nueva pantalla integrada)
-      GoRoute(
-        path: '/risk-categories',
-        builder: (context, state) => const CategoriesScreen(),
-      ),
-      
       // Data Registration - Registro de datos
       GoRoute(
         path: '/data_registration',

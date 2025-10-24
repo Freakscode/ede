@@ -10,7 +10,6 @@ import 'package:caja_herramientas/app/shared/widgets/layouts/custom_bottom_nav_b
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import '../bloc/risk_threat_analysis_bloc.dart';
 import '../bloc/risk_threat_analysis_event.dart';
 import '../bloc/risk_threat_analysis_state.dart';
@@ -193,14 +192,15 @@ class RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
               showBack: true,
             onBack: () {
               if (state.currentBottomNavIndex == 4) {
-                // Cuando estamos en FinalRiskResultsScreen (índice 4), volver a categorías
-                context.go('/risk-categories');
+                // Cuando estamos en FinalRiskResultsScreen (índice 4), volver a categorías (índice 0)
+                context.read<RiskThreatAnalysisBloc>().add(ChangeBottomNavIndex(0));
               } else if (state.currentBottomNavIndex > 0) {
+                // Navegar al índice anterior
                 context.read<RiskThreatAnalysisBloc>().add(
                   ChangeBottomNavIndex(state.currentBottomNavIndex - 1),
                 );
               } else {
-                // Cuando estamos en CategoriesScreen (índice 0), volver al HomeScreen
+                // Cuando estamos en CategoriesScreen (índice 0), salir de la pantalla
                 // Resetear el estado del RiskThreatAnalysisBloc antes de navegar
                 context.read<RiskThreatAnalysisBloc>().add(ResetState());
                 
@@ -214,7 +214,8 @@ class RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
                   ));
                 }
                 
-                context.go('/risk-categories');
+                // Usar Navigator.pop para salir de la pantalla
+                Navigator.of(context).pop();
               }
             },
               showInfo: true,
@@ -230,7 +231,7 @@ class RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
               },
             ),
            
-            bottomNavigationBar: state.currentBottomNavIndex == 4 ? null : CustomBottomNavBar(
+            bottomNavigationBar: (state.currentBottomNavIndex == 0 || state.currentBottomNavIndex == 4) ? null : CustomBottomNavBar(
               currentIndex: state.currentBottomNavIndex,
               onTap: (index) {
                 context.read<RiskThreatAnalysisBloc>().add(

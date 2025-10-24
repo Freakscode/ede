@@ -155,57 +155,60 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<HomeBloc, HomeState>(
-      builder: (context, homeState) {
-        return BlocBuilder<RiskThreatAnalysisBloc, RiskThreatAnalysisState>(
-          builder: (context, riskState) {
-            final selectedEvent = homeState.selectedRiskEvent;
-            final homeBloc = context.read<HomeBloc>();
-            final classifications = homeBloc.getEventClassifications(
-              selectedEvent ?? '',
-            );
-
-            // Crear mapas de estados para cada categoría
-            final categoryStates = <String, CategoryState>{};
-            for (final classification in classifications) {
-              // Obtener el progreso desde navigationData o desde el estado guardado
-              Map<String, double>? progressData = homeState.navigationData?.progressData;
-              if (progressData == null && homeState.activeFormId != null) {
-                progressData = homeState.getFormProgress(homeState.activeFormId!);
-              }
-              
-              final state = _getCategoryState(
-                classification,
-                homeState,
-                context,
-                riskState,
-                progressData,
+    return Padding(
+      padding: const EdgeInsets.all(10),
+      child: BlocBuilder<HomeBloc, HomeState>(
+        builder: (context, homeState) {
+          return BlocBuilder<RiskThreatAnalysisBloc, RiskThreatAnalysisState>(
+            builder: (context, riskState) {
+              final selectedEvent = homeState.selectedRiskEvent;
+              final homeBloc = context.read<HomeBloc>();
+              final classifications = homeBloc.getEventClassifications(
+                selectedEvent ?? '',
               );
-              categoryStates[classification] = state;
-            }
-
-            return RiskCategoriesContent(
-              selectedEvent: selectedEvent ?? '',
-              onCategoryTap: _navigateToCategory,
-              getCategoryState: (classification) {
+      
+              // Crear mapas de estados para cada categoría
+              final categoryStates = <String, CategoryState>{};
+              for (final classification in classifications) {
                 // Obtener el progreso desde navigationData o desde el estado guardado
                 Map<String, double>? progressData = homeState.navigationData?.progressData;
                 if (progressData == null && homeState.activeFormId != null) {
                   progressData = homeState.getFormProgress(homeState.activeFormId!);
                 }
                 
-                return _getCategoryState(
+                final state = _getCategoryState(
                   classification,
                   homeState,
                   context,
                   riskState,
                   progressData,
                 );
-              },
-            );
-          },
-        );
-      },
+                categoryStates[classification] = state;
+              }
+      
+              return RiskCategoriesContent(
+                selectedEvent: selectedEvent ?? '',
+                onCategoryTap: _navigateToCategory,
+                getCategoryState: (classification) {
+                  // Obtener el progreso desde navigationData o desde el estado guardado
+                  Map<String, double>? progressData = homeState.navigationData?.progressData;
+                  if (progressData == null && homeState.activeFormId != null) {
+                    progressData = homeState.getFormProgress(homeState.activeFormId!);
+                  }
+                  
+                  return _getCategoryState(
+                    classification,
+                    homeState,
+                    context,
+                    riskState,
+                    progressData,
+                  );
+                },
+              );
+            },
+          );
+        },
+      ),
     );
   }
 }

@@ -536,18 +536,18 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
           progressData: progress,
         ));
 
-        // Navegar a la pantalla de categorías para ver el progreso y continuar
-        // Navegar directamente a la nueva pantalla de categorías
+        // Navegar directamente al RiskThreatAnalysisScreen con los datos del formulario
         final navigationData = {
           'event': completeForm.eventName,
           'loadSavedForm': true,
           'formId': completeForm.id,
           'showProgressInfo': true,
           'progressData': progress,
+          'targetIndex': 0, // Ir directamente a CategoriesScreen (índice 0)
         };
         
         if (!mounted) return;
-        context.go('/risk-categories', extra: navigationData);
+        context.go('/risk-threat-analysis', extra: navigationData);
       } else {
         // Si no se encuentra el formulario, mostrar error
         if (!mounted) return;
