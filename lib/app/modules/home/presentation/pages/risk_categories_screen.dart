@@ -5,6 +5,7 @@ import 'package:caja_herramientas/app/modules/home/presentation/bloc/home_state.
 import 'package:caja_herramientas/app/modules/home/presentation/bloc/home_event.dart';
 import 'package:caja_herramientas/app/modules/risk_threat_analysis/presentation/bloc/risk_threat_analysis_bloc.dart';
 import 'package:caja_herramientas/app/modules/risk_threat_analysis/presentation/bloc/risk_threat_analysis_event.dart';
+import 'package:caja_herramientas/app/modules/risk_threat_analysis/presentation/bloc/risk_threat_analysis_state.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -23,6 +24,7 @@ class _RiskCategoriesScreenState extends State<RiskCategoriesScreen> {
     String classification,
     HomeState homeState,
     BuildContext context,
+    RiskThreatAnalysisState riskState,
   ) {
     final isAmenaza = classification.toLowerCase() == 'amenaza';
     final isVulnerabilidad = classification.toLowerCase() == 'vulnerabilidad';
@@ -30,47 +32,58 @@ class _RiskCategoriesScreenState extends State<RiskCategoriesScreen> {
         homeState.activeFormId != null && !homeState.isCreatingNew;
 
     if (isAmenaza) {
-      return _getAmenazaState(context);
+      return _getAmenazaState(context, riskState);
     } else if (isVulnerabilidad) {
-      return _getVulnerabilidadState(homeState, context, isEditMode);
+      return _getVulnerabilidadState(homeState, context, isEditMode, riskState);
     }
 
-    return const CategoryState(isAvailable: false, isCompleted: false);
+    return const CategoryState(isAvailable: false, progressPercentage: 0);
   }
 
   // Estado específico para Amenaza
-  CategoryState _getAmenazaState(BuildContext context) {
-    bool isCompleted = false;
-    bool isInProgress = false;
+  CategoryState _getAmenazaState(BuildContext context, RiskThreatAnalysisState riskState) {
+    int progressPercentage = 0;
 
-    try {
-      final riskBloc = context.read<RiskThreatAnalysisBloc>();
-      final state = riskBloc.state;
+    // Solo calcular si hay datos
+    if (riskState.probabilidadSelections.isNotEmpty || 
+        riskState.intensidadSelections.isNotEmpty || 
+        riskState.evidenceImages.isNotEmpty) {
+      
+      int completedItems = 0;
+      int totalItems = 0;
 
-      // Verificar si hay datos básicos
-      final hasProbabilidadSelections = state.probabilidadSelections.isNotEmpty;
-      final hasIntensidadSelections = state.intensidadSelections.isNotEmpty;
-      final hasEvidence = state.evidenceImages.isNotEmpty;
+      // Contar probabilidad
+      if (riskState.probabilidadSelections.isNotEmpty) {
+        totalItems += riskState.probabilidadSelections.length;
+        completedItems += riskState.probabilidadSelections.values
+            .where((value) => value.isNotEmpty && value != 'NA')
+            .length;
+      }
 
-      // Lógica simplificada: está completa si tiene datos y evidencia
-      isCompleted =
-          (hasProbabilidadSelections || hasIntensidadSelections) && hasEvidence;
+      // Contar intensidad
+      if (riskState.intensidadSelections.isNotEmpty) {
+        totalItems += riskState.intensidadSelections.length;
+        completedItems += riskState.intensidadSelections.values
+            .where((value) => value.isNotEmpty && value != 'NA')
+            .length;
+      }
 
-      // Está en progreso si tiene algunos datos pero no está completa
-      isInProgress =
-          (hasProbabilidadSelections ||
-              hasIntensidadSelections ||
-              hasEvidence) &&
-          !isCompleted;
-    } catch (e) {
-      isCompleted = false;
-      isInProgress = false;
+      // Contar evidencias
+      if (riskState.evidenceImages.isNotEmpty) {
+        totalItems += 1;
+        completedItems += riskState.evidenceImages.values
+            .any((images) => images.isNotEmpty) ? 1 : 0;
+      }
+
+      // Calcular porcentaje
+      if (totalItems > 0) {
+        progressPercentage = ((completedItems / totalItems) * 100).round();
+      }
     }
 
     return CategoryState(
       isAvailable: true,
-      isCompleted: isCompleted,
-      isInProgress: isInProgress,
+      progressPercentage: progressPercentage,
     );
   }
 
@@ -79,11 +92,12 @@ class _RiskCategoriesScreenState extends State<RiskCategoriesScreen> {
     HomeState homeState,
     BuildContext context,
     bool isEditMode,
+    RiskThreatAnalysisState riskState,
   ) {
     if (isEditMode) {
-      return _getVulnerabilidadEditMode(homeState, context);
+      return _getVulnerabilidadEditMode(homeState, context, riskState);
     } else {
-      return _getVulnerabilidadCreateMode(homeState, context);
+      return _getVulnerabilidadCreateMode(homeState, context, riskState);
     }
   }
 
@@ -91,36 +105,39 @@ class _RiskCategoriesScreenState extends State<RiskCategoriesScreen> {
   CategoryState _getVulnerabilidadEditMode(
     HomeState homeState,
     BuildContext context,
+    RiskThreatAnalysisState riskState,
   ) {
     final isAvailable = homeState.activeFormId != null;
-    bool isCompleted = false;
-    bool isInProgress = false;
+    int progressPercentage = 0;
 
-    if (isAvailable) {
-      try {
-        final riskBloc = context.read<RiskThreatAnalysisBloc>();
-        final state = riskBloc.state;
+    if (isAvailable && (riskState.dynamicSelections.isNotEmpty || riskState.evidenceImages.isNotEmpty)) {
+      int completedItems = 0;
+      int totalItems = 0;
 
-        // Verificar si hay selecciones de vulnerabilidad
-        final hasVulnerabilidadSelections = state.dynamicSelections.isNotEmpty;
-        final hasEvidence = state.evidenceImages.isNotEmpty;
+      // Contar selecciones de vulnerabilidad
+      for (final subClassSelections in riskState.dynamicSelections.values) {
+        totalItems += subClassSelections.length;
+        completedItems += subClassSelections.values
+            .where((value) => value.isNotEmpty && value != 'NA')
+            .length;
+      }
 
-        // Lógica simplificada: está completa si tiene datos de vulnerabilidad y evidencia
-        isCompleted = hasVulnerabilidadSelections && hasEvidence;
+      // Contar evidencias
+      if (riskState.evidenceImages.isNotEmpty) {
+        totalItems += 1;
+        completedItems += riskState.evidenceImages.values
+            .any((images) => images.isNotEmpty) ? 1 : 0;
+      }
 
-        // Verificar si está en progreso (tiene algunas selecciones pero no está completa)
-        isInProgress =
-            (hasVulnerabilidadSelections || hasEvidence) && !isCompleted;
-      } catch (e) {
-        isCompleted = false;
-        isInProgress = false;
+      // Calcular porcentaje
+      if (totalItems > 0) {
+        progressPercentage = ((completedItems / totalItems) * 100).round();
       }
     }
 
     return CategoryState(
       isAvailable: isAvailable,
-      isCompleted: isCompleted,
-      isInProgress: isInProgress,
+      progressPercentage: progressPercentage,
       disabledMessage: isAvailable ? null : 'No hay formulario activo',
     );
   }
@@ -129,52 +146,58 @@ class _RiskCategoriesScreenState extends State<RiskCategoriesScreen> {
   CategoryState _getVulnerabilidadCreateMode(
     HomeState homeState,
     BuildContext context,
+    RiskThreatAnalysisState riskState,
   ) {
     bool amenazaCompleted = false;
 
-    try {
-      final riskBloc = context.read<RiskThreatAnalysisBloc>();
-      final hasUnqualifiedAmenaza = riskBloc.hasUnqualifiedVariables();
-      final hasEvidence = riskBloc.state.evidenceImages.isNotEmpty;
-      amenazaCompleted = !hasUnqualifiedAmenaza && hasEvidence;
-    } catch (e) {
-      amenazaCompleted = false;
+    // Verificar si amenaza está completa usando solo el estado actual
+    if (riskState.selectedRiskEvent != null && riskState.selectedRiskEvent!.isNotEmpty) {
+      // Usar solo el estado actual sin llamar al BLoC para evitar bucles
+      final hasAmenazaData = riskState.probabilidadSelections.isNotEmpty || 
+                            riskState.intensidadSelections.isNotEmpty;
+      final hasEvidence = riskState.evidenceImages.isNotEmpty;
+      
+      // Simplificar la lógica: si hay datos de amenaza y evidencias, considerar completa
+      amenazaCompleted = hasAmenazaData && hasEvidence;
     }
 
     final isAvailable = amenazaCompleted && homeState.activeFormId != null;
-    bool isCompleted = false;
-    bool isInProgress = false;
+    int progressPercentage = 0;
     String? disabledMessage;
 
     if (!isAvailable) {
       disabledMessage = amenazaCompleted
           ? 'No hay formulario activo'
           : 'Complete primero la calificación de Amenaza';
-    } else {
-      try {
-        final riskBloc = context.read<RiskThreatAnalysisBloc>();
-        final state = riskBloc.state;
+    } else if (riskState.dynamicSelections.isNotEmpty || riskState.evidenceImages.isNotEmpty) {
+      // Calcular progreso solo si hay datos
+      int completedItems = 0;
+      int totalItems = 0;
 
-        // Verificar si hay selecciones de vulnerabilidad
-        final hasVulnerabilidadSelections = state.dynamicSelections.isNotEmpty;
-        final hasEvidence = state.evidenceImages.isNotEmpty;
+      // Contar selecciones de vulnerabilidad
+      for (final subClassSelections in riskState.dynamicSelections.values) {
+        totalItems += subClassSelections.length;
+        completedItems += subClassSelections.values
+            .where((value) => value.isNotEmpty && value != 'NA')
+            .length;
+      }
 
-        // Lógica simplificada: está completa si tiene datos de vulnerabilidad y evidencia
-        isCompleted = hasVulnerabilidadSelections && hasEvidence;
+      // Contar evidencias
+      if (riskState.evidenceImages.isNotEmpty) {
+        totalItems += 1;
+        completedItems += riskState.evidenceImages.values
+            .any((images) => images.isNotEmpty) ? 1 : 0;
+      }
 
-        // Verificar si está en progreso (tiene algunas selecciones pero no está completa)
-        isInProgress =
-            (hasVulnerabilidadSelections || hasEvidence) && !isCompleted;
-      } catch (e) {
-        isCompleted = false;
-        isInProgress = false;
+      // Calcular porcentaje
+      if (totalItems > 0) {
+        progressPercentage = ((completedItems / totalItems) * 100).round();
       }
     }
 
     return CategoryState(
       isAvailable: isAvailable,
-      isCompleted: isCompleted,
-      isInProgress: isInProgress,
+      progressPercentage: progressPercentage,
       disabledMessage: disabledMessage,
     );
   }
@@ -229,28 +252,34 @@ class _RiskCategoriesScreenState extends State<RiskCategoriesScreen> {
   Widget build(BuildContext context) {
     return BlocBuilder<HomeBloc, HomeState>(
       builder: (context, homeState) {
-        final selectedEvent = homeState.selectedRiskEvent;
-        final homeBloc = context.read<HomeBloc>();
-        final classifications = homeBloc.getEventClassifications(
-          selectedEvent ?? '',
-        );
+        return BlocBuilder<RiskThreatAnalysisBloc, RiskThreatAnalysisState>(
+          builder: (context, riskState) {
+            final selectedEvent = homeState.selectedRiskEvent;
+            final homeBloc = context.read<HomeBloc>();
+            final classifications = homeBloc.getEventClassifications(
+              selectedEvent ?? '',
+            );
 
-        // Crear mapas de estados para cada categoría
-        final categoryStates = <String, CategoryState>{};
-        for (final classification in classifications) {
-          categoryStates[classification] = _getCategoryState(
-            classification,
-            homeState,
-            context,
-          );
-        }
+            // Crear mapas de estados para cada categoría
+            final categoryStates = <String, CategoryState>{};
+            for (final classification in classifications) {
+              final state = _getCategoryState(
+                classification,
+                homeState,
+                context,
+                riskState,
+              );
+              categoryStates[classification] = state;
+            }
 
-        return RiskCategoriesContent(
-          classifications: classifications,
-          selectedEvent: selectedEvent ?? '',
-          categoryStates: categoryStates,
-          onCategoryTap: _navigateToCategory,
-          homeState: homeState,
+            return RiskCategoriesContent(
+              classifications: classifications,
+              selectedEvent: selectedEvent ?? '',
+              categoryStates: categoryStates,
+              onCategoryTap: _navigateToCategory,
+              homeState: homeState,
+            );
+          },
         );
       },
     );

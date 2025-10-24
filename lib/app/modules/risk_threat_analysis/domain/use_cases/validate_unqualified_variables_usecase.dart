@@ -9,8 +9,6 @@ class ValidateUnqualifiedVariablesUseCase {
   bool execute(Map<String, dynamic> formData) {
     try {
       final selectedClassification = formData['selectedClassification'] as String? ?? '';
-      print('=== DEBUG execute ===');
-      print('selectedClassification: $selectedClassification');
       
       // Solo verificar la clasificación actual
       if (selectedClassification.toLowerCase() == 'amenaza') {
@@ -25,70 +23,53 @@ class ValidateUnqualifiedVariablesUseCase {
       
       return amenazaHasUnqualified || vulnerabilidadHasUnqualified;
     } catch (e) {
-      print('Error in execute: $e');
       return false;
     }
   }
 
   /// Verificar variables no calificadas en amenaza
   bool _checkAmenazaUnqualifiedVariables(Map<String, dynamic> formData) {
-    print('=== DEBUG _checkAmenazaUnqualifiedVariables ===');
-    
     // Verificar probabilidad
     final probabilidadSelections = Map<String, dynamic>.from(
       formData['amenazaProbabilidadSelections'] ?? {}
     );
-    print('probabilidadSelections: $probabilidadSelections');
     
     // Verificar intensidad
     final intensidadSelections = Map<String, dynamic>.from(
       formData['amenazaIntensidadSelections'] ?? {}
     );
-    print('intensidadSelections: $intensidadSelections');
 
     // Obtener las variables críticas dinámicamente desde RiskEventFactory
     final selectedEvent = formData['selectedRiskEvent'] as String? ?? '';
-    print('selectedEvent: $selectedEvent');
     
     final criticalProbabilidadVariables = _getDynamicProbabilidadVariables(selectedEvent);
     final criticalIntensidadVariables = _getDynamicIntensidadVariables(selectedEvent);
-    
-    print('criticalProbabilidadVariables (dinámico): $criticalProbabilidadVariables');
-    print('criticalIntensidadVariables (dinámico): $criticalIntensidadVariables');
 
     // Verificar si alguna variable crítica no está calificada
     for (final variable in criticalProbabilidadVariables) {
-      print('Checking probabilidad variable: $variable');
       if (!probabilidadSelections.containsKey(variable) || 
           probabilidadSelections[variable] == null ||
           probabilidadSelections[variable] == '') {
-        print('Variable probabilidad no calificada: $variable');
         return true;
       }
     }
 
     for (final variable in criticalIntensidadVariables) {
-      print('Checking intensidad variable: $variable');
       if (!intensidadSelections.containsKey(variable) || 
           intensidadSelections[variable] == null ||
           intensidadSelections[variable] == '') {
-        print('Variable intensidad no calificada: $variable');
         return true;
       }
     }
 
-    print('Todas las variables de amenaza están calificadas');
     return false;
   }
 
   /// Verificar variables no calificadas en vulnerabilidad
   bool _checkVulnerabilidadUnqualifiedVariables(Map<String, dynamic> formData) {
-    print('=== DEBUG _checkVulnerabilidadUnqualifiedVariables ===');
-    
     final vulnerabilidadSelections = Map<String, dynamic>.from(
       formData['vulnerabilidadSelections'] ?? {}
     );
-    print('vulnerabilidadSelections: $vulnerabilidadSelections');
 
     // Las subclasificaciones de vulnerabilidad según RiskEventFactory
     final criticalVulnerabilidadSubClassifications = [
@@ -99,24 +80,19 @@ class ValidateUnqualifiedVariablesUseCase {
 
     // Verificar si alguna subclasificación crítica no está calificada
     for (final subClassificationId in criticalVulnerabilidadSubClassifications) {
-      print('Checking vulnerabilidad subClassification: $subClassificationId');
-      
       if (!vulnerabilidadSelections.containsKey(subClassificationId) || 
           vulnerabilidadSelections[subClassificationId] == null ||
           vulnerabilidadSelections[subClassificationId] == '') {
-        print('Subclasificación vulnerabilidad no calificada: $subClassificationId');
         return true;
       }
       
       // Verificar que la subclasificación tenga al menos una categoría calificada
       final subClassificationData = vulnerabilidadSelections[subClassificationId];
       if (subClassificationData is Map && subClassificationData.isEmpty) {
-        print('Subclasificación vulnerabilidad vacía: $subClassificationId');
         return true;
       }
     }
 
-    print('Todas las subclasificaciones de vulnerabilidad están calificadas');
     return false;
   }
 
@@ -208,7 +184,6 @@ class ValidateUnqualifiedVariablesUseCase {
           .map((category) => category.title)
           .toList();
     } catch (e) {
-      print('Error getting dynamic probabilidad variables: $e');
       return [];
     }
   }

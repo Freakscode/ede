@@ -22,43 +22,58 @@ class ResultsRiskSectionWidget extends StatelessWidget {
   bool _isBothCompleted(BuildContext context) {
     try {
       final riskBloc = context.read<RiskThreatAnalysisBloc>();
+      final state = riskBloc.state;
       
-      // Verificar si Amenaza está completa
+      // Verificar Amenaza usando solo el estado actual sin cambiar clasificación
       bool amenazaCompleted = false;
-      final currentClassification = riskBloc.state.selectedClassification;
-      
-      // Cambiar temporalmente a amenaza para verificar completitud
-      if (currentClassification != 'amenaza') {
-        riskBloc.add(const SelectClassification('amenaza'));
+      if (state.probabilidadSelections.isNotEmpty || state.intensidadSelections.isNotEmpty) {
+        // Verificar si hay variables sin calificar en amenaza
+        bool hasUnqualifiedAmenaza = false;
+        
+        // Verificar probabilidad
+        for (final entry in state.probabilidadSelections.entries) {
+          if (entry.value.isEmpty || entry.value == 'NA') {
+            hasUnqualifiedAmenaza = true;
+            break;
+          }
+        }
+        
+        // Verificar intensidad
+        if (!hasUnqualifiedAmenaza) {
+          for (final entry in state.intensidadSelections.entries) {
+            if (entry.value.isEmpty || entry.value == 'NA') {
+              hasUnqualifiedAmenaza = true;
+              break;
+            }
+          }
+        }
+        
+        amenazaCompleted = !hasUnqualifiedAmenaza && state.evidenceImages.isNotEmpty;
       }
       
-      final hasUnqualifiedAmenaza = riskBloc.hasUnqualifiedVariables();
-      final hasEvidenceAmenaza = riskBloc.state.evidenceImages.isNotEmpty;
-      amenazaCompleted = !hasUnqualifiedAmenaza && hasEvidenceAmenaza;
-      
-      // Cambiar temporalmente a vulnerabilidad para verificar completitud
-      if (currentClassification != 'vulnerabilidad') {
-        riskBloc.add(const SelectClassification('vulnerabilidad'));
-      }
-      
-      final hasUnqualifiedVulnerabilidad = riskBloc.hasUnqualifiedVariables();
-      final hasEvidenceVulnerabilidad = riskBloc.state.evidenceImages.isNotEmpty;
-      final vulnerabilidadCompleted = !hasUnqualifiedVulnerabilidad && hasEvidenceVulnerabilidad;
-      
-      // Restaurar clasificación original
-      if (currentClassification != riskBloc.state.selectedClassification) {
-        riskBloc.add(SelectClassification(currentClassification ?? ''));
+      // Verificar Vulnerabilidad usando solo el estado actual
+      bool vulnerabilidadCompleted = false;
+      if (state.dynamicSelections.isNotEmpty) {
+        bool hasUnqualifiedVulnerabilidad = false;
+        
+        // Verificar todas las subclasificaciones de vulnerabilidad
+        for (final subClassEntry in state.dynamicSelections.entries) {
+          for (final categoryEntry in subClassEntry.value.entries) {
+            if (categoryEntry.value.isEmpty || categoryEntry.value == 'NA') {
+              hasUnqualifiedVulnerabilidad = true;
+              break;
+            }
+          }
+          if (hasUnqualifiedVulnerabilidad) break;
+        }
+        
+        vulnerabilidadCompleted = !hasUnqualifiedVulnerabilidad && state.evidenceImages.isNotEmpty;
       }
       
       final bothCompleted = amenazaCompleted && vulnerabilidadCompleted;
       
-      print('ResultsRiskSectionWidget - amenazaCompleted: $amenazaCompleted');
-      print('ResultsRiskSectionWidget - vulnerabilidadCompleted: $vulnerabilidadCompleted');
-      print('ResultsRiskSectionWidget - bothCompleted: $bothCompleted');
-      
       return bothCompleted;
     } catch (e) {
-      print('Error al verificar completitud en ResultsRiskSectionWidget: $e');
       return false;
     }
   }
@@ -68,7 +83,6 @@ class ResultsRiskSectionWidget extends StatelessWidget {
     return BlocBuilder<HomeBloc, HomeState>(
       builder: (context, homeState) {
         final bothCompleted = _isBothCompleted(context);
-        print('ResultsRiskSectionWidget - bothCompleted: $bothCompleted');
     
     if (bothCompleted) {
       // Mostrar botón de check cuando esté completado

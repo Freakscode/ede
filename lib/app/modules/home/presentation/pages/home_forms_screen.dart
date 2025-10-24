@@ -69,7 +69,7 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
 
         // Progreso total (promedio)
         final totalProgress = (amenazaProgress + vulnerabilidadProgress) / 2;
-
+        
         return {
           'amenaza': amenazaProgress,
           'vulnerabilidad': vulnerabilidadProgress,
@@ -408,6 +408,8 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
                                 'total': 0.0,
                               };
 
+                              
+
                           return FormCardInProgress(
                             title: form.title,
                             lastEdit: form.formattedLastModified,
@@ -419,7 +421,11 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
                             vulnerability: progress['vulnerabilidad']!,
                             onDelete: () =>
                                 _deleteForm(context, form.id, form.title),
-                            onTap: () => _navigateToForm(context, form),
+                            onTap: () {
+                              print(progress['amenaza']!);
+                              print(progress['vulnerabilidad']!);
+                              _navigateToForm(context, form);
+                            },
                           );
                         },
                       ),
@@ -467,18 +473,6 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
       final completeForm = await persistenceService.getCompleteForm(form.id);
 
       if (completeForm != null) {
-        print('=== DEBUG _navigateToForm ===');
-        print('completeForm.id: ${completeForm.id}');
-        print('completeForm.eventName: ${completeForm.eventName}');
-        print('completeForm.amenazaProbabilidadSelections: ${completeForm.amenazaProbabilidadSelections}');
-        print('completeForm.amenazaIntensidadSelections: ${completeForm.amenazaIntensidadSelections}');
-        print('completeForm.vulnerabilidadSelections: ${completeForm.vulnerabilidadSelections}');
-        print('completeForm.evidenceImages: ${completeForm.evidenceImages}');
-        print('completeForm.amenazaScores: ${completeForm.amenazaScores}');
-        print('completeForm.vulnerabilidadScores: ${completeForm.vulnerabilidadScores}');
-        print('completeForm.amenazaColors: ${completeForm.amenazaColors}');
-        print('completeForm.vulnerabilidadColors: ${completeForm.vulnerabilidadColors}');
-        
         // Establecer el formulario como activo antes de navegar
         await persistenceService.setActiveFormId(completeForm.id);
 
@@ -488,6 +482,8 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
         // Get bloc references before async gap
         final homeBloc = context.read<HomeBloc>();
         final riskBloc = context.read<RiskThreatAnalysisBloc>();
+
+        // No resetear el estado del BLoC aquí para preservar los datos cargados
 
         // Determinar la clasificación basándose en los datos disponibles
         // Priorizar amenaza primero, ya que es el flujo natural de creación
@@ -505,10 +501,7 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
 
         // Cargar los datos específicos del formulario en el RiskThreatAnalysisBloc
         final evaluationData = completeForm.toJson();
-        print('=== ENVIANDO DATOS AL BLOC ===');
-        print('eventName: ${completeForm.eventName}');
-        print('classificationType: $classificationType');
-        print('evaluationData keys: ${evaluationData.keys.toList()}');
+        
         
         riskBloc.add(LoadFormData(
           eventName: completeForm.eventName,

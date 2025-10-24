@@ -162,6 +162,8 @@ class RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
               onBack: () {
                 if (state.currentBottomNavIndex == 3) {
                   // Cuando estamos en FinalRiskResultsScreen (índice 3), volver a categorías
+                  // Resetear el estado del RiskThreatAnalysisBloc antes de navegar
+                  context.read<RiskThreatAnalysisBloc>().add(ResetState());
                   final navigationData = {'showRiskCategories': true};
                   context.go('/home', extra: navigationData);
                 } else if (state.currentBottomNavIndex > 0) {
@@ -170,6 +172,8 @@ class RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
                   );
                 } else {
                   // Cuando estamos en el primer índice, volver al HomeScreen con categorías
+                  // Resetear el estado del RiskThreatAnalysisBloc antes de navegar
+                  context.read<RiskThreatAnalysisBloc>().add(ResetState());
                   final navigationData = HomeNavigationType.riskCategories.toNavigationData();
                   context.go('/home', extra: navigationData);
                 }

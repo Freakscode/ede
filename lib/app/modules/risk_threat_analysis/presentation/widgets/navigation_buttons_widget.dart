@@ -42,6 +42,8 @@ class NavigationButtonsWidget extends StatelessWidget {
               () {
                 if (currentIndex == 3) {
                   // Cuando estamos en FinalRiskResultsScreen (índice 3), volver a categorías
+                  // Resetear el estado del RiskThreatAnalysisBloc antes de navegar
+                  context.read<RiskThreatAnalysisBloc>().add(ResetState());
                   final navigationData = {'showRiskCategories': true};
                   context.go('/home', extra: navigationData);
                 } else if (currentIndex > 0) {
@@ -416,7 +418,9 @@ class NavigationButtonsWidget extends StatelessWidget {
         rightButtonText: 'Finalizar',
         rightButtonIcon: Icons.check,
         onRightButtonPressed: () {
-          // NO limpiar datos - solo navegar sin resetear el estado
+          // Resetear el estado del RiskThreatAnalysisBloc antes de navegar
+          context.read<RiskThreatAnalysisBloc>().add(ResetState());
+          
           final navigationData = (state.selectedClassification ?? '').toLowerCase() == 'amenaza'
               ? {'showRiskCategories': true}
               : homeNavigationType.toNavigationData(tabIndex: homeTabIndex);
@@ -428,7 +432,6 @@ class NavigationButtonsWidget extends StatelessWidget {
       );
 
     } catch (e) {
-      print('Error al guardar avance antes de finalizar: $e');
       if (context.mounted) {
         CustomSnackBar.showError(
           context,

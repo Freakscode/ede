@@ -199,19 +199,9 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     Emitter<RiskThreatAnalysisState> emit,
   ) async {
     try {
-      print('=== RiskThreatAnalysisBloc: SelectClassification ===');
-      print('Clasificación anterior: ${state.selectedClassification ?? ''}');
-      print('Clasificación nueva: ${event.classification}');
-      
-      // Obtener información más detallada del stack trace
-      final stackTrace = StackTrace.current.toString();
-      final lines = stackTrace.split('\n');
-      print('Primeras 3 líneas del stack trace:');
-      for (int i = 0; i < 3 && i < lines.length; i++) {
-        print('  ${i + 1}: ${lines[i]}');
+      if (state.selectedClassification != event.classification) {
+        emit(state.copyWith(selectedClassification: event.classification));
       }
-      
-      emit(state.copyWith(selectedClassification: event.classification));
     } catch (e) {
       emit(state.setError('Error al seleccionar clasificación: $e'));
     }
@@ -273,36 +263,27 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     Emitter<RiskThreatAnalysisState> emit,
   ) async {
     try {
-      print('=== DEBUG _onLoadFormData ===');
-      print('eventName: ${event.eventName}');
-      print('classificationType: ${event.classificationType}');
-      print('evaluationData is null: ${event.evaluationData == null}');
-      if (event.evaluationData != null) {
-        print('evaluationData keys: ${event.evaluationData!.keys.toList()}');
-      }
-      
       emit(state.setLoading(true));
       
       // Si hay datos de evaluación específicos, cargarlos directamente
       if (event.evaluationData != null) {
-        print('=== CARGANDO DATOS ESPECÍFICOS DEL FORMULARIO ===');
-        print('evaluationData keys: ${event.evaluationData!.keys.toList()}');
-        
         // Mapear correctamente los datos del CompleteFormDataModel al estado del BLoC
         final evaluationData = event.evaluationData!;
         
+        
         // Mapear selecciones de amenaza - usar las claves correctas
         final probabilidadSelections = Map<String, String>.from(
-          evaluationData['probabilidadSelections'] ?? evaluationData['amenazaProbabilidadSelections'] ?? {}
+          evaluationData['amenazaProbabilidadSelections'] ?? evaluationData['probabilidadSelections'] ?? {}
         );
         final intensidadSelections = Map<String, String>.from(
-          evaluationData['intensidadSelections'] ?? evaluationData['amenazaIntensidadSelections'] ?? {}
+          evaluationData['amenazaIntensidadSelections'] ?? evaluationData['intensidadSelections'] ?? {}
         );
         
         // Mapear selecciones de vulnerabilidad - usar las claves correctas
         final dynamicSelections = Map<String, Map<String, String>>.from(
-          evaluationData['dynamicSelections'] ?? evaluationData['vulnerabilidadSelections'] ?? {}
+          evaluationData['vulnerabilidadSelections'] ?? evaluationData['dynamicSelections'] ?? {}
         );
+        
         
         // Mapear scores combinados
         final Map<String, double> combinedScores = {};
@@ -330,32 +311,48 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
           });
         }
         
+        // Si aún no hay scores, usar scores por defecto basados en las selecciones
+        if (combinedScores.isEmpty) {
+          // Calcular scores por defecto basados en las selecciones
+          if (probabilidadSelections.isNotEmpty) {
+            combinedScores['probabilidad'] = 2.0; // Score por defecto
+          }
+          if (intensidadSelections.isNotEmpty) {
+            combinedScores['intensidad'] = 2.0; // Score por defecto
+          }
+          if (dynamicSelections.isNotEmpty) {
+            dynamicSelections.forEach((key, value) {
+              combinedScores[key] = 2.0; // Score por defecto
+            });
+          }
+        }
+        
         // Los colores se calculan dinámicamente basándose en los scores, no se guardan
         // No necesitamos mapear colores desde evaluationData
         
-        print('Mapeo de datos:');
-        print('- probabilidadSelections: $probabilidadSelections');
-        print('- intensidadSelections: $intensidadSelections');
-        print('- dynamicSelections: $dynamicSelections');
-        print('- combinedScores: $combinedScores');
-        print('- combinedColors: (se calculan dinámicamente)');
-        print('- evidenceImages: ${evaluationData['evidenceImages']}');
-        print('- evidenceCoordinates: ${evaluationData['evidenceCoordinates']}');
-        
-        // Debug específico para scores
-        print('=== DEBUG SCORES ===');
-        print('amenazaScores from evaluationData: ${evaluationData['amenazaScores']}');
-        print('vulnerabilidadScores from evaluationData: ${evaluationData['vulnerabilidadScores']}');
-        print('subClassificationScores from evaluationData: ${evaluationData['subClassificationScores']}');
-        print('combinedScores final: $combinedScores');
-        print('=== END DEBUG SCORES ===');
+        // Mapear evidencias
+        final evidenceImages = evaluationData['evidenceImages'] != null 
+            ? (evaluationData['evidenceImages'] as Map<String, dynamic>).map(
+                (key, value) => MapEntry(key, List<String>.from(value as List))
+              ) 
+            : <String, List<String>>{};
+        final evidenceCoordinates = evaluationData['evidenceCoordinates'] != null 
+            ? (evaluationData['evidenceCoordinates'] as Map<String, dynamic>).map(
+                (key, value) => MapEntry(
+                  key, 
+                  (value as Map<int, dynamic>).map(
+                    (k, v) => MapEntry(k, Map<String, String>.from(v as Map))
+                  )
+                )
+              ) 
+            : <String, Map<int, Map<String, String>>>{};
         
         // Verificar si los datos están vacíos
         if (probabilidadSelections.isEmpty && intensidadSelections.isEmpty && dynamicSelections.isEmpty) {
-          print('⚠️ ADVERTENCIA: Todos los datos de selección están vacíos');
+          // Todos los datos de selección están vacíos
         }
         
-        emit(state.copyWith(
+        final newState = state.copyWith(
           selectedRiskEvent: event.eventName,
           selectedClassification: event.classificationType,
           probabilidadSelections: probabilidadSelections,
@@ -363,15 +360,14 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
           dynamicSelections: dynamicSelections,
           subClassificationScores: combinedScores,
           subClassificationColors: {}, // Los colores se calculan dinámicamente basándose en los scores
-          evidenceImages: evaluationData['evidenceImages'] != null 
-            ? Map<String, List<String>>.from(evaluationData['evidenceImages']) 
-            : {},
-          evidenceCoordinates: evaluationData['evidenceCoordinates'] != null 
-            ? Map<String, Map<int, Map<String, String>>>.from(evaluationData['evidenceCoordinates']) 
-            : {},
+          evidenceImages: evidenceImages,
+          evidenceCoordinates: evidenceCoordinates,
           isLoading: false,
           error: null,
-        ));
+        );
+        
+        
+        emit(newState);
         return;
       }
       
@@ -758,25 +754,11 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
   /// Método de compatibilidad temporal
   bool hasUnqualifiedVariables() {
     try {
-      print('=== DEBUG hasUnqualifiedVariables - INICIO ===');
-      print('selectedClassification ANTES: ${state.selectedClassification ?? ''}');
-      
       final formData = getCurrentFormData();
-      print('FormData keys: ${formData.keys.toList()}');
-      print('amenazaProbabilidadSelections: ${formData['amenazaProbabilidadSelections']}');
-      print('amenazaIntensidadSelections: ${formData['amenazaIntensidadSelections']}');
-      print('vulnerabilidadSelections: ${formData['vulnerabilidadSelections']}');
-      print('selectedClassification: ${formData['selectedClassification']}');
-      
       final result = _validateUnqualifiedVariablesUseCase.execute(formData);
-      print('hasUnqualifiedVariables result: $result');
-      print('selectedClassification DESPUÉS: ${state.selectedClassification ?? ''}');
-      print('=== END DEBUG hasUnqualifiedVariables ===');
-      
       return result;
     } catch (e) {
-      print('Error in hasUnqualifiedVariables: $e');
-    return false;
+      return false;
     }
   }
 
@@ -784,14 +766,12 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
   /// Método de compatibilidad temporal - Restaurar funcionalidad original
   bool shouldShowScoreContainer(String subClassificationId) {
     final score = getSubClassificationScore(subClassificationId);
-    print('shouldShowScoreContainer - subClassificationId: $subClassificationId, score: $score');
     return score > 0;
   }
 
   /// Método centralizado para obtener score de subclasificación
   double getSubClassificationScore(String subClassificationId) {
     final score = state.subClassificationScores[subClassificationId] ?? 0.0;
-    print('getSubClassificationScore - subClassificationId: $subClassificationId, score: $score, allScores: ${state.subClassificationScores}');
     return score;
   }
 
@@ -977,7 +957,6 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     // Calcular el color basándose en el score en lugar de usar colores guardados
     final score = getSubClassificationScore(subClassificationId);
     final color = _scoreToColor(score);
-    print('getSubClassificationColor - subClassificationId: $subClassificationId, score: $score, calculatedColor: $color');
     return color;
   }
 
@@ -1233,9 +1212,6 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
   /// Método de compatibilidad temporal
   Map<String, dynamic> getCurrentFormData() {
     try {
-      print('=== DEBUG getCurrentFormData ===');
-      print('selectedClassification: ${state.selectedClassification ?? ''}');
-      
       final formData = {
         'amenazaProbabilidadSelections': state.probabilidadSelections,
         'amenazaIntensidadSelections': state.intensidadSelections,
@@ -1251,7 +1227,6 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
         'dynamicSelections': state.dynamicSelections,
       };
       
-      print('=== END DEBUG getCurrentFormData ===');
       return formData;
     } catch (e) {
       return {};

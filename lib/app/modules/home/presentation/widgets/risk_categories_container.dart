@@ -28,7 +28,7 @@ class RiskCategoriesContainer extends StatelessWidget {
           final index = entry.key;
           final classification = entry.value;
           final categoryState = categoryStates[classification] ?? 
-              const CategoryState(isAvailable: false, isCompleted: false);
+              const CategoryState(isAvailable: false, progressPercentage: 0);
 
           return Column(
             children: [
@@ -42,7 +42,7 @@ class RiskCategoriesContainer extends StatelessWidget {
                 const SizedBox(height: 18),
             ],
           );
-        }).toList(),
+        }),
       ],
     );
   }
@@ -62,7 +62,7 @@ class RiskCategoriesContainer extends StatelessWidget {
         title: title,
         trailingIcon: trailingIcon,
         onTap: categoryState.isAvailable
-            ? () => onCategoryTap(classification, selectedEvent, categoryState.isCompleted)
+            ? () => onCategoryTap(classification, selectedEvent, categoryState.progressPercentage == 100)
             : () => _showDisabledMessage(context, categoryState.disabledMessage),
       ),
     );
@@ -78,16 +78,17 @@ class RiskCategoriesContainer extends StatelessWidget {
       );
     }
     
-    if (categoryState.isCompleted) {
-      // Si está completa: mostrar checkmark
+    // Lógica simplificada basada en porcentaje de progreso
+    if (categoryState.progressPercentage == 100) {
+      // Si está al 100%: mostrar checkmark
       return SizedBox(
         width: 24,
         height: 24,
         child: SvgPicture.asset(AppIcons.checkCircle, width: 24, height: 24),
       );
-    } else if (categoryState.isInProgress) {
-      // Si está en progreso: mostrar icono de borrador
-       return SizedBox(
+    } else if (categoryState.progressPercentage > 0 && categoryState.progressPercentage < 100) {
+      // Si está entre 1% y 99%: mostrar icono de borrador
+      return SizedBox(
         width: 18,
         height: 17,
         child: SvgPicture.asset(
@@ -100,10 +101,9 @@ class RiskCategoriesContainer extends StatelessWidget {
           ),
         ),
       );
-     
     } else {
-      // Si no está iniciada: mostrar icono de borrar
-       return SizedBox.shrink();
+      // Si está al 0%: no mostrar nada
+      return const SizedBox.shrink();
     }
   }
 
@@ -124,14 +124,12 @@ class RiskCategoriesContainer extends StatelessWidget {
 // Clase para manejar el estado de cada categoría
 class CategoryState {
   final bool isAvailable;
-  final bool isCompleted;
-  final bool isInProgress;
+  final int progressPercentage;
   final String? disabledMessage;
   
   const CategoryState({
     required this.isAvailable,
-    required this.isCompleted,
-    this.isInProgress = false,
+    required this.progressPercentage,
     this.disabledMessage,
   });
 }
