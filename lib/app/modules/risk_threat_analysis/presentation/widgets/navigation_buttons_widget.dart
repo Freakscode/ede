@@ -219,7 +219,7 @@ class NavigationButtonsWidget extends StatelessWidget {
                     vertical: 8,
                   ),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF232B48),
+                    color: DAGRDColors.azulDAGRD,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
@@ -227,7 +227,7 @@ class NavigationButtonsWidget extends StatelessWidget {
                     children: [
                       const Icon(
                         Icons.check_circle_outline,
-                        color: Color(0xFFFFFFFF),
+                        color: DAGRDColors.blancoDAGRD,
                         size: 18,
                       ),
                       const SizedBox(width: 10),
@@ -235,7 +235,7 @@ class NavigationButtonsWidget extends StatelessWidget {
                         'Finalizar formulario',
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          color: Color(0xFFFFFFFF),
+                          color: DAGRDColors.blancoDAGRD,
                           fontFamily: 'Work Sans',
                           fontSize: 14,
                           fontStyle: FontStyle.normal,

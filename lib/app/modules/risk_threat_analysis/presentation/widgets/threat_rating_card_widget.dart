@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 
 class ThreatRatingCardWidget extends StatelessWidget {
   final String score;
@@ -33,7 +34,7 @@ class ThreatRatingCardWidget extends StatelessWidget {
             width: double.infinity,
             padding: const EdgeInsets.all(10),
             decoration: const BoxDecoration(
-              color: Color(0xFF232B48),
+              color: DAGRDColors.azulDAGRD,
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(8),
                 topRight: Radius.circular(8),
@@ -44,7 +45,7 @@ class ThreatRatingCardWidget extends StatelessWidget {
                 title,
                 textAlign: TextAlign.center,
                 style: const TextStyle(
-                  color: Color(0xFFFFFFFF),
+                  color: DAGRDColors.blancoDAGRD,
                   fontFamily: 'Work Sans',
                   fontSize: 16,
                   fontStyle: FontStyle.normal,
@@ -60,7 +61,7 @@ class ThreatRatingCardWidget extends StatelessWidget {
             height: 40,
             padding: const EdgeInsets.fromLTRB(50, 10, 40, 10),
             decoration: const BoxDecoration(
-              color: Color(0xFFFDE047),
+              color: DAGRDColors.nivelMedioBajo,
               borderRadius: BorderRadius.only(
                 bottomLeft: Radius.circular(8),
                 bottomRight: Radius.circular(8),
@@ -72,7 +73,7 @@ class ThreatRatingCardWidget extends StatelessWidget {
                   score,
                   textAlign: TextAlign.center,
                   style: const TextStyle(
-                    color: Color(0xFF1E1E1E),
+                    color: DAGRDColors.negroDAGRD,
                     fontFamily: 'Work Sans',
                     fontSize: 16,
                     fontStyle: FontStyle.normal,
@@ -85,7 +86,7 @@ class ThreatRatingCardWidget extends StatelessWidget {
                   ratingText,
                   textAlign: TextAlign.center,
                   style: const TextStyle(
-                    color: Color(0xFF1E1E1E),
+                    color: DAGRDColors.negroDAGRD,
                     fontFamily: 'Work Sans',
                     fontSize: 16,
                     fontStyle: FontStyle.normal,

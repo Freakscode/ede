@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import '../bloc/risk_threat_analysis_bloc.dart';
 import '../bloc/risk_threat_analysis_state.dart';
 import '../widgets/widgets.dart';
@@ -20,7 +21,7 @@ class RatingResultsScreen extends StatelessWidget {
                 'Metodología de Análisis del Riesgo',
                 textAlign: TextAlign.center,
                 style: const TextStyle(
-                  color: Color(0xFF232B48),
+                  color: DAGRDColors.azulDAGRD,
                   fontFamily: 'Work Sans',
                   fontSize: 20,
                   fontStyle: FontStyle.normal,

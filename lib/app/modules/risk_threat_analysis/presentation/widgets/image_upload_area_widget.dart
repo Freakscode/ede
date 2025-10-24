@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:caja_herramientas/app/core/icons/app_icons.dart';
+import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 
 class ImageUploadAreaWidget extends StatelessWidget {
   final VoidCallback onSelectFromGallery;
@@ -18,9 +19,9 @@ class ImageUploadAreaWidget extends StatelessWidget {
       width: double.infinity,
       height: 120,
       decoration: BoxDecoration(
-        color: const Color(0xFFFFFFFF),
+        color: DAGRDColors.surface,
         border: Border.all(
-          color: const Color(0xFFD1D5DB),
+          color: DAGRDColors.outlineVariant,
           width: 1,
           style: BorderStyle.solid,
         ),
@@ -62,7 +63,7 @@ class ImageUploadAreaWidget extends StatelessWidget {
               width: 46,
               height: 46,
               colorFilter: const ColorFilter.mode(
-                Color(0xFF6B7280),
+                DAGRDColors.grisMedio,
                 BlendMode.srcIn,
               ),
             ),
@@ -71,7 +72,7 @@ class ImageUploadAreaWidget extends StatelessWidget {
               label,
               textAlign: TextAlign.center,
               style: const TextStyle(
-                color: Color(0xFF706F6F),
+                color: DAGRDColors.grisMedio,
                 fontFamily: 'Work Sans',
                 fontSize: 13,
                 fontStyle: FontStyle.normal,

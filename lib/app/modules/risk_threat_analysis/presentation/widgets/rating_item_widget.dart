@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 
 class RatingItemWidget extends StatelessWidget {
   final int rating;
@@ -20,8 +21,8 @@ class RatingItemWidget extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: (isUnrated || isNotApplicable) ? const Color(0xFFF3F4F6) : Colors.white,
-        border: const Border(bottom: BorderSide(color: Color(0xFFE5E7EB), width: 1)),
+        color: (isUnrated || isNotApplicable) ? DAGRDColors.surfaceVariant : DAGRDColors.surface,
+        border: const Border(bottom: BorderSide(color: DAGRDColors.outline, width: 1)),
       ),
       child: Row(
         children: [
@@ -37,7 +38,7 @@ class RatingItemWidget extends StatelessWidget {
                 isNotApplicable ? 'NA' : rating.toString(),
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: isUnrated ? const Color(0xFFFFFFFF) : const Color(0xFF000000),
+                  color: isUnrated ? DAGRDColors.blancoDAGRD : DAGRDColors.negroDAGRD,
                   fontFamily: 'Work Sans',
                   fontSize: isNotApplicable ? 16 : 20,
                   fontStyle: FontStyle.normal,
@@ -53,7 +54,7 @@ class RatingItemWidget extends StatelessWidget {
               child: Text(
                 title,
                 style: const TextStyle(
-                  color: Color(0xFF1E1E1E),
+                  color: DAGRDColors.negroDAGRD,
                   fontFamily: 'Work Sans',
                   fontSize: 15,
                   fontStyle: FontStyle.normal,
@@ -64,7 +65,7 @@ class RatingItemWidget extends StatelessWidget {
             ),
             const Icon(
               Icons.keyboard_arrow_down,
-              color: Color(0xFF6B7280),
+              color: DAGRDColors.grisMedio,
               size: 24,
             ),
           ] else ...[
@@ -72,7 +73,7 @@ class RatingItemWidget extends StatelessWidget {
               child: Text(
                 title,
                 style: const TextStyle(
-                  color: Color(0xFF1E1E1E),
+                  color: DAGRDColors.negroDAGRD,
                   fontFamily: 'Work Sans',
                   fontSize: 14,
                   fontStyle: FontStyle.normal,

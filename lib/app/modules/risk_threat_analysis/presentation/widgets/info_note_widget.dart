@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 
 class InfoNoteWidget extends StatelessWidget {
   const InfoNoteWidget({super.key});
@@ -9,9 +10,9 @@ class InfoNoteWidget extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
       decoration: BoxDecoration(
-        color: const Color(0xFFEFF6FF),
+        color: DAGRDColors.surfaceVariant,
         borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: const Color(0xFFDBEAFE), width: 1),
+        border: Border.all(color: DAGRDColors.outlineVariant, width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -22,7 +23,7 @@ class InfoNoteWidget extends StatelessWidget {
                 TextSpan(
                   text: 'Nota: ',
                   style: TextStyle(
-                    color: Color(0xFF2563EB),
+                    color: DAGRDColors.azulSecundario,
                     fontFamily: 'Work Sans',
                     fontSize: 13,
                     fontStyle: FontStyle.normal,
@@ -34,7 +35,7 @@ class InfoNoteWidget extends StatelessWidget {
                   text:
                       'Máximo 3 imágenes permitidas. Cada imagen debe ser georreferenciada.',
                   style: TextStyle(
-                    color: Color(0xFF2563EB),
+                    color: DAGRDColors.azulSecundario,
                     fontFamily: 'Work Sans',
                     fontSize: 13,
                     fontStyle: FontStyle.normal,

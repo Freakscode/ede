@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import '../bloc/risk_threat_analysis_state.dart';
 
 class RiskMatrixWidget extends StatelessWidget {
@@ -24,10 +25,10 @@ class RiskMatrixWidget extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              _buildLegendItem('BAJO', const Color(0xFF22C55E)),
-              _buildLegendItem('MEDIO\nBAJO', const Color(0xFFFDE047)),
-              _buildLegendItem('MEDIO\nALTO', const Color(0xFFFB923C)),
-              _buildLegendItem('ALTO', const Color(0xFFDC2626)),
+              _buildLegendItem('BAJO', DAGRDColors.nivelBajo),
+              _buildLegendItem('MEDIO\nBAJO', DAGRDColors.nivelMedioBajo),
+              _buildLegendItem('MEDIO\nALTO', DAGRDColors.nivelMedioAlto),
+              _buildLegendItem('ALTO', DAGRDColors.nivelAlto),
             ],
           ),
           
@@ -75,7 +76,7 @@ class RiskMatrixWidget extends StatelessWidget {
                           'Amenaza',
                           textAlign: TextAlign.center,
                           style: const TextStyle(
-                            color: Color(0xFF000000),
+                            color: DAGRDColors.negroDAGRD,
                             fontFamily: 'Work Sans',
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
@@ -132,7 +133,7 @@ class RiskMatrixWidget extends StatelessWidget {
                     'Vulnerabilidad',
                     textAlign: TextAlign.center,
                     style: const TextStyle(
-                      color: Color(0xFF000000),
+                      color: DAGRDColors.negroDAGRD,
                       fontFamily: 'Work Sans',
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
@@ -262,7 +263,7 @@ class RiskMatrixWidget extends StatelessWidget {
           text,
           textAlign: TextAlign.center,
           style: const TextStyle(
-            color: Color(0xFF1E1E1E), // Textos
+            color: DAGRDColors.negroDAGRD, // Textos
             fontFamily: 'Work Sans',
             fontSize: 12,
             fontWeight: FontWeight.w600,
@@ -291,7 +292,7 @@ class HeatmapPainter extends CustomPainter {
       )
       ..close();
     
-    canvas.drawPath(pathVerde, Paint()..color = const Color(0xFF22C55E));
+    canvas.drawPath(pathVerde, Paint()..color = DAGRDColors.nivelBajo);
     
     // Amarillo - banda central amplia
     final pathAmarillo = Path()
@@ -311,7 +312,7 @@ class HeatmapPainter extends CustomPainter {
       ..lineTo(0, 0)
       ..close();
     
-    canvas.drawPath(pathAmarillo, Paint()..color = const Color(0xFFFDE047));
+    canvas.drawPath(pathAmarillo, Paint()..color = DAGRDColors.nivelMedioBajo);
     
     // Naranja - banda superior
     final pathNaranja = Path()
@@ -329,7 +330,7 @@ class HeatmapPainter extends CustomPainter {
       )
       ..close();
     
-    canvas.drawPath(pathNaranja, Paint()..color = const Color(0xFFFB923C));
+    canvas.drawPath(pathNaranja, Paint()..color = DAGRDColors.nivelMedioAlto);
     
     // Rojo - esquina superior derecha
     final pathRojo = Path()
@@ -342,7 +343,7 @@ class HeatmapPainter extends CustomPainter {
       ..lineTo(w, 0)
       ..close();
     
-    canvas.drawPath(pathRojo, Paint()..color = const Color(0xFFDC2626));
+    canvas.drawPath(pathRojo, Paint()..color = DAGRDColors.nivelAlto);
   }
 
   @override

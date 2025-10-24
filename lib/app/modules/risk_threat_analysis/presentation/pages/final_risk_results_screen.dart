@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import '../bloc/risk_threat_analysis_bloc.dart';
 import '../bloc/risk_threat_analysis_state.dart';
 import '../widgets/risk_matrix_widget.dart';
@@ -119,7 +120,7 @@ class FinalRiskResultsScreen extends StatelessWidget {
                 'Perfil del Riesgo',
                 textAlign: TextAlign.center,
                 style: const TextStyle(
-                  color: Color(0xFF232B48),
+                  color: DAGRDColors.azulDAGRD,
                   fontFamily: 'Work Sans',
                   fontSize: 20,
                   fontWeight: FontWeight.w600,
@@ -134,7 +135,7 @@ class FinalRiskResultsScreen extends StatelessWidget {
                 'Amenaza',
                 textAlign: TextAlign.center,
                 style: const TextStyle(
-                  color: Color(0xFF232B48), // AzulDAGRD
+                  color: DAGRDColors.azulDAGRD, // AzulDAGRD
                   fontFamily: 'Work Sans',
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
@@ -166,7 +167,7 @@ class FinalRiskResultsScreen extends StatelessWidget {
                 'Vulnerabilidad',
                 textAlign: TextAlign.center,
                 style: const TextStyle(
-                  color: Color(0xFF232B48), // AzulDAGRD
+                  color: DAGRDColors.azulDAGRD, // AzulDAGRD
                   fontFamily: 'Work Sans',
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
@@ -469,7 +470,7 @@ class FinalRiskResultsScreen extends StatelessWidget {
   Color _getColorFromRating(int rating) {
     switch (rating) {
       case -1:
-        return const Color(0xFF6B7280);
+        return DAGRDColors.grisMedio;
       case 1:
         return Colors.green;
       case 2:
@@ -479,7 +480,7 @@ class FinalRiskResultsScreen extends StatelessWidget {
       case 4:
         return Colors.red;
       default:
-        return const Color(0xFF9CA3AF);
+        return DAGRDColors.grisMedio;
     }
   }
 
@@ -532,13 +533,13 @@ class FinalRiskResultsScreen extends StatelessWidget {
             const Icon(
               Icons.arrow_back_ios,
               size: 16,
-              color: Color(0xFF2563EB), // Azul informativo
+              color: DAGRDColors.azulSecundario, // Azul informativo
             ),
             const SizedBox(width: 8),
             Text(
               text,
               style: const TextStyle(
-                color: Color(0xFF2563EB), // Azul informativo
+                color: DAGRDColors.azulSecundario, // Azul informativo
                 fontFamily: 'Work Sans',
                 fontSize: 15,
                 fontWeight: FontWeight.w500,

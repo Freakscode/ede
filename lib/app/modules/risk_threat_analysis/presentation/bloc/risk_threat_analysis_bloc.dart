@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import '../../domain/entities/risk_analysis_entity.dart';
 import 'package:caja_herramientas/app/shared/models/risk_event_factory.dart';
 import 'package:caja_herramientas/app/shared/models/risk_model_adapter.dart';
@@ -672,23 +673,23 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
       
       if ((state.selectedClassification ?? '').toLowerCase() == 'amenaza') {
         score = globalScoreInfo['amenazaScore'] ?? 0.0;
-        color = globalScoreInfo['amenazaColor'] ?? const Color(0xFFD1D5DB);
+        color = globalScoreInfo['amenazaColor'] ?? DAGRDColors.outlineVariant;
       } else if ((state.selectedClassification ?? '').toLowerCase() == 'vulnerabilidad') {
         score = globalScoreInfo['vulnerabilidadScore'] ?? 0.0;
-        color = globalScoreInfo['vulnerabilidadColor'] ?? const Color(0xFFD1D5DB);
+        color = globalScoreInfo['vulnerabilidadColor'] ?? DAGRDColors.outlineVariant;
       } else {
         score = globalScoreInfo['finalScore'] ?? 0.0;
-        color = globalScoreInfo['finalColor'] ?? const Color(0xFFD1D5DB);
+        color = globalScoreInfo['finalColor'] ?? DAGRDColors.outlineVariant;
       }
       
       // Si no hay score (0.0), devolver el color de borde específico
       if (score == 0.0) {
-        return const Color(0xFFD1D5DB); // #D1D5DB
+        return DAGRDColors.outlineVariant; // #D1D5DB
       }
       
       return color;
     } catch (e) {
-      return const Color(0xFFD1D5DB); // #D1D5DB
+      return DAGRDColors.outlineVariant; // #D1D5DB
     }
   }
 
@@ -812,7 +813,7 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
   Color getColorFromRating(int rating) {
     switch (rating) {
       case -1:
-        return const Color(0xFF6B7280); // Gris más oscuro para "No Aplica"
+        return DAGRDColors.grisMedio; // Gris más oscuro para "No Aplica"
       case 1:
         return Colors.green;
       case 2:
@@ -822,7 +823,7 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
       case 4:
         return Colors.red;
       default:
-        return const Color(0xFF9CA3AF); // Gris para sin calificar
+        return DAGRDColors.grisMedio; // Gris para sin calificar
     }
   }
 
@@ -983,13 +984,13 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     if (score == 0) {
       return Colors.transparent; 
     } else if (score <= 1.75) {
-      return const Color(0xFF22C55E); 
+      return DAGRDColors.nivelBajo; 
     } else if (score <= 2.50) {
-      return const Color(0xFFFDE047); 
+      return DAGRDColors.nivelMedioBajo; 
     } else if (score <= 3.25) {
-      return const Color(0xFFFB923C); 
+      return DAGRDColors.nivelMedioAlto; 
     } else {
-      return const Color(0xFFDC2626); 
+      return DAGRDColors.nivelAlto; 
     }
   }
 

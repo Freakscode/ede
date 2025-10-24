@@ -39,7 +39,7 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
                 'Evidencia Fotográfica - ${(state.selectedClassification ?? '').toUpperCase()}',
                 textAlign: TextAlign.center,
                 style: const TextStyle(
-                  color: Color(0xFF232B48),
+                  color: DAGRDColors.azulDAGRD,
                   fontFamily: 'Work Sans',
                   fontSize: 20,
                   fontStyle: FontStyle.normal,
@@ -59,7 +59,7 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
                     title: Text(
                       subtitle,
                       style: const TextStyle(
-                        color: Color(0xFF706F6F),
+                        color: DAGRDColors.grisMedio,
                         fontFamily: 'Work Sans',
                         fontSize: 18,
                         fontStyle: FontStyle.normal,
@@ -85,8 +85,8 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
                 padding: const EdgeInsets.all(15),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: const Color(0xFFD1D5DB), width: 1),
-                  color: const Color(0xFFFFFFFF),
+                  border: Border.all(color: DAGRDColors.outlineVariant, width: 1),
+                  color: DAGRDColors.surface,
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -172,7 +172,7 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
       // width: 200,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: const Color(0xFF3B82F6), width: 1),
+        border: Border.all(color: DAGRDColors.azulSecundario, width: 1),
         color: Colors.white,
       ),
       child: Column(
@@ -186,7 +186,7 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
                 topLeft: Radius.circular(6), // border-radius: 6px 6px 0 0
                 topRight: Radius.circular(6),
               ),
-              color: const Color(0xFFD3D3D3), // background: lightgray
+              color: DAGRDColors.grisClaro, // background: lightgray
             ),
             child: Stack(
               children: [
@@ -204,10 +204,10 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
                       return Container(
                         width: double.infinity,
                         height: 150,
-                        color: const Color(0xFFD3D3D3),
+                        color: DAGRDColors.grisClaro,
                         child: const Icon(
                           Icons.image,
-                          color: Color(0xFF6B7280),
+                          color: DAGRDColors.grisMedio,
                           size: 32,
                         ),
                       );
@@ -253,7 +253,7 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
                 const Text(
                   'Coordenadas',
                   style: TextStyle(
-                    color: Color(0xFF1E1E1E), // color: #1E1E1E
+                    color: DAGRDColors.negroDAGRD, // color: #1E1E1E
                     fontFamily: 'Work Sans', // font-family: "Work Sans"
                     fontSize: 14, // font-size: 14px
                     fontStyle: FontStyle.normal, // font-style: normal
@@ -319,7 +319,7 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
                               ),
                               decoration: BoxDecoration(
                                 border: Border.all(
-                                  color: const Color(0xFFD1D5DB),
+                                  color: DAGRDColors.outlineVariant,
                                 ),
                                 borderRadius: BorderRadius.circular(4),
                                 color: Colors.white,
@@ -329,7 +329,7 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
                                 child: Text(
                                   '${currentCoordinates['lat']}, ${currentCoordinates['lng']}',
                                   style: const TextStyle(
-                                    color: Color(0xFF374151),
+                                    color: DAGRDColors.grisOscuro,
                                     fontFamily: 'Work Sans',
                                     fontSize: 12,
                                     fontWeight: FontWeight.w500,

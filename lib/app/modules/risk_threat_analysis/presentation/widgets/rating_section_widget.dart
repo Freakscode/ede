@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import 'rating_item_widget.dart';
 
 class RatingSectionWidget extends StatelessWidget {
@@ -22,7 +23,7 @@ class RatingSectionWidget extends StatelessWidget {
           width: double.infinity,
           height: 52,
           decoration: const BoxDecoration(
-            color: Color(0xFF232B48),
+            color: DAGRDColors.azulDAGRD,
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(8),
               topRight: Radius.circular(8),
@@ -35,7 +36,7 @@ class RatingSectionWidget extends StatelessWidget {
                 Text(
                   title,
                   style: const TextStyle(
-                    color: Color(0xFFFFFFFF),
+                    color: DAGRDColors.blancoDAGRD,
                     fontFamily: 'Work Sans',
                     fontSize: 16,
                     fontStyle: FontStyle.normal,
@@ -50,7 +51,7 @@ class RatingSectionWidget extends StatelessWidget {
                     horizontal: 12,
                   ),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFF8C00),
+                    color: DAGRDColors.warning,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Center(
@@ -77,9 +78,9 @@ class RatingSectionWidget extends StatelessWidget {
               bottomRight: Radius.circular(8),
             ),
             border: Border(
-              left: BorderSide(color: Color(0xFFD1D5DB), width: 1),
-              right: BorderSide(color: Color(0xFFD1D5DB), width: 1),
-              bottom: BorderSide(color: Color(0xFFD1D5DB), width: 1),
+              left: BorderSide(color: DAGRDColors.outlineVariant, width: 1),
+              right: BorderSide(color: DAGRDColors.outlineVariant, width: 1),
+              bottom: BorderSide(color: DAGRDColors.outlineVariant, width: 1),
             ),
           ),
           child: Column(

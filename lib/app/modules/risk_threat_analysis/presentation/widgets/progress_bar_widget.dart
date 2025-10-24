@@ -26,7 +26,7 @@ class ProgressBarWidget extends StatelessWidget {
             Container(
               height: 16,
               decoration: BoxDecoration(
-                color: const Color(0xFFE5E7EB),
+                color: DAGRDColors.outline,
                 borderRadius: BorderRadius.circular(99),
               ),
               child: ClipRRect(

@@ -106,7 +106,7 @@ class _RatingScreenState extends State<RatingScreen> {
                 'Metodología de Análisis del Riesgo',
                 textAlign: TextAlign.center,
                 style: const TextStyle(
-                  color: Color(0xFF232B48),
+                  color: DAGRDColors.azulDAGRD,
                   fontFamily: 'Work Sans',
                   fontSize: 20,
                   fontStyle: FontStyle.normal,
@@ -129,7 +129,7 @@ class _RatingScreenState extends State<RatingScreen> {
                     title: Text(
                       subtitle,
                       style: const TextStyle(
-                        color: Color(0xFF706F6F),
+                        color: DAGRDColors.grisMedio,
                         fontFamily: 'Work Sans',
                         fontSize: 18,
                         fontStyle: FontStyle.normal,
@@ -219,9 +219,9 @@ class _RatingScreenState extends State<RatingScreen> {
                 height: 44,
                 padding: const EdgeInsets.fromLTRB(20, 10, 10, 10),
                 decoration: BoxDecoration(
-                  border: Border.all(color: const Color(0xFF2563EB)),
+                  border: Border.all(color: DAGRDColors.azulSecundario),
                   borderRadius: BorderRadius.circular(6),
-                  color: const Color(0xFFEFF6FF), // background: #EFF6FF
+                  color: DAGRDColors.surfaceVariant, // background: #EFF6FF
                 ),
                 child: InkWell(
                   onTap: () {
@@ -235,7 +235,7 @@ class _RatingScreenState extends State<RatingScreen> {
                         width: 20,
                         height: 20,
                         colorFilter: const ColorFilter.mode(
-                          Color(0xFF2563EB),
+                          DAGRDColors.azulSecundario,
                           BlendMode.srcIn,
                         ),
                       ),
@@ -250,7 +250,7 @@ class _RatingScreenState extends State<RatingScreen> {
                             return Text(
                               displayText,
                               style: const TextStyle(
-                                color: Color(0xFF2563EB),
+                                color: DAGRDColors.azulSecundario,
                                 fontFamily: 'Work Sans',
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
@@ -266,7 +266,7 @@ class _RatingScreenState extends State<RatingScreen> {
                         width: 20,
                         height: 20,
                         colorFilter: const ColorFilter.mode(
-                          Color(0xFF2563EB),
+                          DAGRDColors.azulSecundario,
                           BlendMode.srcIn,
                         ),
                       ),
@@ -296,7 +296,7 @@ class _RatingScreenState extends State<RatingScreen> {
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
-                            color: Color(0xFF232B48),
+                            color: DAGRDColors.azulDAGRD,
                             fontFamily: 'Work Sans',
                             fontSize: 16,
                             fontWeight: FontWeight.w500,

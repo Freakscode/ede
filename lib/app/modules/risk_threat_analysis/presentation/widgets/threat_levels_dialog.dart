@@ -125,7 +125,7 @@ class ThreatLevelsDialog extends StatelessWidget {
                 color: level.backgroundColor,
                 borderRadius: BorderRadius.circular(6),
                 border: Border.all(
-                  color: const Color(0xFFD1D5DB), 
+                  color: DAGRDColors.outlineVariant, 
                   width: 1,
                 ),
               ),
