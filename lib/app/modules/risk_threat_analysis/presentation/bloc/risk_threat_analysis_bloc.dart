@@ -15,6 +15,7 @@ import '../../domain/use_cases/validate_unqualified_variables_usecase.dart';
 import '../../domain/use_cases/calculate_global_score_usecase.dart';
 import 'risk_threat_analysis_event.dart';
 import 'risk_threat_analysis_state.dart';
+import '../models/form_mode.dart';
 
 /// BLoC de compatibilidad temporal para RiskThreatAnalysis
 /// Mantiene métodos del BLoC original mientras se refactorizan las pantallas
@@ -47,6 +48,9 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     on<UpdateIntensidadSelection>(_onUpdateIntensidadSelection);
     on<UpdateSelectedRiskEvent>(_onUpdateSelectedRiskEvent);
     on<SelectClassification>(_onSelectClassification);
+    on<SetFormMode>(_onSetFormMode);
+    on<SetCreateMode>(_onSetCreateMode);
+    on<SetEditMode>(_onSetEditMode);
     on<ToggleDynamicDropdown>(_onToggleDynamicDropdown);
     on<UpdateDynamicSelection>(_onUpdateDynamicSelection);
     on<ShowFinalResults>(_onShowFinalResults);
@@ -209,6 +213,41 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     }
   }
 
+  Future<void> _onSetFormMode(
+    SetFormMode event,
+    Emitter<RiskThreatAnalysisState> emit,
+  ) async {
+    try {
+      if (state.formMode != event.mode) {
+        emit(state.copyWith(formMode: event.mode));
+      }
+    } catch (e) {
+      emit(state.setError('Error al establecer modo del formulario: $e'));
+    }
+  }
+
+  Future<void> _onSetCreateMode(
+    SetCreateMode event,
+    Emitter<RiskThreatAnalysisState> emit,
+  ) async {
+    try {
+      emit(state.copyWith(formMode: FormMode.create));
+    } catch (e) {
+      emit(state.setError('Error al establecer modo creación: $e'));
+    }
+  }
+
+  Future<void> _onSetEditMode(
+    SetEditMode event,
+    Emitter<RiskThreatAnalysisState> emit,
+  ) async {
+    try {
+      emit(state.copyWith(formMode: FormMode.edit));
+    } catch (e) {
+      emit(state.setError('Error al establecer modo edición: $e'));
+    }
+  }
+
   Future<void> _onToggleDynamicDropdown(
     ToggleDynamicDropdown event,
     Emitter<RiskThreatAnalysisState> emit,
@@ -271,14 +310,19 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
       print('event.eventName: ${event.eventName}');
       print('event.classificationType: ${event.classificationType}');
       print('event.evaluationData keys: ${event.evaluationData?.keys.toList()}');
+      print('current formMode: ${state.formMode}');
       
       // Si hay datos de evaluación específicos, cargarlos directamente
       if (event.evaluationData != null) {
         // Mapear correctamente los datos del CompleteFormDataModel al estado del BLoC
         final evaluationData = event.evaluationData!;
         
+        // PRESERVAR DATOS EXISTENTES: Solo actualizar si hay datos nuevos
+        final currentProbabilidadSelections = Map<String, String>.from(state.probabilidadSelections);
+        final currentIntensidadSelections = Map<String, String>.from(state.intensidadSelections);
+        final currentDynamicSelections = Map<String, Map<String, String>>.from(state.dynamicSelections);
         
-        // Mapear selecciones de amenaza - usar las claves correctas
+        // Mapear selecciones de amenaza
         final probabilidadSelections = Map<String, String>.from(
           evaluationData['amenazaProbabilidadSelections'] ?? evaluationData['probabilidadSelections'] ?? {}
         );
@@ -286,10 +330,26 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
           evaluationData['amenazaIntensidadSelections'] ?? evaluationData['intensidadSelections'] ?? {}
         );
         
-        // Mapear selecciones de vulnerabilidad - usar las claves correctas
+        // Mapear selecciones de vulnerabilidad
         final dynamicSelections = Map<String, Map<String, String>>.from(
           evaluationData['vulnerabilidadSelections'] ?? evaluationData['dynamicSelections'] ?? {}
         );
+        
+        // Actualizar solo si hay datos nuevos para la clasificación actual
+        if (event.classificationType.toLowerCase() == 'amenaza') {
+          // Para amenaza, actualizar probabilidad e intensidad
+          if (probabilidadSelections.isNotEmpty) {
+            currentProbabilidadSelections.addAll(probabilidadSelections);
+          }
+          if (intensidadSelections.isNotEmpty) {
+            currentIntensidadSelections.addAll(intensidadSelections);
+          }
+        } else if (event.classificationType.toLowerCase() == 'vulnerabilidad') {
+          // Para vulnerabilidad, actualizar dynamicSelections
+          if (dynamicSelections.isNotEmpty) {
+            currentDynamicSelections.addAll(dynamicSelections);
+          }
+        }
         
         
         // Mapear scores combinados
@@ -414,6 +474,10 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
   ) async {
     try {
       emit(state.setLoading(true));
+      
+      print('=== DEBUG _onSaveFormData ===');
+      print('formMode: ${state.formMode}');
+      print('selectedClassification: ${state.selectedClassification}');
       
       // Crear entidad desde el estado actual
       final entity = state.toEntity();

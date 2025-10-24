@@ -165,7 +165,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       final updatedEntity = currentEntity.copyWith(
         selectedRiskEvent: event.eventName,
         showRiskEvents: false,
-        showRiskCategories: true,
+        showRiskCategories: false, // No mostrar pantalla embebida
         selectedRiskCategory: null,
         activeFormId: formId,
         isCreatingNew: true,

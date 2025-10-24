@@ -5,6 +5,7 @@ import 'package:equatable/equatable.dart';
 class RiskAnalysisEntity extends Equatable {
   final String eventName;
   final String classificationType;
+  final String formMode;
   final Map<String, dynamic> selections;
   final Map<String, double> scores;
   final Map<String, String> colors;
@@ -16,6 +17,7 @@ class RiskAnalysisEntity extends Equatable {
   const RiskAnalysisEntity({
     required this.eventName,
     required this.classificationType,
+    this.formMode = 'create',
     this.selections = const {},
     this.scores = const {},
     this.colors = const {},
@@ -29,6 +31,7 @@ class RiskAnalysisEntity extends Equatable {
   List<Object?> get props => [
     eventName,
     classificationType,
+    formMode,
     selections,
     scores,
     colors,
@@ -46,6 +49,12 @@ class RiskAnalysisEntity extends Equatable {
 
   /// Lógica de negocio: ¿Es un análisis de vulnerabilidad?
   bool get isVulnerabilidad => classificationType.toLowerCase() == 'vulnerabilidad';
+  
+  /// Lógica de negocio: ¿Es modo creación?
+  bool get isCreateMode => formMode == 'create';
+  
+  /// Lógica de negocio: ¿Es modo edición?
+  bool get isEditMode => formMode == 'edit';
 
   /// Lógica de negocio: ¿Está vacío el análisis?
   bool get isEmpty => selections.isEmpty;

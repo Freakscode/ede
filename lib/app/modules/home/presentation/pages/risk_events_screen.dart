@@ -5,6 +5,7 @@ import 'package:caja_herramientas/app/shared/models/risk_event_factory.dart';
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 class RiskEventsScreen extends StatelessWidget {
   const RiskEventsScreen({super.key});
@@ -71,10 +72,20 @@ class RiskEventsScreen extends StatelessWidget {
                       print('=== RiskEventsScreen: Evento seleccionado ===');
                       print('Evento: ${riskEvent.name}');
                       print('IconAsset: ${riskEvent.iconAsset}');
-                      homeBloc.add(
-                        SelectRiskEvent(riskEvent.name),
-                      );
-                      print('=== RiskEventsScreen: Evento enviado al HomeBloc ===');
+                      
+                      // Actualizar el estado del HomeBloc
+                      homeBloc.add(SelectRiskEvent(riskEvent.name));
+                      
+                      // Navegar directamente a las categorías
+                      final navigationData = {
+                        'event': riskEvent.name,
+                        'isNewForm': true,
+                        'forceReset': true,
+                      };
+                      
+                      context.go('/risk-categories', extra: navigationData);
+                      
+                      print('=== RiskEventsScreen: Navegando a categorías ===');
                     },
                   );
                 },

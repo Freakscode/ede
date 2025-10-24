@@ -7,6 +7,10 @@ class AppRoutes {
   static const String login = '/login';
   static const String home = '/';
   
+  // Risk Threat Analysis routes
+  static const String riskThreatAnalysis = '/risk-threat-analysis';
+  static const String riskCategories = '/risk-categories';
+  
   // Evaluacion flow routes
   static const String idEvaluacion = '/id_evaluacion';
   static const String idEdificacion = '/id_edificacion';
@@ -34,6 +38,10 @@ class RouteNames {
   // Auth routes
   static const String login = 'login';
   static const String home = 'home';
+  
+  // Risk Threat Analysis routes
+  static const String riskThreatAnalysis = 'riskThreatAnalysis';
+  static const String riskCategories = 'riskCategories';
   
   // Evaluacion flow routes
   static const String idEvaluacion = 'idEvaluacion';

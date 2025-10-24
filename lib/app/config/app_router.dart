@@ -5,6 +5,7 @@ import 'dart:async';
 
 import 'package:caja_herramientas/app/modules/risk_threat_analysis/presentation/pages/risk_threat_analysis_screen.dart';
 import 'package:caja_herramientas/app/modules/risk_threat_analysis/presentation/pages/final_risk_results_screen.dart';
+import 'package:caja_herramientas/app/modules/risk_threat_analysis/presentation/pages/categories_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -56,8 +57,9 @@ GoRouter getAppRouter(BuildContext context) {
         path: '/home_forms',
         builder: (context, state) => const HomeFormsScreen(),
       ),
+      // Risk Threat Analysis - Análisis de riesgo y amenazas
       GoRoute(
-        path: '/risk_threat_analysis',
+        path: '/risk-threat-analysis',
         builder: (context, state) {
           // Manejar tanto String (compatibilidad) como Map (nuevo formato)
           if (state.extra is Map<String, dynamic>) {
@@ -71,6 +73,12 @@ GoRouter getAppRouter(BuildContext context) {
             return RiskThreatAnalysisScreen(selectedEvent: selectedEvent);
           }
         },
+      ),
+      
+      // Risk Categories - Categorías de riesgo (nueva pantalla integrada)
+      GoRoute(
+        path: '/risk-categories',
+        builder: (context, state) => const CategoriesScreen(),
       ),
       
       // Data Registration - Registro de datos

@@ -1,52 +1,50 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:caja_herramientas/app/core/icons/app_icons.dart';
-import 'package:caja_herramientas/app/modules/home/presentation/widgets/category_card.dart';
+import 'package:caja_herramientas/app/modules/risk_threat_analysis/presentation/widgets/category_card.dart';
+import 'package:caja_herramientas/app/modules/risk_threat_analysis/presentation/pages/categories_screen.dart';
 
 /// Widget para el contenedor de categorías de riesgo
 class RiskCategoriesContainer extends StatelessWidget {
-  final List<String> classifications;
   final String selectedEvent;
-  final Map<String, CategoryState> categoryStates;
   final Function(String, String, bool) onCategoryTap;
+  final Function(String) getCategoryState;
 
   const RiskCategoriesContainer({
     super.key,
-    required this.classifications,
     required this.selectedEvent,
-    required this.categoryStates,
     required this.onCategoryTap,
+    required this.getCategoryState,
   });
 
   @override
   Widget build(BuildContext context) {
+    // Clasificaciones fijas para el análisis de riesgo
+    final classifications = ['Amenaza', 'Vulnerabilidad'];
+    
     return Column(
       children: [
-        // Generar CategoryCards dinámicamente basadas en las clasificaciones del modelo
+        // Generar CategoryCards dinámicamente basadas en las clasificaciones
         ...classifications.asMap().entries.map((entry) {
           final index = entry.key;
           final classification = entry.value;
-          final categoryState = categoryStates[classification] ?? 
-              const CategoryState(progressPercentage: 0);
-
-          return Column(
-            children: [
-              _buildCategoryCard(
-                context,
-                classification,
-                categoryState,
-              ),
-              // Agregar espaciado entre cards, excepto después del último
-              if (index < classifications.length - 1)
-                const SizedBox(height: 18),
-            ],
+          final categoryState = getCategoryState(classification);
+          
+          return Padding(
+            padding: EdgeInsets.only(
+              bottom: index < classifications.length - 1 ? 16.0 : 0,
+            ),
+            child: _buildCategoryCard(
+              context,
+              classification,
+              categoryState,
+            ),
           );
-        }),
+        }).toList(),
       ],
     );
   }
 
-  // Construir la tarjeta de categoría
   Widget _buildCategoryCard(
     BuildContext context,
     String classification,
@@ -62,15 +60,14 @@ class RiskCategoriesContainer extends StatelessWidget {
     );
   }
 
-  // Construir el ícono trailing según el estado
   Widget? _buildTrailingIcon(CategoryState categoryState) {
     print('=== DEBUG _buildTrailingIcon ===');
     print('progressPercentage: ${categoryState.progressPercentage}');
     
-    // Lógica simplificada basada en porcentaje de progreso
+    // Lógica simplificada basada en el porcentaje de progreso
     if (categoryState.progressPercentage == 100) {
       print('Mostrando checkmark (100%)');
-      // Si está al 100%: mostrar checkmark
+      // Si 100%: mostrar checkmark
       return SizedBox(
         width: 24,
         height: 24,
@@ -78,7 +75,7 @@ class RiskCategoriesContainer extends StatelessWidget {
       );
     } else if (categoryState.progressPercentage > 0 && categoryState.progressPercentage < 100) {
       print('Mostrando icono de borrador (${categoryState.progressPercentage}%)');
-      // Si está entre 1% y 99%: mostrar icono de borrador
+      // Si entre 1% y 99%: mostrar icono de borrador
       return SizedBox(
         width: 18,
         height: 17,
@@ -94,17 +91,8 @@ class RiskCategoriesContainer extends StatelessWidget {
       );
     } else {
       print('No mostrando icono (0%)');
-      // Si está al 0%: no mostrar nada
+      // Si 0%: no mostrar nada
       return const SizedBox.shrink();
     }
   }
-}
-
-// Clase para manejar el estado de cada categoría
-class CategoryState {
-  final int progressPercentage;
-  
-  const CategoryState({
-    required this.progressPercentage,
-  });
 }

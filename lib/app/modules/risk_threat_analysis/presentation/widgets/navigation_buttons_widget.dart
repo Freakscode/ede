@@ -42,10 +42,7 @@ class NavigationButtonsWidget extends StatelessWidget {
               () {
                 if (currentIndex == 3) {
                   // Cuando estamos en FinalRiskResultsScreen (índice 3), volver a categorías
-                  // Resetear el estado del RiskThreatAnalysisBloc antes de navegar
-                  context.read<RiskThreatAnalysisBloc>().add(ResetState());
-                  final navigationData = {'showRiskCategories': true};
-                  context.go('/home', extra: navigationData);
+                  context.go('/risk-categories');
                 } else if (currentIndex > 0) {
                   context.read<RiskThreatAnalysisBloc>().add(
                     ChangeBottomNavIndex(currentIndex - 1),
@@ -296,8 +293,15 @@ class NavigationButtonsWidget extends StatelessWidget {
       // Crear o actualizar formulario completo
       CompleteFormDataModel completeForm;
       
-      if (homeState.isCreatingNew || homeState.activeFormId == null) {
+      print('=== DEBUG FINALIZAR FORMULARIO ===');
+      print('isCreatingNew: ${homeState.isCreatingNew}');
+      print('activeFormId: ${homeState.activeFormId}');
+      print('selectedClassification: ${state.selectedClassification}');
+      print('selectedRiskEvent: ${state.selectedRiskEvent}');
+      
+      if (homeState.isCreatingNew || homeState.activeFormId == null || homeState.activeFormId!.isEmpty) {
         // Crear nuevo formulario
+        print('Creando nuevo formulario');
         final formId = '${state.selectedRiskEvent ?? ''}_complete_${now.millisecondsSinceEpoch}';
         completeForm = CompleteFormDataModel(
           id: formId,
@@ -339,12 +343,52 @@ class NavigationButtonsWidget extends StatelessWidget {
         );
       } else {
         // Actualizar formulario existente
+        print('Actualizando formulario existente: ${homeState.activeFormId}');
         final existingForm = await persistenceService.getCompleteForm(homeState.activeFormId!);
         if (existingForm == null) {
-          throw Exception('No se encontró el formulario existente');
-        }
-        
-        completeForm = existingForm;
+          print('ERROR: Formulario no encontrado, creando nuevo');
+          // Si no se encuentra el formulario, crear uno nuevo
+          final formId = '${state.selectedRiskEvent ?? ''}_complete_${now.millisecondsSinceEpoch}';
+          completeForm = CompleteFormDataModel(
+            id: formId,
+            eventName: state.selectedRiskEvent ?? '',
+            contactData: contactData,
+            inspectionData: inspectionData,
+            amenazaSelections: (state.selectedClassification ?? '').toLowerCase() == 'amenaza' 
+                ? (formData['dynamicSelections'] ?? {}) : {},
+            amenazaScores: (state.selectedClassification ?? '').toLowerCase() == 'amenaza'
+                ? (formData['subClassificationScores'] ?? {}) : {},
+            amenazaColors: (state.selectedClassification ?? '').toLowerCase() == 'amenaza'
+                ? (formData['subClassificationColors'] ?? {}) : {},
+            amenazaProbabilidadSelections: (state.selectedClassification ?? '').toLowerCase() == 'amenaza'
+                ? (formData['probabilidadSelections'] ?? {}) : {},
+            amenazaIntensidadSelections: (state.selectedClassification ?? '').toLowerCase() == 'amenaza'
+                ? (formData['intensidadSelections'] ?? {}) : {},
+            amenazaSelectedProbabilidad: (state.selectedClassification ?? '').toLowerCase() == 'amenaza'
+                ? formData['selectedProbabilidad'] : null,
+            amenazaSelectedIntensidad: (state.selectedClassification ?? '').toLowerCase() == 'amenaza'
+                ? formData['selectedIntensidad'] : null,
+            vulnerabilidadSelections: (state.selectedClassification ?? '').toLowerCase() == 'vulnerabilidad'
+                ? (formData['dynamicSelections'] ?? {}) : {},
+            vulnerabilidadScores: (state.selectedClassification ?? '').toLowerCase() == 'vulnerabilidad'
+                ? (formData['subClassificationScores'] ?? {}) : {},
+            vulnerabilidadColors: (state.selectedClassification ?? '').toLowerCase() == 'vulnerabilidad'
+                ? (formData['subClassificationColors'] ?? {}) : {},
+            vulnerabilidadProbabilidadSelections: (state.selectedClassification ?? '').toLowerCase() == 'vulnerabilidad'
+                ? (formData['probabilidadSelections'] ?? {}) : {},
+            vulnerabilidadIntensidadSelections: (state.selectedClassification ?? '').toLowerCase() == 'vulnerabilidad'
+                ? (formData['intensidadSelections'] ?? {}) : {},
+            vulnerabilidadSelectedProbabilidad: (state.selectedClassification ?? '').toLowerCase() == 'vulnerabilidad'
+                ? formData['selectedProbabilidad'] : null,
+            vulnerabilidadSelectedIntensidad: (state.selectedClassification ?? '').toLowerCase() == 'vulnerabilidad'
+                ? formData['selectedIntensidad'] : null,
+            evidenceImages: state.evidenceImages,
+            evidenceCoordinates: state.evidenceCoordinates,
+            createdAt: now,
+            updatedAt: now,
+          );
+        } else {
+          completeForm = existingForm;
         if ((state.selectedClassification ?? '').toLowerCase() == 'amenaza') {
           completeForm = completeForm.copyWith(
             amenazaSelections: formData['dynamicSelections'] ?? completeForm.amenazaSelections,
@@ -375,6 +419,7 @@ class NavigationButtonsWidget extends StatelessWidget {
             evidenceCoordinates: state.evidenceCoordinates,
             updatedAt: now,
           );
+        }
         }
       }
 
@@ -418,15 +463,14 @@ class NavigationButtonsWidget extends StatelessWidget {
         rightButtonText: 'Finalizar',
         rightButtonIcon: Icons.check,
         onRightButtonPressed: () {
-          // Resetear el estado del RiskThreatAnalysisBloc antes de navegar
-          context.read<RiskThreatAnalysisBloc>().add(ResetState());
-          
-          final navigationData = (state.selectedClassification ?? '').toLowerCase() == 'amenaza'
-              ? {'showRiskCategories': true}
-              : homeNavigationType.toNavigationData(tabIndex: homeTabIndex);
-          
-          // Navegar sin resetear el estado del formulario
-          context.go('/home', extra: navigationData);
+          if ((state.selectedClassification ?? '').toLowerCase() == 'amenaza') {
+            // Si es amenaza, volver a categorías
+            context.go('/risk-categories');
+          } else {
+            // Si es vulnerabilidad, volver al home
+            final navigationData = homeNavigationType.toNavigationData(tabIndex: homeTabIndex);
+            context.go('/home', extra: navigationData);
+          }
           Navigator.of(context).pop(); // Cerrar el diálogo
         },
       );

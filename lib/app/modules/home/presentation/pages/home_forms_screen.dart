@@ -10,13 +10,13 @@ import '../../presentation/bloc/home_event.dart';
 import '../../presentation/bloc/home_state.dart';
 import 'package:caja_herramientas/app/modules/auth/bloc/auth_bloc.dart';
 import 'package:caja_herramientas/app/modules/auth/bloc/auth_state.dart';
-import '../../domain/entities/form_navigation_data.dart';
 import '../../domain/entities/form_entity.dart';
 import '../../../../shared/services/form_persistence_service.dart';
 import '../../../../shared/models/risk_event_factory.dart';
 import '../../../../shared/models/complete_form_data_model.dart';
 import 'package:caja_herramientas/app/modules/risk_threat_analysis/presentation/bloc/risk_threat_analysis_bloc.dart';
 import 'package:caja_herramientas/app/modules/risk_threat_analysis/presentation/bloc/risk_threat_analysis_event.dart';
+import 'package:go_router/go_router.dart';
 
 class HomeFormsScreen extends StatefulWidget {
   const HomeFormsScreen({super.key});
@@ -537,16 +537,17 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
         ));
 
         // Navegar a la pantalla de categorías para ver el progreso y continuar
-        homeBloc.add(
-          HomeShowRiskCategoriesScreen(
-            FormNavigationData.forExistingForm(
-              eventName: completeForm.eventName,
-              formId: completeForm.id,
-              showProgressInfo: true,
-              progressData: progress, // Pasar el progreso calculado
-            ),
-          ),
-        );
+        // Navegar directamente a la nueva pantalla de categorías
+        final navigationData = {
+          'event': completeForm.eventName,
+          'loadSavedForm': true,
+          'formId': completeForm.id,
+          'showProgressInfo': true,
+          'progressData': progress,
+        };
+        
+        if (!mounted) return;
+        context.go('/risk-categories', extra: navigationData);
       } else {
         // Si no se encuentra el formulario, mostrar error
         if (!mounted) return;

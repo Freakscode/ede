@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import '../models/form_mode.dart';
 
 /// Eventos base para el módulo RiskThreatAnalysis
 abstract class RiskThreatAnalysisEvent extends Equatable {
@@ -23,6 +24,28 @@ class ChangeBottomNavIndex extends RiskThreatAnalysisEvent {
 /// Evento para mostrar resultados finales
 class ShowFinalResults extends RiskThreatAnalysisEvent {
   const ShowFinalResults();
+}
+
+// ========== MODO DE FORMULARIO ==========
+
+/// Evento para establecer el modo del formulario
+class SetFormMode extends RiskThreatAnalysisEvent {
+  final FormMode mode;
+
+  const SetFormMode(this.mode);
+
+  @override
+  List<Object?> get props => [mode];
+}
+
+/// Evento para cambiar a modo creación
+class SetCreateMode extends RiskThreatAnalysisEvent {
+  const SetCreateMode();
+}
+
+/// Evento para cambiar a modo edición
+class SetEditMode extends RiskThreatAnalysisEvent {
+  const SetEditMode();
 }
 
 // ========== DROPDOWNS ==========

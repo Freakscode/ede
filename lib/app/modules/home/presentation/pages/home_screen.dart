@@ -1,5 +1,4 @@
 import 'package:caja_herramientas/app/modules/home/presentation/pages/home_forms_screen.dart';
-import 'package:caja_herramientas/app/modules/home/presentation/pages/risk_categories_screen.dart';
 import 'package:caja_herramientas/app/modules/home/presentation/pages/settings_screen.dart';
 import 'package:caja_herramientas/app/modules/home/presentation/widgets/forms_help_content.dart';
 import 'package:caja_herramientas/app/modules/home/presentation/widgets/general_help_content.dart';
@@ -17,7 +16,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:caja_herramientas/app/modules/home/presentation/bloc/home_bloc.dart';
 import 'package:caja_herramientas/app/modules/home/presentation/bloc/home_event.dart';
 import 'package:caja_herramientas/app/modules/home/presentation/bloc/home_state.dart';
-import 'package:caja_herramientas/app/modules/home/domain/entities/form_navigation_data.dart';
 import 'package:caja_herramientas/app/shared/widgets/layouts/custom_bottom_nav_bar.dart';
 import 'package:go_router/go_router.dart';
 
@@ -47,12 +45,6 @@ class HomeScreen extends StatelessWidget {
       return {
         'categoryTitle': "Ayuda Eventos de Riesgo",
         'contentTitle': "Eventos de Riesgo",
-        'content': HomeHelpContent.build(),
-      };
-    } else if (state.showRiskCategories) {
-      return {
-        'categoryTitle': "Ayuda Categorías de Riesgo",
-        'contentTitle': "Categorías de Riesgo",
         'content': HomeHelpContent.build(),
       };
     } else if (state.showFormCompleted) {
@@ -118,9 +110,8 @@ class HomeScreen extends StatelessWidget {
     final bloc = context.read<HomeBloc>();
     
     if (navigationData!['showRiskCategories'] == true) {
-      bloc.add(HomeShowRiskCategoriesScreen(
-        FormNavigationData.forNewForm(''),
-      ));
+      // Navegar a la nueva pantalla de categorías integrada
+      context.go('/risk-categories');
     } else if (navigationData!['showRiskEvents'] == true) {
       // Si viene de data registration, resetear formularios y mostrar RiskEventsScreen
       if (navigationData!['resetForNewForm'] == true) {
@@ -146,14 +137,10 @@ class HomeScreen extends StatelessWidget {
     return _buildMainTabContent(context, state.selectedIndex);
   }
 
-  /// Construye el contenido para secciones especiales (eventos de riesgo, categorías, formulario completado)
+  /// Construye el contenido para secciones especiales (eventos de riesgo, formulario completado)
   Widget? _buildSpecialSectionContent(HomeState state) {
     if (state.showRiskEvents) {
       return const RiskEventsScreen();
-    }
-    
-    if (state.showRiskCategories) {
-      return const RiskCategoriesScreen();
     }
     
     if (state.showFormCompleted) {
@@ -327,10 +314,8 @@ class HomeScreen extends StatelessWidget {
   void _handleBackAction(BuildContext context, HomeState state) {
     final bloc = context.read<HomeBloc>();
     
-    if (state.showRiskCategories) {
+    if (state.showRiskEvents) {
       bloc.add(HomeShowRiskEventsSection());
-    } else if (state.showRiskEvents) {
-      bloc.add(HomeResetRiskSections());
     } else if (state.showFormCompleted) {
       // Volver a la pantalla de formularios y resetear estado
       bloc.add(HomeResetRiskSections());

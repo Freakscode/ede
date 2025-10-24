@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import '../../domain/entities/risk_analysis_entity.dart';
+import '../models/form_mode.dart';
 
 /// Estado de presentación para el módulo RiskThreatAnalysis
 /// Representa el estado de la UI, separado de la lógica de negocio
@@ -14,6 +15,7 @@ class RiskThreatAnalysisState extends Equatable {
   final Map<String, String> intensidadSelections;
   final String? selectedRiskEvent;
   final String? selectedClassification;
+  final FormMode formMode;
   
   // Estado genérico para dropdowns dinámicos
   final Map<String, bool> dropdownOpenStates;
@@ -47,6 +49,7 @@ class RiskThreatAnalysisState extends Equatable {
     this.intensidadSelections = const {},
     this.selectedRiskEvent,
     this.selectedClassification,
+    this.formMode = FormMode.create,
     this.dropdownOpenStates = const {},
     this.dynamicSelections = const {},
     this.subClassificationScores = const {},
@@ -79,6 +82,7 @@ class RiskThreatAnalysisState extends Equatable {
     return RiskAnalysisEntity(
       eventName: selectedRiskEvent ?? '',
       classificationType: selectedClassification ?? '',
+      formMode: formMode.value,
       selections: {
         ...probabilidadSelections,
         ...intensidadSelections,
@@ -101,6 +105,7 @@ class RiskThreatAnalysisState extends Equatable {
     Map<String, String>? intensidadSelections,
     String? selectedRiskEvent,
     String? selectedClassification,
+    FormMode? formMode,
     Map<String, bool>? dropdownOpenStates,
     Map<String, Map<String, String>>? dynamicSelections,
     Map<String, double>? subClassificationScores,
@@ -122,6 +127,7 @@ class RiskThreatAnalysisState extends Equatable {
       intensidadSelections: intensidadSelections ?? this.intensidadSelections,
       selectedRiskEvent: selectedRiskEvent ?? this.selectedRiskEvent,
       selectedClassification: selectedClassification ?? this.selectedClassification,
+      formMode: formMode ?? this.formMode,
       dropdownOpenStates: dropdownOpenStates ?? this.dropdownOpenStates,
       dynamicSelections: dynamicSelections ?? this.dynamicSelections,
       subClassificationScores: subClassificationScores ?? this.subClassificationScores,
@@ -174,6 +180,12 @@ class RiskThreatAnalysisState extends Equatable {
 
   /// ¿Es un análisis de vulnerabilidad?
   bool get isVulnerabilidad => selectedClassification?.toLowerCase() == 'vulnerabilidad';
+  
+  /// ¿Es modo creación?
+  bool get isCreateMode => formMode.isCreate;
+  
+  /// ¿Es modo edición?
+  bool get isEditMode => formMode.isEdit;
 
   /// ¿Tiene evidencias?
   bool get hasEvidence => evidenceImages.isNotEmpty;
@@ -189,6 +201,7 @@ class RiskThreatAnalysisState extends Equatable {
     intensidadSelections,
     selectedRiskEvent,
     selectedClassification,
+    formMode,
     dropdownOpenStates,
     dynamicSelections,
     subClassificationScores,

@@ -1,5 +1,4 @@
-import 'package:caja_herramientas/app/modules/home/presentation/widgets/risk_categories_content.dart';
-import 'package:caja_herramientas/app/modules/home/presentation/widgets/risk_categories_container.dart';
+import 'package:caja_herramientas/app/modules/risk_threat_analysis/presentation/widgets/risk_categories_content.dart';
 import 'package:caja_herramientas/app/modules/home/presentation/bloc/home_bloc.dart';
 import 'package:caja_herramientas/app/modules/home/presentation/bloc/home_state.dart';
 import 'package:caja_herramientas/app/modules/home/presentation/bloc/home_event.dart';
@@ -11,14 +10,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-class RiskCategoriesScreen extends StatefulWidget {
-  const RiskCategoriesScreen({super.key});
+class CategoriesScreen extends StatefulWidget {
+  const CategoriesScreen({super.key});
 
   @override
-  State<RiskCategoriesScreen> createState() => _RiskCategoriesScreenState();
+  State<CategoriesScreen> createState() => _CategoriesScreenState();
 }
 
-class _RiskCategoriesScreenState extends State<RiskCategoriesScreen> {
+class _CategoriesScreenState extends State<CategoriesScreen> {
   // Método para determinar el estado de una categoría
   CategoryState _getCategoryState(
     String classification,
@@ -132,14 +131,14 @@ class _RiskCategoriesScreenState extends State<RiskCategoriesScreen> {
     riskBloc.add(UpdateSelectedRiskEvent(selectedEvent));
     riskBloc.add(SelectClassification(classification.toLowerCase()));
     
-    // SIEMPRE ir al RatingScreen (índice 0) desde RiskCategoriesScreen
+    // SIEMPRE ir al RatingScreen (índice 0) desde CategoriesScreen
     riskBloc.add(ChangeBottomNavIndex(0));
 
     final navigationData = <String, dynamic>{
       'event': selectedEvent,
       'classification': classification.toLowerCase(),
       'targetIndex': 0, // SIEMPRE RatingScreen
-      'source': 'RiskCategoriesScreen',
+      'source': 'CategoriesScreen',
     };
 
     // Configurar datos de navegación según el modo
@@ -151,7 +150,7 @@ class _RiskCategoriesScreenState extends State<RiskCategoriesScreen> {
       navigationData['formId'] = currentHomeState.activeFormId;
     }
 
-    context.go('/risk_threat_analysis', extra: navigationData);
+    context.go('/risk-threat-analysis', extra: navigationData);
   }
 
   @override
@@ -186,15 +185,34 @@ class _RiskCategoriesScreenState extends State<RiskCategoriesScreen> {
             }
 
             return RiskCategoriesContent(
-              classifications: classifications,
               selectedEvent: selectedEvent ?? '',
-              categoryStates: categoryStates,
               onCategoryTap: _navigateToCategory,
-              homeState: homeState,
+              getCategoryState: (classification) {
+                // Obtener el progreso desde navigationData o desde el estado guardado
+                Map<String, double>? progressData = homeState.navigationData?.progressData;
+                if (progressData == null && homeState.activeFormId != null) {
+                  progressData = homeState.getFormProgress(homeState.activeFormId!);
+                }
+                
+                return _getCategoryState(
+                  classification,
+                  homeState,
+                  context,
+                  riskState,
+                  progressData,
+                );
+              },
             );
           },
         );
       },
     );
   }
+}
+
+/// Estado de una categoría
+class CategoryState {
+  final int progressPercentage;
+
+  const CategoryState({required this.progressPercentage});
 }
