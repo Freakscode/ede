@@ -12,10 +12,11 @@ import 'package:caja_herramientas/app/modules/auth/bloc/auth_bloc.dart';
 import 'package:caja_herramientas/app/modules/auth/bloc/auth_state.dart';
 import '../../domain/entities/form_navigation_data.dart';
 import '../../domain/entities/form_entity.dart';
-import '../../../../shared/models/form_data_model.dart';
 import '../../../../shared/services/form_persistence_service.dart';
 import '../../../../shared/models/risk_event_factory.dart';
 import '../../../../shared/models/complete_form_data_model.dart';
+import 'package:caja_herramientas/app/modules/risk_threat_analysis/presentation/bloc/risk_threat_analysis_bloc.dart';
+import 'package:caja_herramientas/app/modules/risk_threat_analysis/presentation/bloc/risk_threat_analysis_event.dart';
 
 class HomeFormsScreen extends StatefulWidget {
   const HomeFormsScreen({super.key});
@@ -68,7 +69,7 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
 
         // Progreso total (promedio)
         final totalProgress = (amenazaProgress + vulnerabilidadProgress) / 2;
-
+        
         return {
           'amenaza': amenazaProgress,
           'vulnerabilidad': vulnerabilidadProgress,
@@ -407,6 +408,8 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
                                 'total': 0.0,
                               };
 
+                              
+
                           return FormCardInProgress(
                             title: form.title,
                             lastEdit: form.formattedLastModified,
@@ -418,7 +421,17 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
                             vulnerability: progress['vulnerabilidad']!,
                             onDelete: () =>
                                 _deleteForm(context, form.id, form.title),
-                            onTap: () => _navigateToForm(context, form),
+                            onTap: () {
+                              print('=== DEBUG onTap FormCardInProgress ===');
+                              print('form.id: ${form.id}');
+                              print('=== DEBUG _navigateToForm ===');
+                              print('progress: $progress');
+                              print('amenaza: ${progress['amenaza']}');
+                              print('vulnerabilidad: ${progress['vulnerabilidad']}');
+                              print('total: ${progress['total']}');
+                              print('=== END DEBUG _navigateToForm ===');
+                              _navigateToForm(context, form);
+                            },
                           );
                         },
                       ),
@@ -472,11 +485,56 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
         // Check if widget is still mounted before using context
         if (!mounted) return;
 
-        // Get bloc reference before async gap
+        // Get bloc references before async gap
         final homeBloc = context.read<HomeBloc>();
+        final riskBloc = context.read<RiskThreatAnalysisBloc>();
+
+        // No resetear el estado del BLoC aquí para preservar los datos cargados
+
+        // Determinar la clasificación basándose en los datos disponibles
+        // Priorizar amenaza primero, ya que es el flujo natural de creación
+        String classificationType = 'amenaza'; // Por defecto
+        
+        print('=== DEBUG classificationType logic ===');
+        print('amenazaProbabilidadSelections: ${completeForm.amenazaProbabilidadSelections}');
+        print('amenazaIntensidadSelections: ${completeForm.amenazaIntensidadSelections}');
+        print('vulnerabilidadSelections: ${completeForm.vulnerabilidadSelections}');
+        
+        // Si hay datos de amenaza (probabilidad o intensidad), usar amenaza
+        if (completeForm.amenazaProbabilidadSelections.isNotEmpty || 
+            completeForm.amenazaIntensidadSelections.isNotEmpty) {
+          classificationType = 'amenaza';
+          print('Using amenaza classification');
+        }
+        // Solo usar vulnerabilidad si hay datos específicos de vulnerabilidad Y amenaza está completa
+        else if (completeForm.vulnerabilidadSelections.isNotEmpty) {
+          classificationType = 'vulnerabilidad';
+          print('Using vulnerabilidad classification');
+        }
+        
+        print('Final classificationType: $classificationType');
+        print('=== END DEBUG classificationType logic ===');
+
+        // Calcular el progreso del formulario
+        final progress = await _getFormProgress(form.id);
+        
+        // Cargar los datos específicos del formulario en el RiskThreatAnalysisBloc
+        final evaluationData = completeForm.toJson();
+        
+        riskBloc.add(LoadFormData(
+          eventName: completeForm.eventName,
+          classificationType: classificationType,
+          evaluationData: evaluationData,
+        ));
 
         // Marcar como editar (no crear nuevo)
-            homeBloc.add(SetActiveFormId(formId: completeForm.id, isCreatingNew: false));
+        homeBloc.add(SetActiveFormId(formId: completeForm.id, isCreatingNew: false));
+
+        // Guardar el progreso en el estado del HomeBloc para preservarlo
+        homeBloc.add(SetFormProgress(
+          formId: completeForm.id,
+          progressData: progress,
+        ));
 
         // Navegar a la pantalla de categorías para ver el progreso y continuar
         homeBloc.add(
@@ -485,6 +543,7 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
               eventName: completeForm.eventName,
               formId: completeForm.id,
               showProgressInfo: true,
+              progressData: progress, // Pasar el progreso calculado
             ),
           ),
         );

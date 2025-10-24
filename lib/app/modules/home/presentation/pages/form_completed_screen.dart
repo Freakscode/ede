@@ -24,7 +24,7 @@ class FormCompletedScreen extends StatelessWidget {
             'Formulario finalizado correctamente',
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: Color(0xFF232B48), // var(--AzulDAGRD, #232B48)
+              color: DAGRDColors.azulDAGRD,
               fontFamily: 'Work Sans',
               fontSize: 20,
               fontWeight: FontWeight.w600,
@@ -39,7 +39,7 @@ class FormCompletedScreen extends StatelessWidget {
             'El formulario ha sido completado. Seleccione la acción que desea realizar a continuación:',
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: Color(0xFF1E1E1E), // var(--Textos, #1E1E1E)
+              color: DAGRDColors.negroDAGRD,
               fontFamily: 'Work Sans',
               fontSize: 13,
               fontWeight: FontWeight.w500,

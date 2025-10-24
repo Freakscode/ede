@@ -148,7 +148,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               decoration: InputDecoration(
                                 labelText: 'Número de cédula',
                                 labelStyle: const TextStyle(
-                                  color: Color(0xFFCCCCCC), // Texto-inputs #CCC
+                                  color: DAGRDColors.grisMedio, // Texto-inputs
                                   fontFamily: 'Work Sans',
                                   fontSize: 14,
                                   fontWeight: FontWeight.w500,
@@ -161,7 +161,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     width: 20,
                                     height: 20,
                                     colorFilter: const ColorFilter.mode(
-                                      Color(0xFFC6C6C6),
+                                      DAGRDColors.grisMedio,
                                       BlendMode.srcIn,
                                     ),
                                   ),
@@ -182,14 +182,14 @@ class _LoginScreenState extends State<LoginScreen> {
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(6),
                                   borderSide: const BorderSide(
-                                    color: Color(0xFFD1D5DB),
+                                    color: DAGRDColors.outlineVariant,
                                     width: 1,
                                   ),
                                 ),
                                 focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(6),
                                   borderSide: const BorderSide(
-                                    color: Color(0xFFD1D5DB),
+                                    color: DAGRDColors.outlineVariant,
                                     width: 1,
                                   ),
                                 ),
@@ -211,7 +211,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               decoration: InputDecoration(
                                 labelText: 'Contraseña',
                                 labelStyle: const TextStyle(
-                                  color: Color(0xFFCCCCCC), // Texto-inputs #CCC
+                                  color: DAGRDColors.grisMedio, // Texto-inputs
                                   fontFamily: 'Work Sans',
                                   fontSize: 14,
                                   fontWeight: FontWeight.w500,
@@ -225,7 +225,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     width: 20,
                                     height: 20,
                                     colorFilter: const ColorFilter.mode(
-                                      Color(0xFFC6C6C6),
+                                      DAGRDColors.grisMedio,
                                       BlendMode.srcIn,
                                     ),
                                   ),
@@ -246,14 +246,14 @@ class _LoginScreenState extends State<LoginScreen> {
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(6),
                                   borderSide: const BorderSide(
-                                    color: Color(0xFFD1D5DB),
+                                    color: DAGRDColors.outlineVariant,
                                     width: 1,
                                   ),
                                 ),
                                 focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(6),
                                   borderSide: const BorderSide(
-                                    color: Color(0xFFD1D5DB),
+                                    color: DAGRDColors.outlineVariant,
                                     width: 1,
                                   ),
                                 ),

@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import '../../domain/entities/home_entity.dart';
 import '../../domain/entities/form_entity.dart';
+import '../../domain/entities/form_navigation_data.dart';
 
 /// Estado de presentación para el módulo Home
 /// Representa el estado de la UI, separado de la lógica de negocio
@@ -14,7 +15,7 @@ class HomeState extends Equatable {
   final bool notificationsEnabled;
   final bool darkModeEnabled;
   final String selectedLanguage;
-  final String selectedRiskEvent;
+  final String? selectedRiskEvent;
   final String? selectedRiskCategory;
   final Map<String, bool> completedEvaluations;
   final List<FormEntity> savedForms;
@@ -22,6 +23,8 @@ class HomeState extends Equatable {
   final String? activeFormId;
   final bool isCreatingNew;
   final Map<String, Map<String, dynamic>> savedRiskEventModels;
+  final FormNavigationData? navigationData;
+  final Map<String, Map<String, double>> formProgressData;
   
   // Estados de UI específicos
   final bool isLoading;
@@ -38,7 +41,7 @@ class HomeState extends Equatable {
     this.notificationsEnabled = true,
     this.darkModeEnabled = false,
     this.selectedLanguage = 'Español',
-    this.selectedRiskEvent = 'Movimiento en Masa',
+    this.selectedRiskEvent,
     this.selectedRiskCategory,
     this.completedEvaluations = const {},
     this.savedForms = const [],
@@ -46,6 +49,8 @@ class HomeState extends Equatable {
     this.activeFormId,
     this.isCreatingNew = true,
     this.savedRiskEventModels = const {},
+    this.navigationData,
+    this.formProgressData = const {},
     this.isLoading = false,
     this.error,
     this.hasError = false,
@@ -127,6 +132,8 @@ class HomeState extends Equatable {
     String? activeFormId,
     bool? isCreatingNew,
     Map<String, Map<String, dynamic>>? savedRiskEventModels,
+    FormNavigationData? navigationData,
+    Map<String, Map<String, double>>? formProgressData,
     bool? isLoading,
     String? error,
     bool? hasError,
@@ -149,6 +156,8 @@ class HomeState extends Equatable {
       activeFormId: activeFormId ?? this.activeFormId,
       isCreatingNew: isCreatingNew ?? this.isCreatingNew,
       savedRiskEventModels: savedRiskEventModels ?? this.savedRiskEventModels,
+      navigationData: navigationData ?? this.navigationData,
+      formProgressData: formProgressData ?? this.formProgressData,
       isLoading: isLoading ?? this.isLoading,
       error: error ?? this.error,
       hasError: hasError ?? this.hasError,
@@ -231,6 +240,11 @@ class HomeState extends Equatable {
     );
   }
 
+  /// Obtener el progreso de un formulario
+  Map<String, double>? getFormProgress(String formId) {
+    return formProgressData[formId];
+  }
+
   @override
   List<Object?> get props => [
         selectedIndex,
@@ -250,6 +264,8 @@ class HomeState extends Equatable {
         activeFormId,
         isCreatingNew,
         savedRiskEventModels,
+        navigationData,
+        formProgressData,
         isLoading,
         error,
         hasError,

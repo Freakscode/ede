@@ -8,6 +8,7 @@ class FormNavigationData extends Equatable {
   final bool loadSavedForm;
   final bool showProgressInfo;
   final bool resetForNewForm;
+  final Map<String, double>? progressData;
 
   const FormNavigationData({
     required this.eventName,
@@ -15,6 +16,7 @@ class FormNavigationData extends Equatable {
     this.loadSavedForm = false,
     this.showProgressInfo = false,
     this.resetForNewForm = false,
+    this.progressData,
   });
 
   /// Factory constructor para nuevo formulario
@@ -33,6 +35,7 @@ class FormNavigationData extends Equatable {
     required String eventName,
     required String formId,
     bool showProgressInfo = true,
+    Map<String, double>? progressData,
   }) {
     return FormNavigationData(
       eventName: eventName,
@@ -40,6 +43,7 @@ class FormNavigationData extends Equatable {
       loadSavedForm: true,
       showProgressInfo: showProgressInfo,
       resetForNewForm: false,
+      progressData: progressData,
     );
   }
 
@@ -64,6 +68,7 @@ class FormNavigationData extends Equatable {
     bool? loadSavedForm,
     bool? showProgressInfo,
     bool? resetForNewForm,
+    Map<String, double>? progressData,
   }) {
     return FormNavigationData(
       eventName: eventName ?? this.eventName,
@@ -71,6 +76,7 @@ class FormNavigationData extends Equatable {
       loadSavedForm: loadSavedForm ?? this.loadSavedForm,
       showProgressInfo: showProgressInfo ?? this.showProgressInfo,
       resetForNewForm: resetForNewForm ?? this.resetForNewForm,
+      progressData: progressData ?? this.progressData,
     );
   }
 
@@ -101,12 +107,13 @@ class FormNavigationData extends Equatable {
         loadSavedForm,
         showProgressInfo,
         resetForNewForm,
+        progressData,
       ];
 
   @override
   String toString() {
     return 'FormNavigationData(eventName: $eventName, formId: $formId, '
            'loadSavedForm: $loadSavedForm, showProgressInfo: $showProgressInfo, '
-           'resetForNewForm: $resetForNewForm)';
+           'resetForNewForm: $resetForNewForm, progressData: $progressData)';
   }
 }

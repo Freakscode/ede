@@ -43,7 +43,7 @@ class SettingsScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFFE5E5E5)),
+                border: Border.all(color: DAGRDColors.outline),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -101,10 +101,10 @@ class SettingsScreen extends StatelessWidget {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(4),
                         border: Border.all(
-                          color: const Color(0xFFD1D5DB),
+                          color: DAGRDColors.outlineVariant,
                           width: 1,
                         ),
-                        color: const Color(0xFFF9FAFB),
+                        color: DAGRDColors.surfaceVariant,
                       ),
                       padding: const EdgeInsets.symmetric(
                         horizontal: 12,
@@ -118,7 +118,7 @@ class SettingsScreen extends StatelessWidget {
                             child: Text(
                               'Español',
                               style: TextStyle(
-                                color: Color(0xFF1F2937),
+                                color: DAGRDColors.grisOscuro,
                                 fontFamily: 'Work Sans',
                                 fontSize: 13,
                                 fontWeight: FontWeight.w400,
@@ -131,7 +131,7 @@ class SettingsScreen extends StatelessWidget {
                             child: Text(
                               'English',
                               style: TextStyle(
-                                color: Color(0xFF1F2937),
+                                color: DAGRDColors.grisOscuro,
                                 fontFamily: 'Work Sans',
                                 fontSize: 13,
                                 fontWeight: FontWeight.w400,
@@ -187,7 +187,7 @@ class SettingsScreen extends StatelessWidget {
                       child: const Text(
                         'Limpiar Datos ahora',
                         style: TextStyle(
-                          color: Color(0xFF2563EB),
+                          color: DAGRDColors.azulSecundario,
                           fontFamily: 'Work Sans',
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
@@ -208,7 +208,7 @@ class SettingsScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFFE5E5E5)),
+                border: Border.all(color: DAGRDColors.outline),
               ),
               child: Column(
                 children: [
@@ -251,7 +251,7 @@ class SettingsScreen extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: const Color(0xFFE5E5E5)),
+                      border: Border.all(color: DAGRDColors.outline),
                     ),
                     child: Column(
                       children: [
@@ -301,7 +301,7 @@ class SettingsScreen extends StatelessWidget {
           content: const Text(
             '¿Estás seguro de que deseas cerrar sesión?',
             style: TextStyle(
-              color: Color(0xFF6B7280),
+              color: DAGRDColors.grisMedio,
               fontFamily: 'Work Sans',
               fontSize: 14,
               fontWeight: FontWeight.w400,
@@ -315,7 +315,7 @@ class SettingsScreen extends StatelessWidget {
               child: const Text(
                 'Cancelar',
                 style: TextStyle(
-                  color: Color(0xFF6B7280),
+                  color: DAGRDColors.grisMedio,
                   fontFamily: 'Work Sans',
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
@@ -392,7 +392,7 @@ class SettingsScreen extends StatelessWidget {
       decoration: showBorder
           ? const BoxDecoration(
               border: Border(
-                bottom: BorderSide(color: Color(0xFFD1D5DB), width: 1),
+                bottom: BorderSide(color: DAGRDColors.outlineVariant, width: 1),
               ),
             )
           : null,
@@ -427,7 +427,7 @@ class SettingsScreen extends StatelessWidget {
                     Text(
                       title,
                       style: const TextStyle(
-                        color: Color(0xFF000000),
+                        color: DAGRDColors.negroDAGRD,
                         fontFamily: 'Work Sans',
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
@@ -438,7 +438,7 @@ class SettingsScreen extends StatelessWidget {
                     Text(
                       subtitle,
                       style: const TextStyle(
-                        color: Color(0xFF000000),
+                        color: DAGRDColors.negroDAGRD,
                         fontFamily: 'Work Sans',
                         fontSize: 12,
                         fontWeight: FontWeight.w400,

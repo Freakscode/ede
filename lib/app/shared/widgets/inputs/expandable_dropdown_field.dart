@@ -4,9 +4,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:caja_herramientas/app/shared/models/models.dart';
-import 'package:caja_herramientas/app/modules/risk_threat_analysis/bloc/risk_threat_analysis_bloc.dart';
-import 'package:caja_herramientas/app/modules/risk_threat_analysis/bloc/events/risk_threat_analysis_event.dart';
-import 'package:caja_herramientas/app/modules/risk_threat_analysis/bloc/risk_threat_analysis_state.dart';
+import 'package:caja_herramientas/app/modules/risk_threat_analysis/presentation/bloc/risk_threat_analysis_bloc.dart';
+import 'package:caja_herramientas/app/modules/risk_threat_analysis/presentation/bloc/risk_threat_analysis_event.dart';
+import 'package:caja_herramientas/app/modules/risk_threat_analysis/presentation/bloc/risk_threat_analysis_state.dart';
 
 class ExpandableDropdownField extends StatefulWidget {
   final String hint;
@@ -44,49 +44,49 @@ class ExpandableDropdownField extends StatefulWidget {
 class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
   final Map<String, bool> _expandedCategories = {};
 
-  // Método helper para obtener el valor numérico del nivel seleccionado
-  int _getSelectedLevelValue(String categoryTitle, RiskThreatAnalysisState state) {
-    final dropdownSelections = state.dynamicSelections[widget.subClassificationId] ?? {};
-    final selectedLevel = dropdownSelections[categoryTitle];
-    if (selectedLevel == null) return 0;
-    
-    // Si es "No Aplica", devolver -1 para diferenciarlo
-    if (selectedLevel == 'NA') return -1;
-    
-    // Mapear los niveles a sus valores numéricos
-    if (selectedLevel.contains('BAJO') && !selectedLevel.contains('MEDIO')) {
-      return 1;
-    } else if (selectedLevel.contains('MEDIO') && selectedLevel.contains('ALTO')) {
-      return 3;
-    } else if (selectedLevel.contains('MEDIO')) {
-      return 2;
-    } else if (selectedLevel.contains('ALTO')) {
-      return 4;
+  // Método helper para obtener las selecciones correctas según la subclasificación
+  Map<String, String> _getSelectionsForSubClassification(
+    RiskThreatAnalysisState state,
+  ) {
+    if (widget.subClassificationId == 'probabilidad') {
+      return state.probabilidadSelections;
+    } else if (widget.subClassificationId == 'intensidad') {
+      return state.intensidadSelections;
+    } else {
+      return state.dynamicSelections[widget.subClassificationId] ?? {};
     }
-    return 0;
+  }
+
+  // Método helper para obtener el valor numérico del nivel seleccionado
+  int _getSelectedLevelValue(
+    String categoryTitle,
+    RiskThreatAnalysisState state,
+  ) {
+    final bloc = context.read<RiskThreatAnalysisBloc>();
+    final selections = _getSelectionsForSubClassification(state);
+    final selectedLevel = selections[categoryTitle];
+    
+    // Usar el método centralizado del BLoC
+    return bloc.getRatingFromSelection(selectedLevel);
   }
 
   // Método helper para obtener el valor de display (NA o número)
   String _getDisplayValue(String categoryTitle, RiskThreatAnalysisState state) {
-    final dropdownSelections = state.dynamicSelections[widget.subClassificationId] ?? {};
-    final selectedLevel = dropdownSelections[categoryTitle];
-    
+    final selections = _getSelectionsForSubClassification(state);
+    final selectedLevel = selections[categoryTitle];
+
     if (selectedLevel == 'NA') {
       return 'NA';
     }
-    
+
     final numericValue = _getSelectedLevelValue(categoryTitle, state);
     return numericValue <= 0 ? '0' : numericValue.toString();
   }
 
-
-
-
-
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<RiskThreatAnalysisBloc, RiskThreatAnalysisState>(
-      builder: (context, state) {  
+      builder: (context, state) {
         return Column(
           children: [
             // Dropdown Header
@@ -95,7 +95,10 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
               child: Container(
                 width: double.infinity,
                 height: 50,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 10,
+                ),
                 decoration: BoxDecoration(
                   color: widget.isSelected
                       ? DAGRDColors.amarDAGRD
@@ -121,12 +124,15 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            widget.value ?? widget.hint,
+                            (widget.value != null && widget.value!.isNotEmpty)
+                                ? widget.value!
+                                : widget.hint,
                             style: TextStyle(
                               color: widget.isSelected
                                   ? const Color(0xFF1E1E1E)
                                   : (widget.value != null
-                                        ? (widget.textColor ?? const Color(0xFF1E1E1E))
+                                        ? (widget.textColor ??
+                                              const Color(0xFF1E1E1E))
                                         : const Color(0xFF1E1E1E)),
                               fontFamily: 'Work Sans',
                               fontSize: 16,
@@ -137,18 +143,25 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
                         ],
                       ),
                     ),
-                    BlocBuilder<RiskThreatAnalysisBloc, RiskThreatAnalysisState>(
+                    BlocBuilder<
+                      RiskThreatAnalysisBloc,
+                      RiskThreatAnalysisState
+                    >(
                       builder: (context, state) {
                         final bloc = context.read<RiskThreatAnalysisBloc>();
-                        final shouldShow = bloc.shouldShowScoreContainer(widget.subClassificationId);
-                        
-                        if (!shouldShow) return const SizedBox.shrink();
-                        
-                        final score = bloc.getSubClassificationScore(widget.subClassificationId);
-                        final color = bloc.getSubClassificationColor(widget.subClassificationId);
-                        
+                        final shouldShow = bloc.shouldShowScoreContainer(
+                          widget.subClassificationId,
+                        );
 
-                        
+                        if (!shouldShow) return const SizedBox.shrink();
+
+                        final score = bloc.getSubClassificationScore(
+                          widget.subClassificationId,
+                        );
+                        final color = bloc.getSubClassificationColor(
+                          widget.subClassificationId,
+                        );
+
                         return Container(
                           width: 50,
                           height: 32,
@@ -166,7 +179,8 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
                                 fontSize: 14,
                                 fontStyle: FontStyle.normal,
                                 fontWeight: FontWeight.w700,
-                                height: 16 / 14, // 114.286% line-height (16px/14px)
+                                height:
+                                    16 / 14, // 114.286% line-height (16px/14px)
                               ),
                             ),
                           ),
@@ -188,33 +202,33 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
             ),
             // Expanded Content
             if (widget.isSelected)
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(color: const Color(0xFFD1D5DB)),
-                  borderRadius: const BorderRadius.only(
-                    bottomLeft: Radius.circular(8),
-                    bottomRight: Radius.circular(8),
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
+              RepaintBoundary(
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(color: const Color(0xFFD1D5DB)),
+                    borderRadius: const BorderRadius.only(
+                      bottomLeft: Radius.circular(8),
+                      bottomRight: Radius.circular(8),
                     ),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    ...widget.categories.map(
-                      (category) => _buildCategorySection(
-                        context,
-                        category,
-                        state,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      ...widget.categories.map(
+                        (category) =>
+                            _buildCategorySection(context, category, state),
+                      ),
+                    ],
+                  ),
                 ),
               ),
           ],
@@ -269,7 +283,11 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
                     _getDisplayValue(category.title, state),
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: (state.dynamicSelections[widget.subClassificationId]?[category.title] != null) 
+                      color:
+                          (_getSelectionsForSubClassification(
+                                state,
+                              )[category.title] !=
+                              null)
                           ? const Color(0xFF1E1E1E)
                           : const Color(0xFFD1D5DB),
                       fontFamily: 'Work Sans',
@@ -301,7 +319,8 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
               GestureDetector(
                 onTap: () {
                   setState(() {
-                    _expandedCategories[category.title] = !(_expandedCategories[category.title] ?? false);
+                    _expandedCategories[category.title] =
+                        !(_expandedCategories[category.title] ?? false);
                   });
                 },
                 child: Row(
@@ -337,11 +356,33 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
               const Spacer(),
               TextButton(
                 onPressed: () {
-                  // Marcar esta categoría como "No Aplica"
-                  context.read<RiskThreatAnalysisBloc>().add(
-                    UpdateDynamicSelection(widget.subClassificationId, category.title, 'NA'),
-                  );
-                  
+                  // Marcar esta categoría como "No Aplica" usando el evento correcto
+                  final bloc = context.read<RiskThreatAnalysisBloc>();
+
+                  if (widget.subClassificationId == 'probabilidad') {
+                    bloc.add(
+                      UpdateProbabilidadSelection(
+                        category: category.title,
+                        selection: 'NA',
+                      ),
+                    );
+                  } else if (widget.subClassificationId == 'intensidad') {
+                    bloc.add(
+                      UpdateIntensidadSelection(
+                        category: category.title,
+                        selection: 'NA',
+                      ),
+                    );
+                  } else {
+                    bloc.add(
+                      UpdateDynamicSelection(
+                        subClassificationId: widget.subClassificationId,
+                        category: category.title,
+                        selection: 'NA',
+                      ),
+                    );
+                  }
+
                   // Notificar la selección si hay callback
                   if (widget.onSelectionChanged != null) {
                     widget.onSelectionChanged!(category.title, 'NA');
@@ -380,7 +421,8 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
   }
 
   Widget _buildDetailedLevels(DropdownCategory category) {
-    final detailedLevels = category.detailedLevels ?? _getDefaultDetailedLevels();
+    final detailedLevels =
+        category.detailedLevels ?? _getDefaultDetailedLevels();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -558,16 +600,20 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
     ];
   }
 
-  Widget _buildLevelButton(String level, String categoryTitle, RiskThreatAnalysisState state) {
-    final dropdownSelections = state.dynamicSelections[widget.subClassificationId] ?? {};
-    final currentSelection = dropdownSelections[categoryTitle];
-    
+  Widget _buildLevelButton(
+    String level,
+    String categoryTitle,
+    RiskThreatAnalysisState state,
+  ) {
+    final selections = _getSelectionsForSubClassification(state);
+    final currentSelection = selections[categoryTitle];
+
     // Si está marcado como NA, ningún botón debe aparecer como seleccionado
     bool isSelected = currentSelection == level && currentSelection != 'NA';
-    
+
     Color backgroundColor;
     Color selectedBackgroundColor;
-    
+
     if (level.contains('BAJO') && !level.contains('MEDIO')) {
       backgroundColor = const Color(0xFFDCFCE7); // Verde claro desactivado
       selectedBackgroundColor = const Color(0xFF22C55E); // Verde activado
@@ -584,21 +630,65 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
 
     return GestureDetector(
       onTap: () {
-        final dropdownSelections = state.dynamicSelections[widget.subClassificationId] ?? {};
+        final dropdownSelections =
+            state.dynamicSelections[widget.subClassificationId] ?? {};
         final currentSelection = dropdownSelections[categoryTitle];
-        
+
         // Si el nivel ya está seleccionado, deseleccionarlo
         if (currentSelection == level && currentSelection != 'NA') {
-          // Enviar evento para deseleccionar
-          context.read<RiskThreatAnalysisBloc>().add(
-            UpdateDynamicSelection(widget.subClassificationId, categoryTitle, ''),
-          );
+          // Enviar evento para deseleccionar usando el evento correcto
+          final bloc = context.read<RiskThreatAnalysisBloc>();
+
+          if (widget.subClassificationId == 'probabilidad') {
+            bloc.add(
+              UpdateProbabilidadSelection(
+                category: categoryTitle,
+                selection: '',
+              ),
+            );
+          } else if (widget.subClassificationId == 'intensidad') {
+            bloc.add(
+              UpdateIntensidadSelection(category: categoryTitle, selection: ''),
+            );
+          } else {
+            bloc.add(
+              UpdateDynamicSelection(
+                subClassificationId: widget.subClassificationId,
+                category: categoryTitle,
+                selection: '',
+              ),
+            );
+          }
         } else {
           // Seleccionar el nuevo nivel (esto también limpia el estado NA si existía)
-          context.read<RiskThreatAnalysisBloc>().add(
-            UpdateDynamicSelection(widget.subClassificationId, categoryTitle, level),
-          );
-          
+          final bloc = context.read<RiskThreatAnalysisBloc>();
+
+          // Usar el evento correcto según la subclasificación
+          if (widget.subClassificationId == 'probabilidad') {
+            bloc.add(
+              UpdateProbabilidadSelection(
+                category: categoryTitle,
+                selection: level,
+              ),
+            );
+          } else if (widget.subClassificationId == 'intensidad') {
+            bloc.add(
+              UpdateIntensidadSelection(
+                category: categoryTitle,
+                selection: level,
+              ),
+            );
+          } else {
+            // Para otras subclasificaciones (vulnerabilidad), usar UpdateDynamicSelection
+            bloc.add(
+              UpdateDynamicSelection(
+                subClassificationId: widget.subClassificationId,
+                category: categoryTitle,
+                selection: level,
+              ),
+            );
+          }
+
           // Notificar la selección si hay callback
           if (widget.onSelectionChanged != null) {
             widget.onSelectionChanged!(categoryTitle, level);
@@ -612,7 +702,7 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
         decoration: BoxDecoration(
           color: isSelected ? selectedBackgroundColor : backgroundColor,
           borderRadius: BorderRadius.circular(4),
-          border: isSelected 
+          border: isSelected
               ? Border.all(color: selectedBackgroundColor, width: 2)
               : null,
         ),
@@ -627,19 +717,14 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
                   color: const Color(0xFF000000),
                   fontFamily: 'Work Sans',
                   fontSize: 12,
-                  fontWeight: isSelected 
-                      ? FontWeight.w600 
-                      : FontWeight.w400,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
                   height: 1.2,
                 ),
               ),
-
             ],
           ),
         ),
       ),
     );
   }
-
-
 }

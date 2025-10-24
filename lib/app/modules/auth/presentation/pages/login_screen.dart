@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:caja_herramientas/app/shared/widgets/widgets.dart';
+import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import '../../bloc/auth_bloc.dart';
 import '../../bloc/auth_state.dart';
 import '../../bloc/events/auth_events.dart';
@@ -41,7 +42,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: DAGRDColors.surface,
       body: SafeArea(
         child: BlocListener<AuthBloc, AuthState>(
           listener: (context, state) {
@@ -68,7 +69,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 const Icon(
                   Icons.security,
                   size: 80,
-                  color: Color(0xFF1E40AF),
+                  color: DAGRDColors.azulDAGRD,
                 ),
                 const SizedBox(height: 24),
                 
@@ -78,7 +79,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF1E40AF),
+                    color: DAGRDColors.azulDAGRD,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -88,7 +89,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 16,
-                    color: Color(0xFF6B7280),
+                    color: DAGRDColors.grisMedio,
                   ),
                 ),
                 const SizedBox(height: 48),
@@ -156,15 +157,15 @@ class _LoginScreenState extends State<LoginScreen> {
                             child: ElevatedButton(
                               onPressed: state is AuthLoading ? null : _handleLogin,
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF1E40AF),
-                                foregroundColor: Colors.white,
+                                backgroundColor: DAGRDColors.azulDAGRD,
+                                foregroundColor: DAGRDColors.blancoDAGRD,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                               ),
                               child: state is AuthLoading
                                   ? const CircularProgressIndicator(
-                                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                      valueColor: AlwaysStoppedAnimation<Color>(DAGRDColors.blancoDAGRD),
                                     )
                                   : const Text(
                                       'Iniciar Sesión',
