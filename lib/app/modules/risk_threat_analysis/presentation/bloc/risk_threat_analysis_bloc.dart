@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import '../../domain/entities/risk_analysis_entity.dart';
 import 'package:caja_herramientas/app/shared/models/risk_event_factory.dart';
@@ -451,8 +452,46 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     Emitter<RiskThreatAnalysisState> emit,
   ) async {
     try {
-      // TODO: Implementar obtención de ubicación actual
-      emit(state.setError('Funcionalidad de ubicación actual no implementada'));
+      emit(state.setLoading(true));
+      
+      // Verificar permisos de ubicación
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        emit(state.setError('Los servicios de ubicación están deshabilitados'));
+        return;
+      }
+
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          emit(state.setError('Permisos de ubicación denegados'));
+          return;
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        emit(state.setError('Los permisos de ubicación están denegados permanentemente'));
+        return;
+      }
+
+      // Obtener ubicación actual
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+        timeLimit: const Duration(seconds: 10),
+      );
+
+      // Actualizar coordenadas de la imagen
+      add(UpdateImageCoordinates(
+        category: event.category,
+        imageIndex: event.imageIndex,
+        coordinates: {
+          'lat': position.latitude.toString(),
+          'lng': position.longitude.toString(),
+        },
+      ));
+
+      emit(state.setLoading(false));
     } catch (e) {
       emit(state.setError('Error al obtener ubicación actual: $e'));
     }
