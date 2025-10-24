@@ -173,7 +173,7 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(6),
         border: Border.all(color: DAGRDColors.azulSecundario, width: 1),
-        color: Colors.white,
+        color: DAGRDColors.blancoDAGRD,
       ),
       child: Column(
         children: [
@@ -234,7 +234,7 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
                       ),
                       child: const Icon(
                         Icons.close,
-                        color: Colors.white, // stroke: #FFF
+                        color: DAGRDColors.blancoDAGRD, // stroke: #FFF
                         size: 12, // stroke-width: 2px (ajustado para el tamaño)
                       ),
                     ),
@@ -275,9 +275,7 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
                         height: 48, // height: 48px
                         child: ElevatedButton.icon(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(
-                              0xFF232B48,
-                            ), // background: var(--AzulDAGRD, #232B48)
+                            backgroundColor: DAGRDColors.azulDAGRD, // background: var(--AzulDAGRD, #232B48)
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(
                                 4,
@@ -292,13 +290,13 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
                           icon: const Icon(
                             Icons
                                 .location_on_outlined, // icono de ubicación outline
-                            color: Colors.white,
+                            color: DAGRDColors.blancoDAGRD,
                             size: 20,
                           ),
                           label: const Text(
                             'Georreferenciar imagen',
                             style: TextStyle(
-                              color: Colors.white,
+                              color: DAGRDColors.blancoDAGRD,
                               fontFamily: 'Work Sans',
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
@@ -322,7 +320,7 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
                                   color: DAGRDColors.outlineVariant,
                                 ),
                                 borderRadius: BorderRadius.circular(4),
-                                color: Colors.white,
+                                color: DAGRDColors.blancoDAGRD,
                               ),
                               child: Align(
                                 alignment: Alignment.centerLeft,
@@ -354,7 +352,7 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
                               ),
                               child: const Icon(
                                 Icons.location_on,
-                                color: Colors.white,
+                                color: DAGRDColors.blancoDAGRD,
                                 size: 20,
                               ),
                             ),
