@@ -2,6 +2,7 @@ import 'package:caja_herramientas/app/modules/home/presentation/widgets/event_ca
 import 'package:caja_herramientas/app/modules/home/presentation/bloc/home_bloc.dart';
 import 'package:caja_herramientas/app/modules/home/presentation/bloc/home_event.dart';
 import 'package:caja_herramientas/app/shared/models/risk_event_factory.dart';
+import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -24,7 +25,7 @@ class RiskEventsScreen extends StatelessWidget {
               child: Text(
                 'Metodología de Análisis del Riesgo',
                 style: const TextStyle(
-                  color: Color(0xFF232B48),
+                  color: DAGRDColors.azulDAGRD,
                   fontFamily: 'Work Sans',
                   fontSize: 20,
                   fontWeight: FontWeight.w600,
@@ -38,7 +39,7 @@ class RiskEventsScreen extends StatelessWidget {
                 'Seleccione un evento',
                 textAlign: TextAlign.center,
                 style: const TextStyle(
-                  color: Color(0xFF706F6F),
+                  color: DAGRDColors.grisMedio,
                   fontFamily: 'Work Sans',
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
