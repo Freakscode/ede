@@ -137,8 +137,13 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         }
       }
       
+      // Guardar los datos de navegación en el estado
+      final updatedState = HomeState.fromEntity(updatedEntity).copyWith(
+        navigationData: event.navigationData,
+      );
+      
       await _updateHomeStateUseCase.execute(updatedEntity);
-      emit(HomeState.fromEntity(updatedEntity));
+      emit(updatedState);
     } catch (e) {
       emit(state.copyWith(error: 'Error al mostrar categorías de riesgo: $e'));
     }

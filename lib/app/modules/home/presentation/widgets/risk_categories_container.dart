@@ -70,7 +70,12 @@ class RiskCategoriesContainer extends StatelessWidget {
 
   // Construir el ícono trailing según el estado
   Widget? _buildTrailingIcon(CategoryState categoryState) {
+    print('=== DEBUG _buildTrailingIcon ===');
+    print('isAvailable: ${categoryState.isAvailable}');
+    print('progressPercentage: ${categoryState.progressPercentage}');
+    
     if (!categoryState.isAvailable) {
+      print('Mostrando icono de lock');
       return const Icon(
         Icons.lock_outlined,
         color: DAGRDColors.grisMedio,
@@ -80,6 +85,7 @@ class RiskCategoriesContainer extends StatelessWidget {
     
     // Lógica simplificada basada en porcentaje de progreso
     if (categoryState.progressPercentage == 100) {
+      print('Mostrando checkmark (100%)');
       // Si está al 100%: mostrar checkmark
       return SizedBox(
         width: 24,
@@ -87,6 +93,7 @@ class RiskCategoriesContainer extends StatelessWidget {
         child: SvgPicture.asset(AppIcons.checkCircle, width: 24, height: 24),
       );
     } else if (categoryState.progressPercentage > 0 && categoryState.progressPercentage < 100) {
+      print('Mostrando icono de borrador (${categoryState.progressPercentage}%)');
       // Si está entre 1% y 99%: mostrar icono de borrador
       return SizedBox(
         width: 18,
@@ -102,6 +109,7 @@ class RiskCategoriesContainer extends StatelessWidget {
         ),
       );
     } else {
+      print('No mostrando icono (0%)');
       // Si está al 0%: no mostrar nada
       return const SizedBox.shrink();
     }

@@ -422,8 +422,14 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
                             onDelete: () =>
                                 _deleteForm(context, form.id, form.title),
                             onTap: () {
-                              print(progress['amenaza']!);
-                              print(progress['vulnerabilidad']!);
+                              print('=== DEBUG onTap FormCardInProgress ===');
+                              print('form.id: ${form.id}');
+                              print('=== DEBUG _navigateToForm ===');
+                              print('progress: $progress');
+                              print('amenaza: ${progress['amenaza']}');
+                              print('vulnerabilidad: ${progress['vulnerabilidad']}');
+                              print('total: ${progress['total']}');
+                              print('=== END DEBUG _navigateToForm ===');
                               _navigateToForm(context, form);
                             },
                           );
@@ -499,9 +505,11 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
           classificationType = 'vulnerabilidad';
         }
 
+        // Calcular el progreso del formulario
+        final progress = await _getFormProgress(form.id);
+        
         // Cargar los datos específicos del formulario en el RiskThreatAnalysisBloc
         final evaluationData = completeForm.toJson();
-        
         
         riskBloc.add(LoadFormData(
           eventName: completeForm.eventName,
@@ -519,6 +527,7 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
               eventName: completeForm.eventName,
               formId: completeForm.id,
               showProgressInfo: true,
+              progressData: progress, // Pasar el progreso calculado
             ),
           ),
         );

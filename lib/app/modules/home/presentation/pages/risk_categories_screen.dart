@@ -25,6 +25,7 @@ class _RiskCategoriesScreenState extends State<RiskCategoriesScreen> {
     HomeState homeState,
     BuildContext context,
     RiskThreatAnalysisState riskState,
+    Map<String, double>? progressData,
   ) {
     final isAmenaza = classification.toLowerCase() == 'amenaza';
     final isVulnerabilidad = classification.toLowerCase() == 'vulnerabilidad';
@@ -32,53 +33,21 @@ class _RiskCategoriesScreenState extends State<RiskCategoriesScreen> {
         homeState.activeFormId != null && !homeState.isCreatingNew;
 
     if (isAmenaza) {
-      return _getAmenazaState(context, riskState);
+      return _getAmenazaState(context, riskState, progressData);
     } else if (isVulnerabilidad) {
-      return _getVulnerabilidadState(homeState, context, isEditMode, riskState);
+      return _getVulnerabilidadState(homeState, context, isEditMode, riskState, progressData);
     }
 
     return const CategoryState(isAvailable: false, progressPercentage: 0);
   }
 
   // Estado específico para Amenaza
-  CategoryState _getAmenazaState(BuildContext context, RiskThreatAnalysisState riskState) {
+  CategoryState _getAmenazaState(BuildContext context, RiskThreatAnalysisState riskState, Map<String, double>? progressData) {
     int progressPercentage = 0;
 
-    // Solo calcular si hay datos
-    if (riskState.probabilidadSelections.isNotEmpty || 
-        riskState.intensidadSelections.isNotEmpty || 
-        riskState.evidenceImages.isNotEmpty) {
-      
-      int completedItems = 0;
-      int totalItems = 0;
-
-      // Contar probabilidad
-      if (riskState.probabilidadSelections.isNotEmpty) {
-        totalItems += riskState.probabilidadSelections.length;
-        completedItems += riskState.probabilidadSelections.values
-            .where((value) => value.isNotEmpty && value != 'NA')
-            .length;
-      }
-
-      // Contar intensidad
-      if (riskState.intensidadSelections.isNotEmpty) {
-        totalItems += riskState.intensidadSelections.length;
-        completedItems += riskState.intensidadSelections.values
-            .where((value) => value.isNotEmpty && value != 'NA')
-            .length;
-      }
-
-      // Contar evidencias
-      if (riskState.evidenceImages.isNotEmpty) {
-        totalItems += 1;
-        completedItems += riskState.evidenceImages.values
-            .any((images) => images.isNotEmpty) ? 1 : 0;
-      }
-
-      // Calcular porcentaje
-      if (totalItems > 0) {
-        progressPercentage = ((completedItems / totalItems) * 100).round();
-      }
+    // Usar el progreso pasado como parámetro si está disponible
+    if (progressData != null && progressData['amenaza'] != null) {
+      progressPercentage = (progressData['amenaza']! * 100).round();
     }
 
     return CategoryState(
@@ -93,11 +62,12 @@ class _RiskCategoriesScreenState extends State<RiskCategoriesScreen> {
     BuildContext context,
     bool isEditMode,
     RiskThreatAnalysisState riskState,
+    Map<String, double>? progressData,
   ) {
     if (isEditMode) {
-      return _getVulnerabilidadEditMode(homeState, context, riskState);
+      return _getVulnerabilidadEditMode(homeState, context, riskState, progressData);
     } else {
-      return _getVulnerabilidadCreateMode(homeState, context, riskState);
+      return _getVulnerabilidadCreateMode(homeState, context, riskState, progressData);
     }
   }
 
@@ -106,33 +76,14 @@ class _RiskCategoriesScreenState extends State<RiskCategoriesScreen> {
     HomeState homeState,
     BuildContext context,
     RiskThreatAnalysisState riskState,
+    Map<String, double>? progressData,
   ) {
     final isAvailable = homeState.activeFormId != null;
     int progressPercentage = 0;
 
-    if (isAvailable && (riskState.dynamicSelections.isNotEmpty || riskState.evidenceImages.isNotEmpty)) {
-      int completedItems = 0;
-      int totalItems = 0;
-
-      // Contar selecciones de vulnerabilidad
-      for (final subClassSelections in riskState.dynamicSelections.values) {
-        totalItems += subClassSelections.length;
-        completedItems += subClassSelections.values
-            .where((value) => value.isNotEmpty && value != 'NA')
-            .length;
-      }
-
-      // Contar evidencias
-      if (riskState.evidenceImages.isNotEmpty) {
-        totalItems += 1;
-        completedItems += riskState.evidenceImages.values
-            .any((images) => images.isNotEmpty) ? 1 : 0;
-      }
-
-      // Calcular porcentaje
-      if (totalItems > 0) {
-        progressPercentage = ((completedItems / totalItems) * 100).round();
-      }
+    // Usar el progreso pasado como parámetro si está disponible
+    if (progressData != null && progressData['vulnerabilidad'] != null) {
+      progressPercentage = (progressData['vulnerabilidad']! * 100).round();
     }
 
     return CategoryState(
@@ -147,6 +98,7 @@ class _RiskCategoriesScreenState extends State<RiskCategoriesScreen> {
     HomeState homeState,
     BuildContext context,
     RiskThreatAnalysisState riskState,
+    Map<String, double>? progressData,
   ) {
     bool amenazaCompleted = false;
 
@@ -165,34 +117,15 @@ class _RiskCategoriesScreenState extends State<RiskCategoriesScreen> {
     int progressPercentage = 0;
     String? disabledMessage;
 
+    // Usar el progreso pasado como parámetro si está disponible
+    if (progressData != null && progressData['vulnerabilidad'] != null) {
+      progressPercentage = (progressData['vulnerabilidad']! * 100).round();
+    }
+
     if (!isAvailable) {
       disabledMessage = amenazaCompleted
           ? 'No hay formulario activo'
           : 'Complete primero la calificación de Amenaza';
-    } else if (riskState.dynamicSelections.isNotEmpty || riskState.evidenceImages.isNotEmpty) {
-      // Calcular progreso solo si hay datos
-      int completedItems = 0;
-      int totalItems = 0;
-
-      // Contar selecciones de vulnerabilidad
-      for (final subClassSelections in riskState.dynamicSelections.values) {
-        totalItems += subClassSelections.length;
-        completedItems += subClassSelections.values
-            .where((value) => value.isNotEmpty && value != 'NA')
-            .length;
-      }
-
-      // Contar evidencias
-      if (riskState.evidenceImages.isNotEmpty) {
-        totalItems += 1;
-        completedItems += riskState.evidenceImages.values
-            .any((images) => images.isNotEmpty) ? 1 : 0;
-      }
-
-      // Calcular porcentaje
-      if (totalItems > 0) {
-        progressPercentage = ((completedItems / totalItems) * 100).round();
-      }
     }
 
     return CategoryState(
@@ -268,6 +201,7 @@ class _RiskCategoriesScreenState extends State<RiskCategoriesScreen> {
                 homeState,
                 context,
                 riskState,
+                homeState.navigationData?.progressData, // Pasar el progreso desde navigationData
               );
               categoryStates[classification] = state;
             }

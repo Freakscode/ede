@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import '../../domain/entities/home_entity.dart';
 import '../../domain/entities/form_entity.dart';
+import '../../domain/entities/form_navigation_data.dart';
 
 /// Estado de presentación para el módulo Home
 /// Representa el estado de la UI, separado de la lógica de negocio
@@ -22,6 +23,7 @@ class HomeState extends Equatable {
   final String? activeFormId;
   final bool isCreatingNew;
   final Map<String, Map<String, dynamic>> savedRiskEventModels;
+  final FormNavigationData? navigationData;
   
   // Estados de UI específicos
   final bool isLoading;
@@ -46,6 +48,7 @@ class HomeState extends Equatable {
     this.activeFormId,
     this.isCreatingNew = true,
     this.savedRiskEventModels = const {},
+    this.navigationData,
     this.isLoading = false,
     this.error,
     this.hasError = false,
@@ -127,6 +130,7 @@ class HomeState extends Equatable {
     String? activeFormId,
     bool? isCreatingNew,
     Map<String, Map<String, dynamic>>? savedRiskEventModels,
+    FormNavigationData? navigationData,
     bool? isLoading,
     String? error,
     bool? hasError,
@@ -149,6 +153,7 @@ class HomeState extends Equatable {
       activeFormId: activeFormId ?? this.activeFormId,
       isCreatingNew: isCreatingNew ?? this.isCreatingNew,
       savedRiskEventModels: savedRiskEventModels ?? this.savedRiskEventModels,
+      navigationData: navigationData ?? this.navigationData,
       isLoading: isLoading ?? this.isLoading,
       error: error ?? this.error,
       hasError: hasError ?? this.hasError,
@@ -250,6 +255,7 @@ class HomeState extends Equatable {
         activeFormId,
         isCreatingNew,
         savedRiskEventModels,
+        navigationData,
         isLoading,
         error,
         hasError,
