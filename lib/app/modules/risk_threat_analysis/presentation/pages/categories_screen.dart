@@ -1,5 +1,6 @@
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import 'package:caja_herramientas/app/core/icons/app_icons.dart';
+import 'package:caja_herramientas/app/core/utils/logger.dart';
 import 'package:caja_herramientas/app/modules/home/presentation/widgets/category_card.dart';
 import 'package:caja_herramientas/app/modules/home/presentation/bloc/home_bloc.dart';
 import 'package:caja_herramientas/app/modules/home/presentation/bloc/home_state.dart';
@@ -7,6 +8,7 @@ import 'package:caja_herramientas/app/modules/risk_threat_analysis/presentation/
 import 'package:caja_herramientas/app/modules/risk_threat_analysis/presentation/bloc/risk_threat_analysis_bloc.dart';
 import 'package:caja_herramientas/app/modules/risk_threat_analysis/presentation/bloc/risk_threat_analysis_event.dart';
 import 'package:caja_herramientas/app/modules/risk_threat_analysis/presentation/bloc/risk_threat_analysis_state.dart';
+import 'package:caja_herramientas/app/shared/services/form_persistence_service.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -16,13 +18,23 @@ class CategoriesScreen extends StatelessWidget {
   const CategoriesScreen({super.key});
 
   /// Calcula el progreso de una categoría basado en las selecciones y evidencias
-  double _calculateCategoryProgress(String classification, RiskThreatAnalysisState state, RiskThreatAnalysisBloc bloc) {
+  double _calculateCategoryProgress(
+    String classification,
+    RiskThreatAnalysisState state,
+    RiskThreatAnalysisBloc bloc,
+  ) {
     // Usar el método centralizado del bloc para obtener el porcentaje de completado
-    return bloc.getCompletionPercentageForCategory(classification.toLowerCase());
+    return bloc.getCompletionPercentageForCategory(
+      classification.toLowerCase(),
+    );
   }
 
   /// Determina si una categoría está disponible para ser seleccionada
-  bool _isCategoryAvailable(String classification, RiskThreatAnalysisState state, RiskThreatAnalysisBloc bloc) {
+  bool _isCategoryAvailable(
+    String classification,
+    RiskThreatAnalysisState state,
+    RiskThreatAnalysisBloc bloc,
+  ) {
     if (classification.toLowerCase() == 'amenaza') {
       // Amenaza siempre está disponible
       return true;
@@ -35,21 +47,21 @@ class CategoriesScreen extends StatelessWidget {
   }
 
   /// Construye el icono de estado para una categoría
-  Widget? _buildStatusIcon(String classification, RiskThreatAnalysisState state, RiskThreatAnalysisBloc bloc) {
+  Widget? _buildStatusIcon(
+    String classification,
+    RiskThreatAnalysisState state,
+    RiskThreatAnalysisBloc bloc,
+  ) {
     // Usar el método centralizado del bloc para verificar si está completa
     final isComplete = bloc.isCategoryComplete(classification.toLowerCase());
     final progress = _calculateCategoryProgress(classification, state, bloc);
-    
+
     if (isComplete) {
       // Completada: mostrar check ✅
       return SizedBox(
         width: 24,
         height: 24,
-        child: SvgPicture.asset(
-          AppIcons.checkCircle,
-          width: 24,
-          height: 24,
-        ),
+        child: SvgPicture.asset(AppIcons.checkCircle, width: 24, height: 24),
       );
     } else if (progress > 0.0) {
       // En proceso: mostrar borrador 📝
@@ -67,7 +79,7 @@ class CategoriesScreen extends StatelessWidget {
         ),
       );
     }
-    
+
     // Sin progreso: no mostrar icono
     return null;
   }
@@ -124,11 +136,19 @@ class CategoriesScreen extends StatelessWidget {
                     ...classifications.asMap().entries.map((entry) {
                       final index = entry.key;
                       final classification = entry.value;
-                      
+
                       // Calcular estado de la categoría
                       final riskBloc = context.read<RiskThreatAnalysisBloc>();
-                      final isAvailable = _isCategoryAvailable(classification, riskState, riskBloc);
-                      final statusIcon = _buildStatusIcon(classification, riskState, riskBloc);
+                      final isAvailable = _isCategoryAvailable(
+                        classification,
+                        riskState,
+                        riskBloc,
+                      );
+                      final statusIcon = _buildStatusIcon(
+                        classification,
+                        riskState,
+                        riskBloc,
+                      );
 
                       return Column(
                         children: [
@@ -137,24 +157,74 @@ class CategoriesScreen extends StatelessWidget {
                             child: CategoryCard(
                               title: '$classification $selectedEvent',
                               trailingIcon: statusIcon,
-                              onTap: isAvailable ? () {
-                                // Configurar la clasificación seleccionada
-                                riskBloc.add(SelectClassification(classification.toLowerCase()));
-                                
-                                // Navegar a RatingScreen (índice 1)
-                                riskBloc.add(ChangeBottomNavIndex(1));
-                              } : () {
-                                // Mostrar mensaje si no está disponible
-                                if (classification.toLowerCase() == 'vulnerabilidad') {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text('Complete primero la evaluación de Amenaza'),
-                                      backgroundColor: DAGRDColors.warning,
-                                      duration: Duration(seconds: 3),
-                                    ),
-                                  );
-                                }
-                              },
+                              onTap: isAvailable
+                                  ? () async {
+                                      // Configurar la clasificación seleccionada
+                                      riskBloc.add(
+                                        SelectClassification(
+                                          classification.toLowerCase(),
+                                        ),
+                                      );
+
+                                      // Si estamos en modo edición, cargar los datos del formulario para esta clasificación
+                                      final homeBloc = context.read<HomeBloc>();
+                                      final homeState = homeBloc.state;
+
+                                      if (homeState.activeFormId != null &&
+                                          homeState.activeFormId!.isNotEmpty) {
+                                        // Estamos en modo edición, cargar datos específicos para esta clasificación
+                                        try {
+                                          final persistenceService =
+                                              FormPersistenceService();
+                                          final completeForm =
+                                              await persistenceService
+                                                  .getCompleteForm(
+                                                    homeState.activeFormId!,
+                                                  );
+
+                                          if (completeForm != null) {
+                                            final evaluationData = completeForm
+                                                .toJson();
+                                            riskBloc.add(
+                                              LoadFormData(
+                                                eventName:
+                                                    completeForm.eventName,
+                                                classificationType:
+                                                    classification
+                                                        .toLowerCase(),
+                                                evaluationData: evaluationData,
+                                              ),
+                                            );
+                                          }
+                                        } catch (e) {
+                                          Logger.error(
+                                            'Error loading form data for ${classification.toLowerCase()}: $e',
+                                            name: 'CategoriesScreen',
+                                          );
+                                        }
+                                      }
+
+                                      // Navegar a RatingScreen (índice 1)
+                                      riskBloc.add(ChangeBottomNavIndex(1));
+                                    }
+                                  : () {
+                                      // Mostrar mensaje si no está disponible
+                                      if (classification.toLowerCase() ==
+                                          'vulnerabilidad') {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          const SnackBar(
+                                            content: Text(
+                                              'Complete primero la evaluación de Amenaza',
+                                            ),
+                                            backgroundColor:
+                                                DAGRDColors.warning,
+                                            duration: Duration(seconds: 3),
+                                          ),
+                                        );
+                                      }
+                                    },
                             ),
                           ),
                           // Agregar espaciado entre cards, excepto después del último

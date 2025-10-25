@@ -306,11 +306,16 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     try {
       emit(state.setLoading(true));
       
+      print('=== DEBUG _onLoadFormData ===');
+      print('event.evaluationData: ${event.evaluationData}');
+      print('event.evaluationData != null: ${event.evaluationData != null}');
       
       // Si hay datos de evaluación específicos, cargarlos directamente
       if (event.evaluationData != null) {
-        // Mapear correctamente los datos del CompleteFormDataModel al estado del BLoC
-        final evaluationData = event.evaluationData!;
+        print('=== ENTERING EVALUATION DATA BLOCK ===');
+        try {
+          // Mapear correctamente los datos del CompleteFormDataModel al estado del BLoC
+          final evaluationData = event.evaluationData!;
         
         // PRESERVAR DATOS EXISTENTES: Solo actualizar si hay datos nuevos
         final currentProbabilidadSelections = Map<String, String>.from(state.probabilidadSelections);
@@ -333,16 +338,26 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
         // Actualizar solo si hay datos nuevos para la clasificación actual
         if (event.classificationType.toLowerCase() == 'amenaza') {
           // Para amenaza, actualizar probabilidad e intensidad
+          print('=== DEBUG AMENAZA DATA LOADING ===');
+          print('probabilidadSelections from DB: $probabilidadSelections');
+          print('intensidadSelections from DB: $intensidadSelections');
+          
           if (probabilidadSelections.isNotEmpty) {
             currentProbabilidadSelections.addAll(probabilidadSelections);
+            print('Updated currentProbabilidadSelections: $currentProbabilidadSelections');
           }
           if (intensidadSelections.isNotEmpty) {
             currentIntensidadSelections.addAll(intensidadSelections);
+            print('Updated currentIntensidadSelections: $currentIntensidadSelections');
           }
         } else if (event.classificationType.toLowerCase() == 'vulnerabilidad') {
           // Para vulnerabilidad, actualizar dynamicSelections
+          print('=== DEBUG VULNERABILIDAD DATA LOADING ===');
+          print('dynamicSelections from DB: $dynamicSelections');
+          
           if (dynamicSelections.isNotEmpty) {
             currentDynamicSelections.addAll(dynamicSelections);
+            print('Updated currentDynamicSelections: $currentDynamicSelections');
           }
         }
         
@@ -402,8 +417,8 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
             ? (evaluationData['evidenceCoordinates'] as Map<String, dynamic>).map(
                 (key, value) => MapEntry(
                   key, 
-                  (value as Map<int, dynamic>).map(
-                    (k, v) => MapEntry(k, Map<String, String>.from(v as Map))
+                  (value as Map<String, dynamic>).map(
+                    (k, v) => MapEntry(int.parse(k), Map<String, String>.from(v as Map))
                   )
                 )
               ) 
@@ -419,9 +434,9 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
         final newState = state.copyWith(
           selectedRiskEvent: event.eventName,
           selectedClassification: event.classificationType,
-          probabilidadSelections: probabilidadSelections,
-          intensidadSelections: intensidadSelections,
-          dynamicSelections: dynamicSelections,
+          probabilidadSelections: currentProbabilidadSelections,
+          intensidadSelections: currentIntensidadSelections,
+          dynamicSelections: currentDynamicSelections,
           subClassificationScores: combinedScores,
           subClassificationColors: {}, // Los colores se calculan dinámicamente basándose en los scores
           evidenceImages: evidenceImages,
@@ -430,10 +445,23 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
           error: null,
         );
         
+        print('=== DEBUG STATE UPDATE ===');
+        print('Before update - state.probabilidadSelections: ${state.probabilidadSelections}');
+        print('Before update - state.intensidadSelections: ${state.intensidadSelections}');
+        print('After update - newState.probabilidadSelections: ${newState.probabilidadSelections}');
+        print('After update - newState.intensidadSelections: ${newState.intensidadSelections}');
         
         emit(newState);
+        print('=== DEBUG RETURNING FROM _onLoadFormData ===');
         return;
+        } catch (e) {
+          print('=== ERROR IN EVALUATION DATA BLOCK: $e ===');
+          print('Stack trace: ${StackTrace.current}');
+          // Continuar con el fallback
+        }
       }
+      
+      print('=== FALLBACK TO USE CASE ===');
       
       // Cargar datos usando el caso de uso (comportamiento original)
       final entity = await _loadRiskAnalysisUseCase.execute(
@@ -658,9 +686,54 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     return classification.subClassifications;
   }
 
-  /// Método de compatibilidad temporal
+  /// Método para obtener el valor seleccionado de una subclasificación
   String? getValueForSubClassification(String subClassificationId) {
-    // Siempre retornar null para que se muestre el hint (nombre de la subclasificación)
+    final classification = state.selectedClassification?.toLowerCase();
+    
+    print('=== DEBUG getValueForSubClassification ===');
+    print('subClassificationId: $subClassificationId');
+    print('classification: $classification');
+    print('state.probabilidadSelections: ${state.probabilidadSelections}');
+    print('state.intensidadSelections: ${state.intensidadSelections}');
+    print('state.dynamicSelections: ${state.dynamicSelections}');
+    
+    if (classification == 'amenaza') {
+      // Para amenaza, buscar en probabilidad e intensidad
+      if (subClassificationId.toLowerCase().contains('probabilidad')) {
+        // Buscar en las selecciones de probabilidad
+        final probabilidadSelections = state.probabilidadSelections;
+        print('probabilidadSelections: $probabilidadSelections');
+        if (probabilidadSelections.isNotEmpty) {
+          final value = probabilidadSelections.values.first;
+          print('Returning probabilidad value: $value');
+          return value;
+        }
+        print('Returning selectedProbabilidad: ${state.selectedProbabilidad}');
+        return state.selectedProbabilidad;
+      } else if (subClassificationId.toLowerCase().contains('intensidad')) {
+        // Buscar en las selecciones de intensidad
+        final intensidadSelections = state.intensidadSelections;
+        print('intensidadSelections: $intensidadSelections');
+        if (intensidadSelections.isNotEmpty) {
+          final value = intensidadSelections.values.first;
+          print('Returning intensidad value: $value');
+          return value;
+        }
+        print('Returning selectedIntensidad: ${state.selectedIntensidad}');
+        return state.selectedIntensidad;
+      }
+    } else if (classification == 'vulnerabilidad') {
+      // Para vulnerabilidad, buscar en dynamicSelections
+      final dynamicSelections = state.dynamicSelections[subClassificationId];
+      print('dynamicSelections for $subClassificationId: $dynamicSelections');
+      if (dynamicSelections != null && dynamicSelections.isNotEmpty) {
+        final value = dynamicSelections.values.first;
+        print('Returning vulnerabilidad value: $value');
+        return value;
+      }
+    }
+    
+    print('Returning null');
     return null;
   }
 

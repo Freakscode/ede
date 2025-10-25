@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/risk_threat_analysis_bloc.dart';
-import '../bloc/risk_threat_analysis_event.dart';
 import '../bloc/risk_threat_analysis_state.dart';
 import '../widgets/progress_bar_widget.dart';
 import '../widgets/navigation_buttons_widget.dart';
@@ -30,40 +29,8 @@ class _RatingScreenState extends State<RatingScreen> {
   void initState() {
     super.initState();
     _scrollController = ScrollController();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      // Solo procesar navigationData si es la primera vez que se carga la pantalla
-      // No resetear cuando se navega entre pestañas
-      if (widget.navigationData != null) {
-        final data = widget.navigationData!;
-        final forceReset = data['forceReset'] as bool? ?? false;
-        final isNewForm = data['isNewForm'] as bool? ?? false;
-        final isEditMode = data['isEditMode'] as bool? ?? false;
-        
-        // Solo resetear si es explícitamente un formulario nuevo o reset forzado
-        if (forceReset || isNewForm) {
-          // Formulario nuevo o reset forzado - Reseteando estado
-          // context.read<RiskThreatAnalysisBloc>().add(const ResetState()); // COMENTADO: No resetear estado al navegar
-        } else if (isEditMode) {
-          // Si es modo edición, cargar datos existentes
-          final eventToSet = data['event'] as String?;
-          final classificationToSet = data['classification'] as String?;
-          
-          if (eventToSet != null) {
-            context.read<RiskThreatAnalysisBloc>().add(
-              UpdateSelectedRiskEvent(eventToSet)
-            );
-          }
-          
-          if (classificationToSet != null) {
-            context.read<RiskThreatAnalysisBloc>().add(
-              SelectClassification(classificationToSet)
-            );
-          }
-        }
-        // Si no hay flags específicos, NO resetear - mantener el estado actual
-      }
-      // Si no hay navigationData, NO resetear - mantener el estado actual
-    });
+    // La carga de datos ahora se maneja en CategoriesScreen
+    // RatingScreen solo necesita inicializar el ScrollController
   }
   
   @override
