@@ -140,17 +140,10 @@ class DataRegistrationBloc
       final errors = _validateContactForm(currentState);
       final isValid = errors.isEmpty;
 
-      print('=== VALIDACIÓN FORMULARIO DE CONTACTO ===');
-      print('Errores encontrados: $errors');
-      print('Es válido: $isValid');
       if (errors.isNotEmpty) {
-        print('=== DETALLE DE ERRORES DE CONTACTO ===');
         errors.forEach((field, message) {
-          print('$field: $message');
         });
-        print('======================================');
       }
-      print('========================================');
 
       final newState = currentState.copyWith(
         contactErrors: errors,
@@ -189,10 +182,6 @@ class DataRegistrationBloc
   ) {
     if (state is DataRegistrationData) {
       final currentState = state as DataRegistrationData;
-      print('=== PROCESANDO CAMBIO DE ESTADO ===');
-      print('Estado anterior: ${currentState.inspectionStatus}');
-      print('Nuevo estado: ${event.status}');
-      print('==================================');
       
       final newState = currentState.copyWith(
         inspectionStatus: event.status,
@@ -300,18 +289,6 @@ class DataRegistrationBloc
     final errors = _validateInspectionForm(currentState);
     final isValid = errors.isEmpty;
 
-    print('=== VALIDACIÓN COMPLETADA ===');
-    print('Errores encontrados: $errors');
-    print('Es válido: $isValid');
-    if (errors.isNotEmpty) {
-      print('=== DETALLE DE ERRORES ===');
-      errors.forEach((field, message) {
-        print('$field: $message');
-      });
-      print('==========================');
-    }
-    print('============================');
-
     emit(currentState.copyWith(
       inspectionErrors: errors,
       isInspectionValid: isValid,
@@ -385,15 +362,6 @@ class DataRegistrationBloc
     try {
       
       // Crear y guardar datos de inspección
-      print('=== CREANDO InspectionData ===');
-      print('incidentId: ${currentState.inspectionIncidentId} (${currentState.inspectionIncidentId.runtimeType})');
-      print('status: ${currentState.inspectionStatus} (${currentState.inspectionStatus.runtimeType})');
-      print('date: ${currentState.inspectionDate} (${currentState.inspectionDate.runtimeType})');
-      print('time: ${currentState.inspectionTime} (${currentState.inspectionTime.runtimeType})');
-      print('comment: ${currentState.inspectionComment} (${currentState.inspectionComment.runtimeType})');
-      print('injured: ${currentState.inspectionInjured} (${currentState.inspectionInjured.runtimeType})');
-      print('dead: ${currentState.inspectionDead} (${currentState.inspectionDead.runtimeType})');
-      
       final inspectionData = InspectionData(
         incidentId: currentState.inspectionIncidentId,
         status: currentState.inspectionStatus ?? '',
@@ -403,32 +371,14 @@ class DataRegistrationBloc
         injured: currentState.inspectionInjured,
         dead: currentState.inspectionDead,
       );
-      
-      print('InspectionData creado exitosamente: $inspectionData');
-      print('===============================');
 
       final storageService = InspectionStorageService();
       await storageService.saveInspection(inspectionData);
-
-      print('=== DATOS COMPLETOS GUARDADOS EN STORAGE ===');
-      print('--- DATOS DE CONTACTO ---');
-      print('Nombres: ${currentState.contactNames}');
-      print('Celular: ${currentState.contactCellPhone}');
-      print('Teléfono fijo: ${currentState.contactLandline}');
-      print('Email: ${currentState.contactEmail}');
-      print('--- DATOS DE INSPECCIÓN ---');
-      print('InspectionData guardado: $inspectionData');
-      print('==========================================');
 
       emit(const CompleteRegistrationSaved(
         message: 'Registro completo guardado correctamente',
       ));
     } catch (e) {
-      print('=== ERROR EN GUARDADO ===');
-      print('Error: $e');
-      print('Tipo de error: ${e.runtimeType}');
-      print('Stack trace: ${StackTrace.current}');
-      print('========================');
       emit(DataRegistrationError('${UIMessages.saveError}: $e'));
     }
   }
@@ -640,16 +590,6 @@ class DataRegistrationBloc
     Emitter<DataRegistrationState> emit,
   ) {
     if (state is! DataRegistrationData) return;
-    
-    final currentState = state as DataRegistrationData;
-    
-    // Imprimir datos del formulario antes de enviar
-    print('=== ENVIANDO FORMULARIO DE CONTACTO ===');
-    print('Nombres: ${currentState.contactNames}');
-    print('Celular: ${currentState.contactCellPhone}');
-    print('Teléfono fijo: ${currentState.contactLandline}');
-    print('Email: ${currentState.contactEmail}');
-    print('=======================================');
     
     // Disparar validación
     add(const ContactFormValidated());
