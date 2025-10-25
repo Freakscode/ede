@@ -55,16 +55,12 @@ class CalculateGlobalScoreUseCase {
   /// Ejecutar el caso de uso para calcular score global de vulnerabilidad
   double calculateVulnerabilidadGlobalScore(Map<String, dynamic> formData) {
     try {
-      print('=== DEBUG calculateVulnerabilidadGlobalScore ===');
-      print('formData keys: ${formData.keys.toList()}');
       
       final vulnerabilidadSelections = Map<String, dynamic>.from(
         formData['vulnerabilidadSelections'] ?? {}
       );
-      print('vulnerabilidadSelections: $vulnerabilidadSelections');
 
       if (vulnerabilidadSelections.isEmpty) {
-        print('vulnerabilidadSelections is empty, returning 0.0');
         return 0.0;
       }
 
@@ -73,9 +69,7 @@ class CalculateGlobalScoreUseCase {
 
       // Calcular score para cada subclasificación de vulnerabilidad
       for (final subClassificationId in vulnerabilidadSelections.keys) {
-        print('Processing subClassificationId: $subClassificationId');
         final score = _calculateScoreUseCase.execute(subClassificationId, formData);
-        print('Score for $subClassificationId: $score');
         if (score > 0) {
           totalScore += score;
           count++;
@@ -83,8 +77,6 @@ class CalculateGlobalScoreUseCase {
       }
 
       final result = count > 0 ? totalScore / count : 0.0;
-      print('Final vulnerabilidad score: $result (totalScore: $totalScore, count: $count)');
-      print('=== END DEBUG calculateVulnerabilidadGlobalScore ===');
       
       return result;
     } catch (e) {
@@ -177,17 +169,11 @@ class CalculateGlobalScoreUseCase {
   /// Obtener información completa del score global
   Map<String, dynamic> getGlobalScoreInfo(Map<String, dynamic> formData) {
     try {
-      print('=== DEBUG getGlobalScoreInfo ===');
-      print('formData keys: ${formData.keys.toList()}');
-      print('selectedClassification: ${formData['selectedClassification']}');
       
       final amenazaScore = calculateAmenazaGlobalScore(formData);
       final vulnerabilidadScore = calculateVulnerabilidadGlobalScore(formData);
       final finalScore = calculateFinalRiskScore(formData);
 
-      print('amenazaScore: $amenazaScore');
-      print('vulnerabilidadScore: $vulnerabilidadScore');
-      print('finalScore: $finalScore');
 
       final result = {
         'amenazaScore': amenazaScore,
@@ -201,8 +187,6 @@ class CalculateGlobalScoreUseCase {
         'finalLevel': getGlobalRiskLevel(finalScore),
       };
       
-      print('getGlobalScoreInfo result: $result');
-      print('=== END DEBUG getGlobalScoreInfo ===');
       
       return result;
     } catch (e) {
