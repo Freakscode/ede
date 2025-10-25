@@ -32,7 +32,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<HomeNavBarTapped>(_onNavBarTapped);
     on<HomeShowRiskEventsSection>(_onShowRiskEventsSection);
     on<SelectRiskEvent>(_onSelectRiskEvent);
-    on<SelectRiskCategory>(_onSelectRiskCategory);
     on<HomeResetRiskSections>(_onResetRiskSections);
     on<HomeShowFormCompletedScreen>(_onShowFormCompletedScreen);
     on<HomeToggleNotifications>(_onToggleNotifications);
@@ -116,7 +115,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       final updatedEntity = currentEntity.copyWith(
         selectedRiskEvent: event.eventName,
         showRiskEvents: false,
-        selectedRiskCategory: null,
         activeFormId: formId,
         isCreatingNew: true,
         savedForms: const [],
@@ -136,20 +134,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     }
   }
 
-  Future<void> _onSelectRiskCategory(SelectRiskCategory event, Emitter<HomeState> emit) async {
-    try {
-      final currentEntity = state.toEntity();
-      final updatedEntity = currentEntity.copyWith(
-        selectedRiskCategory: '${event.categoryType} ${event.eventName}',
-      );
-      
-      await _updateHomeStateUseCase.execute(updatedEntity);
-      emit(HomeState.fromEntity(updatedEntity));
-    } catch (e) {
-      emit(state.copyWith(error: 'Error al seleccionar categoría de riesgo: $e'));
-    }
-  }
-
   Future<void> _onResetRiskSections(HomeResetRiskSections event, Emitter<HomeState> emit) async {
     try {
       print('=== HomeBloc: ResetRiskSections ejecutado ===');
@@ -162,7 +146,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         showFormCompleted: false,
         // Resetear también el estado interno para permitir crear nuevo formulario
         selectedRiskEvent: null,
-        selectedRiskCategory: null,
         activeFormId: null,
         isCreatingNew: true,
         completedEvaluations: const {},
@@ -383,7 +366,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       final currentEntity = state.toEntity();
       final updatedEntity = currentEntity.copyWith(
         selectedRiskEvent: null,
-        selectedRiskCategory: null,
         activeFormId: null,
         isCreatingNew: true,
         completedEvaluations: const {},

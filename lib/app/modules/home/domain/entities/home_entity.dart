@@ -6,7 +6,6 @@ import 'form_entity.dart';
 class HomeEntity extends Equatable {
   final int selectedIndex;
   final bool showRiskEvents;
-  final bool showRiskCategories;
   final bool showFormCompleted;
   final bool tutorialShown;
   final bool showTutorial;
@@ -14,7 +13,6 @@ class HomeEntity extends Equatable {
   final bool darkModeEnabled;
   final String selectedLanguage;
   final String? selectedRiskEvent;
-  final String? selectedRiskCategory;
   final Map<String, bool> completedEvaluations;
   final List<FormEntity> savedForms;
   final bool isLoadingForms;
@@ -25,7 +23,6 @@ class HomeEntity extends Equatable {
   const HomeEntity({
     required this.selectedIndex,
     required this.showRiskEvents,
-    required this.showRiskCategories,
     required this.showFormCompleted,
     required this.tutorialShown,
     this.showTutorial = true,
@@ -33,7 +30,6 @@ class HomeEntity extends Equatable {
     this.darkModeEnabled = false,
     this.selectedLanguage = 'Español',
     this.selectedRiskEvent,
-    this.selectedRiskCategory,
     this.completedEvaluations = const {},
     this.savedForms = const [],
     this.isLoadingForms = false,
@@ -47,7 +43,6 @@ class HomeEntity extends Equatable {
     return const HomeEntity(
       selectedIndex: 0,
       showRiskEvents: false,
-      showRiskCategories: false,
       showFormCompleted: false,
       tutorialShown: false,
     );
@@ -57,7 +52,6 @@ class HomeEntity extends Equatable {
   HomeEntity copyWith({
     int? selectedIndex,
     bool? showRiskEvents,
-    bool? showRiskCategories,
     bool? showFormCompleted,
     bool? tutorialShown,
     bool? showTutorial,
@@ -65,7 +59,6 @@ class HomeEntity extends Equatable {
     bool? darkModeEnabled,
     String? selectedLanguage,
     String? selectedRiskEvent,
-    String? selectedRiskCategory,
     Map<String, bool>? completedEvaluations,
     List<FormEntity>? savedForms,
     bool? isLoadingForms,
@@ -76,7 +69,6 @@ class HomeEntity extends Equatable {
     return HomeEntity(
       selectedIndex: selectedIndex ?? this.selectedIndex,
       showRiskEvents: showRiskEvents ?? this.showRiskEvents,
-      showRiskCategories: showRiskCategories ?? this.showRiskCategories,
       showFormCompleted: showFormCompleted ?? this.showFormCompleted,
       tutorialShown: tutorialShown ?? this.tutorialShown,
       showTutorial: showTutorial ?? this.showTutorial,
@@ -84,7 +76,6 @@ class HomeEntity extends Equatable {
       darkModeEnabled: darkModeEnabled ?? this.darkModeEnabled,
       selectedLanguage: selectedLanguage ?? this.selectedLanguage,
       selectedRiskEvent: selectedRiskEvent ?? this.selectedRiskEvent,
-      selectedRiskCategory: selectedRiskCategory ?? this.selectedRiskCategory,
       completedEvaluations: completedEvaluations ?? this.completedEvaluations,
       savedForms: savedForms ?? this.savedForms,
       isLoadingForms: isLoadingForms ?? this.isLoadingForms,
@@ -96,7 +87,7 @@ class HomeEntity extends Equatable {
 
   /// Lógica de negocio: ¿Está mostrando alguna sección especial?
   bool get isShowingSpecialSection => 
-      showRiskEvents || showRiskCategories || showFormCompleted;
+      showRiskEvents || showFormCompleted;
 
   /// Lógica de negocio: ¿Está en modo creación de formulario?
   bool get isInFormCreationMode => isCreatingNew && activeFormId == null;
@@ -151,7 +142,6 @@ class HomeEntity extends Equatable {
   List<Object?> get props => [
         selectedIndex,
         showRiskEvents,
-        showRiskCategories,
         showFormCompleted,
         tutorialShown,
         showTutorial,
@@ -159,7 +149,6 @@ class HomeEntity extends Equatable {
         darkModeEnabled,
         selectedLanguage,
         selectedRiskEvent,
-        selectedRiskCategory,
         completedEvaluations,
         savedForms,
         isLoadingForms,

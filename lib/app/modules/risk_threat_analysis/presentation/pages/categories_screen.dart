@@ -7,14 +7,9 @@ import 'package:caja_herramientas/app/modules/risk_threat_analysis/presentation/
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class RiskCategoriesScreen extends StatefulWidget {
+class RiskCategoriesScreen extends StatelessWidget {
   const RiskCategoriesScreen({super.key});
 
-  @override
-  State<RiskCategoriesScreen> createState() => _RiskCategoriesScreenState();
-}
-
-class _RiskCategoriesScreenState extends State<RiskCategoriesScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<RiskThreatAnalysisBloc, RiskThreatAnalysisState>(
@@ -66,24 +61,18 @@ class _RiskCategoriesScreenState extends State<RiskCategoriesScreen> {
                   final index = entry.key;
                   final classification = entry.value;
 
-                  // Todas las categorías están disponibles
-                  bool isAvailable = true;
-
                   return Column(
                     children: [
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: Opacity(
-                          opacity: isAvailable ? 1.0 : 0.6,
-                          child: CategoryCard(
-                            title: '$classification $selectedEvent',
-                            onTap: () {
-                              // Navegar a RatingScreen (índice 1)
-                              final riskBloc = context
-                                  .read<RiskThreatAnalysisBloc>();
-                              riskBloc.add(ChangeBottomNavIndex(1));
-                            },
-                          ),
+                        child: CategoryCard(
+                          title: '$classification $selectedEvent',
+                          onTap: () {
+                            // Navegar a RatingScreen (índice 1)
+                            final riskBloc = context
+                                .read<RiskThreatAnalysisBloc>();
+                            riskBloc.add(ChangeBottomNavIndex(1));
+                          },
                         ),
                       ),
                       // Agregar espaciado entre cards, excepto después del último
