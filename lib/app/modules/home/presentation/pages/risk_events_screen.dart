@@ -80,7 +80,6 @@ class RiskEventsScreen extends StatelessWidget {
                       final navigationData = {
                         'event': riskEvent.name,
                         'isNewForm': true,
-                        'forceReset': true,
                         'targetIndex': 0, // Ir directamente a CategoriesScreen (índice 0)
                       };
                       

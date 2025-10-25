@@ -70,11 +70,10 @@ GoRouter getAppRouter(BuildContext context) {
             // Determinar el modo basándose en los datos de navegación
             final isNewForm = navigationData['isNewForm'] as bool? ?? false;
             final loadSavedForm = navigationData['loadSavedForm'] as bool? ?? false;
-            final forceReset = navigationData['forceReset'] as bool? ?? false;
             
             // Determinar el modo del formulario
             String formMode;
-            if (isNewForm || forceReset) {
+            if (isNewForm) {
               formMode = 'create';
             } else if (loadSavedForm) {
               formMode = 'edit';
