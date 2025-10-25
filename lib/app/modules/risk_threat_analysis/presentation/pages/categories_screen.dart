@@ -1,4 +1,5 @@
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
+import 'package:caja_herramientas/app/core/icons/app_icons.dart';
 import 'package:caja_herramientas/app/modules/home/presentation/widgets/category_card.dart';
 import 'package:caja_herramientas/app/modules/risk_threat_analysis/presentation/bloc/risk_threat_analysis_bloc.dart';
 import 'package:caja_herramientas/app/modules/risk_threat_analysis/presentation/bloc/risk_threat_analysis_event.dart';
@@ -6,9 +7,80 @@ import 'package:caja_herramientas/app/modules/risk_threat_analysis/presentation/
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 
 class RiskCategoriesScreen extends StatelessWidget {
   const RiskCategoriesScreen({super.key});
+
+  /// Calcula el progreso de una categoría basado en las selecciones
+  double _calculateCategoryProgress(String classification, RiskThreatAnalysisState state) {
+    if (classification.toLowerCase() == 'amenaza') {
+      // Para amenaza: contar probabilidad + intensidad
+      final probabilidadCount = state.probabilidadSelections.length;
+      final intensidadCount = state.intensidadSelections.length;
+      final totalExpected = 6; // 3 probabilidad + 3 intensidad
+      return (probabilidadCount + intensidadCount) / totalExpected;
+    } else if (classification.toLowerCase() == 'vulnerabilidad') {
+      // Para vulnerabilidad: contar todas las subclasificaciones
+      int totalSelections = 0;
+      for (final subClassSelections in state.dynamicSelections.values) {
+        totalSelections += subClassSelections.length;
+      }
+      final totalExpected = 8; // Ajustar según el número real de subclasificaciones
+      return totalSelections / totalExpected;
+    }
+    
+    return 0.0;
+  }
+
+  /// Determina si una categoría está disponible para ser seleccionada
+  bool _isCategoryAvailable(String classification, RiskThreatAnalysisState state) {
+    if (classification.toLowerCase() == 'amenaza') {
+      // Amenaza siempre está disponible
+      return true;
+    } else if (classification.toLowerCase() == 'vulnerabilidad') {
+      // Vulnerabilidad solo está disponible si amenaza está completa
+      final amenazaProgress = _calculateCategoryProgress('amenaza', state);
+      return amenazaProgress >= 1.0;
+    }
+    return false;
+  }
+
+  /// Construye el icono de estado para una categoría
+  Widget? _buildStatusIcon(String classification, RiskThreatAnalysisState state) {
+    final progress = _calculateCategoryProgress(classification, state);
+    
+    if (progress >= 1.0) {
+      // Completada: mostrar check ✅
+      return SizedBox(
+        width: 24,
+        height: 24,
+        child: SvgPicture.asset(
+          AppIcons.checkCircle,
+          width: 24,
+          height: 24,
+        ),
+      );
+    } else if (progress > 0.0) {
+      // En proceso: mostrar borrador 📝
+      return SizedBox(
+        width: 18,
+        height: 17,
+        child: SvgPicture.asset(
+          AppIcons.borrar,
+          width: 18,
+          height: 17,
+          colorFilter: const ColorFilter.mode(
+            Color(0xFF2563EB), // Azul informativo
+            BlendMode.srcIn,
+          ),
+        ),
+      );
+    }
+    
+    // Sin progreso: no mostrar icono
+    return null;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,19 +132,40 @@ class RiskCategoriesScreen extends StatelessWidget {
                 ...classifications.asMap().entries.map((entry) {
                   final index = entry.key;
                   final classification = entry.value;
+                  
+                  // Calcular estado de la categoría
+                  final isAvailable = _isCategoryAvailable(classification, riskState);
+                  final statusIcon = _buildStatusIcon(classification, riskState);
 
                   return Column(
                     children: [
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: CategoryCard(
-                          title: '$classification $selectedEvent',
-                          onTap: () {
-                            // Navegar a RatingScreen (índice 1)
-                            final riskBloc = context
-                                .read<RiskThreatAnalysisBloc>();
-                            riskBloc.add(ChangeBottomNavIndex(1));
-                          },
+                        child: Opacity(
+                          opacity: isAvailable ? 1.0 : 0.6,
+                          child: CategoryCard(
+                            title: '$classification $selectedEvent',
+                            trailingIcon: statusIcon,
+                            onTap: isAvailable ? () {
+                              // Configurar la clasificación seleccionada
+                              final riskBloc = context.read<RiskThreatAnalysisBloc>();
+                              riskBloc.add(SelectClassification(classification.toLowerCase()));
+                              
+                              // Navegar a RatingScreen (índice 1)
+                              riskBloc.add(ChangeBottomNavIndex(1));
+                            } : () {
+                              // Mostrar mensaje si no está disponible
+                              if (classification.toLowerCase() == 'vulnerabilidad') {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Complete primero la evaluación de Amenaza'),
+                                    backgroundColor: DAGRDColors.warning,
+                                    duration: Duration(seconds: 3),
+                                  ),
+                                );
+                              }
+                            },
+                          ),
                         ),
                       ),
                       // Agregar espaciado entre cards, excepto después del último

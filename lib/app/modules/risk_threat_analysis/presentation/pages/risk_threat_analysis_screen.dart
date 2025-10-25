@@ -20,10 +20,18 @@ import '../../../home/presentation/bloc/home_event.dart' as home_events;
 import 'package:caja_herramientas/app/shared/services/form_persistence_service.dart';
 
 class RiskThreatAnalysisScreen extends StatefulWidget {
-  final String? selectedEvent;
-  final Map<String, dynamic>? navigationData;
+  final String? event;
+  final int targetIndex;
+  final String? formId;
+  final String formMode; // 'create' | 'edit'
   
-  const RiskThreatAnalysisScreen({super.key, this.selectedEvent, this.navigationData});
+  const RiskThreatAnalysisScreen({
+    super.key, 
+    this.event,
+    this.targetIndex = 0,
+    this.formId,
+    this.formMode = 'create', // Por defecto 'create'
+  });
 
   @override
   State<RiskThreatAnalysisScreen> createState() => _RiskThreatAnalysisScreenState();
@@ -39,75 +47,47 @@ class _RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
   @override
   void didUpdateWidget(covariant RiskThreatAnalysisScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.navigationData != oldWidget.navigationData) {
+    if (widget.event != oldWidget.event || 
+        widget.targetIndex != oldWidget.targetIndex ||
+        widget.formId != oldWidget.formId ||
+        widget.formMode != oldWidget.formMode) {
       _initializeScreen();
     }
   }
 
-  /// Inicializa la pantalla basándose en los datos de navegación
+  /// Inicializa la pantalla basándose en los parámetros
   void _initializeScreen() {
-    if (widget.navigationData == null) return;
-
     final bloc = context.read<RiskThreatAnalysisBloc>();
     final homeBloc = context.read<HomeBloc>();
 
-    // Extraer datos de navegación
-    final event = widget.navigationData!['event'] as String?;
-    final targetIndex = widget.navigationData!['targetIndex'] as int? ?? 0;
-    final isNewForm = widget.navigationData!['isNewForm'] as bool? ?? false;
-    final loadSavedForm = widget.navigationData!['loadSavedForm'] as bool? ?? false;
-    final formId = widget.navigationData!['formId'] as String?;
-    final forceReset = widget.navigationData!['forceReset'] as bool? ?? false;
-
     print('=== RiskThreatAnalysisScreen Initialization ===');
-    print('Event: $event');
-    print('Target Index: $targetIndex');
-    print('Is New Form: $isNewForm');
-    print('Load Saved Form: $loadSavedForm');
-    print('Form ID: $formId');
-    print('Force Reset: $forceReset');
+    print('Event: ${widget.event}');
+    print('Target Index: ${widget.targetIndex}');
+    print('Form ID: ${widget.formId}');
+    print('Form Mode: ${widget.formMode}');
 
-    // Determinar modo del formulario
-    final formMode = _determineFormMode(isNewForm, loadSavedForm, forceReset);
+    // Usar el modo del formulario que viene del router
+    final formMode = widget.formMode == 'edit' ? FormMode.edit : FormMode.create;
     bloc.add(SetFormMode(formMode));
-    print('Form Mode: ${formMode.value}');
 
     // Configurar evento si está disponible
-    if (event != null && event.isNotEmpty) {
-      bloc.add(UpdateSelectedRiskEvent(event));
+    if (widget.event != null && widget.event!.isNotEmpty) {
+      bloc.add(UpdateSelectedRiskEvent(widget.event!));
     }
 
     // Establecer índice de navegación
-    bloc.add(ChangeBottomNavIndex(targetIndex));
+    bloc.add(ChangeBottomNavIndex(widget.targetIndex));
 
     // Manejar datos del formulario según el modo
     if (formMode.isCreate) {
       _handleCreateMode(homeBloc);
     } else {
-      _handleEditMode(formId, bloc);
+      _handleEditMode(widget.formId, bloc);
     }
 
     print('=== End Initialization ===');
   }
 
-  /// Determina el modo del formulario basándose en los parámetros
-  FormMode _determineFormMode(bool isNewForm, bool loadSavedForm, bool forceReset) {
-    if (isNewForm || forceReset) {
-      return FormMode.create;
-    }
-    
-    if (loadSavedForm) {
-      return FormMode.edit;
-    }
-    
-    // Verificar si hay un formulario activo
-    final homeState = context.read<HomeBloc>().state;
-    if (homeState.activeFormId != null && homeState.activeFormId!.isNotEmpty) {
-      return FormMode.edit;
-    }
-    
-    return FormMode.create;
-  }
 
   /// Maneja el modo de creación de formulario
   void _handleCreateMode(HomeBloc homeBloc) {
@@ -199,7 +179,11 @@ class _RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
         // Definir las pantallas disponibles
         final screens = [
           const RiskCategoriesScreen(), // Índice 0 - Categorías
-          RatingScreen(navigationData: widget.navigationData), // Índice 1 - Calificación
+          RatingScreen(navigationData: {
+            'event': widget.event,
+            'formId': widget.formId,
+            'formMode': widget.formMode,
+          }), // Índice 1 - Calificación
           const EvidenceScreen(), // Índice 2 - Evidencias
           const RatingResultsScreen(), // Índice 3 - Resultados
           FinalRiskResultsScreen(eventName: state.selectedRiskEvent ?? ''), // Índice 4 - Resultados Finales

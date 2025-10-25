@@ -8,7 +8,6 @@ import '../widgets/widgets.dart';
 class RatingResultsScreen extends StatelessWidget {
   const RatingResultsScreen({super.key});
 
-
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<RiskThreatAnalysisBloc, RiskThreatAnalysisState>(

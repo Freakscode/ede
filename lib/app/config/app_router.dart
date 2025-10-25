@@ -13,6 +13,8 @@ import '../modules/auth/ui/pages/login_screen.dart';
 import '../modules/splash/presentation/pages/splash_screen.dart';
 import '../modules/home/presentation/pages/home_screen.dart' as home;
 import '../modules/home/presentation/pages/home_forms_screen.dart';
+import '../modules/home/presentation/bloc/home_bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../modules/evaluacion/presentation/pages/home_screen.dart'
     as evaluacion;
@@ -64,13 +66,41 @@ GoRouter getAppRouter(BuildContext context) {
           // Manejar tanto String (compatibilidad) como Map (nuevo formato)
           if (state.extra is Map<String, dynamic>) {
             final navigationData = state.extra as Map<String, dynamic>;
+            
+            // Determinar el modo basándose en los datos de navegación
+            final isNewForm = navigationData['isNewForm'] as bool? ?? false;
+            final loadSavedForm = navigationData['loadSavedForm'] as bool? ?? false;
+            final forceReset = navigationData['forceReset'] as bool? ?? false;
+            
+            // Determinar el modo del formulario
+            String formMode;
+            if (isNewForm || forceReset) {
+              formMode = 'create';
+            } else if (loadSavedForm) {
+              formMode = 'edit';
+            } else {
+              // Verificar si hay un formulario activo
+              final homeBloc = context.read<HomeBloc>();
+              final homeState = homeBloc.state;
+              formMode = (homeState.activeFormId != null && homeState.activeFormId!.isNotEmpty) 
+                  ? 'edit' 
+                  : 'create';
+            }
+            
             return RiskThreatAnalysisScreen(
-              selectedEvent: navigationData['event'] as String?,
-              navigationData: navigationData,
+              event: navigationData['event'] as String?,
+              targetIndex: navigationData['targetIndex'] as int? ?? 0,
+              formId: navigationData['formId'] as String?,
+              formMode: formMode,
             );
           } else {
             final selectedEvent = state.extra as String?;
-            return RiskThreatAnalysisScreen(selectedEvent: selectedEvent);
+            return RiskThreatAnalysisScreen(
+              event: selectedEvent,
+              targetIndex: 0,
+              formId: null,
+              formMode: 'create', // Por defecto para compatibilidad
+            );
           }
         },
       ),
