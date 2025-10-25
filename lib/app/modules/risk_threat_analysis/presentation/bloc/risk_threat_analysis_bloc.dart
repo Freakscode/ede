@@ -306,7 +306,6 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     try {
       emit(state.setLoading(true));
       
-      print('event.eventName: ${event.eventName}');
       
       // Si hay datos de evaluación específicos, cargarlos directamente
       if (event.evaluationData != null) {

@@ -19,6 +19,7 @@ import '../../../home/presentation/bloc/home_bloc.dart';
 import '../../../home/presentation/bloc/home_event.dart' as home_events;
 import 'package:caja_herramientas/app/shared/services/form_persistence_service.dart';
 import 'package:caja_herramientas/app/shared/models/risk_event_factory.dart';
+import 'package:caja_herramientas/app/core/utils/logger.dart';
 
 class RiskThreatAnalysisScreen extends StatefulWidget {
   final String? eventId;
@@ -58,10 +59,9 @@ class _RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
     final bloc = context.read<RiskThreatAnalysisBloc>();
     final homeBloc = context.read<HomeBloc>();
 
-    print('=== RiskThreatAnalysisScreen Initialization ===');
-    print('Event ID: ${widget.eventId}');
-    print('Form ID: ${widget.formId}');
-    print('Form Mode: ${widget.formMode}');
+    Logger.info('RiskThreatAnalysisScreen Initialization', 'RiskThreatAnalysisScreen');
+    Logger.info('Event ID: ${widget.eventId}', 'RiskThreatAnalysisScreen');
+    Logger.info('Form ID: ${widget.formId}', 'RiskThreatAnalysisScreen');
 
     // Usar el modo del formulario que viene del router
     final formMode = widget.formMode == 'edit' ? FormMode.edit : FormMode.create;
@@ -91,8 +91,6 @@ class _RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
 
   /// Maneja el modo de creación de formulario
   void _handleCreateMode(HomeBloc homeBloc) {
-    print('Handling CREATE mode');
-    
     // Resetear estado del bloc
     final bloc = context.read<RiskThreatAnalysisBloc>();
     bloc.add(const ResetDropdowns());
@@ -127,10 +125,10 @@ class _RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
         ));
         
       } else {
-        print('Form not found in database');
+        Logger.warning('Form not found in database', 'RiskThreatAnalysisScreen');
       }
     } catch (e) {
-      print('Error loading form data: $e');
+      Logger.error('Error loading form data: $e', name: 'RiskThreatAnalysisScreen');
     }
   }
 

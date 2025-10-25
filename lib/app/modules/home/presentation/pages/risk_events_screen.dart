@@ -83,7 +83,6 @@ class RiskEventsScreen extends StatelessWidget {
                       
                       context.go('/risk-threat-analysis', extra: navigationData);
                       
-                      Logger.info('Navegando a RiskThreatAnalysisScreen', 'RiskEventsScreen');
                     },
                   );
                 },

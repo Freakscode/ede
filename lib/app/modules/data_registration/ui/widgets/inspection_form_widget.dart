@@ -67,8 +67,7 @@ class _InspectionFormWidgetState extends State<InspectionFormWidget> {
           );
           
           // Navegar al home con navigationData para mostrar RiskEventsScreen
-          print('=== NAVEGANDO AL HOME PARA CREAR NUEVO FORMULARIO ===');
-          print('NavigationData: {showRiskEvents: true, resetForNewForm: true}');
+          
           context.go('/home', extra: {
             'showRiskEvents': true,
             'resetForNewForm': true,
