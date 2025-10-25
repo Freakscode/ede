@@ -422,14 +422,6 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
                             onDelete: () =>
                                 _deleteForm(context, form.id, form.title),
                             onTap: () {
-                              print('=== DEBUG onTap FormCardInProgress ===');
-                              print('form.id: ${form.id}');
-                              print('=== DEBUG _navigateToForm ===');
-                              print('progress: $progress');
-                              print('amenaza: ${progress['amenaza']}');
-                              print('vulnerabilidad: ${progress['vulnerabilidad']}');
-                              print('total: ${progress['total']}');
-                              print('=== END DEBUG _navigateToForm ===');
                               _navigateToForm(context, form);
                             },
                           );
@@ -495,25 +487,17 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
         // Priorizar amenaza primero, ya que es el flujo natural de creación
         String classificationType = 'amenaza'; // Por defecto
         
-        print('=== DEBUG classificationType logic ===');
-        print('amenazaProbabilidadSelections: ${completeForm.amenazaProbabilidadSelections}');
-        print('amenazaIntensidadSelections: ${completeForm.amenazaIntensidadSelections}');
-        print('vulnerabilidadSelections: ${completeForm.vulnerabilidadSelections}');
         
         // Si hay datos de amenaza (probabilidad o intensidad), usar amenaza
         if (completeForm.amenazaProbabilidadSelections.isNotEmpty || 
             completeForm.amenazaIntensidadSelections.isNotEmpty) {
           classificationType = 'amenaza';
-          print('Using amenaza classification');
         }
         // Solo usar vulnerabilidad si hay datos específicos de vulnerabilidad Y amenaza está completa
         else if (completeForm.vulnerabilidadSelections.isNotEmpty) {
           classificationType = 'vulnerabilidad';
-          print('Using vulnerabilidad classification');
         }
         
-        print('Final classificationType: $classificationType');
-        print('=== END DEBUG classificationType logic ===');
 
         // Calcular el progreso del formulario
         final progress = await _getFormProgress(form.id);

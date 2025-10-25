@@ -150,7 +150,6 @@ class FormPersistenceService {
       );
     }
 
-    print('FormPersistenceService: Formulario activo establecido - $formId');
   }
 
   Future<String?> getActiveFormId() async {

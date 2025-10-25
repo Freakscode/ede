@@ -86,7 +86,6 @@ class _RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
       _handleEditMode(widget.formId, bloc);
     }
 
-    print('=== End Initialization ===');
   }
 
 
@@ -104,7 +103,6 @@ class _RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
 
   /// Maneja el modo de edición de formulario
   void _handleEditMode(String? formId, RiskThreatAnalysisBloc bloc) {
-    print('Handling EDIT mode');
     
     if (formId != null && formId.isNotEmpty) {
       // Cargar datos del formulario desde SQLite
@@ -115,7 +113,6 @@ class _RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
   /// Carga los datos del formulario desde SQLite
   Future<void> _loadFormData(String formId, RiskThreatAnalysisBloc bloc) async {
     try {
-      print('Loading form data for ID: $formId');
       
       final persistenceService = FormPersistenceService();
       final completeForm = await persistenceService.getCompleteForm(formId);
@@ -129,7 +126,6 @@ class _RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
           evaluationData: evaluationData,
         ));
         
-        print('Form data loaded successfully');
       } else {
         print('Form not found in database');
       }

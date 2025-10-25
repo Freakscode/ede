@@ -306,11 +306,7 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     try {
       emit(state.setLoading(true));
       
-      print('=== DEBUG _onLoadFormData ===');
       print('event.eventName: ${event.eventName}');
-      print('event.classificationType: ${event.classificationType}');
-      print('event.evaluationData keys: ${event.evaluationData?.keys.toList()}');
-      print('current formMode: ${state.formMode}');
       
       // Si hay datos de evaluación específicos, cargarlos directamente
       if (event.evaluationData != null) {
@@ -419,14 +415,7 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
           // Todos los datos de selección están vacíos
         }
         
-        print('=== DEBUG _onLoadFormData final state ===');
-        print('selectedRiskEvent: ${event.eventName}');
-        print('selectedClassification: ${event.classificationType}');
-        print('probabilidadSelections: $probabilidadSelections');
-        print('intensidadSelections: $intensidadSelections');
-        print('dynamicSelections: $dynamicSelections');
-        print('combinedScores: $combinedScores');
-        print('=== END DEBUG _onLoadFormData final state ===');
+      
         
         final newState = state.copyWith(
           selectedRiskEvent: event.eventName,
