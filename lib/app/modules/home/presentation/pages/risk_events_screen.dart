@@ -3,6 +3,7 @@ import 'package:caja_herramientas/app/modules/home/presentation/bloc/home_bloc.d
 import 'package:caja_herramientas/app/modules/home/presentation/bloc/home_event.dart';
 import 'package:caja_herramientas/app/shared/models/risk_event_factory.dart';
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
+import 'package:caja_herramientas/app/core/utils/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -69,9 +70,8 @@ class RiskEventsScreen extends StatelessWidget {
                     iconAsset: riskEvent.iconAsset,
                     title: riskEvent.name,
                     onTap: () {
-                      print('=== RiskEventsScreen: Evento seleccionado ===');
-                      print('Evento: ${riskEvent.name}');
-                      print('IconAsset: ${riskEvent.iconAsset}');
+                      Logger.info('Evento seleccionado: ${riskEvent.name}', 'RiskEventsScreen');
+                      Logger.info('Event ID: ${riskEvent.id}', 'RiskEventsScreen');
                       
                       // Actualizar el estado del HomeBloc
                       homeBloc.add(SelectRiskEvent(riskEvent.name));
@@ -83,7 +83,7 @@ class RiskEventsScreen extends StatelessWidget {
                       
                       context.go('/risk-threat-analysis', extra: navigationData);
                       
-                      print('=== RiskEventsScreen: Navegando a categorías ===');
+                      Logger.info('Navegando a RiskThreatAnalysisScreen', 'RiskEventsScreen');
                     },
                   );
                 },
