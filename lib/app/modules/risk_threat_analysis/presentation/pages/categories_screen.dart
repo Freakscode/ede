@@ -15,45 +15,32 @@ import 'package:flutter_svg/svg.dart';
 class CategoriesScreen extends StatelessWidget {
   const CategoriesScreen({super.key});
 
-  /// Calcula el progreso de una categoría basado en las selecciones
-  double _calculateCategoryProgress(String classification, RiskThreatAnalysisState state) {
-    if (classification.toLowerCase() == 'amenaza') {
-      // Para amenaza: contar probabilidad + intensidad
-      final probabilidadCount = state.probabilidadSelections.length;
-      final intensidadCount = state.intensidadSelections.length;
-      final totalExpected = 6; // 3 probabilidad + 3 intensidad
-      return (probabilidadCount + intensidadCount) / totalExpected;
-    } else if (classification.toLowerCase() == 'vulnerabilidad') {
-      // Para vulnerabilidad: contar todas las subclasificaciones
-      int totalSelections = 0;
-      for (final subClassSelections in state.dynamicSelections.values) {
-        totalSelections += subClassSelections.length;
-      }
-      final totalExpected = 8; // Ajustar según el número real de subclasificaciones
-      return totalSelections / totalExpected;
-    }
-    
-    return 0.0;
+  /// Calcula el progreso de una categoría basado en las selecciones y evidencias
+  double _calculateCategoryProgress(String classification, RiskThreatAnalysisState state, RiskThreatAnalysisBloc bloc) {
+    // Usar el método centralizado del bloc para obtener el porcentaje de completado
+    return bloc.getCompletionPercentageForCategory(classification.toLowerCase());
   }
 
   /// Determina si una categoría está disponible para ser seleccionada
-  bool _isCategoryAvailable(String classification, RiskThreatAnalysisState state) {
+  bool _isCategoryAvailable(String classification, RiskThreatAnalysisState state, RiskThreatAnalysisBloc bloc) {
     if (classification.toLowerCase() == 'amenaza') {
       // Amenaza siempre está disponible
       return true;
     } else if (classification.toLowerCase() == 'vulnerabilidad') {
       // Vulnerabilidad solo está disponible si amenaza está completa
-      final amenazaProgress = _calculateCategoryProgress('amenaza', state);
-      return amenazaProgress >= 1.0;
+      // Una categoría está completa cuando tiene selecciones Y evidencias
+      return bloc.isCategoryComplete('amenaza');
     }
     return false;
   }
 
   /// Construye el icono de estado para una categoría
-  Widget? _buildStatusIcon(String classification, RiskThreatAnalysisState state) {
-    final progress = _calculateCategoryProgress(classification, state);
+  Widget? _buildStatusIcon(String classification, RiskThreatAnalysisState state, RiskThreatAnalysisBloc bloc) {
+    // Usar el método centralizado del bloc para verificar si está completa
+    final isComplete = bloc.isCategoryComplete(classification.toLowerCase());
+    final progress = _calculateCategoryProgress(classification, state, bloc);
     
-    if (progress >= 1.0) {
+    if (isComplete) {
       // Completada: mostrar check ✅
       return SizedBox(
         width: 24,
@@ -139,8 +126,9 @@ class CategoriesScreen extends StatelessWidget {
                       final classification = entry.value;
                       
                       // Calcular estado de la categoría
-                      final isAvailable = _isCategoryAvailable(classification, riskState);
-                      final statusIcon = _buildStatusIcon(classification, riskState);
+                      final riskBloc = context.read<RiskThreatAnalysisBloc>();
+                      final isAvailable = _isCategoryAvailable(classification, riskState, riskBloc);
+                      final statusIcon = _buildStatusIcon(classification, riskState, riskBloc);
 
                       return Column(
                         children: [
@@ -151,7 +139,6 @@ class CategoriesScreen extends StatelessWidget {
                               trailingIcon: statusIcon,
                               onTap: isAvailable ? () {
                                 // Configurar la clasificación seleccionada
-                                final riskBloc = context.read<RiskThreatAnalysisBloc>();
                                 riskBloc.add(SelectClassification(classification.toLowerCase()));
                                 
                                 // Navegar a RatingScreen (índice 1)
