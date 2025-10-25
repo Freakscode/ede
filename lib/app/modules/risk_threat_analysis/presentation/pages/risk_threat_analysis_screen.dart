@@ -10,6 +10,7 @@ import 'package:caja_herramientas/app/shared/widgets/layouts/custom_bottom_nav_b
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import '../bloc/risk_threat_analysis_bloc.dart';
 import '../bloc/risk_threat_analysis_event.dart';
 import '../bloc/risk_threat_analysis_state.dart';
@@ -187,8 +188,8 @@ class _RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
       ));
     }
     
-    // Salir de la pantalla
-    Navigator.of(context).pop();
+    // Salir de la pantalla - navegar de vuelta al home
+    context.go('/home');
   }
 
   @override

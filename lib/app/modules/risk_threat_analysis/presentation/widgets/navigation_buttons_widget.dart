@@ -41,8 +41,10 @@ class NavigationButtonsWidget extends StatelessWidget {
               onBackPressed ??
               () {
                 if (currentIndex == 3) {
-                  // Cuando estamos en FinalRiskResultsScreen (índice 3), volver a categorías
-                  context.go('/risk-categories');
+                  // Cuando estamos en FinalRiskResultsScreen (índice 3), volver a categorías (índice 0)
+                  context.read<RiskThreatAnalysisBloc>().add(
+                    ChangeBottomNavIndex(0),
+                  );
                 } else if (currentIndex > 0) {
                   context.read<RiskThreatAnalysisBloc>().add(
                     ChangeBottomNavIndex(currentIndex - 1),
@@ -464,8 +466,10 @@ class NavigationButtonsWidget extends StatelessWidget {
         rightButtonIcon: Icons.check,
         onRightButtonPressed: () {
           if ((state.selectedClassification ?? '').toLowerCase() == 'amenaza') {
-            // Si es amenaza, volver a categorías
-            context.go('/risk-categories');
+            // Si es amenaza, volver a categorías (índice 0)
+            context.read<RiskThreatAnalysisBloc>().add(
+              ChangeBottomNavIndex(0),
+            );
           } else {
             // Si es vulnerabilidad, volver al home
             final navigationData = homeNavigationType.toNavigationData(tabIndex: homeTabIndex);
