@@ -602,19 +602,6 @@ class DataRegistrationBloc
   ) {
     if (state is! DataRegistrationData) return;
     
-    final currentState = state as DataRegistrationData;
-    
-    // Imprimir datos del formulario antes de enviar
-    print('=== ENVIANDO FORMULARIO DE INSPECCIÓN ===');
-    print('ID Incidente: ${currentState.inspectionIncidentId}');
-    print('Estado: ${currentState.inspectionStatus}');
-    print('Fecha: ${currentState.inspectionDate}');
-    print('Hora: ${currentState.inspectionTime}');
-    print('Comentario: ${currentState.inspectionComment}');
-    print('Lesionados: ${currentState.inspectionInjured}');
-    print('Muertos: ${currentState.inspectionDead}');
-    print('==========================================');
-    
     // Disparar validación
     add(const InspectionFormValidated());
   }
@@ -625,13 +612,7 @@ class DataRegistrationBloc
     Emitter<DataRegistrationState> emit,
   ) {
     if (state is DataRegistrationData) {
-      final currentState = state as DataRegistrationData;
-      
-      print('=== INICIALIZANDO FORMULARIO DE CONTACTO ===');
-      print('Estado actual: ${currentState.contactErrors}');
-      print('===========================================');
-      
-      // El estado ya está inicializado, solo log para debug
+      // El estado ya está inicializado
     }
   }
 
@@ -641,13 +622,7 @@ class DataRegistrationBloc
     Emitter<DataRegistrationState> emit,
   ) {
     if (state is DataRegistrationData) {
-      final currentState = state as DataRegistrationData;
-      
-      print('=== INICIALIZANDO FORMULARIO DE INSPECCIÓN ===');
-      print('Estado actual: ${currentState.inspectionErrors}');
-      print('=============================================');
-      
-      // El estado ya está inicializado, solo log para debug
+      // El estado ya está inicializado
     }
   }
 

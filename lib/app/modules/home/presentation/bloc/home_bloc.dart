@@ -104,12 +104,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
   Future<void> _onSelectRiskEvent(SelectRiskEvent event, Emitter<HomeState> emit) async {
     try {
-      print('=== HomeBloc: SelectRiskEvent recibido ===');
-      print('Evento seleccionado: ${event.eventName}');
-      
       // Crear un nuevo formulario con ID único
       final formId = '${event.eventName}_${DateTime.now().millisecondsSinceEpoch}';
-      print('Nuevo formId creado: $formId');
       
       final currentEntity = state.toEntity();
       final updatedEntity = currentEntity.copyWith(
@@ -121,25 +117,15 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         isLoadingForms: false,
       );
       
-      print('Estado nuevo - activeFormId: ${updatedEntity.activeFormId}');
-      
       await _updateHomeStateUseCase.execute(updatedEntity);
       emit(HomeState.fromEntity(updatedEntity));
-      
-      print('=== HomeBloc: SelectRiskEvent completado ===');
     } catch (e) {
-      print('=== HomeBloc: Error en SelectRiskEvent ===');
-      print('Error: $e');
       emit(state.copyWith(error: 'Error al seleccionar evento de riesgo: $e'));
     }
   }
 
   Future<void> _onResetRiskSections(HomeResetRiskSections event, Emitter<HomeState> emit) async {
     try {
-      print('=== HomeBloc: ResetRiskSections ejecutado ===');
-      print('Estado anterior - selectedRiskEvent: ${state.selectedRiskEvent}');
-      print('Estado anterior - activeFormId: ${state.activeFormId}');
-      
       final currentEntity = state.toEntity();
       final updatedEntity = currentEntity.copyWith(
         showRiskEvents: false,
@@ -152,16 +138,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         savedRiskEventModels: const {},
       );
       
-      print('Estado nuevo - selectedRiskEvent: ${updatedEntity.selectedRiskEvent}');
-      print('Estado nuevo - activeFormId: ${updatedEntity.activeFormId}');
-      
       await _updateHomeStateUseCase.execute(updatedEntity);
       emit(HomeState.fromEntity(updatedEntity));
-      
-      print('=== HomeBloc: ResetRiskSections completado ===');
     } catch (e) {
-      print('=== HomeBloc: Error en ResetRiskSections ===');
-      print('Error: $e');
       emit(state.copyWith(error: 'Error al resetear secciones de riesgo: $e'));
     }
   }

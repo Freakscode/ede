@@ -131,9 +131,6 @@ class _HomeMainSectionState extends State<HomeMainSection> {
     try {
       final authBloc = context.read<AuthBloc>();
       final authState = authBloc.state;
-      print('AuthBloc encontrado: ✅');
-      print('Estado de autenticación: ${authState.runtimeType}');
-      print('Estado completo: $authState');
 
       if (authState is AuthAuthenticated) {
         print('Usuario autenticado: ${authState.user.nombre}');
