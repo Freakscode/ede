@@ -13,7 +13,6 @@ import '../widgets/progress_bar_widget.dart';
 import '../widgets/navigation_buttons_widget.dart';
 import '../widgets/save_progress_button.dart';
 import '../widgets/threat_levels_dialog.dart';
-import 'risk_threat_analysis_screen.dart';
 
 class RatingScreen extends StatefulWidget {
   final Map<String, dynamic>? navigationData;
@@ -25,39 +24,12 @@ class RatingScreen extends StatefulWidget {
 }
 
 class _RatingScreenState extends State<RatingScreen> {
-  
-  // Función para hacer scroll inteligente - solo si es necesario
-  void _smartScrollToDropdown(BuildContext context, GlobalKey dropdownKey) {
-    final scrollController = PrimaryScrollController.of(context);
-    if (scrollController != null && scrollController.hasClients) {
-      // Obtener la posición del dropdown
-      final RenderBox? dropdownRenderBox = dropdownKey.currentContext?.findRenderObject() as RenderBox?;
-      if (dropdownRenderBox != null) {
-        final dropdownPosition = dropdownRenderBox.localToGlobal(Offset.zero);
-        final screenHeight = MediaQuery.of(context).size.height;
-        final dropdownHeight = dropdownRenderBox.size.height;
-        
-        // Verificar si el dropdown está parcialmente fuera de la pantalla
-        final isPartiallyOffScreen = dropdownPosition.dy + dropdownHeight > screenHeight * 0.8;
-        
-        if (isPartiallyOffScreen) {
-          // Hacer scroll mínimo para hacer visible el dropdown
-          final currentScrollPosition = scrollController.offset;
-          final targetPosition = currentScrollPosition + (dropdownPosition.dy + dropdownHeight - screenHeight * 0.8);
-          
-          scrollController.animateTo(
-            targetPosition.clamp(0.0, scrollController.position.maxScrollExtent),
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeInOut,
-          );
-        }
-      }
-    }
-  }
+  late ScrollController _scrollController;
   
   @override
   void initState() {
     super.initState();
+    _scrollController = ScrollController();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // Solo procesar navigationData si es la primera vez que se carga la pantalla
       // No resetear cuando se navega entre pestañas
@@ -93,12 +65,49 @@ class _RatingScreenState extends State<RatingScreen> {
       // Si no hay navigationData, NO resetear - mantener el estado actual
     });
   }
+  
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+  
+  // Función para hacer scroll inteligente - solo si es necesario
+  void _smartScrollToDropdown(BuildContext context, GlobalKey dropdownKey) {
+    final scrollController = _scrollController;
+    if (scrollController.hasClients) {
+      // Obtener la posición del dropdown
+      final RenderBox? dropdownRenderBox = dropdownKey.currentContext?.findRenderObject() as RenderBox?;
+      if (dropdownRenderBox != null) {
+        final dropdownPosition = dropdownRenderBox.localToGlobal(Offset.zero);
+        final screenHeight = MediaQuery.of(context).size.height;
+        final dropdownHeight = dropdownRenderBox.size.height;
+        
+        // Verificar si el dropdown está parcialmente fuera de la pantalla
+        final isPartiallyOffScreen = dropdownPosition.dy + dropdownHeight > screenHeight * 0.8;
+        
+        if (isPartiallyOffScreen) {
+          // Hacer scroll mínimo para hacer visible el dropdown
+          final currentScrollPosition = scrollController.offset;
+          final targetPosition = currentScrollPosition + (dropdownPosition.dy + dropdownHeight - screenHeight * 0.8);
+          
+          scrollController.animateTo(
+            targetPosition.clamp(0.0, scrollController.position.maxScrollExtent),
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+          );
+        }
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 28),
-      child: BlocBuilder<RiskThreatAnalysisBloc, RiskThreatAnalysisState>(
+    return SingleChildScrollView(
+      controller: _scrollController,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 28),
+        child: BlocBuilder<RiskThreatAnalysisBloc, RiskThreatAnalysisState>(
         builder: (context, state) {
           return Column(
             children: [
@@ -354,6 +363,7 @@ class _RatingScreenState extends State<RatingScreen> {
           );
         },
       ),
+    ),
     );
   }
 }
