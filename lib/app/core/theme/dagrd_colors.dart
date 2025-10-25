@@ -17,6 +17,12 @@ class DAGRDColors {
   
   /// Color amarillo alternativo DAGRD
   static const Color amarDAGRD = Color(0xFFFFCC00);
+  
+  /// Color amarillo claro para fondos
+  static const Color amarilloClaro = Color(0xFFFCD34D);
+  
+  /// Color azul medio para botones
+  static const Color azulMedio = Color(0xFF3B82F6);
 
   // ============================================================================
   // COLORES SECUNDARIOS DAGRD
@@ -40,6 +46,9 @@ class DAGRDColors {
   
   /// Color gris claro para fondos
   static const Color grisClaro = Color(0xFFF7FAFC);
+  
+  /// Color azul muy claro para fondos informativos
+  static const Color azulClaro = Color(0xFFF0F4FF);
   
   /// Color gris medio para textos secundarios
   static const Color grisMedio = Color(0xFF718096);
@@ -84,6 +93,12 @@ class DAGRDColors {
   /// Color de error
   static const Color error = Color(0xFFE53E3E);
   
+  /// Color de error claro para fondos
+  static const Color errorClaro = Color(0xFFFEE2E2);
+  
+  /// Color de error oscuro para iconos
+  static const Color errorOscuro = Color(0xFFDC2626);
+  
   /// Color informativo
   static const Color info = Color(0xFF3182CE);
 
@@ -118,6 +133,12 @@ class DAGRDColors {
   
   /// Color para bordes de enfoque
   static const Color outlineVariant = Color(0xFFD1D5DB);
+  
+  /// Color gris medio para elementos deshabilitados
+  static const Color grisDeshabilitado = Color(0xFFC6C6C6);
+  
+  /// Color azul claro para fondos de información
+  static const Color azulInfoClaro = Color(0xFFE8EDFF);
 
   // ============================================================================
   // COLORES DE TEXTO

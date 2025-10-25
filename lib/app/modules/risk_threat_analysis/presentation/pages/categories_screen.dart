@@ -74,7 +74,7 @@ class CategoriesScreen extends StatelessWidget {
           width: 18,
           height: 17,
           colorFilter: const ColorFilter.mode(
-            Color(0xFF2563EB), // Azul informativo
+            DAGRDColors.azulSecundario, // Azul informativo
             BlendMode.srcIn,
           ),
         ),
@@ -108,7 +108,7 @@ class CategoriesScreen extends StatelessWidget {
                         'Metodología de Análisis del Riesgo',
                         textAlign: TextAlign.center,
                         style: const TextStyle(
-                          color: Color(0xFF232B48), // AzulDAGRD
+                          color: DAGRDColors.azulDAGRD, // AzulDAGRD
                           fontFamily: 'Work Sans',
                           fontSize: 20,
                           fontStyle: FontStyle.normal,
@@ -123,7 +123,7 @@ class CategoriesScreen extends StatelessWidget {
                         'Seleccione una categoría',
                         textAlign: TextAlign.center,
                         style: const TextStyle(
-                          color: Color(0xFF706F6F), // GrisDAGRD
+                          color: DAGRDColors.onSurfaceVariant, // GrisDAGRD
                           fontFamily: 'Work Sans',
                           fontSize: 18,
                           fontStyle: FontStyle.normal,
@@ -183,7 +183,7 @@ class CategoriesScreen extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF0F4FF),
+                        color: DAGRDColors.azulClaro,
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Column(

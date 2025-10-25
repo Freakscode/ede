@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import 'package:caja_herramientas/app/shared/widgets/inputs/custom_text_field.dart';
 import 'package:caja_herramientas/app/shared/widgets/inputs/custom_expandable_dropdown.dart';
 import 'package:caja_herramientas/app/shared/widgets/inputs/custom_date_picker.dart';
@@ -209,7 +210,7 @@ class _InspectionFormWidgetState extends State<InspectionFormWidget> {
             child: Text(
               error,
               style: const TextStyle(
-                color: Color(0xFFE53E3E),
+                color: DAGRDColors.error,
                 fontFamily: 'Work Sans',
                 fontSize: 12,
               ),

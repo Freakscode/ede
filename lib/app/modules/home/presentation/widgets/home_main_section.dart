@@ -99,7 +99,7 @@ class _HomeMainSectionState extends State<HomeMainSection> {
                     width: 24,
                     height: 24,
                     colorFilter: const ColorFilter.mode(
-                      Color(0xFF1E1E1E),
+                      DAGRDColors.onSurface,
                       BlendMode.srcIn,
                     ),
                   ),
@@ -108,7 +108,7 @@ class _HomeMainSectionState extends State<HomeMainSection> {
                     'Ir a portal SIRMED',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: Color(0xFF1E1E1E),
+                      color: DAGRDColors.onSurface,
                       fontFamily: 'Work Sans',
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
