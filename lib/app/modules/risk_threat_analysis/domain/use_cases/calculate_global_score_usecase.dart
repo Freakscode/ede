@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../repositories/risk_analysis_repository_interface.dart';
 import 'calculate_score_usecase.dart';
 
 /// Caso de uso para calcular scores globales de amenaza y vulnerabilidad

@@ -9,8 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
-class RiskCategoriesScreen extends StatelessWidget {
-  const RiskCategoriesScreen({super.key});
+class CategoriesScreen extends StatelessWidget {
+  const CategoriesScreen({super.key});
 
   /// Calcula el progreso de una categoría basado en las selecciones
   double _calculateCategoryProgress(String classification, RiskThreatAnalysisState state) {

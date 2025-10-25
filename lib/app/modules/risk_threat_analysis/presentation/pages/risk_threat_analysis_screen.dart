@@ -173,7 +173,7 @@ class _RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
       builder: (context, state) {
         // Definir las pantallas disponibles
         final screens = [
-          const RiskCategoriesScreen(), // Índice 0 - Categorías
+          const CategoriesScreen(), // Índice 0 - Categorías
           RatingScreen(navigationData: {
             'eventId': widget.eventId,
             'formId': widget.formId,
