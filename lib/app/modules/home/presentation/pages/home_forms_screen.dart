@@ -536,14 +536,16 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
           progressData: progress,
         ));
 
-        // Navegar directamente al RiskThreatAnalysisScreen con los datos del formulario
+        // Navegar al RiskThreatAnalysisScreen (siempre empieza en CategoriesScreen)
+        // Convertir eventName a eventId usando RiskEventFactory
+        final riskEvent = RiskEventFactory.getEventByName(completeForm.eventName);
+        final eventId = riskEvent?.id ?? completeForm.eventName; // Fallback al nombre si no se encuentra
+        
         final navigationData = {
-          'event': completeForm.eventName,
-          'loadSavedForm': true,
+          'eventId': eventId,
           'formId': completeForm.id,
           'showProgressInfo': true,
           'progressData': progress,
-          'targetIndex': 0, // Ir directamente a CategoriesScreen (índice 0)
         };
         
         if (!mounted) return;

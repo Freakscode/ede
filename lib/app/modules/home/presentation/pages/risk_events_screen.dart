@@ -76,11 +76,9 @@ class RiskEventsScreen extends StatelessWidget {
                       // Actualizar el estado del HomeBloc
                       homeBloc.add(SelectRiskEvent(riskEvent.name));
                       
-                      // Navegar directamente al RiskThreatAnalysisScreen con índice 0 (CategoriesScreen)
+                      // Navegar al RiskThreatAnalysisScreen (siempre empieza en CategoriesScreen)
                       final navigationData = {
-                        'event': riskEvent.name,
-                        'isNewForm': true,
-                        'targetIndex': 0, // Ir directamente a CategoriesScreen (índice 0)
+                        'eventId': riskEvent.id,
                       };
                       
                       context.go('/risk-threat-analysis', extra: navigationData);

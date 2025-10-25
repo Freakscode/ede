@@ -18,17 +18,16 @@ import '../models/form_mode.dart';
 import '../../../home/presentation/bloc/home_bloc.dart';
 import '../../../home/presentation/bloc/home_event.dart' as home_events;
 import 'package:caja_herramientas/app/shared/services/form_persistence_service.dart';
+import 'package:caja_herramientas/app/shared/models/risk_event_factory.dart';
 
 class RiskThreatAnalysisScreen extends StatefulWidget {
-  final String? event;
-  final int targetIndex;
+  final String? eventId;
   final String? formId;
   final String formMode; // 'create' | 'edit'
   
   const RiskThreatAnalysisScreen({
     super.key, 
-    this.event,
-    this.targetIndex = 0,
+    this.eventId,
     this.formId,
     this.formMode = 'create', // Por defecto 'create'
   });
@@ -47,8 +46,7 @@ class _RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
   @override
   void didUpdateWidget(covariant RiskThreatAnalysisScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.event != oldWidget.event || 
-        widget.targetIndex != oldWidget.targetIndex ||
+    if (widget.eventId != oldWidget.eventId || 
         widget.formId != oldWidget.formId ||
         widget.formMode != oldWidget.formMode) {
       _initializeScreen();
@@ -61,8 +59,7 @@ class _RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
     final homeBloc = context.read<HomeBloc>();
 
     print('=== RiskThreatAnalysisScreen Initialization ===');
-    print('Event: ${widget.event}');
-    print('Target Index: ${widget.targetIndex}');
+    print('Event ID: ${widget.eventId}');
     print('Form ID: ${widget.formId}');
     print('Form Mode: ${widget.formMode}');
 
@@ -71,12 +68,16 @@ class _RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
     bloc.add(SetFormMode(formMode));
 
     // Configurar evento si está disponible
-    if (widget.event != null && widget.event!.isNotEmpty) {
-      bloc.add(UpdateSelectedRiskEvent(widget.event!));
+    if (widget.eventId != null && widget.eventId!.isNotEmpty) {
+      // Convertir eventId a eventName usando RiskEventFactory
+      final riskEvent = RiskEventFactory.getEventById(widget.eventId!);
+      if (riskEvent != null) {
+        bloc.add(UpdateSelectedRiskEvent(riskEvent.name));
+      }
     }
 
-    // Establecer índice de navegación
-    bloc.add(ChangeBottomNavIndex(widget.targetIndex));
+    // Establecer índice de navegación (siempre empezar en CategoriesScreen - índice 0)
+    bloc.add(ChangeBottomNavIndex(0));
 
     // Manejar datos del formulario según el modo
     if (formMode.isCreate) {
@@ -180,7 +181,7 @@ class _RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
         final screens = [
           const RiskCategoriesScreen(), // Índice 0 - Categorías
           RatingScreen(navigationData: {
-            'event': widget.event,
+            'eventId': widget.eventId,
             'formId': widget.formId,
             'formMode': widget.formMode,
           }), // Índice 1 - Calificación

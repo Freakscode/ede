@@ -63,44 +63,15 @@ GoRouter getAppRouter(BuildContext context) {
       GoRoute(
         path: '/risk-threat-analysis',
         builder: (context, state) {
-          // Manejar tanto String (compatibilidad) como Map (nuevo formato)
-          if (state.extra is Map<String, dynamic>) {
-            final navigationData = state.extra as Map<String, dynamic>;
-            
-            // Determinar el modo basándose en los datos de navegación
-            final isNewForm = navigationData['isNewForm'] as bool? ?? false;
-            final loadSavedForm = navigationData['loadSavedForm'] as bool? ?? false;
-            
-            // Determinar el modo del formulario
-            String formMode;
-            if (isNewForm) {
-              formMode = 'create';
-            } else if (loadSavedForm) {
-              formMode = 'edit';
-            } else {
-              // Verificar si hay un formulario activo
-              final homeBloc = context.read<HomeBloc>();
-              final homeState = homeBloc.state;
-              formMode = (homeState.activeFormId != null && homeState.activeFormId!.isNotEmpty) 
-                  ? 'edit' 
-                  : 'create';
-            }
-            
-            return RiskThreatAnalysisScreen(
-              event: navigationData['event'] as String?,
-              targetIndex: navigationData['targetIndex'] as int? ?? 0,
-              formId: navigationData['formId'] as String?,
-              formMode: formMode,
-            );
-          } else {
-            final selectedEvent = state.extra as String?;
-            return RiskThreatAnalysisScreen(
-              event: selectedEvent,
-              targetIndex: 0,
-              formId: null,
-              formMode: 'create', // Por defecto para compatibilidad
-            );
-          }
+          final navigationData = state.extra as Map<String, dynamic>? ?? {};
+          final formId = navigationData['formId'] as String?;
+          final formMode = (formId != null && formId.isNotEmpty) ? 'edit' : 'create';
+          
+          return RiskThreatAnalysisScreen(
+            eventId: navigationData['eventId'] as String?,
+            formId: navigationData['formId'] as String?,
+            formMode: formMode,
+          );
         },
       ),
       
