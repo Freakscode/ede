@@ -261,6 +261,7 @@ class _RatingScreenState extends State<RatingScreen> {
                   
                   return Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       // Título de calificación dinámico
                       Expanded(

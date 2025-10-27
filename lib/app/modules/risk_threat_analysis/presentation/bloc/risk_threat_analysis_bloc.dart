@@ -789,20 +789,28 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
   /// Método de compatibilidad temporal
   Color getThreatBackgroundColor() {
     try {
-      final formData = getCurrentFormData();
-      final globalScoreInfo = _calculateGlobalScoreUseCase.getGlobalScoreInfo(formData);
-      
-      // Determinar qué score usar según la clasificación actual
       double score;
       Color color;
       
       if ((state.selectedClassification ?? '').toLowerCase() == 'amenaza') {
+        // Para amenaza, usar el use case
+        final formData = getCurrentFormData();
+        final globalScoreInfo = _calculateGlobalScoreUseCase.getGlobalScoreInfo(formData);
         score = globalScoreInfo['amenazaScore'] ?? 0.0;
         color = globalScoreInfo['amenazaColor'] ?? DAGRDColors.outlineVariant;
       } else if ((state.selectedClassification ?? '').toLowerCase() == 'vulnerabilidad') {
-        score = globalScoreInfo['vulnerabilidadScore'] ?? 0.0;
-        color = globalScoreInfo['vulnerabilidadColor'] ?? DAGRDColors.outlineVariant;
+        // Para vulnerabilidad, calcular del promedio de los scores
+        final scores = state.subClassificationScores.values.toList();
+        if (scores.isNotEmpty && scores.any((s) => s > 0)) {
+          score = scores.where((s) => s > 0).reduce((a, b) => a + b) / scores.where((s) => s > 0).length;
+          color = _getColorFromScore(score);
+        } else {
+          score = 0.0;
+          color = DAGRDColors.outlineVariant;
+        }
       } else {
+        final formData = getCurrentFormData();
+        final globalScoreInfo = _calculateGlobalScoreUseCase.getGlobalScoreInfo(formData);
         score = globalScoreInfo['finalScore'] ?? 0.0;
         color = globalScoreInfo['finalColor'] ?? DAGRDColors.outlineVariant;
       }
@@ -817,24 +825,47 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
       return DAGRDColors.outlineVariant; // #D1D5DB
     }
   }
+  
+  /// Helper para obtener color desde score
+  Color _getColorFromScore(double score) {
+    if (score <= 1.5) {
+      return DAGRDColors.nivelBajo;
+    } else if (score <= 2.5) {
+      return DAGRDColors.nivelMedioBajo;
+    } else if (score <= 3.5) {
+      return DAGRDColors.nivelMedioAlto;
+    } else if (score <= 4.5) {
+      return DAGRDColors.nivelAlto;
+    } else {
+      return Colors.deepPurple;
+    }
+  }
 
   /// Método de compatibilidad temporal
   String getFormattedThreatRating() {
     try {
-      final formData = getCurrentFormData();
-      final globalScoreInfo = _calculateGlobalScoreUseCase.getGlobalScoreInfo(formData);
-      
-      // Determinar qué score usar según la clasificación actual
       double score;
       String level;
       
       if ((state.selectedClassification ?? '').toLowerCase() == 'amenaza') {
+        // Para amenaza, calcular del promedio de probabilidad e intensidad
+        final formData = getCurrentFormData();
+        final globalScoreInfo = _calculateGlobalScoreUseCase.getGlobalScoreInfo(formData);
         score = globalScoreInfo['amenazaScore'] ?? 0.0;
         level = globalScoreInfo['amenazaLevel'] ?? 'SIN CALIFICAR';
       } else if ((state.selectedClassification ?? '').toLowerCase() == 'vulnerabilidad') {
-        score = globalScoreInfo['vulnerabilidadScore'] ?? 0.0;
-        level = globalScoreInfo['vulnerabilidadLevel'] ?? 'SIN CALIFICAR';
+        // Para vulnerabilidad, usar los scores ya calculados en el state
+        final scores = state.subClassificationScores.values.toList();
+        if (scores.isNotEmpty && scores.any((s) => s > 0)) {
+          score = scores.where((s) => s > 0).reduce((a, b) => a + b) / scores.where((s) => s > 0).length;
+          level = _getLevelFromScore(score);
+        } else {
+          score = 0.0;
+          level = 'SIN CALIFICAR';
+        }
       } else {
+        final formData = getCurrentFormData();
+        final globalScoreInfo = _calculateGlobalScoreUseCase.getGlobalScoreInfo(formData);
         score = globalScoreInfo['finalScore'] ?? 0.0;
         level = globalScoreInfo['finalLevel'] ?? 'SIN CALIFICAR';
       }
@@ -849,35 +880,58 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
       return 'SIN CALIFICAR';
     }
   }
+  
+  /// Helper para obtener nivel desde score
+  String _getLevelFromScore(double score) {
+    if (score >= 1.0 && score <= 1.75) {
+      return 'BAJO';
+    } else if (score > 1.75 && score <= 2.5) {
+      return 'MEDIO - BAJO';
+    } else if (score > 2.5 && score <= 3.25) {
+      return 'MEDIO - ALTO';
+    } else if (score > 3.25 && score <= 4.0) {
+      return 'ALTO';
+    } else {
+      return 'SIN CALIFICAR';
+    }
+  }
 
   /// Método de compatibilidad temporal
   Color getThreatTextColor() {
     try {
-      final formData = getCurrentFormData();
-      final globalScoreInfo = _calculateGlobalScoreUseCase.getGlobalScoreInfo(formData);
-      
-      // Determinar qué score usar según la clasificación actual
       double score;
-      Color color;
+      Color bgColor;
       
       if ((state.selectedClassification ?? '').toLowerCase() == 'amenaza') {
+        final formData = getCurrentFormData();
+        final globalScoreInfo = _calculateGlobalScoreUseCase.getGlobalScoreInfo(formData);
         score = globalScoreInfo['amenazaScore'] ?? 0.0;
-        color = globalScoreInfo['amenazaColor'] ?? Colors.grey;
+        bgColor = globalScoreInfo['amenazaColor'] ?? Colors.grey;
       } else if ((state.selectedClassification ?? '').toLowerCase() == 'vulnerabilidad') {
-        score = globalScoreInfo['vulnerabilidadScore'] ?? 0.0;
-        color = globalScoreInfo['vulnerabilidadColor'] ?? Colors.grey;
+        // Para vulnerabilidad, calcular del promedio de los scores
+        final scores = state.subClassificationScores.values.toList();
+        if (scores.isNotEmpty && scores.any((s) => s > 0)) {
+          score = scores.where((s) => s > 0).reduce((a, b) => a + b) / scores.where((s) => s > 0).length;
+          bgColor = _getColorFromScore(score);
+        } else {
+          score = 0.0;
+          bgColor = DAGRDColors.outlineVariant;
+        }
       } else {
+        final formData = getCurrentFormData();
+        final globalScoreInfo = _calculateGlobalScoreUseCase.getGlobalScoreInfo(formData);
         score = globalScoreInfo['finalScore'] ?? 0.0;
-        color = globalScoreInfo['finalColor'] ?? Colors.grey;
+        bgColor = globalScoreInfo['finalColor'] ?? Colors.grey;
       }
       
       // Si no hay score (0.0), devolver negro para texto sobre fondo gris
       if (score == 0.0) {
-    return Colors.black;
+        return Colors.black;
       }
       
       // Retornar color de texto basado en el color de fondo
-      return color == Colors.grey ? Colors.black : Colors.white;
+      // Todos los colores DAGRD usan texto blanco excepto el gris
+      return bgColor == DAGRDColors.outlineVariant ? Colors.black : Colors.white;
     } catch (e) {
       return Colors.black;
     }

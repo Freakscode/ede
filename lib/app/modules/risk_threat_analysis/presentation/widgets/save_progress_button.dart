@@ -77,17 +77,10 @@ class SaveProgressButton extends StatelessWidget {
     final homeState = homeBloc.state;
     final authService = AuthService();
 
-    print('=== SaveProgressButton: Iniciando guardado ===');
-    print('Evento seleccionado: ${state.selectedRiskEvent ?? ''}');
-    print('Clasificación seleccionada: ${state.selectedClassification ?? ''}');
-    print('isCreatingNew: ${homeState.isCreatingNew}');
-    print('activeFormId: ${homeState.activeFormId}');
-    print('Usuario autenticado: ${authService.isLoggedIn}');
-    print('Usuario actual: ${authService.currentUser?.nombre}');
+   
     
     // Verificar que tenemos datos mínimos para guardar
     if ((state.selectedRiskEvent ?? '').isEmpty || (state.selectedClassification ?? '').isEmpty) {
-      print('ERROR: No hay datos suficientes para guardar');
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -100,9 +93,7 @@ class SaveProgressButton extends StatelessWidget {
     }
 
     // Usar datos pasados como parámetros o consultar del bloc como fallback
-    print('=== PROCESANDO DATOS DE CONTACTO E INSPECCIÓN ===');
-    print('Usuario autenticado: ${authService.isLoggedIn}');
-    print('Usuario actual: ${authService.currentUser?.nombre}');
+    ;
     
     // Determinar datos según el estado de autenticación
     Map<String, dynamic> contactData = {};
