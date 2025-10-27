@@ -822,10 +822,30 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
           return DAGRDColors.outlineVariant;
         }
         
-        // Para vulnerabilidad, calcular del promedio de los scores
-        final scores = state.subClassificationScores.values.toList();
-        if (scores.isNotEmpty && scores.any((s) => s > 0)) {
-          score = scores.where((s) => s > 0).reduce((a, b) => a + b) / scores.where((s) => s > 0).length;
+        // Para vulnerabilidad, calcular con promedio PONDERADO
+        // Pesos según Excel: FRAGILIDAD FÍSICA: 45%, FRAGILIDAD EN PERSONAS: 10%, EXPOSICIÓN: 45%
+        final Map<String, double> pesos = {
+          'fragilidad_fisica': 0.45,
+          'fragilidad_personas': 0.10,
+          'exposicion': 0.45,
+        };
+        
+        double weightedSum = 0.0;
+        int count = 0;
+        
+        for (final entry in state.subClassificationScores.entries) {
+          final subClassificationId = entry.key;
+          final subScore = entry.value;
+          final peso = pesos[subClassificationId] ?? 0.0;
+          
+          if (subScore > 0 && peso > 0) {
+            weightedSum += (subScore * peso);
+            count++;
+          }
+        }
+        
+        if (count > 0 && weightedSum > 0) {
+          score = weightedSum; // Los pesos ya suman 1.0
           color = _getColorFromScore(score);
         } else {
           score = 0.0;
@@ -900,10 +920,30 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
           return 'SIN CALIFICAR';
         }
         
-        // Usar los scores ya calculados en el state
-        final scores = state.subClassificationScores.values.toList();
-        if (scores.isNotEmpty && scores.any((s) => s > 0)) {
-          score = scores.where((s) => s > 0).reduce((a, b) => a + b) / scores.where((s) => s > 0).length;
+        // Usar los scores ya calculados en el state con promedio PONDERADO
+        // Pesos según Excel: FRAGILIDAD FÍSICA: 45%, FRAGILIDAD EN PERSONAS: 10%, EXPOSICIÓN: 45%
+        final Map<String, double> pesos = {
+          'fragilidad_fisica': 0.45,
+          'fragilidad_personas': 0.10,
+          'exposicion': 0.45,
+        };
+        
+        double weightedSum = 0.0;
+        int count = 0;
+        
+        for (final entry in state.subClassificationScores.entries) {
+          final subClassificationId = entry.key;
+          final subScore = entry.value;
+          final peso = pesos[subClassificationId] ?? 0.0;
+          
+          if (subScore > 0 && peso > 0) {
+            weightedSum += (subScore * peso);
+            count++;
+          }
+        }
+        
+        if (count > 0 && weightedSum > 0) {
+          score = weightedSum; // Los pesos ya suman 1.0, no necesitamos dividir
           level = _getLevelFromScore(score);
         } else {
           score = 0.0;
@@ -985,10 +1025,30 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
           return Colors.black;
         }
         
-        // Para vulnerabilidad, calcular del promedio de los scores
-        final scores = state.subClassificationScores.values.toList();
-        if (scores.isNotEmpty && scores.any((s) => s > 0)) {
-          score = scores.where((s) => s > 0).reduce((a, b) => a + b) / scores.where((s) => s > 0).length;
+        // Para vulnerabilidad, calcular con promedio PONDERADO
+        // Pesos según Excel: FRAGILIDAD FÍSICA: 45%, FRAGILIDAD EN PERSONAS: 10%, EXPOSICIÓN: 45%
+        final Map<String, double> pesos = {
+          'fragilidad_fisica': 0.45,
+          'fragilidad_personas': 0.10,
+          'exposicion': 0.45,
+        };
+        
+        double weightedSum = 0.0;
+        int count = 0;
+        
+        for (final entry in state.subClassificationScores.entries) {
+          final subClassificationId = entry.key;
+          final subScore = entry.value;
+          final peso = pesos[subClassificationId] ?? 0.0;
+          
+          if (subScore > 0 && peso > 0) {
+            weightedSum += (subScore * peso);
+            count++;
+          }
+        }
+        
+        if (count > 0 && weightedSum > 0) {
+          score = weightedSum; // Los pesos ya suman 1.0
           bgColor = _getColorFromScore(score);
         } else {
           score = 0.0;
@@ -1099,6 +1159,14 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
   /// Método centralizado para calcular el score de una sección
   String calculateSectionScore(String subClassificationId) {
     final categories = getCategoriesForCurrentSubClassification(subClassificationId);
+    
+    // Si existe un score pre-calculado en el state, usarlo
+    if (state.subClassificationScores.containsKey(subClassificationId)) {
+      final score = state.subClassificationScores[subClassificationId] ?? 0.0;
+      return score.toStringAsFixed(2).replaceAll('.', ',');
+    }
+    
+    // Si no hay score pre-calculado, calcular con promedio SIMPLE para compatibilidad
     final validRatings = <int>[];
     
     for (final category in categories) {
@@ -1386,19 +1454,11 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
       double sumCalificacionPorWi = 0.0;
       double sumWi = 0.0;
       
-      print('=== DEBUG _calculateWeightedAverage ===');
-      print('SubClassification: $subClassificationId');
-      print('Selected classification: ${state.selectedClassification}');
-      print('Selections recibidas: $selections');
-      print('Categorías en subClassification: ${subClassification.categories.length}');
-      
       for (final category in subClassification.categories) {
         final selectedLevel = selections[category.title];
-        print('Buscando categoría: "${category.title}" -> Encontrado: "${selectedLevel}"');
         
         if (selectedLevel != null && selectedLevel.isNotEmpty && selectedLevel != 'NA') {
           final calificacion = _getSelectedLevelValue(category.title, {category.title: selectedLevel});
-          print('  Calificación: $calificacion, wi: ${category.wi}');
           if (calificacion > 0) { 
             sumCalificacionPorWi += (calificacion * category.wi);
             sumWi += category.wi;
@@ -1406,13 +1466,7 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
         }
       }
       
-      final result = sumWi > 0 ? sumCalificacionPorWi / sumWi : 0.0;
-      print('Resultado calculado: $result');
-      print('Resultado con 2 decimales: ${result.toStringAsFixed(2)}');
-      print('Resultado con 1 decimal: ${result.toStringAsFixed(1)}');
-      print('=======================================');
-      
-      return result;
+      return sumWi > 0 ? sumCalificacionPorWi / sumWi : 0.0;
       
     } catch (e) {
       return _calculateSimpleAverage(subClassificationId, selections);

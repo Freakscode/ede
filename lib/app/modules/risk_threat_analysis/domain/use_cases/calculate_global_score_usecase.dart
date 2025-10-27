@@ -28,24 +28,17 @@ class CalculateGlobalScoreUseCase {
         formData['amenazaIntensidadSelections'] ?? {}
       );
       
-      print('=== DEBUG AMENAZA ===');
-      print('Evento: $eventName');
-      print('Probabilidad selections: $probabilidadSelections');
-      print('Intensidad selections: $intensidadSelections');
-      
       double probabilidadScore = 0.0;
       double intensidadScore = 0.0;
       
       // Calcular score de probabilidad si hay datos
       if (probabilidadSelections.isNotEmpty) {
         probabilidadScore = _calculateAverageFromSelections(probabilidadSelections, eventName);
-        print('Probabilidad score calculado: $probabilidadScore');
       }
       
       // Calcular score de intensidad si hay datos
       if (intensidadSelections.isNotEmpty) {
         intensidadScore = _calculateAverageFromSelections(intensidadSelections, eventName);
-        print('Intensidad score calculado: $intensidadScore');
       }
       
       // Si ambos son 0, no hay calificaciones
@@ -56,9 +49,6 @@ class CalculateGlobalScoreUseCase {
       // Calcular score global (promedio ponderado)
       // Probabilidad tiene peso 0.4, Intensidad tiene peso 0.6
       final globalScore = (probabilidadScore * 0.4) + (intensidadScore * 0.6);
-      
-      print('Score global calculado: $globalScore');
-      print('====================');
       
       return globalScore;
     } catch (e) {
@@ -79,21 +69,27 @@ class CalculateGlobalScoreUseCase {
         return 0.0;
       }
 
-      double totalScore = 0.0;
-      int count = 0;
+      // Pesos según Excel: FRAGILIDAD FÍSICA: 45%, FRAGILIDAD EN PERSONAS: 10%, EXPOSICIÓN: 45%
+      final Map<String, double> pesos = {
+        'fragilidad_fisica': 0.45,
+        'fragilidad_personas': 0.10,
+        'exposicion': 0.45,
+      };
 
-      // Calcular score para cada subclasificación de vulnerabilidad
+      double weightedSum = 0.0;
+
+      // Calcular score ponderado para cada subclasificación de vulnerabilidad
       for (final subClassificationId in vulnerabilidadSelections.keys) {
         final score = _calculateScoreUseCase.execute(subClassificationId, formData);
-        if (score > 0) {
-          totalScore += score;
-          count++;
+        final peso = pesos[subClassificationId] ?? 0.0;
+        
+        if (score > 0 && peso > 0) {
+          weightedSum += (score * peso);
         }
       }
 
-      final result = count > 0 ? totalScore / count : 0.0;
-      
-      return result;
+      // Los pesos ya suman 1.0, así que no necesitamos dividir
+      return weightedSum;
     } catch (e) {
       print('Error in calculateVulnerabilidadGlobalScore: $e');
       return 0.0;
@@ -151,8 +147,6 @@ class CalculateGlobalScoreUseCase {
     double totalPonderado = 0.0;
     double totalPeso = 0.0;
     
-    print('Calculando promedio PONDERADO de selecciones...');
-    
     // Iterar sobre cada categoría seleccionada
     for (final entry in selections.entries) {
       final categoryTitle = entry.key;
@@ -168,8 +162,6 @@ class CalculateGlobalScoreUseCase {
         // Obtener el peso (wi) de la categoría usando el ID
         final weight = weights[categoryId] ?? 1.0;
         
-        print('  Título: "$categoryTitle" -> Normalizado: "$normalizedTitle" -> ID: "$categoryId" -> Nivel: "$value" -> Score: $score, Peso: $weight');
-        
         if (score > 0 && weight > 0) {
           totalPonderado += (score * weight);
           totalPeso += weight;
@@ -177,9 +169,7 @@ class CalculateGlobalScoreUseCase {
       }
     }
     
-    final average = totalPeso > 0 ? totalPonderado / totalPeso : 0.0;
-    print('Promedio ponderado calculado: $average (Σwi*valor=${totalPonderado}, Σwi=${totalPeso})');
-    return average;
+    return totalPeso > 0 ? totalPonderado / totalPeso : 0.0;
   }
   
   /// Crear mapeo de títulos a IDs de categorías
@@ -201,7 +191,6 @@ class CalculateGlobalScoreUseCase {
       }
     }
     
-    print('Mapeo de títulos a IDs creado (${titleToId.length} entradas)');
     return titleToId;
   }
   
@@ -211,7 +200,6 @@ class CalculateGlobalScoreUseCase {
     final riskEvent = RiskEventFactory.getEventByName(eventName);
     
     if (riskEvent == null) {
-      print('Evento no encontrado: $eventName');
       return <String, double>{};
     }
     
@@ -224,12 +212,10 @@ class CalculateGlobalScoreUseCase {
         // Iterar sobre todas las categorías
         for (final category in subClassification.categories) {
           weights[category.id] = category.wi.toDouble();
-          print('  Categoría ID: ${category.id}, wi: ${category.wi}');
         }
       }
     }
     
-    print('Pesos obtenidos desde RiskEventFactory para evento: $eventName (${weights.length} categorías)');
     return weights;
   }
   
@@ -238,8 +224,6 @@ class CalculateGlobalScoreUseCase {
   double _levelToScore(String level) {
     // Normalizar el nivel: quitar saltos de línea, espacios extra, guiones
     final normalized = level.replaceAll('\n', ' ').trim().toLowerCase().replaceAll('-', ' ');
-    
-    print('  Normalizando nivel: "$level" -> "$normalized"');
     
     if (normalized.contains('muy bajo')) {
       return 1.0;

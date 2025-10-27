@@ -78,11 +78,10 @@ class _RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
       }
     }
 
-    // Establecer índice de navegación (solo si no hay datos previos)
-    final currentState = bloc.state;
-    if (currentState.selectedRiskEvent == null || currentState.selectedRiskEvent!.isEmpty) {
-      bloc.add(ChangeBottomNavIndex(0));
-    }
+    // Establecer índice de navegación a 0 (Categorías) siempre al inicializar
+    // Esto asegura que cuando abramos un formulario desde FormCardInProgress, 
+    // siempre empecemos desde Categorías (index 0)
+    bloc.add(ChangeBottomNavIndex(0));
 
     // Manejar datos del formulario según el modo
     if (formMode.isCreate) {
