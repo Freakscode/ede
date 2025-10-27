@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'calculate_score_usecase.dart';
+import 'package:caja_herramientas/app/shared/models/risk_event_factory.dart';
+import 'package:caja_herramientas/app/shared/models/risk_event_model.dart';
 
 /// Caso de uso para calcular scores globales de amenaza y vulnerabilidad
 /// Encapsula la lógica de negocio para cálculos de puntuación global
@@ -13,6 +15,9 @@ class CalculateGlobalScoreUseCase {
   /// Ejecutar el caso de uso para calcular score global de amenaza
   double calculateAmenazaGlobalScore(Map<String, dynamic> formData) {
     try {
+      // Obtener el nombre del evento
+      final eventName = formData['selectedRiskEvent']?.toString() ?? '';
+      
       // Buscar en amenaza probabilidad
       final probabilidadSelections = Map<String, dynamic>.from(
         formData['amenazaProbabilidadSelections'] ?? {}
@@ -23,17 +28,24 @@ class CalculateGlobalScoreUseCase {
         formData['amenazaIntensidadSelections'] ?? {}
       );
       
+      print('=== DEBUG AMENAZA ===');
+      print('Evento: $eventName');
+      print('Probabilidad selections: $probabilidadSelections');
+      print('Intensidad selections: $intensidadSelections');
+      
       double probabilidadScore = 0.0;
       double intensidadScore = 0.0;
       
       // Calcular score de probabilidad si hay datos
       if (probabilidadSelections.isNotEmpty) {
-        probabilidadScore = _calculateAverageFromSelections(probabilidadSelections);
+        probabilidadScore = _calculateAverageFromSelections(probabilidadSelections, eventName);
+        print('Probabilidad score calculado: $probabilidadScore');
       }
       
       // Calcular score de intensidad si hay datos
       if (intensidadSelections.isNotEmpty) {
-        intensidadScore = _calculateAverageFromSelections(intensidadSelections);
+        intensidadScore = _calculateAverageFromSelections(intensidadSelections, eventName);
+        print('Intensidad score calculado: $intensidadScore');
       }
       
       // Si ambos son 0, no hay calificaciones
@@ -42,11 +54,15 @@ class CalculateGlobalScoreUseCase {
       }
       
       // Calcular score global (promedio ponderado)
-      // Probabilidad tiene peso 0.6, Intensidad tiene peso 0.4
-      final globalScore = (probabilidadScore * 0.6) + (intensidadScore * 0.4);
+      // Probabilidad tiene peso 0.4, Intensidad tiene peso 0.6
+      final globalScore = (probabilidadScore * 0.4) + (intensidadScore * 0.6);
+      
+      print('Score global calculado: $globalScore');
+      print('====================');
       
       return globalScore;
     } catch (e) {
+      print('Error in calculateAmenazaGlobalScore: $e');
       return 0.0;
     }
   }
@@ -123,46 +139,126 @@ class CalculateGlobalScoreUseCase {
     }
   }
 
-  /// Calcular promedio de selecciones
-  double _calculateAverageFromSelections(Map<String, dynamic> selections) {
+  /// Calcular promedio ponderado de selecciones usando pesos (wi)
+  double _calculateAverageFromSelections(Map<String, dynamic> selections, String eventName) {
     if (selections.isEmpty) return 0.0;
     
-    double totalScore = 0.0;
-    int count = 0;
+    // Obtener los pesos y un mapeo de títulos a IDs
+    final riskEvent = RiskEventFactory.getEventByName(eventName);
+    final weights = _getAllCategoryWeights(eventName);
+    final titleToIdMap = _createTitleToIdMap(riskEvent);
     
-    for (final value in selections.values) {
-      if (value is String && value != 'No Aplica' && value != 'NA') {
+    double totalPonderado = 0.0;
+    double totalPeso = 0.0;
+    
+    print('Calculando promedio PONDERADO de selecciones...');
+    
+    // Iterar sobre cada categoría seleccionada
+    for (final entry in selections.entries) {
+      final categoryTitle = entry.key;
+      final value = entry.value;
+      
+      if (value is String && value != 'No Aplica' && value != 'NA' && value.isNotEmpty) {
+        // Convertir título a ID para buscar el peso
+        // Normalizar el título para eliminar diferencias de formato
+        final normalizedTitle = categoryTitle.replaceAll('\n', ' ').trim();
+        final categoryId = titleToIdMap[normalizedTitle] ?? titleToIdMap[categoryTitle] ?? categoryTitle;
         final score = _levelToScore(value);
-        if (score > 0) {
-          totalScore += score;
-          count++;
+        
+        // Obtener el peso (wi) de la categoría usando el ID
+        final weight = weights[categoryId] ?? 1.0;
+        
+        print('  Título: "$categoryTitle" -> Normalizado: "$normalizedTitle" -> ID: "$categoryId" -> Nivel: "$value" -> Score: $score, Peso: $weight');
+        
+        if (score > 0 && weight > 0) {
+          totalPonderado += (score * weight);
+          totalPeso += weight;
         }
       }
     }
     
-    return count > 0 ? totalScore / count : 0.0;
+    final average = totalPeso > 0 ? totalPonderado / totalPeso : 0.0;
+    print('Promedio ponderado calculado: $average (Σwi*valor=${totalPonderado}, Σwi=${totalPeso})');
+    return average;
+  }
+  
+  /// Crear mapeo de títulos a IDs de categorías
+  Map<String, String> _createTitleToIdMap(RiskEventModel? riskEvent) {
+    final titleToId = <String, String>{};
+    
+    if (riskEvent == null) return titleToId;
+    
+    for (final classification in riskEvent.classifications) {
+      for (final subClassification in classification.subClassifications) {
+        for (final category in subClassification.categories) {
+          // Normalizar el título (sin saltos de línea) como clave
+          final normalizedTitle = category.title.replaceAll('\n', ' ').trim();
+          titleToId[normalizedTitle] = category.id;
+          
+          // También agregar el título original con saltos de línea por si acaso
+          titleToId[category.title] = category.id;
+        }
+      }
+    }
+    
+    print('Mapeo de títulos a IDs creado (${titleToId.length} entradas)');
+    return titleToId;
+  }
+  
+  /// Obtener TODOS los pesos (wi) de las categorías para un evento específico
+  Map<String, double> _getAllCategoryWeights(String eventName) {
+    // Obtener el evento desde RiskEventFactory
+    final riskEvent = RiskEventFactory.getEventByName(eventName);
+    
+    if (riskEvent == null) {
+      print('Evento no encontrado: $eventName');
+      return <String, double>{};
+    }
+    
+    final weights = <String, double>{};
+    
+    // Iterar sobre todas las clasificaciones del evento
+    for (final classification in riskEvent.classifications) {
+      // Iterar sobre todas las subclasificaciones
+      for (final subClassification in classification.subClassifications) {
+        // Iterar sobre todas las categorías
+        for (final category in subClassification.categories) {
+          weights[category.id] = category.wi.toDouble();
+          print('  Categoría ID: ${category.id}, wi: ${category.wi}');
+        }
+      }
+    }
+    
+    print('Pesos obtenidos desde RiskEventFactory para evento: $eventName (${weights.length} categorías)');
+    return weights;
   }
   
   /// Convertir nivel de texto a score numérico
+  /// Valores según Excel: BAJO=1, MEDIO-BAJO=2, MEDIO-ALTO=3, ALTO=4
   double _levelToScore(String level) {
-    switch (level.toLowerCase()) {
-      case 'muy bajo':
-        return 1.0;
-      case 'bajo':
-        return 2.0;
-      case 'medio bajo':
-        return 2.5;
-      case 'medio':
-        return 3.0;
-      case 'medio alto':
-        return 3.5;
-      case 'alto':
-        return 4.0;
-      case 'muy alto':
-        return 5.0;
-      default:
-        return 0.0;
+    // Normalizar el nivel: quitar saltos de línea, espacios extra, guiones
+    final normalized = level.replaceAll('\n', ' ').trim().toLowerCase().replaceAll('-', ' ');
+    
+    print('  Normalizando nivel: "$level" -> "$normalized"');
+    
+    if (normalized.contains('muy bajo')) {
+      return 1.0;
+    } else if (normalized.contains('medio alto') || normalized.contains('medio-alto')) {
+      return 3.0;
+    } else if (normalized.contains('medio bajo') || normalized.contains('medio-bajo') || 
+               (normalized.contains('medio') && normalized.contains('bajo'))) {
+      return 2.0;
+    } else if (normalized.contains('medio') && !normalized.contains('alto') && !normalized.contains('bajo')) {
+      return 2.0;
+    } else if (normalized.contains('bajo') && !normalized.contains('alto')) {
+      return 1.0;
+    } else if (normalized.contains('alto') && !normalized.contains('muy')) {
+      return 4.0;
+    } else if (normalized.contains('muy alto') || normalized.contains('muy-alto')) {
+      return 5.0;
     }
+    
+    return 0.0;
   }
 
   /// Obtener información completa del score global

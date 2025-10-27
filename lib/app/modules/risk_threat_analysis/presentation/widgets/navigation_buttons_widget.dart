@@ -81,7 +81,7 @@ class NavigationButtonsWidget extends StatelessWidget {
         ),
 
         // Botón Continuar o Finalizar
-        if (currentIndex < 2) // Botón Continuar para las primeras dos pestañas
+        if (currentIndex < 3) // Botón Continuar para índices 0, 1, y 2
           InkWell(
             onTap:
                 onContinuePressed ??
@@ -112,7 +112,7 @@ class NavigationButtonsWidget extends StatelessWidget {
               ],
             ),
           )
-        else // Botón Finalizar para la última pestaña
+        else // Botón Finalizar para la pestaña de Resultados (índice 3)
           BlocBuilder<RiskThreatAnalysisBloc, RiskThreatAnalysisState>(
             builder: (context, state) {
               return InkWell(
@@ -132,83 +132,59 @@ class NavigationButtonsWidget extends StatelessWidget {
                           rightButtonText: 'Finalizar  ',
                           rightButtonIcon: Icons.check_circle,
                           onRightButtonPressed: () async {
-                            // Marcar el formulario como explícitamente completado
+                            // Guardar el progreso antes de finalizar
                             final homeBloc = context.read<HomeBloc>();
                             final homeState = homeBloc.state;
-
+                            final persistenceService = FormPersistenceService();
+                            final riskBloc = context.read<RiskThreatAnalysisBloc>();
+                            
                             if (homeState.activeFormId != null) {
-                              // Obtener el servicio de persistencia
-                              final FormPersistenceService persistenceService =
-                                  FormPersistenceService();
+                              // Actualizar formulario existente
                               final completeForm = await persistenceService
                                   .getCompleteForm(homeState.activeFormId!);
-
+                              
                               if (completeForm != null) {
-                                // Marcar como explícitamente completado
+                                final formData = riskBloc.getCurrentFormData();
+                                final now = DateTime.now();
+                                
+                                // Actualizar el formulario con los datos actuales
                                 final updatedForm = completeForm.copyWith(
-                                  isExplicitlyCompleted: true,
-                                  updatedAt: DateTime.now(),
+                                  amenazaProbabilidadSelections: formData['probabilidadSelections'] ?? completeForm.amenazaProbabilidadSelections,
+                                  amenazaIntensidadSelections: formData['intensidadSelections'] ?? completeForm.amenazaIntensidadSelections,
+                                  amenazaScores: formData['subClassificationScores'] ?? completeForm.amenazaScores,
+                                  amenazaColors: formData['subClassificationColors'] ?? completeForm.amenazaColors,
+                                  vulnerabilidadProbabilidadSelections: formData['probabilidadSelections'] ?? completeForm.vulnerabilidadProbabilidadSelections,
+                                  vulnerabilidadIntensidadSelections: formData['intensidadSelections'] ?? completeForm.vulnerabilidadIntensidadSelections,
+                                  vulnerabilidadScores: formData['subClassificationScores'] ?? completeForm.vulnerabilidadScores,
+                                  vulnerabilidadColors: formData['subClassificationColors'] ?? completeForm.vulnerabilidadColors,
+                                  evidenceImages: riskBloc.state.evidenceImages,
+                                  evidenceCoordinates: riskBloc.state.evidenceCoordinates,
+                                  updatedAt: now,
                                 );
 
                                 // Guardar el formulario actualizado
-                                await persistenceService.saveCompleteForm(
-                                  updatedForm,
-                                );
-
-                                // Recargar los formularios en HomeBloc
-                                homeBloc.add(LoadForms());
-
+                                await persistenceService.saveCompleteForm(updatedForm);
+                                
                                 // Mostrar mensaje de éxito
                                 CustomSnackBar.showSuccess(
                                   context,
-                                  title: 'Formulario completado',
-                                  message: 'El formulario ha sido completado exitosamente',
+                                  title: 'Progreso guardado',
+                                  message: 'El formulario ha sido guardado exitosamente',
                                 );
-
-                                // Navegar a la pantalla de formulario completado
-                                homeBloc.add(HomeShowFormCompletedScreen());
-                                context.go('/home');
+                                
+                                // Volver a Categorías (índice 0)
+                                context.read<RiskThreatAnalysisBloc>().add(
+                                  ChangeBottomNavIndex(0),
+                                );
+                                
+                                // Cerrar el diálogo
                                 Navigator.of(context).pop();
                               }
                             }
                           },
                         );
                       }
-                      // Si estamos en la última pestaña (índice 2), manejar finalización
-                      else if (currentIndex == 2) {
-                        final riskBloc = context.read<RiskThreatAnalysisBloc>();
-
-                        // Validar si hay variables sin calificar antes de finalizar
-                        if (riskBloc.hasUnqualifiedVariables()) {
-                          // Mostrar diálogo de formulario incompleto
-                          CustomActionDialog.show(
-                            context: context,
-                            title: 'Formulario incompleto',
-                            message:
-                                'Antes de finalizar, revisa el formulario. Algunas variables aún no han sido evaluadas',
-                            leftButtonText: 'Cancelar ',
-                            leftButtonIcon: Icons.close,
-                            rightButtonText: 'Revisar 2',
-                            rightButtonIcon: Icons.edit,
-                            onRightButtonPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                          );
-                          return;
-                        }
-
-                        // Si estamos en amenaza o vulnerabilidad, guardar avance y mostrar diálogo de confirmación
-                        if ((state.selectedClassification ?? '').toLowerCase() == 'amenaza' ||
-                            (state.selectedClassification ?? '').toLowerCase() == 'vulnerabilidad') {
-                          // Guardar avance antes de finalizar
-                          await _saveProgressBeforeFinalize(context, state, riskBloc);
-                        }
-                      } else {
-                        // Para las primeras dos pestañas, continuar a la siguiente
-                        context.read<RiskThreatAnalysisBloc>().add(
-                          ChangeBottomNavIndex(currentIndex + 1),
-                        );
-                      }
+                      // Solo ejecutar la lógica de finalización en índice 3 (Resultados)
                     },
                 child: Container(
                   width: 185,
@@ -252,7 +228,9 @@ class NavigationButtonsWidget extends StatelessWidget {
     );
   }
 
-  /// Guarda el progreso antes de finalizar el formulario
+  /// Método no utilizado actualmente (guardado para referencia futura)
+  /// TODO: Eliminar o re-implementar según necesidades
+  @Deprecated('Ya no se usa, la lógica de guardado está en índice 3')
   Future<void> _saveProgressBeforeFinalize(
     BuildContext context,
     RiskThreatAnalysisState state,

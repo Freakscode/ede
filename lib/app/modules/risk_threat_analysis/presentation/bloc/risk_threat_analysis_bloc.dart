@@ -928,14 +928,22 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
   }
   
   /// Helper para obtener nivel desde score
+  /// Rangos según Excel para escalas de 1-4:
+  /// BAJO: 1.0 - 1.75
+  /// MEDIO-BAJO: 1.76 - 2.5
+  /// MEDIO-ALTO: 2.51 - 3.25
+  /// ALTO: 3.26 - 4.0
   String _getLevelFromScore(double score) {
-    if (score >= 1.0 && score <= 1.75) {
+    // Redondear a 2 decimales para comparaciones precisas
+    final rounded = double.parse(score.toStringAsFixed(2));
+    
+    if (rounded >= 1.0 && rounded <= 1.75) {
       return 'BAJO';
-    } else if (score > 1.75 && score <= 2.5) {
+    } else if (rounded > 1.75 && rounded <= 2.5) {
       return 'MEDIO - BAJO';
-    } else if (score > 2.5 && score <= 3.25) {
+    } else if (rounded > 2.5 && rounded <= 3.25) {
       return 'MEDIO - ALTO';
-    } else if (score > 3.25 && score <= 4.0) {
+    } else if (rounded > 3.25 && rounded <= 4.0) {
       return 'ALTO';
     } else {
       return 'SIN CALIFICAR';
@@ -1312,6 +1320,10 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
         classification == 'amenaza' && subClassificationId == 'probabilidad') {
       return 'weighted_average';
     }
+    // Inundación y otros eventos también deben usar promedio ponderado
+    if (eventName == 'Inundación' || eventName == 'Movimiento en Masa' || eventName == 'Avenida Torrencial') {
+      return 'weighted_average';
+    }
     if (classification == 'vulnerabilidad') {
       return 'weighted_average';
     }
@@ -1374,10 +1386,19 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
       double sumCalificacionPorWi = 0.0;
       double sumWi = 0.0;
       
+      print('=== DEBUG _calculateWeightedAverage ===');
+      print('SubClassification: $subClassificationId');
+      print('Selected classification: ${state.selectedClassification}');
+      print('Selections recibidas: $selections');
+      print('Categorías en subClassification: ${subClassification.categories.length}');
+      
       for (final category in subClassification.categories) {
         final selectedLevel = selections[category.title];
+        print('Buscando categoría: "${category.title}" -> Encontrado: "${selectedLevel}"');
+        
         if (selectedLevel != null && selectedLevel.isNotEmpty && selectedLevel != 'NA') {
           final calificacion = _getSelectedLevelValue(category.title, {category.title: selectedLevel});
+          print('  Calificación: $calificacion, wi: ${category.wi}');
           if (calificacion > 0) { 
             sumCalificacionPorWi += (calificacion * category.wi);
             sumWi += category.wi;
@@ -1385,7 +1406,13 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
         }
       }
       
-      return sumWi > 0 ? sumCalificacionPorWi / sumWi : 0.0;
+      final result = sumWi > 0 ? sumCalificacionPorWi / sumWi : 0.0;
+      print('Resultado calculado: $result');
+      print('Resultado con 2 decimales: ${result.toStringAsFixed(2)}');
+      print('Resultado con 1 decimal: ${result.toStringAsFixed(1)}');
+      print('=======================================');
+      
+      return result;
       
     } catch (e) {
       return _calculateSimpleAverage(subClassificationId, selections);
@@ -1434,17 +1461,24 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
   }
 
   /// Obtener valor de nivel seleccionado (del código original)
+  /// Valores según Excel: BAJO=1, MEDIO-BAJO=2, MEDIO-ALTO=3, ALTO=4
   int _getSelectedLevelValue(String categoryTitle, Map<String, String> selections) {
     final selectedLevel = selections[categoryTitle];
     if (selectedLevel == null) return 0;
     if (selectedLevel == 'NA') return -1;
-    if (selectedLevel.contains('BAJO') && !selectedLevel.contains('MEDIO')) {
-      return 1;
-    } else if (selectedLevel.contains('MEDIO') && selectedLevel.contains('ALTO')) {
+    
+    // Normalizar el nivel
+    final normalized = selectedLevel.replaceAll('\n', ' ').trim();
+    
+    if (normalized.contains('MEDIO ALTO') || normalized.contains('MEDIO-ALTO')) {
       return 3;
-    } else if (selectedLevel.contains('MEDIO')) {
+    } else if (normalized.contains('MEDIO BAJO') || normalized.contains('MEDIO-BAJO')) {
       return 2;
-    } else if (selectedLevel.contains('ALTO')) {
+    } else if (normalized.contains('BAJO') && !normalized.contains('MEDIO')) {
+      return 1;
+    } else if (normalized.contains('MEDIO') && !normalized.contains('ALTO') && !normalized.contains('BAJO')) {
+      return 2;
+    } else if (normalized.contains('ALTO') && !normalized.contains('MEDIO')) {
       return 4;
     }
     return 0;

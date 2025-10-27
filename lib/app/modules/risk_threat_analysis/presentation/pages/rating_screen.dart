@@ -155,6 +155,7 @@ class _RatingScreenState extends State<RatingScreen> {
                     children: subClassifications.asMap().entries.map((entry) {
                       final index = entry.key;
                       final subClassification = entry.value;
+
                       
                       final dropdownKey = GlobalKey(debugLabel: 'dropdown_${subClassification.id}');
                       
