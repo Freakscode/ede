@@ -115,9 +115,30 @@ class NavigationButtonsWidget extends StatelessWidget {
         else // Botón Finalizar para la pestaña de Resultados (índice 3)
           BlocBuilder<RiskThreatAnalysisBloc, RiskThreatAnalysisState>(
             builder: (context, state) {
+              // Verificar si hay variables sin calificar
+              final riskBloc = context.read<RiskThreatAnalysisBloc>();
+              final formData = riskBloc.getCurrentFormData();
+              final hasUnqualifiedVariables = _hasUnqualifiedVariables(formData, state);
+              
               return InkWell(
-                onTap:
-                    onContinuePressed ??
+                onTap: hasUnqualifiedVariables 
+                      ? () {
+                        // Si hay variables sin calificar, mostrar diálogo de advertencia
+                        CustomActionDialog.show(
+                          context: context,
+                          title: 'Formulario incompleto',
+                          message: 'Antes de finalizar, revisa el formulario.\nAlgunas variables aún no han sido evaluadas',
+                          leftButtonText: 'Cancelar  ',
+                          leftButtonIcon: Icons.close,
+                          rightButtonText: 'Revisar  ',
+                          rightButtonIcon: Icons.edit,
+                          onRightButtonPressed: () {
+                            // Cerrar el diálogo
+                            Navigator.of(context).pop();
+                          },
+                        );
+                      }
+                    : onContinuePressed ??
                     () async {
                       // Si estamos en FinalRiskResultsScreen (índice 3), completar formulario
                       if (currentIndex == 3) {
@@ -126,7 +147,7 @@ class NavigationButtonsWidget extends StatelessWidget {
                           context: context,
                           title: 'Finalizar formulario',
                           message:
-                              ' ¿Deseas finalizar el formulario? Antes de finalizar, puedes revisar tus respuestas. ',
+                              '¿Deseas finalizar el formulario? Antes de finalizar, puedes revisar tus respuestas.',
                           leftButtonText: 'Revisar  ',
                           leftButtonIcon: Icons.close,
                           rightButtonText: 'Finalizar  ',
@@ -146,21 +167,47 @@ class NavigationButtonsWidget extends StatelessWidget {
                               if (completeForm != null) {
                                 final formData = riskBloc.getCurrentFormData();
                                 final now = DateTime.now();
+                                final state = riskBloc.state;
+                                final classification = (state.selectedClassification ?? '').toLowerCase();
                                 
                                 // Actualizar el formulario con los datos actuales
-                                final updatedForm = completeForm.copyWith(
-                                  amenazaProbabilidadSelections: formData['probabilidadSelections'] ?? completeForm.amenazaProbabilidadSelections,
-                                  amenazaIntensidadSelections: formData['intensidadSelections'] ?? completeForm.amenazaIntensidadSelections,
-                                  amenazaScores: formData['subClassificationScores'] ?? completeForm.amenazaScores,
-                                  amenazaColors: formData['subClassificationColors'] ?? completeForm.amenazaColors,
-                                  vulnerabilidadProbabilidadSelections: formData['probabilidadSelections'] ?? completeForm.vulnerabilidadProbabilidadSelections,
-                                  vulnerabilidadIntensidadSelections: formData['intensidadSelections'] ?? completeForm.vulnerabilidadIntensidadSelections,
-                                  vulnerabilidadScores: formData['subClassificationScores'] ?? completeForm.vulnerabilidadScores,
-                                  vulnerabilidadColors: formData['subClassificationColors'] ?? completeForm.vulnerabilidadColors,
-                                  evidenceImages: riskBloc.state.evidenceImages,
-                                  evidenceCoordinates: riskBloc.state.evidenceCoordinates,
-                                  updatedAt: now,
-                                );
+                                // Solo actualizar los campos correspondientes a la clasificación actual
+                                CompleteFormDataModel updatedForm;
+                                
+                                if (classification == 'amenaza') {
+                                  updatedForm = completeForm.copyWith(
+                                    amenazaSelections: formData['dynamicSelections'] ?? completeForm.amenazaSelections,
+                                    amenazaProbabilidadSelections: formData['probabilidadSelections'] ?? completeForm.amenazaProbabilidadSelections,
+                                    amenazaIntensidadSelections: formData['intensidadSelections'] ?? completeForm.amenazaIntensidadSelections,
+                                    amenazaScores: formData['subClassificationScores'] ?? completeForm.amenazaScores,
+                                    amenazaColors: formData['subClassificationColors'] ?? completeForm.amenazaColors,
+                                    amenazaSelectedProbabilidad: formData['selectedProbabilidad'] ?? completeForm.amenazaSelectedProbabilidad,
+                                    amenazaSelectedIntensidad: formData['selectedIntensidad'] ?? completeForm.amenazaSelectedIntensidad,
+                                    evidenceImages: riskBloc.state.evidenceImages,
+                                    evidenceCoordinates: riskBloc.state.evidenceCoordinates,
+                                    updatedAt: now,
+                                  );
+                                } else if (classification == 'vulnerabilidad') {
+                                  updatedForm = completeForm.copyWith(
+                                    vulnerabilidadSelections: formData['dynamicSelections'] ?? completeForm.vulnerabilidadSelections,
+                                    vulnerabilidadProbabilidadSelections: formData['probabilidadSelections'] ?? completeForm.vulnerabilidadProbabilidadSelections,
+                                    vulnerabilidadIntensidadSelections: formData['intensidadSelections'] ?? completeForm.vulnerabilidadIntensidadSelections,
+                                    vulnerabilidadScores: formData['subClassificationScores'] ?? completeForm.vulnerabilidadScores,
+                                    vulnerabilidadColors: formData['subClassificationColors'] ?? completeForm.vulnerabilidadColors,
+                                    vulnerabilidadSelectedProbabilidad: formData['selectedProbabilidad'] ?? completeForm.vulnerabilidadSelectedProbabilidad,
+                                    vulnerabilidadSelectedIntensidad: formData['selectedIntensidad'] ?? completeForm.vulnerabilidadSelectedIntensidad,
+                                    evidenceImages: riskBloc.state.evidenceImages,
+                                    evidenceCoordinates: riskBloc.state.evidenceCoordinates,
+                                    updatedAt: now,
+                                  );
+                                } else {
+                                  // Si no hay clasificación clara, actualizar ambos
+                                  updatedForm = completeForm.copyWith(
+                                    evidenceImages: riskBloc.state.evidenceImages,
+                                    evidenceCoordinates: riskBloc.state.evidenceCoordinates,
+                                    updatedAt: now,
+                                  );
+                                }
 
                                 // Guardar el formulario actualizado
                                 await persistenceService.saveCompleteForm(updatedForm);
@@ -465,6 +512,113 @@ class NavigationButtonsWidget extends StatelessWidget {
           message: 'Error al guardar avance: $e',
         );
       }
+    }
+  }
+
+  /// Verificar si hay variables sin calificar
+  bool _hasUnqualifiedVariables(
+    Map<String, dynamic> formData,
+    RiskThreatAnalysisState state,
+  ) {
+    try {
+      final classification = (state.selectedClassification ?? '').toLowerCase();
+      
+      // Extraer selecciones según el tipo de clasificación
+      Map<String, dynamic> amenazaSelections = {};
+      Map<String, dynamic> vulnerabilidadSelections = {};
+      Map<String, dynamic> probabilidadSelections = {};
+      Map<String, dynamic> intensidadSelections = {};
+      
+      // Obtener datos desde el formulario
+      if (classification == 'amenaza') {
+        probabilidadSelections = formData['amenazaProbabilidadSelections'] as Map<String, dynamic>? ?? 
+                                 formData['probabilidadSelections'] as Map<String, dynamic>? ?? {};
+        intensidadSelections = formData['amenazaIntensidadSelections'] as Map<String, dynamic>? ?? 
+                               formData['intensidadSelections'] as Map<String, dynamic>? ?? {};
+        amenazaSelections = formData['dynamicSelections'] as Map<String, dynamic>? ?? {};
+      } else if (classification == 'vulnerabilidad') {
+        vulnerabilidadSelections = formData['dynamicSelections'] as Map<String, dynamic>? ?? 
+                                    formData['vulnerabilidadSelections'] as Map<String, dynamic>? ?? {};
+      }
+
+      if (classification == 'amenaza') {
+        // Verificar amenaza: probabilidad, intensidad y amenazaSelections
+        
+        // Verificar que haya selecciones en amenaza
+        if (amenazaSelections.isEmpty) {
+          return true;
+        }
+        
+        // Verificar probabilidad
+        if (probabilidadSelections.isEmpty) {
+          return true;
+        }
+        
+        // Verificar que cada variable en probabilidad tenga un valor válido
+        for (var entry in probabilidadSelections.entries) {
+          if (entry.value == null || entry.value == '' || entry.value == 0) {
+            return true;
+          }
+        }
+        
+        // Verificar intensidad
+        if (intensidadSelections.isEmpty) {
+          return true;
+        }
+        
+        // Verificar que cada variable en intensidad tenga un valor válido
+        for (var entry in intensidadSelections.entries) {
+          if (entry.value == null || entry.value == '' || entry.value == 0) {
+            return true;
+          }
+        }
+      } else if (classification == 'vulnerabilidad') {
+        // Verificar vulnerabilidad: todas las subclasificaciones deben estar calificadas
+        
+        if (vulnerabilidadSelections.isEmpty) {
+          return true;
+        }
+        
+        // Subclasificaciones críticas de vulnerabilidad
+        final criticalSubClassifications = [
+          'fragilidad_fisica',
+          'fragilidad_personas', 
+          'exposicion'
+        ];
+        
+        // Verificar que cada subclasificación crítica esté presente y calificada
+        for (var subClassificationId in criticalSubClassifications) {
+          if (!vulnerabilidadSelections.containsKey(subClassificationId)) {
+            return true;
+          }
+          
+          final subClassificationData = vulnerabilidadSelections[subClassificationId];
+          
+          // Verificar que sea un mapa y que no esté vacío
+          if (subClassificationData is! Map || subClassificationData.isEmpty) {
+            return true;
+          }
+          
+          // Verificar que al menos una categoría tenga un valor
+          bool hasValue = false;
+          for (var value in subClassificationData.values) {
+            if (value != null && value != '' && value != 0 && value != 'Sin calificar') {
+              hasValue = true;
+              break;
+            }
+          }
+          
+          if (!hasValue) {
+            return true;
+          }
+        }
+      }
+      
+      return false;
+    } catch (e) {
+      print('Error verificando variables sin calificar: $e');
+      // En caso de error, permitir finalizar
+      return false;
     }
   }
 }
