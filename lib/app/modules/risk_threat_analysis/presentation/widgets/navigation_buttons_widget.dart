@@ -158,12 +158,12 @@ class NavigationButtonsWidget extends StatelessWidget {
                             final homeState = homeBloc.state;
                             final persistenceService = FormPersistenceService();
                             final riskBloc = context.read<RiskThreatAnalysisBloc>();
-                            
+
                             if (homeState.activeFormId != null) {
                               // Actualizar formulario existente
                               final completeForm = await persistenceService
                                   .getCompleteForm(homeState.activeFormId!);
-                              
+
                               if (completeForm != null) {
                                 final formData = riskBloc.getCurrentFormData();
                                 final now = DateTime.now();
@@ -246,11 +246,118 @@ class NavigationButtonsWidget extends StatelessWidget {
                                 // Guardar el formulario actualizado
                                 await persistenceService.saveCompleteForm(updatedForm);
                                 
+                                // Actualizar HomeBloc para indicar que ya no estamos creando nuevo
+                                if (context.mounted) {
+                                  context.read<HomeBloc>().add(
+                                    SetActiveFormId(formId: updatedForm.id, isCreatingNew: false),
+                                  );
+                                }
+                                
                                 // Mostrar mensaje de éxito
                                 CustomSnackBar.showSuccess(
                                   context,
                                   title: 'Progreso guardado',
                                   message: 'El formulario ha sido guardado exitosamente',
+                                );
+                                
+                                // Volver a Categorías (índice 0)
+                                context.read<RiskThreatAnalysisBloc>().add(
+                                  ChangeBottomNavIndex(0),
+                                );
+                                
+                                // Cerrar el diálogo
+                                Navigator.of(context).pop();
+                              } else {
+                                // No existe el formulario, crear uno nuevo
+                                final formData = riskBloc.getCurrentFormData();
+                                final now = DateTime.now();
+                                final state = riskBloc.state;
+                                final classification = (state.selectedClassification ?? '').toLowerCase();
+                                
+                                // Obtener datos de contacto e inspección
+                                final authService = AuthService();
+                                Map<String, dynamic> contactData = {};
+                                Map<String, dynamic> inspectionData = {};
+                                
+                                if (authService.isLoggedIn) {
+                                  final user = authService.currentUser;
+                                  contactData = {
+                                    'names': user?.nombre ?? '',
+                                    'cellPhone': user?.cedula ?? '',
+                                    'landline': '',
+                                    'email': user?.email ?? '',
+                                  };
+                                }
+                                
+                                // Filtrar scores por clasificación
+                                final allScoresNew = formData['subClassificationScores'] as Map<String, double>? ?? {};
+                                Map<String, double> amenazaScores = {};
+                                Map<String, double> vulnerabilidadScores = {};
+                                
+                                if (classification == 'amenaza') {
+                                  if (allScoresNew.containsKey('probabilidad')) {
+                                    amenazaScores['probabilidad'] = allScoresNew['probabilidad']!;
+                                  }
+                                  if (allScoresNew.containsKey('intensidad')) {
+                                    amenazaScores['intensidad'] = allScoresNew['intensidad']!;
+                                  }
+                                } else if (classification == 'vulnerabilidad') {
+                                  final vulnerabilidadKeys = ['fragilidad_fisica', 'fragilidad_personas', 'exposicion'];
+                                  for (final key in vulnerabilidadKeys) {
+                                    if (allScoresNew.containsKey(key)) {
+                                      vulnerabilidadScores[key] = allScoresNew[key]!;
+                                    }
+                                  }
+                                }
+                                
+                                // Convertir colores
+                                final colorsData = formData['subClassificationColors'] as Map<String, Color>? ?? {};
+                                final serializableColors = <String, Color>{};
+                                colorsData.forEach((key, value) {
+                                  serializableColors[key] = value;
+                                });
+                                
+                                final newFormId = '${state.selectedRiskEvent ?? ''}_complete_${now.millisecondsSinceEpoch}';
+                                
+                                final newCompleteForm = CompleteFormDataModel(
+                                  id: newFormId,
+                                  eventName: state.selectedRiskEvent ?? '',
+                                  contactData: contactData,
+                                  inspectionData: inspectionData,
+                                  amenazaSelections: classification == 'amenaza' ? (formData['dynamicSelections'] ?? {}) : {},
+                                  amenazaScores: amenazaScores,
+                                  amenazaColors: classification == 'amenaza' ? serializableColors : {},
+                                  amenazaProbabilidadSelections: classification == 'amenaza' ? (formData['probabilidadSelections'] ?? {}) : {},
+                                  amenazaIntensidadSelections: classification == 'amenaza' ? (formData['intensidadSelections'] ?? {}) : {},
+                                  amenazaSelectedProbabilidad: null,
+                                  amenazaSelectedIntensidad: null,
+                                  vulnerabilidadSelections: classification == 'vulnerabilidad' ? (formData['dynamicSelections'] ?? {}) : {},
+                                  vulnerabilidadScores: vulnerabilidadScores,
+                                  vulnerabilidadColors: classification == 'vulnerabilidad' ? serializableColors : {},
+                                  vulnerabilidadProbabilidadSelections: classification == 'vulnerabilidad' ? (formData['probabilidadSelections'] ?? {}) : {},
+                                  vulnerabilidadIntensidadSelections: classification == 'vulnerabilidad' ? (formData['intensidadSelections'] ?? {}) : {},
+                                  vulnerabilidadSelectedProbabilidad: null,
+                                  vulnerabilidadSelectedIntensidad: null,
+                                  evidenceImages: state.evidenceImages,
+                                  evidenceCoordinates: state.evidenceCoordinates,
+                                  createdAt: now,
+                                  updatedAt: now,
+                                );
+                                
+                                // Guardar el nuevo formulario
+                                await persistenceService.saveCompleteForm(newCompleteForm);
+                                await persistenceService.setActiveFormId(newCompleteForm.id);
+                                
+                                // Actualizar HomeBloc para indicar que ya no estamos creando nuevo
+                                context.read<HomeBloc>().add(
+                                  SetActiveFormId(formId: newCompleteForm.id, isCreatingNew: false),
+                                );
+
+                                // Mostrar mensaje de éxito
+                                CustomSnackBar.showSuccess(
+                                  context,
+                                  title: 'Formulario guardado',
+                                  message: 'El nuevo formulario ha sido guardado exitosamente',
                                 );
                                 
                                 // Volver a Categorías (índice 0)
