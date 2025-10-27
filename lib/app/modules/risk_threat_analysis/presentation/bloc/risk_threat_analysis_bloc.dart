@@ -793,12 +793,35 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
       Color color;
       
       if ((state.selectedClassification ?? '').toLowerCase() == 'amenaza') {
+        // Verificar si hay selecciones REALES del usuario
+        if (state.probabilidadSelections.isEmpty && state.intensidadSelections.isEmpty) {
+          return DAGRDColors.outlineVariant;
+        }
+        
         // Para amenaza, usar el use case
         final formData = getCurrentFormData();
         final globalScoreInfo = _calculateGlobalScoreUseCase.getGlobalScoreInfo(formData);
         score = globalScoreInfo['amenazaScore'] ?? 0.0;
         color = globalScoreInfo['amenazaColor'] ?? DAGRDColors.outlineVariant;
       } else if ((state.selectedClassification ?? '').toLowerCase() == 'vulnerabilidad') {
+        // Verificar si hay selecciones REALES del usuario
+        if (state.dynamicSelections.isEmpty) {
+          return DAGRDColors.outlineVariant;
+        }
+        
+        // Verificar si hay al menos una selección no vacía
+        bool hasValidSelections = false;
+        for (final entry in state.dynamicSelections.entries) {
+          if (entry.value.isNotEmpty) {
+            hasValidSelections = true;
+            break;
+          }
+        }
+        
+        if (!hasValidSelections) {
+          return DAGRDColors.outlineVariant;
+        }
+        
         // Para vulnerabilidad, calcular del promedio de los scores
         final scores = state.subClassificationScores.values.toList();
         if (scores.isNotEmpty && scores.any((s) => s > 0)) {
@@ -848,13 +871,36 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
       String level;
       
       if ((state.selectedClassification ?? '').toLowerCase() == 'amenaza') {
-        // Para amenaza, calcular del promedio de probabilidad e intensidad
+        // Para amenaza, verificar si hay selecciones REALES del usuario
+        if (state.probabilidadSelections.isEmpty && state.intensidadSelections.isEmpty) {
+          return 'SIN CALIFICAR';
+        }
+        
+        // Calcular del promedio de probabilidad e intensidad
         final formData = getCurrentFormData();
         final globalScoreInfo = _calculateGlobalScoreUseCase.getGlobalScoreInfo(formData);
         score = globalScoreInfo['amenazaScore'] ?? 0.0;
         level = globalScoreInfo['amenazaLevel'] ?? 'SIN CALIFICAR';
       } else if ((state.selectedClassification ?? '').toLowerCase() == 'vulnerabilidad') {
-        // Para vulnerabilidad, usar los scores ya calculados en el state
+        // Para vulnerabilidad, verificar si hay selecciones REALES del usuario
+        if (state.dynamicSelections.isEmpty) {
+          return 'SIN CALIFICAR';
+        }
+        
+        // Verificar si hay al menos una selección no vacía
+        bool hasValidSelections = false;
+        for (final entry in state.dynamicSelections.entries) {
+          if (entry.value.isNotEmpty) {
+            hasValidSelections = true;
+            break;
+          }
+        }
+        
+        if (!hasValidSelections) {
+          return 'SIN CALIFICAR';
+        }
+        
+        // Usar los scores ya calculados en el state
         final scores = state.subClassificationScores.values.toList();
         if (scores.isNotEmpty && scores.any((s) => s > 0)) {
           score = scores.where((s) => s > 0).reduce((a, b) => a + b) / scores.where((s) => s > 0).length;
@@ -903,11 +949,34 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
       Color bgColor;
       
       if ((state.selectedClassification ?? '').toLowerCase() == 'amenaza') {
+        // Verificar si hay selecciones REALES del usuario
+        if (state.probabilidadSelections.isEmpty && state.intensidadSelections.isEmpty) {
+          return Colors.black;
+        }
+        
         final formData = getCurrentFormData();
         final globalScoreInfo = _calculateGlobalScoreUseCase.getGlobalScoreInfo(formData);
         score = globalScoreInfo['amenazaScore'] ?? 0.0;
         bgColor = globalScoreInfo['amenazaColor'] ?? Colors.grey;
       } else if ((state.selectedClassification ?? '').toLowerCase() == 'vulnerabilidad') {
+        // Verificar si hay selecciones REALES del usuario
+        if (state.dynamicSelections.isEmpty) {
+          return Colors.black;
+        }
+        
+        // Verificar si hay al menos una selección no vacía
+        bool hasValidSelections = false;
+        for (final entry in state.dynamicSelections.entries) {
+          if (entry.value.isNotEmpty) {
+            hasValidSelections = true;
+            break;
+          }
+        }
+        
+        if (!hasValidSelections) {
+          return Colors.black;
+        }
+        
         // Para vulnerabilidad, calcular del promedio de los scores
         final scores = state.subClassificationScores.values.toList();
         if (scores.isNotEmpty && scores.any((s) => s > 0)) {
