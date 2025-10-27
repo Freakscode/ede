@@ -171,16 +171,36 @@ class NavigationButtonsWidget extends StatelessWidget {
                                 final classification = (state.selectedClassification ?? '').toLowerCase();
                                 
                                 // Actualizar el formulario con los datos actuales
-                                // Solo actualizar los campos correspondientes a la clasificación actual
+                                // Obtener scores y colores filtrados
+                                final allScoresUpdate = formData['subClassificationScores'] as Map<String, double>? ?? {};
+                                final allColorsUpdate = formData['subClassificationColors'] as Map<String, Color>? ?? {};
+                                
                                 CompleteFormDataModel updatedForm;
                                 
                                 if (classification == 'amenaza') {
+                                  // Para amenaza, solo guardar scores de probabilidad e intensidad
+                                  final amenazaScoresOnly = Map<String, double>.from(completeForm.amenazaScores);
+                                  final amenazaColorsOnly = Map<String, Color>.from(completeForm.amenazaColors);
+                                  
+                                  if (allScoresUpdate.containsKey('probabilidad')) {
+                                    amenazaScoresOnly['probabilidad'] = allScoresUpdate['probabilidad']!;
+                                  }
+                                  if (allScoresUpdate.containsKey('intensidad')) {
+                                    amenazaScoresOnly['intensidad'] = allScoresUpdate['intensidad']!;
+                                  }
+                                  if (allColorsUpdate.containsKey('probabilidad')) {
+                                    amenazaColorsOnly['probabilidad'] = allColorsUpdate['probabilidad']!;
+                                  }
+                                  if (allColorsUpdate.containsKey('intensidad')) {
+                                    amenazaColorsOnly['intensidad'] = allColorsUpdate['intensidad']!;
+                                  }
+                                  
                                   updatedForm = completeForm.copyWith(
                                     amenazaSelections: formData['dynamicSelections'] ?? completeForm.amenazaSelections,
                                     amenazaProbabilidadSelections: formData['probabilidadSelections'] ?? completeForm.amenazaProbabilidadSelections,
                                     amenazaIntensidadSelections: formData['intensidadSelections'] ?? completeForm.amenazaIntensidadSelections,
-                                    amenazaScores: formData['subClassificationScores'] ?? completeForm.amenazaScores,
-                                    amenazaColors: formData['subClassificationColors'] ?? completeForm.amenazaColors,
+                                    amenazaScores: amenazaScoresOnly,
+                                    amenazaColors: amenazaColorsOnly,
                                     amenazaSelectedProbabilidad: formData['selectedProbabilidad'] ?? completeForm.amenazaSelectedProbabilidad,
                                     amenazaSelectedIntensidad: formData['selectedIntensidad'] ?? completeForm.amenazaSelectedIntensidad,
                                     evidenceImages: riskBloc.state.evidenceImages,
@@ -188,12 +208,26 @@ class NavigationButtonsWidget extends StatelessWidget {
                                     updatedAt: now,
                                   );
                                 } else if (classification == 'vulnerabilidad') {
+                                  // Para vulnerabilidad, solo guardar scores de fragilidad_fisica, fragilidad_personas, exposicion
+                                  final vulnerabilidadScoresOnly = Map<String, double>.from(completeForm.vulnerabilidadScores);
+                                  final vulnerabilidadColorsOnly = Map<String, Color>.from(completeForm.vulnerabilidadColors);
+                                  
+                                  final vulnerabilidadKeys = ['fragilidad_fisica', 'fragilidad_personas', 'exposicion'];
+                                  for (final key in vulnerabilidadKeys) {
+                                    if (allScoresUpdate.containsKey(key)) {
+                                      vulnerabilidadScoresOnly[key] = allScoresUpdate[key]!;
+                                    }
+                                    if (allColorsUpdate.containsKey(key)) {
+                                      vulnerabilidadColorsOnly[key] = allColorsUpdate[key]!;
+                                    }
+                                  }
+                                  
                                   updatedForm = completeForm.copyWith(
                                     vulnerabilidadSelections: formData['dynamicSelections'] ?? completeForm.vulnerabilidadSelections,
                                     vulnerabilidadProbabilidadSelections: formData['probabilidadSelections'] ?? completeForm.vulnerabilidadProbabilidadSelections,
                                     vulnerabilidadIntensidadSelections: formData['intensidadSelections'] ?? completeForm.vulnerabilidadIntensidadSelections,
-                                    vulnerabilidadScores: formData['subClassificationScores'] ?? completeForm.vulnerabilidadScores,
-                                    vulnerabilidadColors: formData['subClassificationColors'] ?? completeForm.vulnerabilidadColors,
+                                    vulnerabilidadScores: vulnerabilidadScoresOnly,
+                                    vulnerabilidadColors: vulnerabilidadColorsOnly,
                                     vulnerabilidadSelectedProbabilidad: formData['selectedProbabilidad'] ?? completeForm.vulnerabilidadSelectedProbabilidad,
                                     vulnerabilidadSelectedIntensidad: formData['selectedIntensidad'] ?? completeForm.vulnerabilidadSelectedIntensidad,
                                     evidenceImages: riskBloc.state.evidenceImages,
@@ -416,11 +450,32 @@ class NavigationButtonsWidget extends StatelessWidget {
           );
         } else {
           completeForm = existingForm;
+        // Obtener scores y filtrar solo los relevantes para la clasificación actual
+        final allScores = formData['subClassificationScores'] as Map<String, double>? ?? {};
+        final allColors = formData['subClassificationColors'] as Map<String, Color>? ?? {};
+        
         if ((state.selectedClassification ?? '').toLowerCase() == 'amenaza') {
+          // Para amenaza, solo guardar scores de probabilidad e intensidad
+          final amenazaScoresOnly = Map<String, double>.from(completeForm.amenazaScores);
+          final amenazaColorsOnly = Map<String, Color>.from(completeForm.amenazaColors);
+          
+          if (allScores.containsKey('probabilidad')) {
+            amenazaScoresOnly['probabilidad'] = allScores['probabilidad']!;
+          }
+          if (allScores.containsKey('intensidad')) {
+            amenazaScoresOnly['intensidad'] = allScores['intensidad']!;
+          }
+          if (allColors.containsKey('probabilidad')) {
+            amenazaColorsOnly['probabilidad'] = allColors['probabilidad']!;
+          }
+          if (allColors.containsKey('intensidad')) {
+            amenazaColorsOnly['intensidad'] = allColors['intensidad']!;
+          }
+          
           completeForm = completeForm.copyWith(
             amenazaSelections: formData['dynamicSelections'] ?? completeForm.amenazaSelections,
-            amenazaScores: formData['subClassificationScores'] ?? completeForm.amenazaScores,
-            amenazaColors: formData['subClassificationColors'] ?? completeForm.amenazaColors,
+            amenazaScores: amenazaScoresOnly,
+            amenazaColors: amenazaColorsOnly,
             amenazaProbabilidadSelections: formData['probabilidadSelections'] ?? completeForm.amenazaProbabilidadSelections,
             amenazaIntensidadSelections: formData['intensidadSelections'] ?? completeForm.amenazaIntensidadSelections,
             amenazaSelectedProbabilidad: formData['selectedProbabilidad'] ?? completeForm.amenazaSelectedProbabilidad,
@@ -432,10 +487,24 @@ class NavigationButtonsWidget extends StatelessWidget {
             updatedAt: now,
           );
         } else if ((state.selectedClassification ?? '').toLowerCase() == 'vulnerabilidad') {
+          // Para vulnerabilidad, solo guardar scores de fragilidad_fisica, fragilidad_personas, exposicion
+          final vulnerabilidadScoresOnly = Map<String, double>.from(completeForm.vulnerabilidadScores);
+          final vulnerabilidadColorsOnly = Map<String, Color>.from(completeForm.vulnerabilidadColors);
+          
+          final vulnerabilidadKeys = ['fragilidad_fisica', 'fragilidad_personas', 'exposicion'];
+          for (final key in vulnerabilidadKeys) {
+            if (allScores.containsKey(key)) {
+              vulnerabilidadScoresOnly[key] = allScores[key]!;
+            }
+            if (allColors.containsKey(key)) {
+              vulnerabilidadColorsOnly[key] = allColors[key]!;
+            }
+          }
+          
           completeForm = completeForm.copyWith(
             vulnerabilidadSelections: formData['dynamicSelections'] ?? completeForm.vulnerabilidadSelections,
-            vulnerabilidadScores: formData['subClassificationScores'] ?? completeForm.vulnerabilidadScores,
-            vulnerabilidadColors: formData['subClassificationColors'] ?? completeForm.vulnerabilidadColors,
+            vulnerabilidadScores: vulnerabilidadScoresOnly,
+            vulnerabilidadColors: vulnerabilidadColorsOnly,
             vulnerabilidadProbabilidadSelections: formData['probabilidadSelections'] ?? completeForm.vulnerabilidadProbabilidadSelections,
             vulnerabilidadIntensidadSelections: formData['intensidadSelections'] ?? completeForm.vulnerabilidadIntensidadSelections,
             vulnerabilidadSelectedProbabilidad: formData['selectedProbabilidad'] ?? completeForm.vulnerabilidadSelectedProbabilidad,

@@ -169,7 +169,22 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
       final newSelections = Map<String, String>.from(state.probabilidadSelections);
       newSelections[event.category] = event.selection;
       
-      emit(state.copyWith(probabilidadSelections: newSelections));
+      // Recalcular score de probabilidad
+      final probabilidadScore = _calculateWeightedAverage(
+        'probabilidad',
+        newSelections,
+      );
+      
+      final updatedScores = Map<String, double>.from(state.subClassificationScores);
+      updatedScores['probabilidad'] = probabilidadScore;
+      final updatedColors = Map<String, Color>.from(state.subClassificationColors);
+      updatedColors['probabilidad'] = _scoreToColor(probabilidadScore);
+      
+      emit(state.copyWith(
+        probabilidadSelections: newSelections,
+        subClassificationScores: updatedScores,
+        subClassificationColors: updatedColors,
+      ));
     } catch (e) {
       emit(state.setError('Error al actualizar selección de probabilidad: $e'));
     }
@@ -183,7 +198,22 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
       final newSelections = Map<String, String>.from(state.intensidadSelections);
       newSelections[event.category] = event.selection;
       
-      emit(state.copyWith(intensidadSelections: newSelections));
+      // Recalcular score de intensidad
+      final intensidadScore = _calculateWeightedAverage(
+        'intensidad',
+        newSelections,
+      );
+      
+      final updatedScores = Map<String, double>.from(state.subClassificationScores);
+      updatedScores['intensidad'] = intensidadScore;
+      final updatedColors = Map<String, Color>.from(state.subClassificationColors);
+      updatedColors['intensidad'] = _scoreToColor(intensidadScore);
+      
+      emit(state.copyWith(
+        intensidadSelections: newSelections,
+        subClassificationScores: updatedScores,
+        subClassificationColors: updatedColors,
+      ));
     } catch (e) {
       emit(state.setError('Error al actualizar selección de intensidad: $e'));
     }
@@ -368,29 +398,14 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
           });
         }
         
-        // Fallback a subClassificationScores si no hay scores separados
-        if (evaluationData['subClassificationScores'] != null && combinedScores.isEmpty) {
+        // Mapear scores de probabilidad e intensidad si existen
+        if (evaluationData['subClassificationScores'] != null) {
           final subClassificationScores = Map<String, dynamic>.from(evaluationData['subClassificationScores']);
           subClassificationScores.forEach((key, value) {
             combinedScores[key] = (value is double) ? value : (value as num).toDouble();
           });
         }
         
-        // Si aún no hay scores, usar scores por defecto basados en las selecciones
-        if (combinedScores.isEmpty) {
-          // Calcular scores por defecto basados en las selecciones
-          if (probabilidadSelections.isNotEmpty) {
-            combinedScores['probabilidad'] = 2.0; // Score por defecto
-          }
-          if (intensidadSelections.isNotEmpty) {
-            combinedScores['intensidad'] = 2.0; // Score por defecto
-          }
-          if (dynamicSelections.isNotEmpty) {
-            dynamicSelections.forEach((key, value) {
-              combinedScores[key] = 2.0; // Score por defecto
-            });
-          }
-        }
         
         // Los colores se calculan dinámicamente basándose en los scores, no se guardan
         // No necesitamos mapear colores desde evaluationData
@@ -433,8 +448,27 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
           error: null,
         );
         
-        
         emit(newState);
+        
+        // Recalcular scores de amenaza si las selecciones están cargadas pero los scores no
+        if (event.classificationType.toLowerCase() == 'amenaza') {
+          if (currentProbabilidadSelections.isNotEmpty && !combinedScores.containsKey('probabilidad')) {
+            final probabilidadScore = _calculateWeightedAverage('probabilidad', currentProbabilidadSelections);
+            final intensidadScore = currentIntensidadSelections.isNotEmpty && !combinedScores.containsKey('intensidad')
+                ? _calculateWeightedAverage('intensidad', currentIntensidadSelections)
+                : combinedScores['intensidad'] ?? 0.0;
+            
+            final updatedScores = Map<String, double>.from(combinedScores);
+            updatedScores['probabilidad'] = probabilidadScore;
+            if (intensidadScore > 0) {
+              updatedScores['intensidad'] = intensidadScore;
+            }
+            
+            final finalState = newState.copyWith(subClassificationScores: updatedScores);
+            emit(finalState);
+          }
+        }
+        
         return;
         } catch (e) {
           // Continuar con el fallback
