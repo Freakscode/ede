@@ -47,6 +47,8 @@ class _RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
   @override
   void didUpdateWidget(covariant RiskThreatAnalysisScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
+    // Solo reinicializar si los parámetros críticos cambiaron
+    // NO reinicializar solo por navegación interna
     if (widget.eventId != oldWidget.eventId || 
         widget.formId != oldWidget.formId ||
         widget.formMode != oldWidget.formMode) {
@@ -76,8 +78,11 @@ class _RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
       }
     }
 
-    // Establecer índice de navegación (siempre empezar en CategoriesScreen - índice 0)
-    bloc.add(ChangeBottomNavIndex(0));
+    // Establecer índice de navegación (solo si no hay datos previos)
+    final currentState = bloc.state;
+    if (currentState.selectedRiskEvent == null || currentState.selectedRiskEvent!.isEmpty) {
+      bloc.add(ChangeBottomNavIndex(0));
+    }
 
     // Manejar datos del formulario según el modo
     if (formMode.isCreate) {
@@ -91,9 +96,17 @@ class _RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
 
   /// Maneja el modo de creación de formulario
   void _handleCreateMode(HomeBloc homeBloc) {
-    // Resetear estado del bloc
+    // Solo cerrar dropdowns abiertos, NO limpiar datos
     final bloc = context.read<RiskThreatAnalysisBloc>();
-    bloc.add(const ResetDropdowns());
+    
+    // Solo resetear dropdowns si no hay datos guardados
+    // Si hay selecciones, mantenerlas
+    final currentState = bloc.state;
+    if (currentState.probabilidadSelections.isEmpty && 
+        currentState.intensidadSelections.isEmpty && 
+        currentState.dynamicSelections.isEmpty) {
+      bloc.add(const ResetDropdowns());
+    }
     
     // Configurar como nuevo formulario en HomeBloc
     homeBloc.add(home_events.SetActiveFormId(formId: '', isCreatingNew: true));
