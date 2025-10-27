@@ -6,6 +6,7 @@ import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import 'package:caja_herramientas/app/shared/services/form_persistence_service.dart';
 import 'package:caja_herramientas/app/shared/models/complete_form_data_model.dart';
 import 'package:caja_herramientas/app/shared/widgets/dialogs/custom_action_dialog.dart';
+import 'package:caja_herramientas/app/shared/widgets/snackbars/custom_snackbar.dart';
 import 'package:caja_herramientas/app/modules/auth/services/auth_service.dart';
 import 'package:caja_herramientas/app/modules/data_registration/bloc/data_registration_bloc.dart';
 import 'package:caja_herramientas/app/modules/data_registration/bloc/data_registration_state.dart';
@@ -82,11 +83,10 @@ class SaveProgressButton extends StatelessWidget {
     // Verificar que tenemos datos mínimos para guardar
     if ((state.selectedRiskEvent ?? '').isEmpty || (state.selectedClassification ?? '').isEmpty) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('No hay datos suficientes para guardar'),
-            backgroundColor: Colors.red,
-          ),
+        CustomSnackBar.showError(
+          context,
+          title: 'Error',
+          message: 'No hay datos suficientes para guardar',
         );
       }
       return;
@@ -390,12 +390,10 @@ class SaveProgressButton extends StatelessWidget {
               Navigator.of(context).pop();
 
               if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Progreso guardado exitosamente'),
-                    duration: Duration(seconds: 2),
-                    backgroundColor: Colors.green,
-                  ),
+                CustomSnackBar.showSuccess(
+                  context,
+                  title: 'Progreso guardado',
+                  message: 'Progreso guardado exitosamente',
                 );
               }
             } catch (e) {
@@ -403,12 +401,10 @@ class SaveProgressButton extends StatelessWidget {
               Navigator.of(context).pop();
 
               if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Error al guardar: $e'),
-                    duration: const Duration(seconds: 3),
-                    backgroundColor: Colors.red,
-                  ),
+                CustomSnackBar.showError(
+                  context,
+                  title: 'Error al guardar',
+                  message: 'Error al guardar: $e',
                 );
               }
             }
@@ -419,12 +415,10 @@ class SaveProgressButton extends StatelessWidget {
       print('SaveProgressButton: Error al guardar progreso - $e');
 
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error al guardar progreso: $e'),
-            duration: const Duration(seconds: 3),
-            backgroundColor: Colors.red,
-          ),
+        CustomSnackBar.showError(
+          context,
+          title: 'Error',
+          message: 'Error al guardar progreso: $e',
         );
       }
     }
