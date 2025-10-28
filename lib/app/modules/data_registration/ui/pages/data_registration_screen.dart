@@ -1,3 +1,5 @@
+import 'package:caja_herramientas/app/core/constants/app_assets.dart';
+import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:caja_herramientas/app/shared/widgets/layouts/custom_app_bar.dart';
@@ -23,7 +25,7 @@ class _DataRegistrationScreenState extends State<DataRegistrationScreen> {
     super.initState();
     _contactFormKey = GlobalKey<FormState>();
     _inspectionFormKey = GlobalKey<FormState>();
-    
+
     // Resetear el formulario una sola vez al inicializar
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<DataRegistrationBloc>().add(const ResetAllForms());
@@ -34,7 +36,9 @@ class _DataRegistrationScreenState extends State<DataRegistrationScreen> {
   Widget build(BuildContext context) {
     return BlocBuilder<DataRegistrationBloc, DataRegistrationState>(
       builder: (context, state) {
-        final showInspectionForm = state is DataRegistrationData ? state.showInspectionForm : false;
+        final showInspectionForm = state is DataRegistrationData
+            ? state.showInspectionForm
+            : false;
 
         return Scaffold(
           appBar: CustomAppBar(
@@ -43,11 +47,38 @@ class _DataRegistrationScreenState extends State<DataRegistrationScreen> {
             showProfile: true,
             onBack: showInspectionForm ? _handleBackPressed : null,
           ),
-          body: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 37, vertical: 31),
-            child: showInspectionForm
-                ? InspectionFormWidget(formKey: _inspectionFormKey)
-                : ContactFormWidget(formKey: _contactFormKey),
+          body: Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 37,
+                    vertical: 31,
+                  ),
+                  child: showInspectionForm
+                      ? InspectionFormWidget(formKey: _inspectionFormKey)
+                      : ContactFormWidget(formKey: _contactFormKey),
+                ),
+              ),
+              // Footer con logos - siempre abajo del todo
+              Container(
+                width: double.infinity,
+                height: 110,
+                decoration: BoxDecoration(
+                  color: DAGRDColors.azulDAGRD,
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(24),
+                  ),
+                ),
+                child: Center(
+                  child: Image.asset(
+                    AppAssets.logoDagrdBomberosAlcaldia,
+                    height: 100,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
+            ],
           ),
         );
       },
