@@ -20,3 +20,5 @@ export 'tutorial_models.dart';
 export 'risk_events.dart';
 export 'risk_completion_progress.dart';
 export 'category_status_badge.dart';
+export 'infographic_card_widget.dart';
+export 'section_header_widget.dart';
