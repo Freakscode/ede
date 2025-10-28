@@ -177,99 +177,240 @@ class _EducationalMaterialScreenState extends State<EducationalMaterialScreen> {
   }
 
   Widget _buildContent() {
-    // Mostrar placeholder content por ahora
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: DAGRDColors.azulDAGRD.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: SvgPicture.asset(
-                _getIconForTab(_selectedTab),
-                width: 80,
-                height: 80,
-                colorFilter: const ColorFilter.mode(
-                  DAGRDColors.azulDAGRD,
-                  BlendMode.srcIn,
-                ),
-              ),
+    if (_selectedTab == 0) {
+      // Mostrar card de infografía
+      return _buildInfographicCard();
+    }
+    
+    // Para otros tabs, mostrar contenido simple
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: const Color(0xFFEBF2F8),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            _getTitleForTab(_selectedTab),
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: const Color(0xFF2C3E50),
+              fontFamily: 'Work Sans',
             ),
-            const SizedBox(height: 24),
-            Text(
-              _getTitleForTab(_selectedTab),
-              style: const TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                color: DAGRDColors.azulDAGRD,
-              ),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            _getDescriptionForTab(_selectedTab),
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w400,
+              color: const Color(0xFF5C6F80),
+              fontFamily: 'Work Sans',
             ),
-            const SizedBox(height: 12),
-            Text(
-              _getDescriptionForTab(_selectedTab),
-              style: TextStyle(
-                fontSize: 18,
-                color: Colors.grey.shade600,
-                fontWeight: FontWeight.w500,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 12,
-              ),
-              decoration: BoxDecoration(
-                color: Colors.orange.shade50,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                  color: Colors.orange.shade200,
-                  width: 1,
-                ),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.info_outline,
-                    color: Colors.orange.shade700,
-                    size: 20,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Contenido disponible próximamente',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.orange.shade700,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
-  String _getIconForTab(int index) {
-    switch (index) {
-      case 0:
-        return AppIcons.images;
-      case 1:
-        return AppIcons.video;
-      case 2:
-        return AppIcons.files;
-      default:
-        return AppIcons.book;
-    }
+  Widget _buildInfographicCard() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Sección de imagen con badge
+          Stack(
+            children: [
+              // Placeholder para imagen
+              Container(
+                height: 200,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(12),
+                    topRight: Radius.circular(12),
+                  ),
+                ),
+                child: const Center(
+                  child: Icon(
+                    Icons.image,
+                    size: 80,
+                    color: Colors.grey,
+                  ),
+                ),
+              ),
+              // Badge Evaluación EDE
+              _buildCategoryBadge('Evaluación EDE'),
+              // Botón de vista
+              Positioned(
+                right: 10,
+                bottom: 10,
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: const BoxDecoration(
+                    color: DAGRDColors.azulDAGRD,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.visibility_outlined,
+                    color: Colors.white,
+                    size: 20,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          // Sección de contenido
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'Gestión del Riesgo - Definiciones generales',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          color: DAGRDColors.negroDAGRD,
+                          fontFamily: 'Work Sans',
+                          height: 16 / 13,
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 32,
+                      height: 32,
+                      child: IconButton(
+                        icon: const Icon(Icons.star_border),
+                        color: Colors.grey,
+                        iconSize: 32,
+                        padding: EdgeInsets.zero,
+                        onPressed: () {},
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Material educativo Gestión del Riesgo',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w400,
+                    color: DAGRDColors.negroDAGRD,
+                    fontFamily: 'Work Sans',
+                    height: 16 / 12,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Publicado: 10/jul/2025',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w400,
+                        color: const Color(0xFF706F6F),
+                        fontFamily: 'Work Sans',
+                        height: 16 / 12,
+                      ),
+                    ),
+                    Container(
+                      height: 32,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFDBEAFE),
+                        borderRadius: BorderRadius.circular(100),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          TextButton.icon(
+                            onPressed: () {},
+                            icon: SvgPicture.asset(
+                              AppIcons.download,
+                              width: 16,
+                              height: 16,
+                              colorFilter: const ColorFilter.mode(
+                                Color(0xFF2563EB),
+                                BlendMode.srcIn,
+                              ),
+                            ),
+                            label: const Text(
+                              'Descargar',
+                              style: TextStyle(
+                                color: Color(0xFF2563EB),
+                                fontFamily: 'Work Sans',
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                                height: 16 / 12,
+                              ),
+                            ),
+                            style: TextButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 8,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Widget para el badge de categoría (ej: "Evaluación EDE")
+  Widget _buildCategoryBadge(String text) {
+    return Positioned(
+      left: 10,
+      top: 14,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: DAGRDColors.amarDAGRD,
+          borderRadius: BorderRadius.circular(100),
+        ),
+        child: Center(
+          child: Text(
+            text,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: Color(0xFF1E1E1E),
+              fontFamily: 'Work Sans',
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              height: 16 / 12,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   String _getTitleForTab(int index) {
@@ -277,7 +418,7 @@ class _EducationalMaterialScreenState extends State<EducationalMaterialScreen> {
       case 0:
         return 'Infografías';
       case 1:
-        return 'Videos';
+        return 'Videos educativos';
       case 2:
         return 'Documentos';
       default:
@@ -290,12 +431,13 @@ class _EducationalMaterialScreenState extends State<EducationalMaterialScreen> {
       case 0:
         return 'Visualiza información de manera clara y atractiva';
       case 1:
-        return 'Aprende a través de contenido en video';
+        return 'Contenido audiovisual sobre procedimientos y protocolos';
       case 2:
-        return 'Consulta documentos y guías de referencia';
+        return 'Documentación técnica y manuales de procedimientos';
       default:
         return 'Recursos de aprendizaje y capacitación';
     }
   }
 }
+
 
