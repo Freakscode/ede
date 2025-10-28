@@ -361,22 +361,20 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
           evaluationData['vulnerabilidadSelections'] ?? evaluationData['dynamicSelections'] ?? {}
         );
         
-        // Actualizar solo si hay datos nuevos para la clasificación actual
-        if (event.classificationType.toLowerCase() == 'amenaza') {
-          // Para amenaza, actualizar probabilidad e intensidad
-          
-          if (probabilidadSelections.isNotEmpty) {
-            currentProbabilidadSelections.addAll(probabilidadSelections);
-          }
-          if (intensidadSelections.isNotEmpty) {
-            currentIntensidadSelections.addAll(intensidadSelections);
-          }
-        } else if (event.classificationType.toLowerCase() == 'vulnerabilidad') {
-          // Para vulnerabilidad, actualizar dynamicSelections
-          
-          if (dynamicSelections.isNotEmpty) {
-            currentDynamicSelections.addAll(dynamicSelections);
-          }
+        // Siempre cargar ambos tipos de datos (amenaza y vulnerabilidad) cuando están disponibles
+        // Esto permite que la pantalla final muestre todos los datos sin restricciones
+        
+        // Actualizar datos de amenaza
+        if (probabilidadSelections.isNotEmpty) {
+          currentProbabilidadSelections.addAll(probabilidadSelections);
+        }
+        if (intensidadSelections.isNotEmpty) {
+          currentIntensidadSelections.addAll(intensidadSelections);
+        }
+        
+        // Actualizar datos de vulnerabilidad
+        if (dynamicSelections.isNotEmpty) {
+          currentDynamicSelections.addAll(dynamicSelections);
         }
         
         
@@ -434,9 +432,15 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
         
       
         
+        // NO cambiar selectedClassification si ya hay una clasificación activa
+        // Esto permite cargar tanto amenaza como vulnerabilidad sin perder datos
+        final finalClassification = state.selectedClassification?.isNotEmpty == true 
+            ? state.selectedClassification 
+            : event.classificationType;
+        
         final newState = state.copyWith(
           selectedRiskEvent: event.eventName,
-          selectedClassification: event.classificationType,
+          selectedClassification: finalClassification,
           probabilidadSelections: currentProbabilidadSelections,
           intensidadSelections: currentIntensidadSelections,
           dynamicSelections: currentDynamicSelections,

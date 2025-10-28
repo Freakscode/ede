@@ -3,19 +3,80 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import '../bloc/risk_threat_analysis_bloc.dart';
 import '../bloc/risk_threat_analysis_state.dart';
+import '../bloc/risk_threat_analysis_event.dart';
 import '../widgets/risk_matrix_widget.dart';
 import '../widgets/widgets.dart';
 import 'package:caja_herramientas/app/shared/models/risk_event_model.dart';
 import 'package:caja_herramientas/app/shared/models/risk_event_factory.dart';
-// import '../../../home/presentation/bloc/home_bloc.dart';
+import '../../../home/presentation/bloc/home_bloc.dart';
+import '../../../../shared/services/form_persistence_service.dart';
 
-class FinalRiskResultsScreen extends StatelessWidget {
+class FinalRiskResultsScreen extends StatefulWidget {
   final String eventName;
 
   const FinalRiskResultsScreen({
     super.key,
     this.eventName = 'Evento de Prueba', // Valor por defecto para desarrollo
   });
+
+  @override
+  State<FinalRiskResultsScreen> createState() => _FinalRiskResultsScreenState();
+}
+
+class _FinalRiskResultsScreenState extends State<FinalRiskResultsScreen> {
+  bool _hasLoadedData = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Cargar todos los datos de amenaza y vulnerabilidad
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_hasLoadedData && context.mounted) {
+        _loadAllFormDataFromHome();
+        _hasLoadedData = true;
+      }
+    });
+  }
+
+  void _loadAllFormDataFromHome() {
+    final bloc = context.read<RiskThreatAnalysisBloc>();
+    final homeBloc = context.read<HomeBloc>();
+    
+    final formId = homeBloc.state.activeFormId;
+    if (formId != null && formId.isNotEmpty) {
+      _loadAllFormData(formId, bloc);
+    }
+  }
+
+  Future<void> _loadAllFormData(String formId, RiskThreatAnalysisBloc bloc) async {
+    try {
+      final persistenceService = FormPersistenceService();
+      final completeForm = await persistenceService.getCompleteForm(formId);
+      
+      if (completeForm != null) {
+        final evaluationData = completeForm.toJson();
+        
+        // Cargar datos de amenaza primero
+        bloc.add(LoadFormData(
+          eventName: completeForm.eventName,
+          classificationType: 'amenaza',
+          evaluationData: evaluationData,
+        ));
+        
+        // Esperar un poco antes de cargar vulnerabilidad para que no se sobrescriban
+        await Future.delayed(const Duration(milliseconds: 100));
+        
+        // Cargar datos de vulnerabilidad
+        bloc.add(LoadFormData(
+          eventName: completeForm.eventName,
+          classificationType: 'vulnerabilidad',
+          evaluationData: evaluationData,
+        ));
+      }
+    } catch (e) {
+      print('Error loading all form data: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -215,28 +276,45 @@ class FinalRiskResultsScreen extends StatelessWidget {
     RiskThreatAnalysisState state,
   ) {
     final bloc = context.read<RiskThreatAnalysisBloc>();
-
-    // Construir secciones de probabilidad e intensidad para amenaza
-    final probabilidadItems = _buildProbabilidadItems(bloc, state);
-    final probabilidadScore = _calculateSectionScore(probabilidadItems);
-
-    final intensidadItems = _buildIntensidadItems(bloc, state);
-    final intensidadScore = _calculateSectionScore(intensidadItems);
-
+    
+    // Obtener subclasificaciones de amenaza
+    final amenazaSubClassifications = ['probabilidad', 'intensidad'];
+    
     return Column(
-      children: [
-        RatingSectionWidget(
-          title: 'Probabilidad',
-          score: probabilidadScore,
-          items: probabilidadItems,
-        ),
-        const SizedBox(height: 24),
-        RatingSectionWidget(
-          title: 'Intensidad',
-          score: intensidadScore,
-          items: intensidadItems,
-        ),
-      ],
+      children: amenazaSubClassifications.asMap().entries.map((entry) {
+        final index = entry.key;
+        final subClassId = entry.value;
+        
+        // Usar el método centralizado del BLoC para obtener items
+        final items = bloc.getItemsForSubClassification(subClassId);
+        final score = bloc.calculateSectionScore(subClassId);
+        
+        // Obtener el nombre de la subclasificación desde el evento
+        final riskEvent = _getRiskEventByName(state.selectedRiskEvent ?? '');
+        String title = subClassId;
+        if (riskEvent != null) {
+          final classification = riskEvent.classifications.firstWhere(
+            (c) => c.id == 'amenaza',
+            orElse: () => riskEvent.classifications.first,
+          );
+          final subClass = classification.subClassifications.firstWhere(
+            (s) => s.id == subClassId,
+            orElse: () => classification.subClassifications.first,
+          );
+          title = subClass.name;
+        }
+        
+        return Column(
+          children: [
+            if (index > 0) const SizedBox(height: 24),
+            RatingSectionWidget(
+              title: title,
+              score: score,
+              items: items,
+            ),
+          ],
+        );
+      }).toList(),
     );
   }
 
@@ -262,19 +340,49 @@ class FinalRiskResultsScreen extends StatelessWidget {
     RiskThreatAnalysisState state,
   ) {
     final bloc = context.read<RiskThreatAnalysisBloc>();
-    final sections = _buildVulnerabilidadSectionsList(bloc, state);
-
+    
+    // Obtener subclasificaciones de vulnerabilidad desde el evento
+    final riskEvent = _getRiskEventByName(state.selectedRiskEvent ?? '');
+    List<String> vulnerabilidadSubClassifications = [];
+    
+    if (riskEvent != null) {
+      final classification = riskEvent.classifications.firstWhere(
+        (c) => c.id == 'vulnerabilidad',
+        orElse: () => riskEvent.classifications.first,
+      );
+      vulnerabilidadSubClassifications = classification.subClassifications.map((s) => s.id).toList();
+    }
+    
     return Column(
-      children: sections.asMap().entries.map((entry) {
+      children: vulnerabilidadSubClassifications.asMap().entries.map((entry) {
         final index = entry.key;
-        final section = entry.value;
+        final subClassId = entry.value;
+        
+        // Construir items manualmente para vulnerabilidad
+        final items = _buildVulnerabilidadItems(bloc, state, subClassId, riskEvent);
+        final score = bloc.calculateSectionScore(subClassId);
+        
+        // Obtener el nombre de la subclasificación
+        String title = subClassId;
+        if (riskEvent != null) {
+          final classification = riskEvent.classifications.firstWhere(
+            (c) => c.id == 'vulnerabilidad',
+            orElse: () => riskEvent.classifications.first,
+          );
+          final subClass = classification.subClassifications.firstWhere(
+            (s) => s.id == subClassId,
+            orElse: () => classification.subClassifications.first,
+          );
+          title = subClass.name;
+        }
+        
         return Column(
           children: [
             if (index > 0) const SizedBox(height: 24),
             RatingSectionWidget(
-              title: section['title'] as String,
-              score: section['score'] as String,
-              items: section['items'] as List<Map<String, dynamic>>,
+              title: title,
+              score: score,
+              items: items,
             ),
           ],
         );
@@ -298,166 +406,63 @@ class FinalRiskResultsScreen extends StatelessWidget {
     );
   }
 
-  // Métodos auxiliares adaptados de RatingResultsScreen
-  List<Map<String, dynamic>> _buildProbabilidadItems(
+  // Método auxiliar para construir items de vulnerabilidad
+  List<Map<String, dynamic>> _buildVulnerabilidadItems(
     RiskThreatAnalysisBloc bloc,
     RiskThreatAnalysisState state,
+    String subClassId,
+    RiskEventModel? riskEvent,
   ) {
     final items = <Map<String, dynamic>>[];
-    final selectedEvent = state.selectedRiskEvent ?? '';
-
-    final riskEvent = _getRiskEventByName(selectedEvent);
-    if (riskEvent != null) {
-      final classification = riskEvent.classifications.firstWhere(
-        (c) => c.id == 'amenaza',
-        orElse: () => riskEvent.classifications.first,
-      );
-
-      final probabilidadSubClass = classification.subClassifications.firstWhere(
-        (s) => s.id == 'probabilidad',
-        orElse: () => classification.subClassifications.first,
-      );
-
-      for (final category in probabilidadSubClass.categories) {
-        final selection = state.probabilidadSelections[category.title];
-        final rating = _getRatingFromSelection(selection);
-        final color = _getColorFromRating(rating);
-
-        String title = category.title;
-        if (rating == -1) {
-          title = '${category.title} - No Aplica';
-        } else if (rating == 0) {
-          title = '${category.title} - Sin calificar';
-        }
-
-        items.add({'rating': rating, 'title': title, 'color': color});
-      }
-    }
-
-    return items;
-  }
-
-  List<Map<String, dynamic>> _buildIntensidadItems(
-    RiskThreatAnalysisBloc bloc,
-    RiskThreatAnalysisState state,
-  ) {
-    final items = <Map<String, dynamic>>[];
-    final selectedEvent = state.selectedRiskEvent ?? '';
-
-    final riskEvent = _getRiskEventByName(selectedEvent);
-    if (riskEvent != null) {
-      final classification = riskEvent.classifications.firstWhere(
-        (c) => c.id == 'amenaza',
-        orElse: () => riskEvent.classifications.first,
-      );
-
-      final intensidadSubClass = classification.subClassifications.firstWhere(
-        (s) => s.id == 'intensidad',
-        orElse: () => classification.subClassifications.first,
-      );
-
-      for (final category in intensidadSubClass.categories) {
-        final selection = state.intensidadSelections[category.title];
-        final rating = _getRatingFromSelection(selection);
-        final color = _getColorFromRating(rating);
-
-        String title = category.title;
-        if (rating == -1) {
-          title = '${category.title} - No Aplica';
-        } else if (rating == 0) {
-          title = '${category.title} - Sin calificar';
-        }
-
-        items.add({'rating': rating, 'title': title, 'color': color});
-      }
-    }
-
-    return items;
-  }
-
-  List<Map<String, dynamic>> _buildVulnerabilidadSectionsList(
-    RiskThreatAnalysisBloc bloc,
-    RiskThreatAnalysisState state,
-  ) {
-    final sections = <Map<String, dynamic>>[];
-    final selectedEvent = state.selectedRiskEvent ?? '';
-
-    final riskEvent = _getRiskEventByName(selectedEvent);
+    
     if (riskEvent != null) {
       final classification = riskEvent.classifications.firstWhere(
         (c) => c.id == 'vulnerabilidad',
         orElse: () => riskEvent.classifications.first,
       );
-
-      for (final subClassification in classification.subClassifications) {
-        final items = _buildVulnerabilidadSubClassificationItems(
-          bloc,
-          state,
-          subClassification.id,
-        );
-        final score = _calculateSectionScore(items);
-
-        sections.add({
-          'title': subClassification.name,
-          'score': score,
-          'items': items,
-        });
-      }
-    }
-
-    return sections;
-  }
-
-  List<Map<String, dynamic>> _buildVulnerabilidadSubClassificationItems(
-    RiskThreatAnalysisBloc bloc,
-    RiskThreatAnalysisState state,
-    String subClassificationId,
-  ) {
-    final items = <Map<String, dynamic>>[];
-    final selectedEvent = state.selectedRiskEvent ?? '';
-
-    final riskEvent = _getRiskEventByName(selectedEvent);
-    if (riskEvent != null) {
-      final classification = riskEvent.classifications.firstWhere(
-        (c) => c.id == 'vulnerabilidad',
-        orElse: () => riskEvent.classifications.first,
-      );
-
+      
       final subClass = classification.subClassifications.firstWhere(
-        (s) => s.id == subClassificationId,
+        (s) => s.id == subClassId,
         orElse: () => classification.subClassifications.first,
       );
-
+      
+      // Debug: imprimir todas las dynamicSelections disponibles
+      print('DEBUG: state.dynamicSelections keys: ${state.dynamicSelections.keys.toList()}');
+      for (var key in state.dynamicSelections.keys) {
+        print('DEBUG: dynamicSelections[$key] = ${state.dynamicSelections[key]}');
+      }
+      
       for (final category in subClass.categories) {
-        final selections = state.dynamicSelections[subClassificationId] ?? {};
+        final selections = state.dynamicSelections[subClassId] ?? {};
         final selection = selections[category.title];
-
+        
+        print('DEBUG vulnerabilidad - category: ${category.title}, selection: $selection, all keys: ${selections.keys.toList()}');
+        
         final rating = _getRatingFromSelection(selection);
         final color = _getColorFromRating(rating);
-
+        
         String title = category.title;
         if (rating == -1) {
           title = '${category.title} - No Aplica';
         } else if (rating == 0) {
           title = '${category.title} - Sin calificar';
         }
-
+        
         items.add({'rating': rating, 'title': title, 'color': color});
       }
     }
-
+    
+    print('DEBUG _buildVulnerabilidadItems returning ${items.length} items');
     return items;
   }
-
-  // Métodos auxiliares
+  
   int _getRatingFromSelection(String? selectedLevel) {
     if (selectedLevel == null || selectedLevel.isEmpty) return 0;
     if (selectedLevel == 'NA') return -1;
-
+    
     if (selectedLevel.contains('BAJO') && !selectedLevel.contains('MEDIO')) {
       return 1;
-    } else if (selectedLevel.contains('MEDIO') &&
-        selectedLevel.contains('ALTO')) {
+    } else if (selectedLevel.contains('MEDIO') && selectedLevel.contains('ALTO')) {
       return 3;
     } else if (selectedLevel.contains('MEDIO')) {
       return 2;
@@ -466,7 +471,7 @@ class FinalRiskResultsScreen extends StatelessWidget {
     }
     return 0;
   }
-
+  
   Color _getColorFromRating(int rating) {
     switch (rating) {
       case -1:
@@ -482,18 +487,6 @@ class FinalRiskResultsScreen extends StatelessWidget {
       default:
         return DAGRDColors.grisMedio;
     }
-  }
-
-  String _calculateSectionScore(List<Map<String, dynamic>> items) {
-    final validRatings = items
-        .where((item) => item['rating'] != 0 && item['rating'] != -1)
-        .map((item) => item['rating'] as int)
-        .toList();
-
-    if (validRatings.isEmpty) return '0,00';
-
-    final average = validRatings.reduce((a, b) => a + b) / validRatings.length;
-    return average.toStringAsFixed(2).replaceAll('.', ',');
   }
 
   String _getRiskClassification(double score) {
