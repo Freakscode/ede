@@ -97,14 +97,14 @@ class VideoCardWidget extends StatelessWidget {
                   child: Container(
                     width: 40,
                     height: 40,
+                    padding: const EdgeInsets.all(8),
                     decoration: const BoxDecoration(
                       color: DAGRDColors.azulDAGRD,
                       shape: BoxShape.circle,
                     ),
                     child: SvgPicture.asset(
                       AppIcons.preview,
-                      width: 20,
-                      height: 20,
+                     
                       colorFilter: const ColorFilter.mode(
                         Colors.white,
                         BlendMode.srcIn,

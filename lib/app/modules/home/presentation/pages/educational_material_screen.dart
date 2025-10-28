@@ -1,11 +1,11 @@
-import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import 'package:caja_herramientas/app/core/icons/app_icons.dart';
 import 'package:caja_herramientas/app/modules/home/presentation/widgets/infographic_card_widget.dart';
 import 'package:caja_herramientas/app/modules/home/presentation/widgets/section_header_widget.dart';
 import 'package:caja_herramientas/app/modules/home/presentation/widgets/video_card_widget.dart';
 import 'package:caja_herramientas/app/modules/home/presentation/widgets/document_card_widget.dart';
+import 'package:caja_herramientas/app/modules/home/presentation/widgets/material_tab_widget.dart';
+import 'package:caja_herramientas/app/modules/home/presentation/widgets/material_filter_chip_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 /// Pantalla de Material Educativo que muestra recursos de aprendizaje
 /// y capacitación para los usuarios de la aplicación.
@@ -13,15 +13,22 @@ class EducationalMaterialScreen extends StatefulWidget {
   const EducationalMaterialScreen({super.key});
 
   @override
-  State<EducationalMaterialScreen> createState() => _EducationalMaterialScreenState();
+  State<EducationalMaterialScreen> createState() =>
+      _EducationalMaterialScreenState();
 }
 
 class _EducationalMaterialScreenState extends State<EducationalMaterialScreen> {
-  int _selectedTab = 0; // 0: Infografías, 1: Videos, 2: Documentos
+  // Constantes
+  static const int _infographicsTabIndex = 0;
+  static const int _videosTabIndex = 1;
+  static const int _documentsTabIndex = 2;
+
+  // Estado
+  int _selectedTab = _infographicsTabIndex;
   String _selectedFilter = 'Todos';
 
-  // Filtros disponibles
-  final List<String> _filters = [
+  // Datos estáticos
+  static const List<String> _filters = [
     'Todos',
     'Evaluación EDE',
     'Análisis del Riesgo',
@@ -31,109 +38,83 @@ class _EducationalMaterialScreenState extends State<EducationalMaterialScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+    return Column(
       children: [
-        
-        // Tabs de navegación
-        _buildTabs(),
-        
-        const SizedBox(height: 10),
-        
-        // Filtros
-        _buildFilters(),
-        
+        // Tabs de navegación - fijo arriba
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: _buildTab(
+                    index: _infographicsTabIndex,
+                    label: 'Infografías',
+                    iconAsset: AppIcons.images,
+                  ),
+                ),
+                Expanded(
+                  child: _buildTab(
+                    index: _videosTabIndex,
+                    label: 'Videos',
+                    iconAsset: AppIcons.video,
+                  ),
+                ),
+                Expanded(
+                  child: _buildTab(
+                    index: _documentsTabIndex,
+                    label: 'Documentos',
+                    iconAsset: AppIcons.files,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+
+        // Filtros - fijo debajo de tabs
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: _buildFilters(),
+        ),
+
         const SizedBox(height: 24),
-        
-        // Contenido de la sección seleccionada
-        _buildContent(),
+
+        // Contenido - scrollable
+        Expanded(
+          child: ListView(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            children: [
+              _buildContent(),
+              const SizedBox(height: 24), // Espacio al final
+            ],
+          ),
+        ),
       ],
     );
   }
 
-  Widget _buildTabs() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: _buildTab(
-              index: 0,
-              label: 'Infografías',
-              iconAsset: AppIcons.images,
-            ),
-          ),
-          Expanded(
-            child: _buildTab(
-              index: 1,
-              label: 'Videos',
-              iconAsset: AppIcons.video,
-            ),
-          ),
-          Expanded(
-            child: _buildTab(
-              index: 2,
-              label: 'Documentos',
-              iconAsset: AppIcons.files,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  
 
   Widget _buildTab({
     required int index,
     required String label,
     required String iconAsset,
   }) {
-    final isSelected = _selectedTab == index;
-    
-    return InkWell(
+    return MaterialTabWidget(
+      index: index,
+      label: label,
+      iconAsset: iconAsset,
+      isSelected: _selectedTab == index,
       onTap: () {
         setState(() {
           _selectedTab = index;
         });
       },
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        decoration: BoxDecoration(
-          border: Border(
-            bottom: BorderSide(
-              color: isSelected ? DAGRDColors.azulDAGRD : Colors.transparent,
-              width: 3,
-            ),
-          ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SvgPicture.asset(
-              iconAsset,
-              width: 20,
-              height: 20,
-              colorFilter: ColorFilter.mode(
-                isSelected ? DAGRDColors.azulDAGRD : DAGRDColors.grisMedio,
-                BlendMode.srcIn,
-              ),
-            ),
-            const SizedBox(width: 8),
-            Text(
-              label,
-              style: TextStyle(
-                color: isSelected ? DAGRDColors.azulDAGRD : DAGRDColors.grisMedio,
-                fontFamily: 'Work Sans',
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                height: 1.0,
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 
@@ -146,34 +127,15 @@ class _EducationalMaterialScreenState extends State<EducationalMaterialScreen> {
         separatorBuilder: (context, index) => const SizedBox(width: 8),
         itemBuilder: (context, index) {
           final filter = _filters[index];
-          final isSelected = _selectedFilter == filter;
-          
-          return InkWell(
+
+          return MaterialFilterChipWidget(
+            label: filter,
+            isSelected: _selectedFilter == filter,
             onTap: () {
               setState(() {
                 _selectedFilter = filter;
               });
             },
-            borderRadius: BorderRadius.circular(20),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
-              decoration: BoxDecoration(
-                color: isSelected ? DAGRDColors.azulDAGRD : Colors.grey.shade200,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Center(
-                child: Text(
-                  filter,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: isSelected ? Colors.white : const Color(0xFF1E1E1E),
-                    fontFamily: 'Work Sans',
-                    fontSize: 13,
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-            ),
           );
         },
       ),
@@ -195,7 +157,7 @@ class _EducationalMaterialScreenState extends State<EducationalMaterialScreen> {
         ],
       );
     }
-    
+
     if (_selectedTab == 1) {
       // Mostrar encabezado y card de video
       return Column(
@@ -210,7 +172,7 @@ class _EducationalMaterialScreenState extends State<EducationalMaterialScreen> {
         ],
       );
     }
-    
+
     // Tab de Documentos
     if (_selectedTab == 2) {
       return Column(
@@ -225,7 +187,7 @@ class _EducationalMaterialScreenState extends State<EducationalMaterialScreen> {
         ],
       );
     }
-    
+
     // Para otros tabs, mostrar contenido simple
     return SectionHeaderWidget(
       title: _getTitleForTab(_selectedTab),
@@ -237,7 +199,8 @@ class _EducationalMaterialScreenState extends State<EducationalMaterialScreen> {
   Widget _buildDocumentCard() {
     return DocumentCardWidget(
       title: 'Manual de evaluación estructural',
-      description: 'Guía completa para la evaluación de daños estructurales post-sismo',
+      description:
+          'Guía completa para la evaluación de daños estructurales post-sismo',
       publishedDate: '10/jul/2025',
       onView: () {
         // TODO: Implementar visualización del documento
@@ -293,5 +256,3 @@ class _EducationalMaterialScreenState extends State<EducationalMaterialScreen> {
     }
   }
 }
-
-
