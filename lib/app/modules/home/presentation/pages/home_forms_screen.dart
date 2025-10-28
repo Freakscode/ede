@@ -19,6 +19,7 @@ import 'package:caja_herramientas/app/modules/risk_threat_analysis/presentation/
 import 'package:go_router/go_router.dart';
 import 'package:caja_herramientas/app/shared/widgets/dialogs/custom_action_dialog.dart';
 import 'package:caja_herramientas/app/shared/widgets/snackbars/custom_snackbar.dart';
+import 'package:caja_herramientas/app/modules/home/presentation/widgets/filter_dialog.dart';
 
 class HomeFormsScreen extends StatefulWidget {
   const HomeFormsScreen({super.key});
@@ -362,7 +363,24 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
                                 BlendMode.srcIn,
                               ),
                             ),
-                            onPressed: () {},
+                            onPressed: () async {
+                              // Get authentication status
+                              final authState = context.read<AuthBloc>().state;
+                              final isAuthenticated = authState is AuthAuthenticated;
+                              
+                              final filters = await FilterDialog.show(
+                                context,
+                                isUserAuthenticated: isAuthenticated,
+                              );
+                              if (filters != null && mounted) {
+                                // TODO: Apply filters to the completed forms
+                                CustomSnackBar.showInfo(
+                                  context,
+                                  message: 'Filtros aplicados',
+                                  title: 'Filtros',
+                                );
+                              }
+                            },
                           ),
                         ],
                       ),
