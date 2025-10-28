@@ -1,0 +1,253 @@
+{
+    "id": "Avenida Torrencial_complete_1761609290316",
+    "eventName": "Avenida Torrencial",
+    "createdAt": "2025-01-28T10:00:00.000Z",
+    "updatedAt": "2025-01-28T10:30:00.000Z",
+    "isExplicitlyCompleted": false,
+    "sireNumber": "SIRE-2025-001",
+    "amenaza": {
+        "probabilidad": {
+            "items": [
+                {
+                    "id": "categorizacion_amenaza_mapa_torrencialidad",
+                    "label": "Categorización de Amenaza en Mapas de Torrencialidad",
+                    "value": 1
+                },
+                {
+                    "id": "tipo_material_cauce",
+                    "label": "Tipo de Material del Cauce",
+                    "value": 2
+                },
+                {
+                    "id": "cambios_seccion_hidraulica",
+                    "label": "Cambios en la Sección Hidráulica",
+                    "value": 3
+                },
+                {
+                    "id": "profundidad_cauce",
+                    "label": "Profundidad del Cauce",
+                    "value": 2
+                },
+                {
+                    "id": "estabilidad_taludes_laderas",
+                    "label": "Estabilidad de los Taludes o Laderas Adyacentes del Cauce",
+                    "value": 2
+                }
+            ],
+            "evidenceImages": [
+                "/data/user/0/com.example.caja_herramientas/app_flutter/probabilidad_0.jpg",
+                "/data/user/0/com.example.caja_herramientas/app_flutter/probabilidad_1.jpg",
+                "/data/user/0/com.example.caja_herramientas/app_flutter/probabilidad_2.jpg"
+            ],
+            "evidenceCoordinates": {
+                "0": {
+                    "latitude": "4.6097",
+                    "longitude": "-74.0817",
+                    "altitude": "2600.0",
+                    "accuracy": "10.5",
+                    "timestamp": "2025-01-28T10:00:00.000Z"
+                },
+                "1": {
+                    "latitude": "4.6098",
+                    "longitude": "-74.0818",
+                    "altitude": "2610.0",
+                    "accuracy": "12.3",
+                    "timestamp": "2025-01-28T10:05:00.000Z"
+                },
+                "2": {
+                    "latitude": "4.6099",
+                    "longitude": "-74.0819",
+                    "altitude": "2620.0",
+                    "accuracy": "15.0",
+                    "timestamp": "2025-01-28T10:10:00.000Z"
+                }
+            }
+        },
+        "intensidad": {
+            "items": [
+                {
+                    "id": "potencial_dano_edificaciones",
+                    "label": "Potencial de Daño en Edificaciones",
+                    "value": 1
+                },
+                {
+                    "id": "capacidad_perdida_vidas_humanas",
+                    "label": "Capacidad de Generar Pérdida de Vidas Humanas",
+                    "value": 2
+                },
+                {
+                    "id": "alteracion_funcionamiento_lineas_vitales",
+                    "label": "Alteración del Funcionamiento de Líneas Vitales y Espacio Público",
+                    "value": 2
+                }
+            ],
+            "evidenceImages": [
+                "/data/user/0/com.example.caja_herramientas/app_flutter/intensidad_0.jpg",
+                "/data/user/0/com.example.caja_herramientas/app_flutter/intensidad_1.jpg"
+            ],
+            "evidenceCoordinates": {
+                "0": {
+                    "latitude": "4.6100",
+                    "longitude": "-74.0820",
+                    "altitude": "2630.0",
+                    "accuracy": "8.5",
+                    "timestamp": "2025-01-28T10:15:00.000Z"
+                },
+                "1": {
+                    "latitude": "4.6101",
+                    "longitude": "-74.0821",
+                    "altitude": "2640.0",
+                    "accuracy": "9.2",
+                    "timestamp": "2025-01-28T10:20:00.000Z"
+                }
+            }
+        },
+        "amenazaScores": {
+            "probabilidad": 2.05,
+            "intensidad": 1.65,
+            "global": 1.85
+        },
+        "amenazaColors": {
+            "probabilidad": 4289733120,
+            "intensidad": 4290456831,
+            "global": 4290456831
+        }
+    },
+    "vulnerabilidad": {
+        "fragilidad_fisica": {
+            "items": [
+                {
+                    "id": "calidad_materiales_procesos_constructivos",
+                    "label": "Calidad de los Materiales y Procesos Constructivos",
+                    "value": 1
+                },
+                {
+                    "id": "estado_conservacion",
+                    "label": "Estado de Conservación",
+                    "value": 2
+                },
+                {
+                    "id": "tipologia_estructural",
+                    "label": "Tipología Estructural",
+                    "value": 3
+                }
+            ],
+            "evidenceImages": [
+                "/data/user/0/com.example.caja_herramientas/app_flutter/fragilidad_fisica_0.jpg",
+                "/data/user/0/com.example.caja_herramientas/app_flutter/fragilidad_fisica_1.jpg",
+                "/data/user/0/com.example.caja_herramientas/app_flutter/fragilidad_fisica_2.jpg"
+            ],
+            "evidenceCoordinates": {
+                "0": {
+                    "latitude": "4.6102",
+                    "longitude": "-74.0822",
+                    "altitude": "2650.0",
+                    "accuracy": "11.0",
+                    "timestamp": "2025-01-28T10:25:00.000Z"
+                },
+                "1": {
+                    "latitude": "4.6103",
+                    "longitude": "-74.0823",
+                    "altitude": "2660.0",
+                    "accuracy": "8.5",
+                    "timestamp": "2025-01-28T10:30:00.000Z"
+                },
+                "2": {
+                    "latitude": "4.6104",
+                    "longitude": "-74.0824",
+                    "altitude": "2670.0",
+                    "accuracy": "9.8",
+                    "timestamp": "2025-01-28T10:35:00.000Z"
+                }
+            }
+        },
+        "fragilidad_personas": {
+            "items": [
+                {
+                    "id": "nivel_organizacion",
+                    "label": "Nivel de Organización",
+                    "value": 1
+                },
+                {
+                    "id": "suficiencia_economica",
+                    "label": "Suficiencia Económica",
+                    "value": 2
+                }
+            ],
+            "evidenceImages": [
+                "/data/user/0/com.example.caja_herramientas/app_flutter/fragilidad_personas_0.jpg",
+                "/data/user/0/com.example.caja_herramientas/app_flutter/fragilidad_personas_1.jpg"
+            ],
+            "evidenceCoordinates": {
+                "0": {
+                    "latitude": "4.6105",
+                    "longitude": "-74.0825",
+                    "altitude": "2680.0",
+                    "accuracy": "12.3",
+                    "timestamp": "2025-01-28T10:40:00.000Z"
+                },
+                "1": {
+                    "latitude": "4.6106",
+                    "longitude": "-74.0826",
+                    "altitude": "2690.0",
+                    "accuracy": "10.5",
+                    "timestamp": "2025-01-28T10:45:00.000Z"
+                }
+            }
+        },
+        "exposicion": {
+            "items": [
+                {
+                    "id": "edificaciones_expuestas",
+                    "label": "Edificaciones Expuestas",
+                    "value": 1
+                },
+                {
+                    "id": "otros_elementos_expuestos",
+                    "label": "Otros Elementos Expuestos (Líneas vitales y drenajes)",
+                    "value": 2
+                },
+                {
+                    "id": "escala_afectacion",
+                    "label": "Escala de Afectación",
+                    "value": 3
+                }
+            ],
+            "evidenceImages": [
+                "/data/user/0/com.example.caja_herramientas/app_flutter/exposicion_0.jpg"
+            ],
+            "evidenceCoordinates": {
+                "0": {
+                    "latitude": "4.6107",
+                    "longitude": "-74.0827",
+                    "altitude": "2700.166",
+                    "accuracy": "11.0",
+                    "timestamp": "2025-01-28T10:50:00.000Z"
+                }
+            }
+        },
+        "vulnerabilidadScores": {
+            "fragilidad_fisica": 2.10,
+            "fragilidad_personas": 1.40,
+            "exposicion": 2.25,
+            "global": 1.92
+        },
+        "vulnerabilidadColors": {
+            "fragilidad_fisica": 4290456831,
+            "fragilidad_personas": 4289733120,
+            "exposicion": 4291984256,
+            "global": 4290456831
+        }
+    },
+    "contactData": {
+        "name": "Juan Pérez",
+        "phone": "+57 300 123 4567",
+        "email": "juan.perez@example.com",
+        "role": "Inspector DAGRD"
+    },
+    "inspectionData": {
+        "location": "Calle 123 #45-67, Bogotá",
+        "date": "2025-01-28T10:00:00.000Z",
+        "inspector": "Juan Pérez"
+    }
+}

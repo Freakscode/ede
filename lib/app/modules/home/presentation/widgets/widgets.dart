@@ -22,4 +22,5 @@ export 'risk_completion_progress.dart';
 export 'category_status_badge.dart';
 export 'infographic_card_widget.dart';
 export 'section_header_widget.dart';
+export 'document_card_widget.dart';
 export 'video_card_widget.dart';
