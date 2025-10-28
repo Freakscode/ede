@@ -5,6 +5,8 @@ import 'package:caja_herramientas/app/core/icons/app_icons.dart';
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import 'package:caja_herramientas/app/modules/home/presentation/bloc/home_bloc.dart';
 import 'package:caja_herramientas/app/modules/home/presentation/bloc/home_state.dart';
+import 'package:caja_herramientas/app/modules/risk_threat_analysis/presentation/bloc/risk_threat_analysis_bloc.dart';
+import 'package:caja_herramientas/app/modules/risk_threat_analysis/presentation/bloc/risk_threat_analysis_event.dart';
 
 class ResultsRiskSectionWidget extends StatelessWidget {
   final HomeState homeState;
@@ -20,16 +22,24 @@ class ResultsRiskSectionWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<HomeBloc, HomeState>(
       builder: (context, homeState) {
-        // Estado deshabilitado (gris) - botón no clickeable
+        // Verificar si amenaza y vulnerabilidad están completas
+        final riskBloc = context.read<RiskThreatAnalysisBloc>();
+        final isAmenazaComplete = riskBloc.isCategoryComplete('amenaza');
+        final isVulnerabilidadComplete = riskBloc.isCategoryComplete('vulnerabilidad');
+        final isEnabled = isAmenazaComplete && isVulnerabilidadComplete;
+        
         return GestureDetector(
-          onTap: null, // Deshabilitado
+          onTap: isEnabled ? () {
+            // Navegar a la pantalla de resultados finales (índice 4)
+            context.read<RiskThreatAnalysisBloc>().add(ChangeBottomNavIndex(4));
+          } : null,
           child: Container(
             padding: const EdgeInsets.symmetric(
               vertical: 10,
               horizontal: 20,
             ),
             decoration: BoxDecoration(
-              color: DAGRDColors.outline, // Gris cuando está deshabilitado
+              color: isEnabled ? DAGRDColors.amarDAGRD : DAGRDColors.outline,
               borderRadius: BorderRadius.circular(8),
             ),
             child: Row(
@@ -39,7 +49,7 @@ class ResultsRiskSectionWidget extends StatelessWidget {
                   height: 48,
                   padding: const EdgeInsets.all(9.882),
                   decoration: BoxDecoration(
-                    color: DAGRDColors.outlineVariant, // Gris cuando está deshabilitado
+                    color: isEnabled ? DAGRDColors.azulDAGRD : DAGRDColors.outlineVariant,
                     borderRadius: BorderRadius.circular(24),
                   ),
                   child: SvgPicture.asset(
@@ -47,7 +57,7 @@ class ResultsRiskSectionWidget extends StatelessWidget {
                     width: 24.707,
                     height: 22.059,
                     colorFilter: ColorFilter.mode(
-                      DAGRDColors.onSurfaceVariant, // Gris oscuro cuando está deshabilitado
+                      isEnabled ? DAGRDColors.amarDAGRD : DAGRDColors.onSurfaceVariant,
                       BlendMode.srcIn,
                     ),
                   ),
@@ -61,7 +71,7 @@ class ResultsRiskSectionWidget extends StatelessWidget {
                         'Resultados Riesgo',
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          color: DAGRDColors.onSurfaceVariant, // Gris cuando está deshabilitado
+                          color: isEnabled ? const Color(0xFF1E1E1E) : DAGRDColors.onSurfaceVariant,
                           fontFamily: 'Work Sans',
                           fontSize: 18,
                           fontStyle: FontStyle.normal,
@@ -73,7 +83,7 @@ class ResultsRiskSectionWidget extends StatelessWidget {
                         selectedEvent,
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          color: DAGRDColors.onSurfaceVariant, // Gris cuando está deshabilitado
+                          color: isEnabled ? const Color(0xFF1E1E1E) : DAGRDColors.onSurfaceVariant,
                           fontFamily: 'Work Sans',
                           fontSize: 18,
                           fontStyle: FontStyle.normal,
