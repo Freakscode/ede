@@ -1,3 +1,4 @@
+export 'classification_rating_card_widget.dart';
 export 'home_navigation_type.dart';
 export 'image_upload_area_widget.dart';
 export 'info_note_widget.dart';

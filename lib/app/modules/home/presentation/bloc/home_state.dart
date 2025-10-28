@@ -8,7 +8,6 @@ import '../../domain/entities/form_navigation_data.dart';
 class HomeState extends Equatable {
   final int selectedIndex;
   final bool showRiskEvents;
-  final bool showRiskCategories;
   final bool showFormCompleted;
   final bool tutorialShown;
   final bool showTutorial;
@@ -16,7 +15,6 @@ class HomeState extends Equatable {
   final bool darkModeEnabled;
   final String selectedLanguage;
   final String? selectedRiskEvent;
-  final String? selectedRiskCategory;
   final Map<String, bool> completedEvaluations;
   final List<FormEntity> savedForms;
   final bool isLoadingForms;
@@ -34,7 +32,6 @@ class HomeState extends Equatable {
   const HomeState({
     required this.selectedIndex,
     required this.showRiskEvents,
-    required this.showRiskCategories,
     required this.showFormCompleted,
     required this.tutorialShown,
     this.showTutorial = true,
@@ -42,7 +39,6 @@ class HomeState extends Equatable {
     this.darkModeEnabled = false,
     this.selectedLanguage = 'Español',
     this.selectedRiskEvent,
-    this.selectedRiskCategory,
     this.completedEvaluations = const {},
     this.savedForms = const [],
     this.isLoadingForms = false,
@@ -61,7 +57,6 @@ class HomeState extends Equatable {
     return HomeState(
       selectedIndex: 0,
       showRiskEvents: false,
-      showRiskCategories: false,
       showFormCompleted: false,
       tutorialShown: false,
     );
@@ -72,7 +67,6 @@ class HomeState extends Equatable {
     return HomeState(
       selectedIndex: entity.selectedIndex,
       showRiskEvents: entity.showRiskEvents,
-      showRiskCategories: entity.showRiskCategories,
       showFormCompleted: entity.showFormCompleted,
       tutorialShown: entity.tutorialShown,
       showTutorial: entity.showTutorial,
@@ -80,7 +74,6 @@ class HomeState extends Equatable {
       darkModeEnabled: entity.darkModeEnabled,
       selectedLanguage: entity.selectedLanguage,
       selectedRiskEvent: entity.selectedRiskEvent,
-      selectedRiskCategory: entity.selectedRiskCategory,
       completedEvaluations: entity.completedEvaluations,
       savedForms: entity.savedForms,
       isLoadingForms: entity.isLoadingForms,
@@ -95,7 +88,6 @@ class HomeState extends Equatable {
     return HomeEntity(
       selectedIndex: selectedIndex,
       showRiskEvents: showRiskEvents,
-      showRiskCategories: showRiskCategories,
       showFormCompleted: showFormCompleted,
       tutorialShown: tutorialShown,
       showTutorial: showTutorial,
@@ -103,7 +95,6 @@ class HomeState extends Equatable {
       darkModeEnabled: darkModeEnabled,
       selectedLanguage: selectedLanguage,
       selectedRiskEvent: selectedRiskEvent,
-      selectedRiskCategory: selectedRiskCategory,
       completedEvaluations: completedEvaluations,
       savedForms: savedForms,
       isLoadingForms: isLoadingForms,
@@ -117,7 +108,6 @@ class HomeState extends Equatable {
   HomeState copyWith({
     int? selectedIndex,
     bool? showRiskEvents,
-    bool? showRiskCategories,
     bool? showFormCompleted,
     bool? tutorialShown,
     bool? showTutorial,
@@ -125,7 +115,6 @@ class HomeState extends Equatable {
     bool? darkModeEnabled,
     String? selectedLanguage,
     String? selectedRiskEvent,
-    String? selectedRiskCategory,
     Map<String, bool>? completedEvaluations,
     List<FormEntity>? savedForms,
     bool? isLoadingForms,
@@ -141,7 +130,6 @@ class HomeState extends Equatable {
     return HomeState(
       selectedIndex: selectedIndex ?? this.selectedIndex,
       showRiskEvents: showRiskEvents ?? this.showRiskEvents,
-      showRiskCategories: showRiskCategories ?? this.showRiskCategories,
       showFormCompleted: showFormCompleted ?? this.showFormCompleted,
       tutorialShown: tutorialShown ?? this.tutorialShown,
       showTutorial: showTutorial ?? this.showTutorial,
@@ -149,7 +137,6 @@ class HomeState extends Equatable {
       darkModeEnabled: darkModeEnabled ?? this.darkModeEnabled,
       selectedLanguage: selectedLanguage ?? this.selectedLanguage,
       selectedRiskEvent: selectedRiskEvent ?? this.selectedRiskEvent,
-      selectedRiskCategory: selectedRiskCategory ?? this.selectedRiskCategory,
       completedEvaluations: completedEvaluations ?? this.completedEvaluations,
       savedForms: savedForms ?? this.savedForms,
       isLoadingForms: isLoadingForms ?? this.isLoadingForms,
@@ -189,7 +176,7 @@ class HomeState extends Equatable {
 
   /// ¿Está mostrando alguna sección especial?
   bool get isShowingSpecialSection => 
-      showRiskEvents || showRiskCategories || showFormCompleted;
+      showRiskEvents || showFormCompleted;
 
   /// ¿Está en modo creación de formulario?
   bool get isInFormCreationMode => isCreatingNew && activeFormId == null;
@@ -249,7 +236,6 @@ class HomeState extends Equatable {
   List<Object?> get props => [
         selectedIndex,
         showRiskEvents,
-        showRiskCategories,
         showFormCompleted,
         tutorialShown,
         showTutorial,
@@ -257,7 +243,6 @@ class HomeState extends Equatable {
         darkModeEnabled,
         selectedLanguage,
         selectedRiskEvent,
-        selectedRiskCategory,
         completedEvaluations,
         savedForms,
         isLoadingForms,
@@ -274,7 +259,7 @@ class HomeState extends Equatable {
   @override
   String toString() {
     return 'HomeState(selectedIndex: $selectedIndex, showRiskEvents: $showRiskEvents, '
-           'showRiskCategories: $showRiskCategories, showFormCompleted: $showFormCompleted, '
-           'tutorialShown: $tutorialShown, isLoading: $isLoading, hasError: $hasError)';
+           'showFormCompleted: $showFormCompleted, tutorialShown: $tutorialShown, '
+           'isLoading: $isLoading, hasError: $hasError)';
   }
 }

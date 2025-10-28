@@ -8,7 +8,6 @@ import '../widgets/widgets.dart';
 class RatingResultsScreen extends StatelessWidget {
   const RatingResultsScreen({super.key});
 
-
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<RiskThreatAnalysisBloc, RiskThreatAnalysisState>(
@@ -109,31 +108,8 @@ class RatingResultsScreen extends StatelessWidget {
     BuildContext context,
     RiskThreatAnalysisState state,
   ) {
-    final bloc = context.read<RiskThreatAnalysisBloc>();
-
-    // Determinar el título basado en la clasificación
-    final title = (state.selectedClassification ?? '').toLowerCase() == 'amenaza'
-        ? 'Calificación Amenaza'
-        : 'Calificación Vulnerabilidad';
-
-    // Usar la misma lógica que el RatingScreen - obtener el texto formateado directamente del BLoC
-    final formattedRating = bloc.getFormattedThreatRating();
-    
-    // Parsear el texto formateado para extraer el score y el nivel
-    final parts = formattedRating.split(' ');
-    String scoreText = '0,0';
-    String ratingText = 'SIN CALIFICAR';
-    
-    if (parts.length >= 2) {
-      scoreText = parts[0].replaceAll('.', ',');
-      ratingText = parts.sublist(1).join(' ');
-    }
-
-    return ThreatRatingCardWidget(
-      title: title,
-      score: scoreText,
-      ratingText: ratingText,
-    );
+    final classificationType = (state.selectedClassification ?? '').toLowerCase();
+    return ClassificationRatingCardWidget(classificationType: classificationType);
   }
 
 

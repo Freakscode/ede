@@ -56,7 +56,7 @@ class CompletedFormCardWidget extends StatelessWidget {
                         child: Text(
                           form.title,
                           style: const TextStyle(
-                            color: Color(0xFF1E1E1E),
+                            color: DAGRDColors.onSurface,
                             fontFamily: 'Work Sans',
                             fontWeight: FontWeight.w500,
                             fontSize: 14,
@@ -70,7 +70,7 @@ class CompletedFormCardWidget extends StatelessWidget {
                         children: [
                           Container(
                             decoration: BoxDecoration(
-                              color: const Color(0xFFFEE2E2),
+                              color: DAGRDColors.errorClaro,
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: IconButton(
@@ -79,7 +79,7 @@ class CompletedFormCardWidget extends StatelessWidget {
                                 width: 20,
                                 height: 20,
                                 colorFilter: const ColorFilter.mode(
-                                  Color(0xFFDC2626),
+                                  DAGRDColors.errorOscuro,
                                   BlendMode.srcIn,
                                 ),
                               ),
@@ -99,7 +99,7 @@ class CompletedFormCardWidget extends StatelessWidget {
                         child: Text(
                           'Completado: ${form.formattedLastModified}',
                           style: const TextStyle(
-                            color: Color(0xFFC6C6C6),
+                            color: DAGRDColors.grisDeshabilitado,
                             fontFamily: 'Work Sans',
                             fontWeight: FontWeight.w400,
                             fontSize: 14,
@@ -118,14 +118,14 @@ class CompletedFormCardWidget extends StatelessWidget {
                           ),
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
-                            color: const Color(0xFFE8EDFF),
+                            color: DAGRDColors.azulInfoClaro,
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
                             form.riskEvent ?? '',
                             textAlign: TextAlign.center,
                             style: const TextStyle(
-                              color: Color(0xFF2563EB),
+                              color: DAGRDColors.azulSecundario,
                               fontFamily: 'Work Sans',
                               fontWeight: FontWeight.w500,
                               fontSize: 12,
@@ -144,9 +144,9 @@ class CompletedFormCardWidget extends StatelessWidget {
                   ActionButtonWidget(
                     title: 'Descargar',
                     icon: Icons.download_outlined,
-                    backgroundColor: const Color(0xFF232B48), // Azul DAGRD
-                    textColor: Colors.white,
-                    iconColor: Colors.white,
+                    backgroundColor: DAGRDColors.azulDAGRD, // Azul DAGRD
+                    textColor: DAGRDColors.blancoDAGRD,
+                    iconColor: DAGRDColors.blancoDAGRD,
                     onTap: onDownload,
                   ),
                   
@@ -157,9 +157,9 @@ class CompletedFormCardWidget extends StatelessWidget {
                     ActionButtonWidget(
                       title: 'Asociar a SIRE',
                       icon: Icons.link_outlined,
-                      backgroundColor: const Color(0xFFFCD34D), // Amarillo
-                      textColor: const Color(0xFF1E1E1E), // Gris oscuro
-                      iconColor: const Color(0xFF1E1E1E), // Gris oscuro
+                      backgroundColor: DAGRDColors.amarilloClaro, // Amarillo
+                      textColor: DAGRDColors.onSurface, // Gris oscuro
+                      iconColor: DAGRDColors.onSurface, // Gris oscuro
                       onTap: onAssociateToSIRE,
                     ),
                     const SizedBox(height: 8),
@@ -169,9 +169,9 @@ class CompletedFormCardWidget extends StatelessWidget {
                   ActionButtonWidget(
                     title: 'Enviar por correo',
                     icon: Icons.send_outlined,
-                    backgroundColor: const Color(0xFF3B82F6), // Azul medio
-                    textColor: const Color(0xFFFFFFFF), // Blanco
-                    iconColor: const Color(0xFFFFFFFF), // Blanco
+                    backgroundColor: DAGRDColors.azulMedio, // Azul medio
+                    textColor: DAGRDColors.blancoDAGRD, // Blanco
+                    iconColor: DAGRDColors.blancoDAGRD, // Blanco
                     onTap: onSendEmail,
                   ),
                 ],

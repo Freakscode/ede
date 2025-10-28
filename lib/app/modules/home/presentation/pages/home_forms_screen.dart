@@ -10,13 +10,16 @@ import '../../presentation/bloc/home_event.dart';
 import '../../presentation/bloc/home_state.dart';
 import 'package:caja_herramientas/app/modules/auth/bloc/auth_bloc.dart';
 import 'package:caja_herramientas/app/modules/auth/bloc/auth_state.dart';
-import '../../domain/entities/form_navigation_data.dart';
 import '../../domain/entities/form_entity.dart';
 import '../../../../shared/services/form_persistence_service.dart';
 import '../../../../shared/models/risk_event_factory.dart';
 import '../../../../shared/models/complete_form_data_model.dart';
 import 'package:caja_herramientas/app/modules/risk_threat_analysis/presentation/bloc/risk_threat_analysis_bloc.dart';
 import 'package:caja_herramientas/app/modules/risk_threat_analysis/presentation/bloc/risk_threat_analysis_event.dart';
+import 'package:go_router/go_router.dart';
+import 'package:caja_herramientas/app/shared/widgets/dialogs/custom_action_dialog.dart';
+import 'package:caja_herramientas/app/shared/widgets/snackbars/custom_snackbar.dart';
+import 'package:caja_herramientas/app/modules/home/presentation/widgets/filter_dialog.dart';
 
 class HomeFormsScreen extends StatefulWidget {
   const HomeFormsScreen({super.key});
@@ -27,6 +30,12 @@ class HomeFormsScreen extends StatefulWidget {
 
 class _HomeFormsScreenState extends State<HomeFormsScreen> {
   int _tabIndex = 0;
+  
+  // Variables de filtros
+  DateTime? _startDate;
+  DateTime? _endDate;
+  String _selectedPhenomenon = 'Todos';
+  String _sireNumber = '';
 
   @override
   void initState() {
@@ -230,6 +239,39 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
     }
   }
 
+  // Método para filtrar los formularios completados
+  List<FormEntity> _filterCompletedForms(List<FormEntity> forms) {
+    return forms.where((form) {
+      // Filtro por fenómeno amenazante
+      if (_selectedPhenomenon != 'Todos') {
+        if (form.riskEvent != _selectedPhenomenon) {
+          return false;
+        }
+      }
+      
+      // Filtro por rango de fechas
+      if (_startDate != null || _endDate != null) {
+        final formDate = form.lastModified;
+        
+        if (_startDate != null && formDate.isBefore(_startDate!)) {
+          return false;
+        }
+        
+        if (_endDate != null && formDate.isAfter(_endDate!.add(const Duration(days: 1)))) {
+          return false;
+        }
+      }
+      
+      // Filtro por número SIRE
+      if (_sireNumber.isNotEmpty) {
+        // TODO: Implementar filtro por número SIRE cuando esté disponible en FormEntity
+        // Por ahora, no filtrar por SIRE
+      }
+      
+      return true;
+    }).toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<HomeBloc, HomeState>(
@@ -360,7 +402,31 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
                                 BlendMode.srcIn,
                               ),
                             ),
-                            onPressed: () {},
+                            onPressed: () async {
+                              // Get authentication status
+                              final authState = context.read<AuthBloc>().state;
+                              final isAuthenticated = authState is AuthAuthenticated;
+                              
+                              final filters = await FilterDialog.show(
+                                context,
+                                isUserAuthenticated: isAuthenticated,
+                              );
+                              if (filters != null && mounted) {
+                                // Aplicar filtros
+                                setState(() {
+                                  _startDate = filters['startDate'];
+                                  _endDate = filters['endDate'];
+                                  _selectedPhenomenon = filters['phenomenon'] ?? 'Todos';
+                                  _sireNumber = filters['sireNumber'] ?? '';
+                                });
+                                
+                                CustomSnackBar.showInfo(
+                                  context,
+                                  message: 'Filtros aplicados',
+                                  title: 'Filtros',
+                                );
+                              }
+                            },
                           ),
                         ],
                       ),
@@ -371,7 +437,7 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
                 child: Text(
                   _tabIndex == 0
                       ? '${state.inProgressForms.length} formularios en proceso'
-                      : '${state.completedForms.length} formularios finalizados',
+                      : '${_filterCompletedForms(state.completedForms).length} formularios finalizados',
                   style: const TextStyle(
                     color: Colors.black,
                     fontFamily: 'Work Sans',
@@ -422,14 +488,6 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
                             onDelete: () =>
                                 _deleteForm(context, form.id, form.title),
                             onTap: () {
-                              print('=== DEBUG onTap FormCardInProgress ===');
-                              print('form.id: ${form.id}');
-                              print('=== DEBUG _navigateToForm ===');
-                              print('progress: $progress');
-                              print('amenaza: ${progress['amenaza']}');
-                              print('vulnerabilidad: ${progress['vulnerabilidad']}');
-                              print('total: ${progress['total']}');
-                              print('=== END DEBUG _navigateToForm ===');
                               _navigateToForm(context, form);
                             },
                           );
@@ -440,7 +498,7 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
                 }),
               ] else ...[
                 // Formularios completados
-                ...state.completedForms.asMap().entries.map((entry) {
+                ..._filterCompletedForms(state.completedForms).asMap().entries.map((entry) {
                   final index = entry.key;
                   final form = entry.value;
                   return Column(
@@ -495,25 +553,17 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
         // Priorizar amenaza primero, ya que es el flujo natural de creación
         String classificationType = 'amenaza'; // Por defecto
         
-        print('=== DEBUG classificationType logic ===');
-        print('amenazaProbabilidadSelections: ${completeForm.amenazaProbabilidadSelections}');
-        print('amenazaIntensidadSelections: ${completeForm.amenazaIntensidadSelections}');
-        print('vulnerabilidadSelections: ${completeForm.vulnerabilidadSelections}');
         
         // Si hay datos de amenaza (probabilidad o intensidad), usar amenaza
         if (completeForm.amenazaProbabilidadSelections.isNotEmpty || 
             completeForm.amenazaIntensidadSelections.isNotEmpty) {
           classificationType = 'amenaza';
-          print('Using amenaza classification');
         }
         // Solo usar vulnerabilidad si hay datos específicos de vulnerabilidad Y amenaza está completa
         else if (completeForm.vulnerabilidadSelections.isNotEmpty) {
           classificationType = 'vulnerabilidad';
-          print('Using vulnerabilidad classification');
         }
         
-        print('Final classificationType: $classificationType');
-        print('=== END DEBUG classificationType logic ===');
 
         // Calcular el progreso del formulario
         final progress = await _getFormProgress(form.id);
@@ -536,106 +586,86 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
           progressData: progress,
         ));
 
-        // Navegar a la pantalla de categorías para ver el progreso y continuar
-        homeBloc.add(
-          HomeShowRiskCategoriesScreen(
-            FormNavigationData.forExistingForm(
-              eventName: completeForm.eventName,
-              formId: completeForm.id,
-              showProgressInfo: true,
-              progressData: progress, // Pasar el progreso calculado
-            ),
-          ),
-        );
+        // Navegar al RiskThreatAnalysisScreen (siempre empieza en CategoriesScreen)
+        // Convertir eventName a eventId usando RiskEventFactory
+        final riskEvent = RiskEventFactory.getEventByName(completeForm.eventName);
+        final eventId = riskEvent?.id ?? completeForm.eventName; // Fallback al nombre si no se encuentra
+        
+        final navigationData = {
+          'eventId': eventId,
+          'formId': completeForm.id,
+          'showProgressInfo': true,
+          'progressData': progress,
+        };
+        
+        if (!mounted) return;
+        context.go('/risk-threat-analysis', extra: navigationData);
       } else {
         // Si no se encuentra el formulario, mostrar error
         if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('No se pudo cargar el formulario'),
-            backgroundColor: Colors.red,
-          ),
+        CustomSnackBar.showError(
+          context,
+          message: 'No se pudo cargar el formulario',
+          title: 'Error',
         );
       }
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error al cargar el formulario: $e'),
-          backgroundColor: Colors.red,
-        ),
+      CustomSnackBar.showError(
+        context,
+        message: 'Error al cargar el formulario: $e',
+        title: 'Error',
       );
     }
   }
 
   void _deleteForm(BuildContext context, String formId, String formTitle) {
-    showDialog(
+    CustomActionDialog.show(
       context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text(
-            'Eliminar formulario',
-            style: TextStyle(
-              color: DAGRDColors.azulDAGRD,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          content: Text(
-            '¿Estás seguro de que deseas eliminar el formulario "$formTitle"?\n\nEsta acción no se puede deshacer.',
-            style: const TextStyle(fontSize: 16, height: 1.4),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              style: TextButton.styleFrom(foregroundColor: Colors.grey[600]),
-              child: const Text('Cancelar'),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                Navigator.of(context).pop();
-                try {
-                  // Eliminar formulario completo desde SQLite
-                  final persistenceService = FormPersistenceService();
-                  await persistenceService.deleteForm(formId);
+      title: 'Eliminar formulario',
+      message: '¿Está seguro que desea eliminar el borrador de este formulario?',
+      leftButtonText: 'Cancelar',
+      leftButtonIcon: Icons.close,
+      onLeftButtonPressed: () => Navigator.of(context).pop(),
+      rightButtonText: 'Eliminar',
+      rightButtonIcon: Icons.delete,
+      rightButtonColor: Colors.red,
+      onRightButtonPressed: () async {
+        Navigator.of(context).pop();
+        try {
+          // Eliminar formulario completo desde SQLite
+          final persistenceService = FormPersistenceService();
+          await persistenceService.deleteForm(formId);
 
-                  // Recargar la lista de formularios
-                  context.read<HomeBloc>().add(LoadForms());
+          // Check if widget is still mounted before using context
+          if (!mounted) return;
 
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Formulario "$formTitle" eliminado'),
-                      backgroundColor: Colors.red,
-                      duration: const Duration(seconds: 2),
-                    ),
-                  );
-                } catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Error al eliminar formulario: $e'),
-                      backgroundColor: Colors.red,
-                    ),
-                  );
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                foregroundColor: Colors.white,
-              ),
-              child: const Text('Eliminar'),
-            ),
-          ],
-        );
+          // Recargar la lista de formularios
+          context.read<HomeBloc>().add(LoadForms());
+
+          CustomSnackBar.showSuccess(
+            context,
+            message: 'Formulario "$formTitle" eliminado',
+            title: 'Eliminado',
+            duration: const Duration(seconds: 2),
+          );
+        } catch (e) {
+          if (!mounted) return;
+          CustomSnackBar.showError(
+            context,
+            message: 'Error al eliminar formulario: $e',
+            title: 'Error',
+          );
+        }
       },
     );
   }
 
 
   void _showMessage(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.orange,
-      ),
+    CustomSnackBar.showWarning(
+      context,
+      message: message,
     );
   }
 }

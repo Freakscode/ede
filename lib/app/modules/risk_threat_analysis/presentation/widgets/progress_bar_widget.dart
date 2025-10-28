@@ -61,37 +61,29 @@ class ProgressBarWidget extends StatelessWidget {
   
   double _calculateProgress(BuildContext context, RiskThreatAnalysisState state) {
     try {
-      print('DEBUG: _calculateProgress called with selectedClassification = ${state.selectedClassification}');
       
       // Para ambas clasificaciones (amenaza y vulnerabilidad): calcular basado en subclasificaciones
       if ((state.selectedClassification ?? '').toLowerCase().trim() == 'amenaza') {
-        print('DEBUG: calculating amenaza progress');
         return _calculateAmenazaProgress(context, state);
       } else if ((state.selectedClassification ?? '').toLowerCase().trim() == 'vulnerabilidad') {
-        print('DEBUG: calculating vulnerabilidad progress');
         return _calculateVulnerabilidadProgress(context, state);
       }
       
-      print('DEBUG: no matching classification, returning 0.0');
       return 0.0;
     } catch (e) {
-      print('ERROR in _calculateProgress: $e');
       return 0.0;
     }
   }
   
   double _calculateAmenazaProgress(BuildContext context, RiskThreatAnalysisState state) {
     try {
-      print('=== AMENAZA PROGRESS CALCULATION ===');
       
       // Obtener todas las subclasificaciones de amenaza (probabilidad + intensidad)
       final bloc = context.read<RiskThreatAnalysisBloc>();
       final amenazaSubClassifications = bloc.getAmenazaSubClassifications();
       
-      print('DEBUG: amenazaSubClassifications.length = ${amenazaSubClassifications.length}');
       
       if (amenazaSubClassifications.isEmpty) {
-        print('DEBUG: No amenaza subClassifications found');
         return 0.0;
       }
       
@@ -103,11 +95,8 @@ class ProgressBarWidget extends StatelessWidget {
           .where((sub) => sub.id == 'intensidad')
           .firstOrNull;
       
-      print('DEBUG: probabilidadSubClassification = $probabilidadSubClassification');
-      print('DEBUG: intensidadSubClassification = $intensidadSubClassification');
       
       if (probabilidadSubClassification == null || intensidadSubClassification == null) {
-        print('DEBUG: Missing subClassification');
         return 0.0;
       }
       
@@ -117,46 +106,31 @@ class ProgressBarWidget extends StatelessWidget {
       final totalCategories = probabilidadCategories.length + intensidadCategories.length;
       final total = totalCategories.toDouble();
       
-      print('DEBUG: probabilidadCategories.length = ${probabilidadCategories.length}');
-      print('DEBUG: intensidadCategories.length = ${intensidadCategories.length}');
-      print('DEBUG: total = $total');
       
       if (total == 0) {
-        print('DEBUG: total is 0');
         return 0.0;
       }
       
       // Contar cuántas categorías tienen selecciones
       double completed = 0.0;
-      print('DEBUG: About to check selections...');
-      print('DEBUG: probabilidadSelections = ${state.probabilidadSelections}');
-      print('DEBUG: intensidadSelections = ${state.intensidadSelections}');
       
       // Verificar categorías de probabilidad
-      print('DEBUG: Checking PROBABILIDAD categories:');
       for (final category in probabilidadCategories) {
-        print('DEBUG: - ${category.title}');
         final hasSelection = state.probabilidadSelections.containsKey(category.title);
-        print('DEBUG: category ${category.title} hasSelection = $hasSelection');
         if (hasSelection) {
           completed += 1;
         }
       }
       
       // Verificar categorías de intensidad
-      print('DEBUG: Checking INTENSIDAD categories:');
       for (final category in intensidadCategories) {
-        print('DEBUG: - ${category.title}');
         final hasSelection = state.intensidadSelections.containsKey(category.title);
-        print('DEBUG: category ${category.title} hasSelection = $hasSelection');
         if (hasSelection) {
           completed += 1;
         }
       }
       
       final progress = completed / total;
-      print('DEBUG: completed = $completed, total = $total, progress = $progress');
-      print('=== END AMENAZA PROGRESS CALCULATION ===');
       return progress;
     } catch (e) {
       print('ERROR in _calculateAmenazaProgress: $e');

@@ -5,6 +5,7 @@ import 'dart:async';
 
 import 'package:caja_herramientas/app/modules/risk_threat_analysis/presentation/pages/risk_threat_analysis_screen.dart';
 import 'package:caja_herramientas/app/modules/risk_threat_analysis/presentation/pages/final_risk_results_screen.dart';
+import 'package:caja_herramientas/app/modules/risk_threat_analysis/presentation/pages/categories_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -12,6 +13,8 @@ import '../modules/auth/ui/pages/login_screen.dart';
 import '../modules/splash/presentation/pages/splash_screen.dart';
 import '../modules/home/presentation/pages/home_screen.dart' as home;
 import '../modules/home/presentation/pages/home_forms_screen.dart';
+import '../modules/home/presentation/bloc/home_bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../modules/evaluacion/presentation/pages/home_screen.dart'
     as evaluacion;
@@ -56,20 +59,19 @@ GoRouter getAppRouter(BuildContext context) {
         path: '/home_forms',
         builder: (context, state) => const HomeFormsScreen(),
       ),
+      // Risk Threat Analysis - Análisis de riesgo y amenazas
       GoRoute(
-        path: '/risk_threat_analysis',
+        path: '/risk-threat-analysis',
         builder: (context, state) {
-          // Manejar tanto String (compatibilidad) como Map (nuevo formato)
-          if (state.extra is Map<String, dynamic>) {
-            final navigationData = state.extra as Map<String, dynamic>;
-            return RiskThreatAnalysisScreen(
-              selectedEvent: navigationData['event'] as String?,
-              navigationData: navigationData,
-            );
-          } else {
-            final selectedEvent = state.extra as String?;
-            return RiskThreatAnalysisScreen(selectedEvent: selectedEvent);
-          }
+          final navigationData = state.extra as Map<String, dynamic>? ?? {};
+          final formId = navigationData['formId'] as String?;
+          final formMode = (formId != null && formId.isNotEmpty) ? 'edit' : 'create';
+          
+          return RiskThreatAnalysisScreen(
+            eventId: navigationData['eventId'] as String?,
+            formId: navigationData['formId'] as String?,
+            formMode: formMode,
+          );
         },
       ),
       

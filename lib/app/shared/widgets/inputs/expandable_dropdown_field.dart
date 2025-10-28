@@ -117,16 +117,16 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
                       : BorderRadius.circular(8),
                 ),
                 child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            (widget.value != null && widget.value!.isNotEmpty)
-                                ? widget.value!
-                                : widget.hint,
+                            widget.hint,
                             style: TextStyle(
                               color: widget.isSelected
                                   ? const Color(0xFF1E1E1E)

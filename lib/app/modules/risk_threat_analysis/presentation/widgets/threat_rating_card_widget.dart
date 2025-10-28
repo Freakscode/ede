@@ -55,13 +55,13 @@ class ThreatRatingCardWidget extends StatelessWidget {
               ),
             ),
           ),
-          // Contenido amarillo
+          // Contenido con color dinámico según el nivel
           Container(
             width: double.infinity,
             height: 40,
             padding: const EdgeInsets.fromLTRB(50, 10, 40, 10),
             decoration: const BoxDecoration(
-              color: DAGRDColors.nivelMedioBajo,
+              color: DAGRDColors.amarilloDAGRD,
               borderRadius: BorderRadius.only(
                 bottomLeft: Radius.circular(8),
                 bottomRight: Radius.circular(8),

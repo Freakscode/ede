@@ -15,6 +15,7 @@ import '../../domain/use_cases/validate_unqualified_variables_usecase.dart';
 import '../../domain/use_cases/calculate_global_score_usecase.dart';
 import 'risk_threat_analysis_event.dart';
 import 'risk_threat_analysis_state.dart';
+import '../models/form_mode.dart';
 
 /// BLoC de compatibilidad temporal para RiskThreatAnalysis
 /// Mantiene métodos del BLoC original mientras se refactorizan las pantallas
@@ -47,6 +48,9 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     on<UpdateIntensidadSelection>(_onUpdateIntensidadSelection);
     on<UpdateSelectedRiskEvent>(_onUpdateSelectedRiskEvent);
     on<SelectClassification>(_onSelectClassification);
+    on<SetFormMode>(_onSetFormMode);
+    on<SetCreateMode>(_onSetCreateMode);
+    on<SetEditMode>(_onSetEditMode);
     on<ToggleDynamicDropdown>(_onToggleDynamicDropdown);
     on<UpdateDynamicSelection>(_onUpdateDynamicSelection);
     on<ShowFinalResults>(_onShowFinalResults);
@@ -165,7 +169,22 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
       final newSelections = Map<String, String>.from(state.probabilidadSelections);
       newSelections[event.category] = event.selection;
       
-      emit(state.copyWith(probabilidadSelections: newSelections));
+      // Recalcular score de probabilidad
+      final probabilidadScore = _calculateWeightedAverage(
+        'probabilidad',
+        newSelections,
+      );
+      
+      final updatedScores = Map<String, double>.from(state.subClassificationScores);
+      updatedScores['probabilidad'] = probabilidadScore;
+      final updatedColors = Map<String, Color>.from(state.subClassificationColors);
+      updatedColors['probabilidad'] = _scoreToColor(probabilidadScore);
+      
+      emit(state.copyWith(
+        probabilidadSelections: newSelections,
+        subClassificationScores: updatedScores,
+        subClassificationColors: updatedColors,
+      ));
     } catch (e) {
       emit(state.setError('Error al actualizar selección de probabilidad: $e'));
     }
@@ -179,7 +198,22 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
       final newSelections = Map<String, String>.from(state.intensidadSelections);
       newSelections[event.category] = event.selection;
       
-      emit(state.copyWith(intensidadSelections: newSelections));
+      // Recalcular score de intensidad
+      final intensidadScore = _calculateWeightedAverage(
+        'intensidad',
+        newSelections,
+      );
+      
+      final updatedScores = Map<String, double>.from(state.subClassificationScores);
+      updatedScores['intensidad'] = intensidadScore;
+      final updatedColors = Map<String, Color>.from(state.subClassificationColors);
+      updatedColors['intensidad'] = _scoreToColor(intensidadScore);
+      
+      emit(state.copyWith(
+        intensidadSelections: newSelections,
+        subClassificationScores: updatedScores,
+        subClassificationColors: updatedColors,
+      ));
     } catch (e) {
       emit(state.setError('Error al actualizar selección de intensidad: $e'));
     }
@@ -206,6 +240,41 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
       }
     } catch (e) {
       emit(state.setError('Error al seleccionar clasificación: $e'));
+    }
+  }
+
+  Future<void> _onSetFormMode(
+    SetFormMode event,
+    Emitter<RiskThreatAnalysisState> emit,
+  ) async {
+    try {
+      if (state.formMode != event.mode) {
+        emit(state.copyWith(formMode: event.mode));
+      }
+    } catch (e) {
+      emit(state.setError('Error al establecer modo del formulario: $e'));
+    }
+  }
+
+  Future<void> _onSetCreateMode(
+    SetCreateMode event,
+    Emitter<RiskThreatAnalysisState> emit,
+  ) async {
+    try {
+      emit(state.copyWith(formMode: FormMode.create));
+    } catch (e) {
+      emit(state.setError('Error al establecer modo creación: $e'));
+    }
+  }
+
+  Future<void> _onSetEditMode(
+    SetEditMode event,
+    Emitter<RiskThreatAnalysisState> emit,
+  ) async {
+    try {
+      emit(state.copyWith(formMode: FormMode.edit));
+    } catch (e) {
+      emit(state.setError('Error al establecer modo edición: $e'));
     }
   }
 
@@ -267,18 +336,19 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     try {
       emit(state.setLoading(true));
       
-      print('=== DEBUG _onLoadFormData ===');
-      print('event.eventName: ${event.eventName}');
-      print('event.classificationType: ${event.classificationType}');
-      print('event.evaluationData keys: ${event.evaluationData?.keys.toList()}');
       
       // Si hay datos de evaluación específicos, cargarlos directamente
       if (event.evaluationData != null) {
-        // Mapear correctamente los datos del CompleteFormDataModel al estado del BLoC
-        final evaluationData = event.evaluationData!;
+        try {
+          // Mapear correctamente los datos del CompleteFormDataModel al estado del BLoC
+          final evaluationData = event.evaluationData!;
         
+        // PRESERVAR DATOS EXISTENTES: Solo actualizar si hay datos nuevos
+        final currentProbabilidadSelections = Map<String, String>.from(state.probabilidadSelections);
+        final currentIntensidadSelections = Map<String, String>.from(state.intensidadSelections);
+        final currentDynamicSelections = Map<String, Map<String, String>>.from(state.dynamicSelections);
         
-        // Mapear selecciones de amenaza - usar las claves correctas
+        // Mapear selecciones de amenaza
         final probabilidadSelections = Map<String, String>.from(
           evaluationData['amenazaProbabilidadSelections'] ?? evaluationData['probabilidadSelections'] ?? {}
         );
@@ -286,10 +356,26 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
           evaluationData['amenazaIntensidadSelections'] ?? evaluationData['intensidadSelections'] ?? {}
         );
         
-        // Mapear selecciones de vulnerabilidad - usar las claves correctas
+        // Mapear selecciones de vulnerabilidad
         final dynamicSelections = Map<String, Map<String, String>>.from(
           evaluationData['vulnerabilidadSelections'] ?? evaluationData['dynamicSelections'] ?? {}
         );
+        
+        // Siempre cargar ambos tipos de datos (amenaza y vulnerabilidad) cuando están disponibles
+        // Esto permite que la pantalla final muestre todos los datos sin restricciones
+        
+        // Actualizar datos de amenaza
+        if (probabilidadSelections.isNotEmpty) {
+          currentProbabilidadSelections.addAll(probabilidadSelections);
+        }
+        if (intensidadSelections.isNotEmpty) {
+          currentIntensidadSelections.addAll(intensidadSelections);
+        }
+        
+        // Actualizar datos de vulnerabilidad
+        if (dynamicSelections.isNotEmpty) {
+          currentDynamicSelections.addAll(dynamicSelections);
+        }
         
         
         // Mapear scores combinados
@@ -310,29 +396,14 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
           });
         }
         
-        // Fallback a subClassificationScores si no hay scores separados
-        if (evaluationData['subClassificationScores'] != null && combinedScores.isEmpty) {
+        // Mapear scores de probabilidad e intensidad si existen
+        if (evaluationData['subClassificationScores'] != null) {
           final subClassificationScores = Map<String, dynamic>.from(evaluationData['subClassificationScores']);
           subClassificationScores.forEach((key, value) {
             combinedScores[key] = (value is double) ? value : (value as num).toDouble();
           });
         }
         
-        // Si aún no hay scores, usar scores por defecto basados en las selecciones
-        if (combinedScores.isEmpty) {
-          // Calcular scores por defecto basados en las selecciones
-          if (probabilidadSelections.isNotEmpty) {
-            combinedScores['probabilidad'] = 2.0; // Score por defecto
-          }
-          if (intensidadSelections.isNotEmpty) {
-            combinedScores['intensidad'] = 2.0; // Score por defecto
-          }
-          if (dynamicSelections.isNotEmpty) {
-            dynamicSelections.forEach((key, value) {
-              combinedScores[key] = 2.0; // Score por defecto
-            });
-          }
-        }
         
         // Los colores se calculan dinámicamente basándose en los scores, no se guardan
         // No necesitamos mapear colores desde evaluationData
@@ -347,8 +418,8 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
             ? (evaluationData['evidenceCoordinates'] as Map<String, dynamic>).map(
                 (key, value) => MapEntry(
                   key, 
-                  (value as Map<int, dynamic>).map(
-                    (k, v) => MapEntry(k, Map<String, String>.from(v as Map))
+                  (value as Map<String, dynamic>).map(
+                    (k, v) => MapEntry(int.parse(k), Map<String, String>.from(v as Map))
                   )
                 )
               ) 
@@ -359,21 +430,20 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
           // Todos los datos de selección están vacíos
         }
         
-        print('=== DEBUG _onLoadFormData final state ===');
-        print('selectedRiskEvent: ${event.eventName}');
-        print('selectedClassification: ${event.classificationType}');
-        print('probabilidadSelections: $probabilidadSelections');
-        print('intensidadSelections: $intensidadSelections');
-        print('dynamicSelections: $dynamicSelections');
-        print('combinedScores: $combinedScores');
-        print('=== END DEBUG _onLoadFormData final state ===');
+      
+        
+        // NO cambiar selectedClassification si ya hay una clasificación activa
+        // Esto permite cargar tanto amenaza como vulnerabilidad sin perder datos
+        final finalClassification = state.selectedClassification?.isNotEmpty == true 
+            ? state.selectedClassification 
+            : event.classificationType;
         
         final newState = state.copyWith(
           selectedRiskEvent: event.eventName,
-          selectedClassification: event.classificationType,
-          probabilidadSelections: probabilidadSelections,
-          intensidadSelections: intensidadSelections,
-          dynamicSelections: dynamicSelections,
+          selectedClassification: finalClassification,
+          probabilidadSelections: currentProbabilidadSelections,
+          intensidadSelections: currentIntensidadSelections,
+          dynamicSelections: currentDynamicSelections,
           subClassificationScores: combinedScores,
           subClassificationColors: {}, // Los colores se calculan dinámicamente basándose en los scores
           evidenceImages: evidenceImages,
@@ -382,10 +452,33 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
           error: null,
         );
         
-        
         emit(newState);
+        
+        // Recalcular scores de amenaza si las selecciones están cargadas pero los scores no
+        if (event.classificationType.toLowerCase() == 'amenaza') {
+          if (currentProbabilidadSelections.isNotEmpty && !combinedScores.containsKey('probabilidad')) {
+            final probabilidadScore = _calculateWeightedAverage('probabilidad', currentProbabilidadSelections);
+            final intensidadScore = currentIntensidadSelections.isNotEmpty && !combinedScores.containsKey('intensidad')
+                ? _calculateWeightedAverage('intensidad', currentIntensidadSelections)
+                : combinedScores['intensidad'] ?? 0.0;
+            
+            final updatedScores = Map<String, double>.from(combinedScores);
+            updatedScores['probabilidad'] = probabilidadScore;
+            if (intensidadScore > 0) {
+              updatedScores['intensidad'] = intensidadScore;
+            }
+            
+            final finalState = newState.copyWith(subClassificationScores: updatedScores);
+            emit(finalState);
+          }
+        }
+        
         return;
+        } catch (e) {
+          // Continuar con el fallback
+        }
       }
+      
       
       // Cargar datos usando el caso de uso (comportamiento original)
       final entity = await _loadRiskAnalysisUseCase.execute(
@@ -414,6 +507,7 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
   ) async {
     try {
       emit(state.setLoading(true));
+      
       
       // Crear entidad desde el estado actual
       final entity = state.toEntity();
@@ -606,9 +700,39 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     return classification.subClassifications;
   }
 
-  /// Método de compatibilidad temporal
+  /// Método para obtener el valor seleccionado de una subclasificación
   String? getValueForSubClassification(String subClassificationId) {
-    // Siempre retornar null para que se muestre el hint (nombre de la subclasificación)
+    final classification = state.selectedClassification?.toLowerCase();
+    
+    
+    if (classification == 'amenaza') {
+      // Para amenaza, buscar en probabilidad e intensidad
+      if (subClassificationId.toLowerCase().contains('probabilidad')) {
+        // Buscar en las selecciones de probabilidad
+        final probabilidadSelections = state.probabilidadSelections;
+        if (probabilidadSelections.isNotEmpty) {
+          final value = probabilidadSelections.values.first;
+          return value;
+        }
+        return state.selectedProbabilidad;
+      } else if (subClassificationId.toLowerCase().contains('intensidad')) {
+        // Buscar en las selecciones de intensidad
+        final intensidadSelections = state.intensidadSelections;
+        if (intensidadSelections.isNotEmpty) {
+          final value = intensidadSelections.values.first;
+          return value;
+        }
+        return state.selectedIntensidad;
+      }
+    } else if (classification == 'vulnerabilidad') {
+      // Para vulnerabilidad, buscar en dynamicSelections
+      final dynamicSelections = state.dynamicSelections[subClassificationId];
+      if (dynamicSelections != null && dynamicSelections.isNotEmpty) {
+        final value = dynamicSelections.values.first;
+        return value;
+      }
+    }
+    
     return null;
   }
 
@@ -703,20 +827,71 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
   /// Método de compatibilidad temporal
   Color getThreatBackgroundColor() {
     try {
-      final formData = getCurrentFormData();
-      final globalScoreInfo = _calculateGlobalScoreUseCase.getGlobalScoreInfo(formData);
-      
-      // Determinar qué score usar según la clasificación actual
       double score;
       Color color;
       
       if ((state.selectedClassification ?? '').toLowerCase() == 'amenaza') {
+        // Verificar si hay selecciones REALES del usuario
+        if (state.probabilidadSelections.isEmpty && state.intensidadSelections.isEmpty) {
+          return DAGRDColors.outlineVariant;
+        }
+        
+        // Para amenaza, usar el use case
+        final formData = getCurrentFormData();
+        final globalScoreInfo = _calculateGlobalScoreUseCase.getGlobalScoreInfo(formData);
         score = globalScoreInfo['amenazaScore'] ?? 0.0;
         color = globalScoreInfo['amenazaColor'] ?? DAGRDColors.outlineVariant;
       } else if ((state.selectedClassification ?? '').toLowerCase() == 'vulnerabilidad') {
-        score = globalScoreInfo['vulnerabilidadScore'] ?? 0.0;
-        color = globalScoreInfo['vulnerabilidadColor'] ?? DAGRDColors.outlineVariant;
+        // Verificar si hay selecciones REALES del usuario
+        if (state.dynamicSelections.isEmpty) {
+          return DAGRDColors.outlineVariant;
+        }
+        
+        // Verificar si hay al menos una selección no vacía
+        bool hasValidSelections = false;
+        for (final entry in state.dynamicSelections.entries) {
+          if (entry.value.isNotEmpty) {
+            hasValidSelections = true;
+            break;
+          }
+        }
+        
+        if (!hasValidSelections) {
+          return DAGRDColors.outlineVariant;
+        }
+        
+        // Para vulnerabilidad, calcular con promedio PONDERADO
+        // Pesos según Excel: FRAGILIDAD FÍSICA: 45%, FRAGILIDAD EN PERSONAS: 10%, EXPOSICIÓN: 45%
+        final Map<String, double> pesos = {
+          'fragilidad_fisica': 0.45,
+          'fragilidad_personas': 0.10,
+          'exposicion': 0.45,
+        };
+        
+        double weightedSum = 0.0;
+        int count = 0;
+        
+        for (final entry in state.subClassificationScores.entries) {
+          final subClassificationId = entry.key;
+          final subScore = entry.value;
+          final peso = pesos[subClassificationId] ?? 0.0;
+          
+          if (subScore > 0 && peso > 0) {
+            weightedSum += (subScore * peso);
+            count++;
+          }
+        }
+        
+        if (count > 0 && weightedSum > 0) {
+          score = weightedSum; // Los pesos ya suman 1.0
+          color = _getColorFromScore(score);
+        } else {
+          score = 0.0;
+          color = DAGRDColors.outlineVariant;
+        }
       } else {
+        final formData = getCurrentFormData();
+        final globalScoreInfo = _calculateGlobalScoreUseCase.getGlobalScoreInfo(formData);
         score = globalScoreInfo['finalScore'] ?? 0.0;
         color = globalScoreInfo['finalColor'] ?? DAGRDColors.outlineVariant;
       }
@@ -731,24 +906,90 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
       return DAGRDColors.outlineVariant; // #D1D5DB
     }
   }
+  
+  /// Helper para obtener color desde score
+  Color _getColorFromScore(double score) {
+    if (score <= 1.5) {
+      return DAGRDColors.nivelBajo;
+    } else if (score <= 2.5) {
+      return DAGRDColors.nivelMedioBajo;
+    } else if (score <= 3.5) {
+      return DAGRDColors.nivelMedioAlto;
+    } else if (score <= 4.5) {
+      return DAGRDColors.nivelAlto;
+    } else {
+      return Colors.deepPurple;
+    }
+  }
 
   /// Método de compatibilidad temporal
   String getFormattedThreatRating() {
     try {
-      final formData = getCurrentFormData();
-      final globalScoreInfo = _calculateGlobalScoreUseCase.getGlobalScoreInfo(formData);
-      
-      // Determinar qué score usar según la clasificación actual
       double score;
       String level;
       
       if ((state.selectedClassification ?? '').toLowerCase() == 'amenaza') {
+        // Para amenaza, verificar si hay selecciones REALES del usuario
+        if (state.probabilidadSelections.isEmpty && state.intensidadSelections.isEmpty) {
+          return 'SIN CALIFICAR';
+        }
+        
+        // Calcular del promedio de probabilidad e intensidad
+        final formData = getCurrentFormData();
+        final globalScoreInfo = _calculateGlobalScoreUseCase.getGlobalScoreInfo(formData);
         score = globalScoreInfo['amenazaScore'] ?? 0.0;
         level = globalScoreInfo['amenazaLevel'] ?? 'SIN CALIFICAR';
       } else if ((state.selectedClassification ?? '').toLowerCase() == 'vulnerabilidad') {
-        score = globalScoreInfo['vulnerabilidadScore'] ?? 0.0;
-        level = globalScoreInfo['vulnerabilidadLevel'] ?? 'SIN CALIFICAR';
+        // Para vulnerabilidad, verificar si hay selecciones REALES del usuario
+        if (state.dynamicSelections.isEmpty) {
+          return 'SIN CALIFICAR';
+        }
+        
+        // Verificar si hay al menos una selección no vacía
+        bool hasValidSelections = false;
+        for (final entry in state.dynamicSelections.entries) {
+          if (entry.value.isNotEmpty) {
+            hasValidSelections = true;
+            break;
+          }
+        }
+        
+        if (!hasValidSelections) {
+          return 'SIN CALIFICAR';
+        }
+        
+        // Usar los scores ya calculados en el state con promedio PONDERADO
+        // Pesos según Excel: FRAGILIDAD FÍSICA: 45%, FRAGILIDAD EN PERSONAS: 10%, EXPOSICIÓN: 45%
+        final Map<String, double> pesos = {
+          'fragilidad_fisica': 0.45,
+          'fragilidad_personas': 0.10,
+          'exposicion': 0.45,
+        };
+        
+        double weightedSum = 0.0;
+        int count = 0;
+        
+        for (final entry in state.subClassificationScores.entries) {
+          final subClassificationId = entry.key;
+          final subScore = entry.value;
+          final peso = pesos[subClassificationId] ?? 0.0;
+          
+          if (subScore > 0 && peso > 0) {
+            weightedSum += (subScore * peso);
+            count++;
+          }
+        }
+        
+        if (count > 0 && weightedSum > 0) {
+          score = weightedSum; // Los pesos ya suman 1.0, no necesitamos dividir
+          level = _getLevelFromScore(score);
+        } else {
+          score = 0.0;
+          level = 'SIN CALIFICAR';
+        }
       } else {
+        final formData = getCurrentFormData();
+        final globalScoreInfo = _calculateGlobalScoreUseCase.getGlobalScoreInfo(formData);
         score = globalScoreInfo['finalScore'] ?? 0.0;
         level = globalScoreInfo['finalLevel'] ?? 'SIN CALIFICAR';
       }
@@ -763,35 +1004,109 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
       return 'SIN CALIFICAR';
     }
   }
+  
+  /// Helper para obtener nivel desde score
+  /// Rangos según Excel para escalas de 1-4:
+  /// BAJO: 1.0 - 1.75
+  /// MEDIO-BAJO: 1.76 - 2.5
+  /// MEDIO-ALTO: 2.51 - 3.25
+  /// ALTO: 3.26 - 4.0
+  String _getLevelFromScore(double score) {
+    // Redondear a 2 decimales para comparaciones precisas
+    final rounded = double.parse(score.toStringAsFixed(2));
+    
+    if (rounded >= 1.0 && rounded <= 1.75) {
+      return 'BAJO';
+    } else if (rounded > 1.75 && rounded <= 2.5) {
+      return 'MEDIO - BAJO';
+    } else if (rounded > 2.5 && rounded <= 3.25) {
+      return 'MEDIO - ALTO';
+    } else if (rounded > 3.25 && rounded <= 4.0) {
+      return 'ALTO';
+    } else {
+      return 'SIN CALIFICAR';
+    }
+  }
 
   /// Método de compatibilidad temporal
   Color getThreatTextColor() {
     try {
-      final formData = getCurrentFormData();
-      final globalScoreInfo = _calculateGlobalScoreUseCase.getGlobalScoreInfo(formData);
-      
-      // Determinar qué score usar según la clasificación actual
       double score;
-      Color color;
+      Color bgColor;
       
       if ((state.selectedClassification ?? '').toLowerCase() == 'amenaza') {
+        // Verificar si hay selecciones REALES del usuario
+        if (state.probabilidadSelections.isEmpty && state.intensidadSelections.isEmpty) {
+          return Colors.black;
+        }
+        
+        final formData = getCurrentFormData();
+        final globalScoreInfo = _calculateGlobalScoreUseCase.getGlobalScoreInfo(formData);
         score = globalScoreInfo['amenazaScore'] ?? 0.0;
-        color = globalScoreInfo['amenazaColor'] ?? Colors.grey;
+        bgColor = globalScoreInfo['amenazaColor'] ?? Colors.grey;
       } else if ((state.selectedClassification ?? '').toLowerCase() == 'vulnerabilidad') {
-        score = globalScoreInfo['vulnerabilidadScore'] ?? 0.0;
-        color = globalScoreInfo['vulnerabilidadColor'] ?? Colors.grey;
+        // Verificar si hay selecciones REALES del usuario
+        if (state.dynamicSelections.isEmpty) {
+          return Colors.black;
+        }
+        
+        // Verificar si hay al menos una selección no vacía
+        bool hasValidSelections = false;
+        for (final entry in state.dynamicSelections.entries) {
+          if (entry.value.isNotEmpty) {
+            hasValidSelections = true;
+            break;
+          }
+        }
+        
+        if (!hasValidSelections) {
+          return Colors.black;
+        }
+        
+        // Para vulnerabilidad, calcular con promedio PONDERADO
+        // Pesos según Excel: FRAGILIDAD FÍSICA: 45%, FRAGILIDAD EN PERSONAS: 10%, EXPOSICIÓN: 45%
+        final Map<String, double> pesos = {
+          'fragilidad_fisica': 0.45,
+          'fragilidad_personas': 0.10,
+          'exposicion': 0.45,
+        };
+        
+        double weightedSum = 0.0;
+        int count = 0;
+        
+        for (final entry in state.subClassificationScores.entries) {
+          final subClassificationId = entry.key;
+          final subScore = entry.value;
+          final peso = pesos[subClassificationId] ?? 0.0;
+          
+          if (subScore > 0 && peso > 0) {
+            weightedSum += (subScore * peso);
+            count++;
+          }
+        }
+        
+        if (count > 0 && weightedSum > 0) {
+          score = weightedSum; // Los pesos ya suman 1.0
+          bgColor = _getColorFromScore(score);
+        } else {
+          score = 0.0;
+          bgColor = DAGRDColors.outlineVariant;
+        }
       } else {
+        final formData = getCurrentFormData();
+        final globalScoreInfo = _calculateGlobalScoreUseCase.getGlobalScoreInfo(formData);
         score = globalScoreInfo['finalScore'] ?? 0.0;
-        color = globalScoreInfo['finalColor'] ?? Colors.grey;
+        bgColor = globalScoreInfo['finalColor'] ?? Colors.grey;
       }
       
       // Si no hay score (0.0), devolver negro para texto sobre fondo gris
       if (score == 0.0) {
-    return Colors.black;
+        return Colors.black;
       }
       
       // Retornar color de texto basado en el color de fondo
-      return color == Colors.grey ? Colors.black : Colors.white;
+      // Todos los colores DAGRD usan texto blanco excepto el gris
+      return bgColor == DAGRDColors.outlineVariant ? Colors.black : Colors.white;
     } catch (e) {
       return Colors.black;
     }
@@ -850,20 +1165,7 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
 
   /// Método centralizado para obtener el color basado en el rating
   Color getColorFromRating(int rating) {
-    switch (rating) {
-      case -1:
-        return DAGRDColors.grisMedio; // Gris más oscuro para "No Aplica"
-      case 1:
-        return Colors.green;
-      case 2:
-        return Colors.yellow;
-      case 3:
-        return Colors.orange;
-      case 4:
-        return Colors.red;
-      default:
-        return DAGRDColors.grisMedio; // Gris para sin calificar
-    }
+    return DAGRDColors.getNivelColorFromRating(rating);
   }
 
   /// Método centralizado para obtener la selección de una categoría
@@ -882,6 +1184,14 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
   /// Método centralizado para calcular el score de una sección
   String calculateSectionScore(String subClassificationId) {
     final categories = getCategoriesForCurrentSubClassification(subClassificationId);
+    
+    // Si existe un score pre-calculado en el state, usarlo
+    if (state.subClassificationScores.containsKey(subClassificationId)) {
+      final score = state.subClassificationScores[subClassificationId] ?? 0.0;
+      return score.toStringAsFixed(2).replaceAll('.', ',');
+    }
+    
+    // Si no hay score pre-calculado, calcular con promedio SIMPLE para compatibilidad
     final validRatings = <int>[];
     
     for (final category in categories) {
@@ -1103,6 +1413,10 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
         classification == 'amenaza' && subClassificationId == 'probabilidad') {
       return 'weighted_average';
     }
+    // Inundación y otros eventos también deben usar promedio ponderado
+    if (eventName == 'Inundación' || eventName == 'Movimiento en Masa' || eventName == 'Avenida Torrencial') {
+      return 'weighted_average';
+    }
     if (classification == 'vulnerabilidad') {
       return 'weighted_average';
     }
@@ -1167,6 +1481,7 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
       
       for (final category in subClassification.categories) {
         final selectedLevel = selections[category.title];
+        
         if (selectedLevel != null && selectedLevel.isNotEmpty && selectedLevel != 'NA') {
           final calificacion = _getSelectedLevelValue(category.title, {category.title: selectedLevel});
           if (calificacion > 0) { 
@@ -1225,17 +1540,24 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
   }
 
   /// Obtener valor de nivel seleccionado (del código original)
+  /// Valores según Excel: BAJO=1, MEDIO-BAJO=2, MEDIO-ALTO=3, ALTO=4
   int _getSelectedLevelValue(String categoryTitle, Map<String, String> selections) {
     final selectedLevel = selections[categoryTitle];
     if (selectedLevel == null) return 0;
     if (selectedLevel == 'NA') return -1;
-    if (selectedLevel.contains('BAJO') && !selectedLevel.contains('MEDIO')) {
-      return 1;
-    } else if (selectedLevel.contains('MEDIO') && selectedLevel.contains('ALTO')) {
+    
+    // Normalizar el nivel
+    final normalized = selectedLevel.replaceAll('\n', ' ').trim();
+    
+    if (normalized.contains('MEDIO ALTO') || normalized.contains('MEDIO-ALTO')) {
       return 3;
-    } else if (selectedLevel.contains('MEDIO')) {
+    } else if (normalized.contains('MEDIO BAJO') || normalized.contains('MEDIO-BAJO')) {
       return 2;
-    } else if (selectedLevel.contains('ALTO')) {
+    } else if (normalized.contains('BAJO') && !normalized.contains('MEDIO')) {
+      return 1;
+    } else if (normalized.contains('MEDIO') && !normalized.contains('ALTO') && !normalized.contains('BAJO')) {
+      return 2;
+    } else if (normalized.contains('ALTO') && !normalized.contains('MEDIO')) {
       return 4;
     }
     return 0;

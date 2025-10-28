@@ -6,6 +6,7 @@ import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import 'package:caja_herramientas/app/shared/services/form_persistence_service.dart';
 import 'package:caja_herramientas/app/shared/models/complete_form_data_model.dart';
 import 'package:caja_herramientas/app/shared/widgets/dialogs/custom_action_dialog.dart';
+import 'package:caja_herramientas/app/shared/widgets/snackbars/custom_snackbar.dart';
 import 'package:caja_herramientas/app/modules/auth/services/auth_service.dart';
 import 'package:caja_herramientas/app/modules/data_registration/bloc/data_registration_bloc.dart';
 import 'package:caja_herramientas/app/modules/data_registration/bloc/data_registration_state.dart';
@@ -77,32 +78,22 @@ class SaveProgressButton extends StatelessWidget {
     final homeState = homeBloc.state;
     final authService = AuthService();
 
-    print('=== SaveProgressButton: Iniciando guardado ===');
-    print('Evento seleccionado: ${state.selectedRiskEvent ?? ''}');
-    print('Clasificación seleccionada: ${state.selectedClassification ?? ''}');
-    print('isCreatingNew: ${homeState.isCreatingNew}');
-    print('activeFormId: ${homeState.activeFormId}');
-    print('Usuario autenticado: ${authService.isLoggedIn}');
-    print('Usuario actual: ${authService.currentUser?.nombre}');
+   
     
     // Verificar que tenemos datos mínimos para guardar
     if ((state.selectedRiskEvent ?? '').isEmpty || (state.selectedClassification ?? '').isEmpty) {
-      print('ERROR: No hay datos suficientes para guardar');
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('No hay datos suficientes para guardar'),
-            backgroundColor: Colors.red,
-          ),
+        CustomSnackBar.showError(
+          context,
+          title: 'Error',
+          message: 'No hay datos suficientes para guardar',
         );
       }
       return;
     }
 
     // Usar datos pasados como parámetros o consultar del bloc como fallback
-    print('=== PROCESANDO DATOS DE CONTACTO E INSPECCIÓN ===');
-    print('Usuario autenticado: ${authService.isLoggedIn}');
-    print('Usuario actual: ${authService.currentUser?.nombre}');
+    ;
     
     // Determinar datos según el estado de autenticación
     Map<String, dynamic> contactData = {};
@@ -210,43 +201,60 @@ class SaveProgressButton extends StatelessWidget {
         );
 
         // Crear formulario con datos actuales
+        // Filtrar scores por clasificación
+        final allScoresCreate = formData['subClassificationScores'] as Map<String, double>? ?? {};
+        final classification = (state.selectedClassification ?? '').toLowerCase();
+        
+        Map<String, double> amenazaScores = {};
+        Map<String, double> vulnerabilidadScores = {};
+        
+        if (classification == 'amenaza') {
+          // Solo scores de probabilidad e intensidad
+          if (allScoresCreate.containsKey('probabilidad')) {
+            amenazaScores['probabilidad'] = allScoresCreate['probabilidad']!;
+          }
+          if (allScoresCreate.containsKey('intensidad')) {
+            amenazaScores['intensidad'] = allScoresCreate['intensidad']!;
+          }
+        } else if (classification == 'vulnerabilidad') {
+          // Solo scores de fragilidad_fisica, fragilidad_personas, exposicion
+          final vulnerabilidadKeys = ['fragilidad_fisica', 'fragilidad_personas', 'exposicion'];
+          for (final key in vulnerabilidadKeys) {
+            if (allScoresCreate.containsKey(key)) {
+              vulnerabilidadScores[key] = allScoresCreate[key]!;
+            }
+          }
+        }
+        
         completeForm = CompleteFormDataModel(
           id: formId,
           eventName: state.selectedRiskEvent ?? '',
           contactData: contactData,
           inspectionData: inspectionData,
           // Datos de amenaza
-          amenazaSelections: (state.selectedClassification ?? '').toLowerCase() == 'amenaza'
+          amenazaSelections: classification == 'amenaza'
               ? (formData['dynamicSelections'] ?? {})
               : {},
-          amenazaScores: (state.selectedClassification ?? '').toLowerCase() == 'amenaza'
-              ? (formData['subClassificationScores'] ?? {})
-              : {},
-          amenazaColors: (state.selectedClassification ?? '').toLowerCase() == 'amenaza'
-              ? serializableColors
-              : {},
-          amenazaProbabilidadSelections: (state.selectedClassification ?? '').toLowerCase() == 'amenaza'
+          amenazaScores: amenazaScores,
+          amenazaColors: classification == 'amenaza' ? serializableColors : {},
+          amenazaProbabilidadSelections: classification == 'amenaza'
               ? (formData['probabilidadSelections'] ?? {})
               : {},
-          amenazaIntensidadSelections: (state.selectedClassification ?? '').toLowerCase() == 'amenaza'
+          amenazaIntensidadSelections: classification == 'amenaza'
               ? (formData['intensidadSelections'] ?? {})
               : {},
           amenazaSelectedProbabilidad: null,
           amenazaSelectedIntensidad: null,
           // Datos de vulnerabilidad
-          vulnerabilidadSelections: (state.selectedClassification ?? '').toLowerCase() == 'vulnerabilidad'
+          vulnerabilidadSelections: classification == 'vulnerabilidad'
               ? (formData['dynamicSelections'] ?? {})
               : {},
-          vulnerabilidadScores: (state.selectedClassification ?? '').toLowerCase() == 'vulnerabilidad'
-              ? (formData['subClassificationScores'] ?? {})
-              : {},
-          vulnerabilidadColors: (state.selectedClassification ?? '').toLowerCase() == 'vulnerabilidad'
-              ? serializableColors
-              : {},
-          vulnerabilidadProbabilidadSelections: (state.selectedClassification ?? '').toLowerCase() == 'vulnerabilidad'
+          vulnerabilidadScores: vulnerabilidadScores,
+          vulnerabilidadColors: classification == 'vulnerabilidad' ? serializableColors : {},
+          vulnerabilidadProbabilidadSelections: classification == 'vulnerabilidad'
               ? (formData['probabilidadSelections'] ?? {})
               : {},
-          vulnerabilidadIntensidadSelections: (state.selectedClassification ?? '').toLowerCase() == 'vulnerabilidad'
+          vulnerabilidadIntensidadSelections: classification == 'vulnerabilidad'
               ? (formData['intensidadSelections'] ?? {})
               : {},
           vulnerabilidadSelectedProbabilidad: null,
@@ -276,13 +284,24 @@ class SaveProgressButton extends StatelessWidget {
         completeForm = existingForm;
 
         // Actualizar según la clasificación actual
+        // Obtener scores y filtrar solo los relevantes
+        final allScoresSave = formData['subClassificationScores'] as Map<String, double>? ?? {};
+        
         if ((state.selectedClassification ?? '').toLowerCase() == 'amenaza') {
+          // Para amenaza, solo guardar scores de probabilidad e intensidad
+          final amenazaScoresOnly = Map<String, double>.from(completeForm.amenazaScores);
+          
+          if (allScoresSave.containsKey('probabilidad')) {
+            amenazaScoresOnly['probabilidad'] = allScoresSave['probabilidad']!;
+          }
+          if (allScoresSave.containsKey('intensidad')) {
+            amenazaScoresOnly['intensidad'] = allScoresSave['intensidad']!;
+          }
+          
           completeForm = completeForm.copyWith(
             amenazaSelections:
                 formData['dynamicSelections'] ?? completeForm.amenazaSelections,
-            amenazaScores:
-                formData['subClassificationScores'] ??
-                completeForm.amenazaScores,
+            amenazaScores: amenazaScoresOnly,
             amenazaColors: serializableColors.isNotEmpty
                 ? serializableColors
                 : completeForm.amenazaColors,
@@ -306,13 +325,21 @@ class SaveProgressButton extends StatelessWidget {
           );
         } else if ((state.selectedClassification ?? '').toLowerCase() ==
             'vulnerabilidad') {
+          // Para vulnerabilidad, solo guardar scores de fragilidad_fisica, fragilidad_personas, exposicion
+          final vulnerabilidadScoresOnly = Map<String, double>.from(completeForm.vulnerabilidadScores);
+          
+          final vulnerabilidadKeys = ['fragilidad_fisica', 'fragilidad_personas', 'exposicion'];
+          for (final key in vulnerabilidadKeys) {
+            if (allScoresSave.containsKey(key)) {
+              vulnerabilidadScoresOnly[key] = allScoresSave[key]!;
+            }
+          }
+          
           completeForm = completeForm.copyWith(
             vulnerabilidadSelections:
                 formData['dynamicSelections'] ??
                 completeForm.vulnerabilidadSelections,
-            vulnerabilidadScores:
-                formData['subClassificationScores'] ??
-                completeForm.vulnerabilidadScores,
+            vulnerabilidadScores: vulnerabilidadScoresOnly,
             vulnerabilidadColors: serializableColors.isNotEmpty
                 ? serializableColors
                 : completeForm.vulnerabilidadColors,
@@ -399,12 +426,10 @@ class SaveProgressButton extends StatelessWidget {
               Navigator.of(context).pop();
 
               if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Progreso guardado exitosamente'),
-                    duration: Duration(seconds: 2),
-                    backgroundColor: Colors.green,
-                  ),
+                CustomSnackBar.showSuccess(
+                  context,
+                  title: 'Progreso guardado',
+                  message: 'Progreso guardado exitosamente',
                 );
               }
             } catch (e) {
@@ -412,12 +437,10 @@ class SaveProgressButton extends StatelessWidget {
               Navigator.of(context).pop();
 
               if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Error al guardar: $e'),
-                    duration: const Duration(seconds: 3),
-                    backgroundColor: Colors.red,
-                  ),
+                CustomSnackBar.showError(
+                  context,
+                  title: 'Error al guardar',
+                  message: 'Error al guardar: $e',
                 );
               }
             }
@@ -428,12 +451,10 @@ class SaveProgressButton extends StatelessWidget {
       print('SaveProgressButton: Error al guardar progreso - $e');
 
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error al guardar progreso: $e'),
-            duration: const Duration(seconds: 3),
-            backgroundColor: Colors.red,
-          ),
+        CustomSnackBar.showError(
+          context,
+          title: 'Error',
+          message: 'Error al guardar progreso: $e',
         );
       }
     }

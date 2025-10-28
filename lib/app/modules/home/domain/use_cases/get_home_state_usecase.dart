@@ -40,14 +40,6 @@ class GetHomeStateUseCase {
     }
     
     // Validar que no haya conflictos en las secciones mostradas
-    if (homeState.showRiskEvents && homeState.showRiskCategories) {
-      return false;
-    }
-    
-    if (homeState.showRiskCategories && homeState.showFormCompleted) {
-      return false;
-    }
-    
     if (homeState.showRiskEvents && homeState.showFormCompleted) {
       return false;
     }

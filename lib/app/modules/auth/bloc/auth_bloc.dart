@@ -90,29 +90,22 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     try {
-      print('=== AuthBloc: Verificando estado de autenticación ===');
       final isLoggedIn = await _authRepository.isLoggedIn();
-      print('AuthBloc: isLoggedIn = $isLoggedIn');
       
       if (isLoggedIn) {
         final user = await _authRepository.getCurrentUser();
-        print('AuthBloc: user = $user');
         if (user != null) {
-          print('AuthBloc: Usuario encontrado, emitiendo AuthAuthenticated');
           emit(AuthAuthenticated(
             user: user,
             message: 'Usuario autenticado',
           ));
         } else {
-          print('AuthBloc: Usuario es null, emitiendo AuthUnauthenticated');
           emit(const AuthUnauthenticated());
         }
       } else {
-        print('AuthBloc: No está logueado, emitiendo AuthUnauthenticated');
         emit(const AuthUnauthenticated());
       }
     } catch (e) {
-      print('AuthBloc: Error al verificar estado: $e');
       emit(const AuthUnauthenticated());
     }
   }

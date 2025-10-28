@@ -13,6 +13,7 @@ class CustomActionDialog extends StatelessWidget {
   final IconData rightButtonIcon;
   final VoidCallback? onRightButtonPressed;
   final bool isLeftButtonOutlined;
+  final Color? rightButtonColor;
 
   const CustomActionDialog({
     super.key,
@@ -27,6 +28,7 @@ class CustomActionDialog extends StatelessWidget {
     required this.rightButtonIcon,
     this.onRightButtonPressed,
     this.isLeftButtonOutlined = true,
+    this.rightButtonColor,
   });
 
   @override
@@ -60,7 +62,9 @@ class CustomActionDialog extends StatelessWidget {
                       color: Colors.black,
                       fontFamily: 'Work Sans',
                       fontSize: 16,
-                      fontWeight: FontWeight.w600,
+                      fontStyle: FontStyle.normal,
+                      fontWeight: FontWeight.w500,
+                      height: 18 / 16, // 112.5% -> 18px
                     ),
                   ),
                 ),
@@ -91,8 +95,9 @@ class CustomActionDialog extends StatelessWidget {
                 color: Colors.black,
                 fontFamily: 'Work Sans',
                 fontSize: 14,
+                fontStyle: FontStyle.normal,
                 fontWeight: FontWeight.w400,
-                height: 1.4,
+                height: 24 / 14, // 171.429% -> 24px
               ),
             ),
 
@@ -149,7 +154,7 @@ class CustomActionDialog extends StatelessWidget {
                       ),
                     ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: DAGRDColors.azulDAGRD,
+                      backgroundColor: rightButtonColor ?? DAGRDColors.azulDAGRD,
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(4),
@@ -180,6 +185,7 @@ class CustomActionDialog extends StatelessWidget {
     required IconData rightButtonIcon,
     VoidCallback? onRightButtonPressed,
     bool isLeftButtonOutlined = true,
+    Color? rightButtonColor,
   }) {
     return showDialog<void>(
       context: context,
@@ -197,6 +203,7 @@ class CustomActionDialog extends StatelessWidget {
           rightButtonIcon: rightButtonIcon,
           onRightButtonPressed: onRightButtonPressed,
           isLeftButtonOutlined: isLeftButtonOutlined,
+          rightButtonColor: rightButtonColor,
         );
       },
     );

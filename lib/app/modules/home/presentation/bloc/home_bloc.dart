@@ -31,9 +31,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<HomeInitialized>(_onHomeInitialized);
     on<HomeNavBarTapped>(_onNavBarTapped);
     on<HomeShowRiskEventsSection>(_onShowRiskEventsSection);
-    on<HomeShowRiskCategoriesScreen>(_onShowRiskCategoriesScreen);
     on<SelectRiskEvent>(_onSelectRiskEvent);
-    on<SelectRiskCategory>(_onSelectRiskCategory);
     on<HomeResetRiskSections>(_onResetRiskSections);
     on<HomeShowFormCompletedScreen>(_onShowFormCompletedScreen);
     on<HomeToggleNotifications>(_onToggleNotifications);
@@ -79,7 +77,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       final updatedEntity = currentEntity.copyWith(
         selectedIndex: event.index,
         showRiskEvents: false,
-        showRiskCategories: false,
         showFormCompleted: false,
       );
       
@@ -95,7 +92,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       final currentEntity = state.toEntity();
       final updatedEntity = currentEntity.copyWith(
         showRiskEvents: true,
-        showRiskCategories: false,
         showFormCompleted: false,
       );
       
@@ -106,132 +102,45 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     }
   }
 
-  Future<void> _onShowRiskCategoriesScreen(HomeShowRiskCategoriesScreen event, Emitter<HomeState> emit) async {
-    try {
-      final currentEntity = state.toEntity();
-      
-      // Actualizar estado según los datos de navegación
-      HomeEntity updatedEntity = currentEntity.copyWith(
-        showRiskEvents: false,
-        showRiskCategories: true,
-        showFormCompleted: false,
-      );
-      
-      // Si viene con un evento específico, configurarlo
-      if (event.navigationData.eventName.isNotEmpty) {
-        updatedEntity = updatedEntity.copyWith(
-          selectedRiskEvent: event.navigationData.eventName,
-          selectedRiskCategory: null,
-        );
-        
-        // Si viene con datos de formulario guardado, configurar el formulario activo
-        if (event.navigationData.loadSavedForm && event.navigationData.formId.isNotEmpty) {
-          updatedEntity = updatedEntity.copyWith(
-            activeFormId: event.navigationData.formId,
-            isCreatingNew: false,
-          );
-        } else {
-          updatedEntity = updatedEntity.copyWith(
-            activeFormId: null,
-            isCreatingNew: true,
-          );
-        }
-      }
-      
-      // Guardar los datos de navegación en el estado
-      final updatedState = HomeState.fromEntity(updatedEntity).copyWith(
-        navigationData: event.navigationData,
-      );
-      
-      await _updateHomeStateUseCase.execute(updatedEntity);
-      emit(updatedState);
-    } catch (e) {
-      emit(state.copyWith(error: 'Error al mostrar categorías de riesgo: $e'));
-    }
-  }
-
   Future<void> _onSelectRiskEvent(SelectRiskEvent event, Emitter<HomeState> emit) async {
     try {
-      print('=== HomeBloc: SelectRiskEvent recibido ===');
-      print('Evento seleccionado: ${event.eventName}');
-      print('Estado anterior - showRiskEvents: ${state.showRiskEvents}');
-      print('Estado anterior - showRiskCategories: ${state.showRiskCategories}');
-      
       // Crear un nuevo formulario con ID único
       final formId = '${event.eventName}_${DateTime.now().millisecondsSinceEpoch}';
-      print('Nuevo formId creado: $formId');
       
       final currentEntity = state.toEntity();
       final updatedEntity = currentEntity.copyWith(
         selectedRiskEvent: event.eventName,
         showRiskEvents: false,
-        showRiskCategories: true,
-        selectedRiskCategory: null,
         activeFormId: formId,
         isCreatingNew: true,
         savedForms: const [],
         isLoadingForms: false,
       );
       
-      print('Estado nuevo - showRiskEvents: ${updatedEntity.showRiskEvents}');
-      print('Estado nuevo - showRiskCategories: ${updatedEntity.showRiskCategories}');
-      print('Estado nuevo - activeFormId: ${updatedEntity.activeFormId}');
-      
       await _updateHomeStateUseCase.execute(updatedEntity);
       emit(HomeState.fromEntity(updatedEntity));
-      
-      print('=== HomeBloc: SelectRiskEvent completado ===');
     } catch (e) {
-      print('=== HomeBloc: Error en SelectRiskEvent ===');
-      print('Error: $e');
       emit(state.copyWith(error: 'Error al seleccionar evento de riesgo: $e'));
-    }
-  }
-
-  Future<void> _onSelectRiskCategory(SelectRiskCategory event, Emitter<HomeState> emit) async {
-    try {
-      final currentEntity = state.toEntity();
-      final updatedEntity = currentEntity.copyWith(
-        selectedRiskCategory: '${event.categoryType} ${event.eventName}',
-      );
-      
-      await _updateHomeStateUseCase.execute(updatedEntity);
-      emit(HomeState.fromEntity(updatedEntity));
-    } catch (e) {
-      emit(state.copyWith(error: 'Error al seleccionar categoría de riesgo: $e'));
     }
   }
 
   Future<void> _onResetRiskSections(HomeResetRiskSections event, Emitter<HomeState> emit) async {
     try {
-      print('=== HomeBloc: ResetRiskSections ejecutado ===');
-      print('Estado anterior - selectedRiskEvent: ${state.selectedRiskEvent}');
-      print('Estado anterior - activeFormId: ${state.activeFormId}');
-      
       final currentEntity = state.toEntity();
       final updatedEntity = currentEntity.copyWith(
         showRiskEvents: false,
-        showRiskCategories: false,
         showFormCompleted: false,
         // Resetear también el estado interno para permitir crear nuevo formulario
         selectedRiskEvent: null,
-        selectedRiskCategory: null,
         activeFormId: null,
         isCreatingNew: true,
         completedEvaluations: const {},
         savedRiskEventModels: const {},
       );
       
-      print('Estado nuevo - selectedRiskEvent: ${updatedEntity.selectedRiskEvent}');
-      print('Estado nuevo - activeFormId: ${updatedEntity.activeFormId}');
-      
       await _updateHomeStateUseCase.execute(updatedEntity);
       emit(HomeState.fromEntity(updatedEntity));
-      
-      print('=== HomeBloc: ResetRiskSections completado ===');
     } catch (e) {
-      print('=== HomeBloc: Error en ResetRiskSections ===');
-      print('Error: $e');
       emit(state.copyWith(error: 'Error al resetear secciones de riesgo: $e'));
     }
   }
@@ -242,7 +151,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       final updatedEntity = currentEntity.copyWith(
         showFormCompleted: true,
         showRiskEvents: false,
-        showRiskCategories: false,
       );
       
       await _updateHomeStateUseCase.execute(updatedEntity);
@@ -437,7 +345,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       final currentEntity = state.toEntity();
       final updatedEntity = currentEntity.copyWith(
         selectedRiskEvent: null,
-        selectedRiskCategory: null,
         activeFormId: null,
         isCreatingNew: true,
         completedEvaluations: const {},

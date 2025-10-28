@@ -68,7 +68,6 @@ class AuthRepositoryImplementation implements AuthRepository {
     final token = await getToken();
     final user = await getCurrentUser();
     final result = token != null && token.isNotEmpty && user != null;
-    print('AuthRepository: isLoggedIn() - token: $token, user: $user, result: $result');
     return result;
   }
 
@@ -81,20 +80,15 @@ class AuthRepositoryImplementation implements AuthRepository {
   Future<UserEntity?> getCurrentUser() async {
     try {
       final userJson = sharedPreferences.getString(_userKey);
-      print('AuthRepository: getCurrentUser() - userJson: $userJson');
       if (userJson != null) {
         final userMap = json.decode(userJson) as Map<String, dynamic>;
-        print('AuthRepository: getCurrentUser() - userMap: $userMap');
         // Reconstruir usuario desde JSON guardado
         final userModel = UserModel.fromJson(userMap);
         final user = userModel.toEntity();
-        print('AuthRepository: getCurrentUser() - user reconstruido: $user');
         return user;
       }
-      print('AuthRepository: getCurrentUser() - userJson es null');
       return null;
     } catch (e) {
-      print('AuthRepository: getCurrentUser() - error: $e');
       return null;
     }
   }

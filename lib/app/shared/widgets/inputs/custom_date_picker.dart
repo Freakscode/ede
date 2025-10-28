@@ -1,4 +1,3 @@
-import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import 'package:flutter/material.dart';
 
 class CustomDatePicker extends StatelessWidget {
@@ -31,36 +30,42 @@ class CustomDatePicker extends StatelessWidget {
         Text(
           label,
           style: const TextStyle(
-            color: DAGRDColors.azulDAGRD,
+            color: Color(0xFF706F6F), // GrisDAGRD
             fontFamily: 'Work Sans',
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-            height: 1.33333, // 16px / 12px = 1.33333 (133.333%)
+            fontSize: 13.549,
+            fontStyle: FontStyle.normal,
+            fontWeight: FontWeight.w400,
+            height: 18.066 / 13.549, // 133.333%
+            overflow: TextOverflow.ellipsis,
           ),
         ),
         const SizedBox(height: 8),
         InkWell(
           onTap: () => _selectDate(context),
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            padding: const EdgeInsets.only(top: 6, right: 10, bottom: 6, left: 16),
             decoration: BoxDecoration(
-              color: DAGRDColors.blancoDAGRD,
+              color: Colors.white,
               border: Border.all(
                 color: errorMessage != null 
                     ? const Color(0xFFE53E3E) // Rojo para error
-                    : DAGRDColors.grisMedio, 
-                width: 1
+                    : const Color(0xFFD1D5DB), // Bordes #D1D5DB
+                width: 1,
               ),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Row(
               children: [
-                Icon(
-                  Icons.calendar_today,
-                  color: errorMessage != null 
-                      ? const Color(0xFFE53E3E) // Rojo para error
-                      : DAGRDColors.grisMedio,
-                  size: 20,
+                SizedBox(
+                  width: 36,
+                  // height: 36,
+                  child: Icon(
+                    Icons.calendar_today,
+                    color: errorMessage != null 
+                        ? const Color(0xFFE53E3E) // Rojo para error
+                        : const Color(0xFFEFEFEF), // #EFEFEF
+                    size: 24,
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -71,11 +76,12 @@ class CustomDatePicker extends StatelessWidget {
                     style: TextStyle(
                       color: selectedDate != null
                           ? Colors.black
-                          : const Color(0xFFCCCCCC),
+                          : const Color(0xFFCCCCCC), // #CCC
                       fontFamily: 'Work Sans',
-                      fontSize: 14,
-                      fontWeight: selectedDate != null ? FontWeight.w400 : FontWeight.w500,
-                      height: 1.42857, // 20px / 14px = 1.42857 (142.857%)
+                      fontSize: selectedDate != null ? 14 : 13,
+                      fontStyle: FontStyle.normal,
+                      fontWeight: FontWeight.w400,
+                      height: selectedDate != null ? null : 1.0, // normal for placeholder
                     ),
                   ),
                 ),

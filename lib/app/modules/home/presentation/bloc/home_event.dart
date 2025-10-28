@@ -1,5 +1,4 @@
 import 'package:equatable/equatable.dart';
-import '../../domain/entities/form_navigation_data.dart';
 
 /// Eventos base para el módulo Home
 abstract class HomeEvent extends Equatable {
@@ -31,16 +30,6 @@ class HomeShowRiskEventsSection extends HomeEvent {
   const HomeShowRiskEventsSection();
 }
 
-/// Evento para mostrar la pantalla de categorías de riesgo
-class HomeShowRiskCategoriesScreen extends HomeEvent {
-  final FormNavigationData navigationData;
-
-  const HomeShowRiskCategoriesScreen(this.navigationData);
-
-  @override
-  List<Object?> get props => [navigationData];
-}
-
 /// Evento para seleccionar un evento de riesgo
 class SelectRiskEvent extends HomeEvent {
   final String eventName;
@@ -49,20 +38,6 @@ class SelectRiskEvent extends HomeEvent {
 
   @override
   List<Object?> get props => [eventName];
-}
-
-/// Evento para seleccionar una categoría de riesgo
-class SelectRiskCategory extends HomeEvent {
-  final String categoryType;
-  final String eventName;
-
-  const SelectRiskCategory({
-    required this.categoryType,
-    required this.eventName,
-  });
-
-  @override
-  List<Object?> get props => [categoryType, eventName];
 }
 
 /// Evento para resetear las secciones de riesgo

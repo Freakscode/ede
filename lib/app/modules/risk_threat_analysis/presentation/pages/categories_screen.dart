@@ -1,0 +1,299 @@
+import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
+import 'package:caja_herramientas/app/core/icons/app_icons.dart';
+import 'package:caja_herramientas/app/core/utils/logger.dart';
+import 'package:caja_herramientas/app/modules/home/presentation/widgets/category_card.dart';
+import 'package:caja_herramientas/app/modules/home/presentation/bloc/home_bloc.dart';
+import 'package:caja_herramientas/app/modules/home/presentation/bloc/home_state.dart';
+import 'package:caja_herramientas/app/modules/risk_threat_analysis/presentation/widgets/results_risk_section_widget.dart';
+import 'package:caja_herramientas/app/modules/risk_threat_analysis/presentation/bloc/risk_threat_analysis_bloc.dart';
+import 'package:caja_herramientas/app/modules/risk_threat_analysis/presentation/bloc/risk_threat_analysis_event.dart';
+import 'package:caja_herramientas/app/modules/risk_threat_analysis/presentation/bloc/risk_threat_analysis_state.dart';
+import 'package:caja_herramientas/app/shared/services/form_persistence_service.dart';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
+
+class CategoriesScreen extends StatelessWidget {
+  const CategoriesScreen({super.key});
+
+  /// Calcula el progreso de una categoría basado en las selecciones y evidencias
+  double _calculateCategoryProgress(
+    String classification,
+    RiskThreatAnalysisState state,
+    RiskThreatAnalysisBloc bloc,
+  ) {
+    // Usar el método centralizado del bloc para obtener el porcentaje de completado
+    return bloc.getCompletionPercentageForCategory(
+      classification.toLowerCase(),
+    );
+  }
+
+  /// Determina si una categoría está disponible para ser seleccionada
+  bool _isCategoryAvailable(
+    String classification,
+    RiskThreatAnalysisState state,
+    RiskThreatAnalysisBloc bloc,
+  ) {
+    if (classification.toLowerCase() == 'amenaza') {
+      // Amenaza siempre está disponible
+      return true;
+    } else if (classification.toLowerCase() == 'vulnerabilidad') {
+      // Vulnerabilidad solo está disponible si amenaza está completa
+      // Una categoría está completa cuando tiene selecciones Y evidencias
+      return bloc.isCategoryComplete('amenaza');
+    }
+    return false;
+  }
+
+  /// Construye el icono de estado para una categoría
+  Widget? _buildStatusIcon(
+    String classification,
+    RiskThreatAnalysisState state,
+    RiskThreatAnalysisBloc bloc,
+  ) {
+    // Usar el método centralizado del bloc para verificar si está completa
+    final isComplete = bloc.isCategoryComplete(classification.toLowerCase());
+    final progress = _calculateCategoryProgress(classification, state, bloc);
+
+    if (isComplete) {
+      // Completada: mostrar check ✅
+      return SizedBox(
+        width: 24,
+        height: 24,
+        child: SvgPicture.asset(AppIcons.checkCircle, width: 24, height: 24),
+      );
+    } else if (progress > 0.0) {
+      // En proceso: mostrar borrador 📝
+      return SizedBox(
+        width: 18,
+        height: 17,
+        child: SvgPicture.asset(
+          AppIcons.borrar,
+          width: 18,
+          height: 17,
+          colorFilter: const ColorFilter.mode(
+            DAGRDColors.azulSecundario, // Azul informativo
+            BlendMode.srcIn,
+          ),
+        ),
+      );
+    }
+
+    // Sin progreso: no mostrar icono
+    return null;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<RiskThreatAnalysisBloc, RiskThreatAnalysisState>(
+      builder: (context, riskState) {
+        final selectedEvent = riskState.selectedRiskEvent ?? '';
+
+        // Clasificaciones fijas para el análisis de riesgo
+        final classifications = ['Amenaza', 'Vulnerabilidad'];
+
+        return BlocBuilder<HomeBloc, HomeState>(
+          builder: (context, homeState) {
+            return SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 28),
+                    Center(
+                      child: Text(
+                        'Metodología de Análisis del Riesgo',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: DAGRDColors.azulDAGRD, // AzulDAGRD
+                          fontFamily: 'Work Sans',
+                          fontSize: 20,
+                          fontStyle: FontStyle.normal,
+                          fontWeight: FontWeight.w600,
+                          height: 28 / 20, // 140% line-height
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    Center(
+                      child: Text(
+                        'Seleccione una categoría',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: DAGRDColors.onSurfaceVariant, // GrisDAGRD
+                          fontFamily: 'Work Sans',
+                          fontSize: 18,
+                          fontStyle: FontStyle.normal,
+                          fontWeight: FontWeight.w600,
+                          height: 28 / 18, // 155.556% line-height
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    // Generar CategoryCards dinámicamente basadas en las clasificaciones del modelo
+                    ...classifications.asMap().entries.map((entry) {
+                      final index = entry.key;
+                      final classification = entry.value;
+
+                      // Calcular estado de la categoría
+                      final riskBloc = context.read<RiskThreatAnalysisBloc>();
+                      final isAvailable = _isCategoryAvailable(
+                        classification,
+                        riskState,
+                        riskBloc,
+                      );
+                      final statusIcon = _buildStatusIcon(
+                        classification,
+                        riskState,
+                        riskBloc,
+                      );
+
+                      return Column(
+                        children: [
+                          Opacity(
+                            opacity: isAvailable ? 1.0 : 0.6,
+                            child: CategoryCard(
+                              title: '$classification $selectedEvent',
+                              trailingIcon: statusIcon,
+                              onTap: isAvailable
+                                  ? () async {
+                                      // Configurar la clasificación seleccionada
+                                      riskBloc.add(
+                                        SelectClassification(
+                                          classification.toLowerCase(),
+                                        ),
+                                      );
+
+                                      // Si estamos en modo edición, cargar los datos del formulario para esta clasificación
+                                      final homeBloc = context.read<HomeBloc>();
+                                      final homeState = homeBloc.state;
+
+                                      if (homeState.activeFormId != null &&
+                                          homeState.activeFormId!.isNotEmpty) {
+                                        // Estamos en modo edición, cargar datos específicos para esta clasificación
+                                        try {
+                                          final persistenceService =
+                                              FormPersistenceService();
+                                          final completeForm =
+                                              await persistenceService
+                                                  .getCompleteForm(
+                                                    homeState.activeFormId!,
+                                                  );
+
+                                          if (completeForm != null) {
+                                            final evaluationData = completeForm
+                                                .toJson();
+                                            riskBloc.add(
+                                              LoadFormData(
+                                                eventName:
+                                                    completeForm.eventName,
+                                                classificationType:
+                                                    classification
+                                                        .toLowerCase(),
+                                                evaluationData: evaluationData,
+                                              ),
+                                            );
+                                          }
+                                        } catch (e) {
+                                          Logger.error(
+                                            'Error loading form data for ${classification.toLowerCase()}: $e',
+                                            name: 'CategoriesScreen',
+                                          );
+                                        }
+                                      }
+
+                                      // Navegar a RatingScreen (índice 1)
+                                      riskBloc.add(ChangeBottomNavIndex(1));
+                                    }
+                                  : () {
+                                      // Mostrar mensaje si no está disponible
+                                      if (classification.toLowerCase() ==
+                                          'vulnerabilidad') {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          const SnackBar(
+                                            content: Text(
+                                              'Complete primero la evaluación de Amenaza',
+                                            ),
+                                            backgroundColor:
+                                                DAGRDColors.warning,
+                                            duration: Duration(seconds: 3),
+                                          ),
+                                        );
+                                      }
+                                    },
+                            ),
+                          ),
+                          // Agregar espaciado entre cards, excepto después del último
+                          if (index < classifications.length - 1)
+                            const SizedBox(height: 18),
+                        ],
+                      );
+                    }),
+
+                    const SizedBox(height: 24),
+
+                    // Información con progreso
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: DAGRDColors.azulClaro,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Text(
+                                'Información',
+                                style: const TextStyle(
+                                  color: DAGRDColors.azulSecundario,
+                                  fontFamily: 'Work Sans',
+                                  fontSize: 13,
+                                  fontStyle: FontStyle.normal,
+                                  fontWeight: FontWeight.w500,
+                                  height: 18 / 13,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            'Complete los formularios de Amenaza y Vulnerabilidad para visualizar la evaluación completa del riesgo.',
+                            style: const TextStyle(
+                              color: DAGRDColors.azulSecundario,
+                              fontFamily: 'Work Sans',
+                              fontSize: 13,
+                              fontStyle: FontStyle.normal,
+                              fontWeight: FontWeight.w400,
+                              height: 18 / 13,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 24),
+
+                    // Resultados Riesgo - Widget original con HomeState
+                    ResultsRiskSectionWidget(
+                      homeState: homeState,
+                      selectedEvent: selectedEvent,
+                    ),
+
+                    const SizedBox(height: 24),
+                    const SizedBox(height: 100),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+}

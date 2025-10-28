@@ -1,6 +1,6 @@
 import 'package:caja_herramientas/app/modules/home/presentation/pages/home_forms_screen.dart';
-import 'package:caja_herramientas/app/modules/home/presentation/pages/risk_categories_screen.dart';
 import 'package:caja_herramientas/app/modules/home/presentation/pages/settings_screen.dart';
+import 'package:caja_herramientas/app/modules/home/presentation/pages/educational_material_screen.dart';
 import 'package:caja_herramientas/app/modules/home/presentation/widgets/forms_help_content.dart';
 import 'package:caja_herramientas/app/modules/home/presentation/widgets/general_help_content.dart';
 import 'package:caja_herramientas/app/modules/home/presentation/widgets/home_main_section.dart';
@@ -17,7 +17,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:caja_herramientas/app/modules/home/presentation/bloc/home_bloc.dart';
 import 'package:caja_herramientas/app/modules/home/presentation/bloc/home_event.dart';
 import 'package:caja_herramientas/app/modules/home/presentation/bloc/home_state.dart';
-import 'package:caja_herramientas/app/modules/home/domain/entities/form_navigation_data.dart';
 import 'package:caja_herramientas/app/shared/widgets/layouts/custom_bottom_nav_bar.dart';
 import 'package:go_router/go_router.dart';
 
@@ -47,12 +46,6 @@ class HomeScreen extends StatelessWidget {
       return {
         'categoryTitle': "Ayuda Eventos de Riesgo",
         'contentTitle': "Eventos de Riesgo",
-        'content': HomeHelpContent.build(),
-      };
-    } else if (state.showRiskCategories) {
-      return {
-        'categoryTitle': "Ayuda Categorías de Riesgo",
-        'contentTitle': "Categorías de Riesgo",
         'content': HomeHelpContent.build(),
       };
     } else if (state.showFormCompleted) {
@@ -118,9 +111,8 @@ class HomeScreen extends StatelessWidget {
     final bloc = context.read<HomeBloc>();
     
     if (navigationData!['showRiskCategories'] == true) {
-      bloc.add(HomeShowRiskCategoriesScreen(
-        FormNavigationData.forNewForm(''),
-      ));
+      // Navegar a la nueva pantalla de categorías integrada
+      context.go('/risk-categories');
     } else if (navigationData!['showRiskEvents'] == true) {
       // Si viene de data registration, resetear formularios y mostrar RiskEventsScreen
       if (navigationData!['resetForNewForm'] == true) {
@@ -146,14 +138,10 @@ class HomeScreen extends StatelessWidget {
     return _buildMainTabContent(context, state.selectedIndex);
   }
 
-  /// Construye el contenido para secciones especiales (eventos de riesgo, categorías, formulario completado)
+  /// Construye el contenido para secciones especiales (eventos de riesgo, formulario completado)
   Widget? _buildSpecialSectionContent(HomeState state) {
     if (state.showRiskEvents) {
       return const RiskEventsScreen();
-    }
-    
-    if (state.showRiskCategories) {
-      return const RiskCategoriesScreen();
     }
     
     if (state.showFormCompleted) {
@@ -175,7 +163,7 @@ class HomeScreen extends StatelessWidget {
       case 0: // Inicio
         return const HomeMainSection();
       case 1: // Material educativo
-        return _buildEducationalMaterialContent();
+        return const EducationalMaterialScreen();
       case 2: // Mis formularios
         return const HomeFormsScreen();
       case 3: // Configuración
@@ -185,84 +173,6 @@ class HomeScreen extends StatelessWidget {
       default:
         return null; // Pestaña no reconocida
     }
-  }
-
-  /// Construye el contenido del material educativo
-  Widget _buildEducationalMaterialContent() {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: DAGRDColors.azulDAGRD.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Icon(
-                Icons.school_outlined,
-                size: 80,
-                color: DAGRDColors.azulDAGRD,
-              ),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              'Material Educativo',
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                color: DAGRDColors.azulDAGRD,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              'Recursos de aprendizaje y capacitación',
-              style: TextStyle(
-                fontSize: 18,
-                color: Colors.grey.shade600,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 12,
-              ),
-              decoration: BoxDecoration(
-                color: Colors.orange.shade50,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                  color: Colors.orange.shade200,
-                  width: 1,
-                ),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.info_outline,
-                    color: Colors.orange.shade700,
-                    size: 20,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Próximamente disponible',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.orange.shade700,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 
   /// Construye un fallback de error para pestañas no reconocidas
@@ -327,10 +237,8 @@ class HomeScreen extends StatelessWidget {
   void _handleBackAction(BuildContext context, HomeState state) {
     final bloc = context.read<HomeBloc>();
     
-    if (state.showRiskCategories) {
+    if (state.showRiskEvents) {
       bloc.add(HomeShowRiskEventsSection());
-    } else if (state.showRiskEvents) {
-      bloc.add(HomeResetRiskSections());
     } else if (state.showFormCompleted) {
       // Volver a la pantalla de formularios y resetear estado
       bloc.add(HomeResetRiskSections());

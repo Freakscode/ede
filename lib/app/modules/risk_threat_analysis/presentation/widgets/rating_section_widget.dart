@@ -51,8 +51,8 @@ class RatingSectionWidget extends StatelessWidget {
                     horizontal: 12,
                   ),
                   decoration: BoxDecoration(
-                    color: DAGRDColors.warning,
-                    borderRadius: BorderRadius.circular(12),
+                    color: DAGRDColors.getNivelColorFromScore(score),
+                    borderRadius: const BorderRadius.all(Radius.circular(12)),
                   ),
                   child: Center(
                     child: Text(

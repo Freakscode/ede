@@ -3,8 +3,10 @@ import 'package:caja_herramientas/app/modules/home/presentation/bloc/home_bloc.d
 import 'package:caja_herramientas/app/modules/home/presentation/bloc/home_event.dart';
 import 'package:caja_herramientas/app/shared/models/risk_event_factory.dart';
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
+import 'package:caja_herramientas/app/core/utils/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 class RiskEventsScreen extends StatelessWidget {
   const RiskEventsScreen({super.key});
@@ -68,13 +70,19 @@ class RiskEventsScreen extends StatelessWidget {
                     iconAsset: riskEvent.iconAsset,
                     title: riskEvent.name,
                     onTap: () {
-                      print('=== RiskEventsScreen: Evento seleccionado ===');
-                      print('Evento: ${riskEvent.name}');
-                      print('IconAsset: ${riskEvent.iconAsset}');
-                      homeBloc.add(
-                        SelectRiskEvent(riskEvent.name),
-                      );
-                      print('=== RiskEventsScreen: Evento enviado al HomeBloc ===');
+                      Logger.info('Evento seleccionado: ${riskEvent.name}', 'RiskEventsScreen');
+                      Logger.info('Event ID: ${riskEvent.id}', 'RiskEventsScreen');
+                      
+                      // Actualizar el estado del HomeBloc
+                      homeBloc.add(SelectRiskEvent(riskEvent.name));
+                      
+                      // Navegar al RiskThreatAnalysisScreen (siempre empieza en CategoriesScreen)
+                      final navigationData = {
+                        'eventId': riskEvent.id,
+                      };
+                      
+                      context.go('/risk-threat-analysis', extra: navigationData);
+                      
                     },
                   );
                 },

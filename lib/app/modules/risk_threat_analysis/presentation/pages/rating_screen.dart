@@ -7,13 +7,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/risk_threat_analysis_bloc.dart';
-import '../bloc/risk_threat_analysis_event.dart';
 import '../bloc/risk_threat_analysis_state.dart';
 import '../widgets/progress_bar_widget.dart';
 import '../widgets/navigation_buttons_widget.dart';
 import '../widgets/save_progress_button.dart';
 import '../widgets/threat_levels_dialog.dart';
-import 'risk_threat_analysis_screen.dart';
 
 class RatingScreen extends StatefulWidget {
   final Map<String, dynamic>? navigationData;
@@ -25,11 +23,26 @@ class RatingScreen extends StatefulWidget {
 }
 
 class _RatingScreenState extends State<RatingScreen> {
+  late ScrollController _scrollController;
+  
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+    // La carga de datos ahora se maneja en CategoriesScreen
+    // RatingScreen solo necesita inicializar el ScrollController
+  }
+  
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
   
   // Función para hacer scroll inteligente - solo si es necesario
   void _smartScrollToDropdown(BuildContext context, GlobalKey dropdownKey) {
-    final parentState = context.findAncestorStateOfType<RiskThreatAnalysisScreenState>();
-    if (parentState != null && parentState.scrollController.hasClients) {
+    final scrollController = _scrollController;
+    if (scrollController.hasClients) {
       // Obtener la posición del dropdown
       final RenderBox? dropdownRenderBox = dropdownKey.currentContext?.findRenderObject() as RenderBox?;
       if (dropdownRenderBox != null) {
@@ -42,11 +55,11 @@ class _RatingScreenState extends State<RatingScreen> {
         
         if (isPartiallyOffScreen) {
           // Hacer scroll mínimo para hacer visible el dropdown
-          final currentScrollPosition = parentState.scrollController.offset;
+          final currentScrollPosition = scrollController.offset;
           final targetPosition = currentScrollPosition + (dropdownPosition.dy + dropdownHeight - screenHeight * 0.8);
           
-          parentState.scrollController.animateTo(
-            targetPosition.clamp(0.0, parentState.scrollController.position.maxScrollExtent),
+          scrollController.animateTo(
+            targetPosition.clamp(0.0, scrollController.position.maxScrollExtent),
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeInOut,
           );
@@ -54,51 +67,14 @@ class _RatingScreenState extends State<RatingScreen> {
       }
     }
   }
-  
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      // Solo procesar navigationData si es la primera vez que se carga la pantalla
-      // No resetear cuando se navega entre pestañas
-      if (widget.navigationData != null) {
-        final data = widget.navigationData!;
-        final forceReset = data['forceReset'] as bool? ?? false;
-        final isNewForm = data['isNewForm'] as bool? ?? false;
-        final isEditMode = data['isEditMode'] as bool? ?? false;
-        
-        // Solo resetear si es explícitamente un formulario nuevo o reset forzado
-        if (forceReset || isNewForm) {
-          // Formulario nuevo o reset forzado - Reseteando estado
-          // context.read<RiskThreatAnalysisBloc>().add(const ResetState()); // COMENTADO: No resetear estado al navegar
-        } else if (isEditMode) {
-          // Si es modo edición, cargar datos existentes
-          final eventToSet = data['event'] as String?;
-          final classificationToSet = data['classification'] as String?;
-          
-          if (eventToSet != null) {
-            context.read<RiskThreatAnalysisBloc>().add(
-              UpdateSelectedRiskEvent(eventToSet)
-            );
-          }
-          
-          if (classificationToSet != null) {
-            context.read<RiskThreatAnalysisBloc>().add(
-              SelectClassification(classificationToSet)
-            );
-          }
-        }
-        // Si no hay flags específicos, NO resetear - mantener el estado actual
-      }
-      // Si no hay navigationData, NO resetear - mantener el estado actual
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 28),
-      child: BlocBuilder<RiskThreatAnalysisBloc, RiskThreatAnalysisState>(
+    return SingleChildScrollView(
+      controller: _scrollController,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 28),
+        child: BlocBuilder<RiskThreatAnalysisBloc, RiskThreatAnalysisState>(
         builder: (context, state) {
           return Column(
             children: [
@@ -179,6 +155,7 @@ class _RatingScreenState extends State<RatingScreen> {
                     children: subClassifications.asMap().entries.map((entry) {
                       final index = entry.key;
                       final subClassification = entry.value;
+
                       
                       final dropdownKey = GlobalKey(debugLabel: 'dropdown_${subClassification.id}');
                       
@@ -285,6 +262,7 @@ class _RatingScreenState extends State<RatingScreen> {
                   
                   return Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       // Título de calificación dinámico
                       Expanded(
@@ -354,6 +332,7 @@ class _RatingScreenState extends State<RatingScreen> {
           );
         },
       ),
+    ),
     );
   }
 }
