@@ -322,16 +322,7 @@ class _FinalRiskResultsScreenState extends State<FinalRiskResultsScreen> {
     BuildContext context,
     RiskThreatAnalysisState state,
   ) {
-    final bloc = context.read<RiskThreatAnalysisBloc>();
-    final finalScore = bloc.calculateAmenazaGlobalScore();
-    final scoreText = finalScore.toStringAsFixed(2).replaceAll('.', ',');
-    final ratingText = _getRiskClassification(finalScore);
-
-    return ThreatRatingCardWidget(
-      title: 'Calificación Amenaza',
-      score: scoreText,
-      ratingText: ratingText,
-    );
+    return const ClassificationRatingCardWidget(classificationType: 'amenaza');
   }
 
   // Métodos para construir secciones de Vulnerabilidad
@@ -394,16 +385,7 @@ class _FinalRiskResultsScreenState extends State<FinalRiskResultsScreen> {
     BuildContext context,
     RiskThreatAnalysisState state,
   ) {
-    final bloc = context.read<RiskThreatAnalysisBloc>();
-    final finalScore = bloc.calculateVulnerabilidadFinalScore();
-    final scoreText = finalScore.toStringAsFixed(2).replaceAll('.', ',');
-    final ratingText = _getRiskClassification(finalScore);
-
-    return ThreatRatingCardWidget(
-      title: 'Calificación Vulnerabilidad',
-      score: scoreText,
-      ratingText: ratingText,
-    );
+    return const ClassificationRatingCardWidget(classificationType: 'vulnerabilidad');
   }
 
   // Método auxiliar para construir items de vulnerabilidad
@@ -477,20 +459,6 @@ class _FinalRiskResultsScreenState extends State<FinalRiskResultsScreen> {
         return Colors.red;
       default:
         return DAGRDColors.grisMedio;
-    }
-  }
-
-  String _getRiskClassification(double score) {
-    if (score >= 1.0 && score <= 1.75) {
-      return 'BAJO';
-    } else if (score > 1.75 && score <= 2.5) {
-      return 'MEDIO - BAJO';
-    } else if (score > 2.5 && score <= 3.25) {
-      return 'MEDIO - ALTO';
-    } else if (score > 3.25 && score <= 4.0) {
-      return 'ALTO';
-    } else {
-      return 'SIN CALIFICAR';
     }
   }
 
