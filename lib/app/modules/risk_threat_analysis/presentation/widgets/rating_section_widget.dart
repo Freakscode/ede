@@ -51,7 +51,7 @@ class RatingSectionWidget extends StatelessWidget {
                     horizontal: 12,
                   ),
                   decoration: BoxDecoration(
-                    color: _getColorFromScore(score),
+                    color: DAGRDColors.getNivelColorFromScore(score),
                     borderRadius: const BorderRadius.all(Radius.circular(12)),
                   ),
                   child: Center(
@@ -93,24 +93,5 @@ class RatingSectionWidget extends StatelessWidget {
         ),
       ],
     );
-  }
-
-  /// Obtiene el color correspondiente al score
-  Color _getColorFromScore(String scoreStr) {
-    // Convertir el string del score a número
-    final score = double.tryParse(scoreStr.replaceAll(',', '.')) ?? 0.0;
-    
-    if (score >= 1.0 && score <= 1.75) {
-      return DAGRDColors.nivelBajo; // Verde
-    } else if (score > 1.75 && score <= 2.5) {
-      return DAGRDColors.nivelMedioBajo; // Amarillo
-    } else if (score > 2.5 && score <= 3.25) {
-      return DAGRDColors.nivelMedioAlto; // Naranja
-    } else if (score > 3.25 && score <= 4.0) {
-      return DAGRDColors.nivelAlto; // Rojo
-    } else {
-      // Sin calificar - color gris
-      return DAGRDColors.grisMedio;
-    }
   }
 }

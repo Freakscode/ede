@@ -176,6 +176,44 @@ class DAGRDColors {
     }
   }
 
+  /// Obtener color de nivel según el score numérico (string)
+  static Color getNivelColorFromScore(String scoreStr) {
+    // Convertir el string del score a número
+    final score = double.tryParse(scoreStr.replaceAll(',', '.')) ?? 0.0;
+    
+    if (score >= 1.0 && score <= 1.75) {
+      return nivelBajo; // Verde
+    } else if (score > 1.75 && score <= 2.5) {
+      return nivelMedioBajo; // Amarillo
+    } else if (score > 2.5 && score <= 3.25) {
+      return nivelMedioAlto; // Naranja
+    } else if (score > 3.25 && score <= 4.0) {
+      return nivelAlto; // Rojo
+    } else {
+      // Sin calificar - color gris
+      return grisMedio;
+    }
+  }
+
+  /// Obtener color de nivel según el rating entero (1-4)
+  /// Usa colores HTML estándar para compatibilidad con el código existente
+  static Color getNivelColorFromRating(int rating) {
+    switch (rating) {
+      case -1:
+        return grisMedio; // No aplica
+      case 1:
+        return Colors.green; // BAJO - Verde
+      case 2:
+        return Colors.yellow; // MEDIO - BAJO - Amarillo
+      case 3:
+        return Colors.orange; // MEDIO - ALTO - Naranja
+      case 4:
+        return Colors.red; // ALTO - Rojo
+      default:
+        return grisMedio; // Sin calificar
+    }
+  }
+
   /// Obtener color de estado según el tipo
   static Color getEstadoColor(String estado) {
     switch (estado.toLowerCase()) {

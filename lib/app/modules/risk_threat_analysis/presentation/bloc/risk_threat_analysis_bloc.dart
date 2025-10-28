@@ -1165,20 +1165,7 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
 
   /// Método centralizado para obtener el color basado en el rating
   Color getColorFromRating(int rating) {
-    switch (rating) {
-      case -1:
-        return DAGRDColors.grisMedio; // Gris más oscuro para "No Aplica"
-      case 1:
-        return Colors.green;
-      case 2:
-        return Colors.yellow;
-      case 3:
-        return Colors.orange;
-      case 4:
-        return Colors.red;
-      default:
-        return DAGRDColors.grisMedio; // Gris para sin calificar
-    }
+    return DAGRDColors.getNivelColorFromRating(rating);
   }
 
   /// Método centralizado para obtener la selección de una categoría

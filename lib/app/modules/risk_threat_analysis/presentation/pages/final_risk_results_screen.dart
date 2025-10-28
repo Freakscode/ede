@@ -413,7 +413,7 @@ class _FinalRiskResultsScreenState extends State<FinalRiskResultsScreen> {
         final selection = selections[category.title];
         
         final rating = _getRatingFromSelection(selection);
-        final color = _getColorFromRating(rating);
+        final color = DAGRDColors.getNivelColorFromRating(rating);
         
         String title = category.title;
         if (rating == -1) {
@@ -443,23 +443,6 @@ class _FinalRiskResultsScreenState extends State<FinalRiskResultsScreen> {
       return 4;
     }
     return 0;
-  }
-  
-  Color _getColorFromRating(int rating) {
-    switch (rating) {
-      case -1:
-        return DAGRDColors.grisMedio;
-      case 1:
-        return Colors.green;
-      case 2:
-        return Colors.yellow;
-      case 3:
-        return Colors.orange;
-      case 4:
-        return Colors.red;
-      default:
-        return DAGRDColors.grisMedio;
-    }
   }
 
   RiskEventModel? _getRiskEventByName(String eventName) {
