@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import 'package:caja_herramientas/app/shared/widgets/inputs/custom_date_picker.dart';
+import 'package:caja_herramientas/app/shared/models/risk_event_factory.dart';
 
 class FilterDialog extends StatefulWidget {
   final bool isUserAuthenticated;
@@ -148,23 +149,7 @@ class _FilterDialogState extends State<FilterDialog> {
                   value: _selectedPhenomenon,
                   isExpanded: true,
                   underline: const SizedBox(),
-                  items: ['Todos', 'Movimiento en Masa', 'Inundación', 'Sequía', 'Incendio', 'Otros']
-                      .map((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(
-                        value,
-                        style: const TextStyle(
-                          color: Color(0xFF1E1E1E), // Textos
-                          fontFamily: 'Work Sans',
-                          fontSize: 13,
-                          fontStyle: FontStyle.normal,
-                          fontWeight: FontWeight.w500,
-                          height: 22 / 13, // 169.231%
-                        ),
-                      ),
-                    );
-                  }).toList(),
+                  items: _buildPhenomenonItems(),
                   onChanged: (String? newValue) {
                     setState(() {
                       _selectedPhenomenon = newValue ?? 'Todos';
@@ -325,6 +310,33 @@ class _FilterDialogState extends State<FilterDialog> {
         child,
       ],
     );
+  }
+
+  /// Construye los items del dropdown de fenómeno amenazante de forma dinámica
+  List<DropdownMenuItem<String>> _buildPhenomenonItems() {
+    // Obtener todos los eventos disponibles
+    final events = RiskEventFactory.getAllEvents();
+    
+    // Crear lista de nombres de eventos
+    final eventNames = ['Todos'] + events.map((e) => e.name).toList();
+    
+    // Convertir a DropdownMenuItem
+    return eventNames.map((String value) {
+      return DropdownMenuItem<String>(
+        value: value,
+        child: Text(
+          value,
+          style: const TextStyle(
+            color: Color(0xFF1E1E1E), // Textos
+            fontFamily: 'Work Sans',
+            fontSize: 13,
+            fontStyle: FontStyle.normal,
+            fontWeight: FontWeight.w500,
+            height: 22 / 13, // 169.231%
+          ),
+        ),
+      );
+    }).toList();
   }
 }
 
