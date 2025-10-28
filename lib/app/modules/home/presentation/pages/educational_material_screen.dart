@@ -2,6 +2,7 @@ import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import 'package:caja_herramientas/app/core/icons/app_icons.dart';
 import 'package:caja_herramientas/app/modules/home/presentation/widgets/infographic_card_widget.dart';
 import 'package:caja_herramientas/app/modules/home/presentation/widgets/section_header_widget.dart';
+import 'package:caja_herramientas/app/modules/home/presentation/widgets/video_card_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -194,6 +195,21 @@ class _EducationalMaterialScreenState extends State<EducationalMaterialScreen> {
       );
     }
     
+    if (_selectedTab == 1) {
+      // Mostrar encabezado y card de video
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SectionHeaderWidget(
+            title: _getTitleForTab(_selectedTab),
+            description: _getDescriptionForTab(_selectedTab),
+          ),
+          const SizedBox(height: 16),
+          _buildVideoCard(),
+        ],
+      );
+    }
+    
     // Para otros tabs, mostrar contenido simple
     return SectionHeaderWidget(
       title: _getTitleForTab(_selectedTab),
@@ -208,6 +224,16 @@ class _EducationalMaterialScreenState extends State<EducationalMaterialScreen> {
       description: 'Material educativo Gestión del Riesgo',
       publishedDate: '10/jul/2025',
       categoryBadge: 'Evaluación EDE',
+    );
+  }
+
+  Widget _buildVideoCard() {
+    return const VideoCardWidget(
+      title: 'Protocolo de Seguridad en Emergencias',
+      description: 'Video educativo sobre procedimientos de seguridad',
+      duration: '12:45',
+      publishedDate: '15/sep/2025',
+      categoryBadge: 'Seguridad',
     );
   }
 
