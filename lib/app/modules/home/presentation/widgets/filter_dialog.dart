@@ -34,6 +34,13 @@ class _FilterDialogState extends State<FilterDialog> {
   String _selectedPhenomenon = 'Todos';
   final TextEditingController _sireNumberController = TextEditingController();
   
+  // Decoración compartida para los inputs
+  static const BoxDecoration _inputDecoration = BoxDecoration(
+    color: Colors.white,
+    border: Border.fromBorderSide(BorderSide(color: Color(0xFFD1D5DB), width: 1)),
+    borderRadius: BorderRadius.all(Radius.circular(8)),
+  );
+  
   // Contar filtros activos
   int _getActiveFiltersCount() {
     int count = 0;
@@ -149,16 +156,18 @@ class _FilterDialogState extends State<FilterDialog> {
                 });
               },
               child: Container(
-                padding: const EdgeInsets.only(top: 4, right: 10, bottom: 4, left: 16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(color: const Color(0xFFD1D5DB), width: 1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
+                padding: const EdgeInsets.only(left: 12, right: 8),
+                decoration: _inputDecoration,
                 child: DropdownButton<String>(
                   value: _selectedPhenomenon,
                   isExpanded: true,
                   underline: const SizedBox(),
+                  style: const TextStyle(
+                    color: Colors.black,
+                    fontFamily: 'Work Sans',
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                  ),
                   items: _buildPhenomenonItems(),
                   onChanged: (String? newValue) {
                     setState(() {
@@ -180,31 +189,28 @@ class _FilterDialogState extends State<FilterDialog> {
                     _sireNumberController.clear();
                   });
                 },
-                child: Container(
-                  padding: const EdgeInsets.only(top: 5, right: 10, bottom: 5, left: 16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    border: Border.all(color: const Color(0xFFD1D5DB), width: 1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: TextField(
-                    controller: _sireNumberController,
-                    decoration: const InputDecoration(
-                      hintText: 'Ingrese número de caso',
-                      hintStyle: TextStyle(
-                        color: Color(0xFFCCCCCC),
-                        fontFamily: 'Work Sans',
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      border: InputBorder.none,
-                    ),
-                    style: const TextStyle(
-                      color: Colors.black,
+                child: TextField(
+                  controller: _sireNumberController,
+                  maxLines: 1,
+                  decoration: const InputDecoration(
+                    hintText: 'Ingrese número de caso',
+                    hintStyle: TextStyle(
+                      color: Color(0xFFCCCCCC),
                       fontFamily: 'Work Sans',
                       fontSize: 14,
-                      fontWeight: FontWeight.w400,
+                      fontWeight: FontWeight.w500,
                     ),
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide(color: Color(0xFFD1D5DB), width: 1),
+                      borderRadius: BorderRadius.all(Radius.circular(8)),
+                    ),
+                    contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  ),
+                  style: const TextStyle(
+                    color: Colors.black,
+                    fontFamily: 'Work Sans',
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
                   ),
                 ),
               ),
