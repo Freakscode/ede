@@ -33,6 +33,16 @@ class _FilterDialogState extends State<FilterDialog> {
   DateTime? _endDate;
   String _selectedPhenomenon = 'Todos';
   final TextEditingController _sireNumberController = TextEditingController();
+  
+  // Contar filtros activos
+  int _getActiveFiltersCount() {
+    int count = 0;
+    if (_startDate != null) count++;
+    if (_endDate != null) count++;
+    if (_selectedPhenomenon != 'Todos') count++;
+    if (_sireNumberController.text.isNotEmpty) count++;
+    return count;
+  }
 
   @override
   void dispose() {
@@ -244,9 +254,9 @@ class _FilterDialogState extends State<FilterDialog> {
                         borderRadius: BorderRadius.circular(4),
                       ),
                     ),
-                    child: const Text(
-                      'Aplicar filtros',
-                      style: TextStyle(
+                    child: Text(
+                      'Aplicar filtros${_getActiveFiltersCount() > 0 ? ' (${_getActiveFiltersCount()})' : ''}',
+                      style: const TextStyle(
                         color: Colors.white,
                         fontFamily: 'Work Sans',
                         fontSize: 14,

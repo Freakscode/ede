@@ -30,6 +30,12 @@ class HomeFormsScreen extends StatefulWidget {
 
 class _HomeFormsScreenState extends State<HomeFormsScreen> {
   int _tabIndex = 0;
+  
+  // Variables de filtros
+  DateTime? _startDate;
+  DateTime? _endDate;
+  String _selectedPhenomenon = 'Todos';
+  String _sireNumber = '';
 
   @override
   void initState() {
@@ -233,6 +239,39 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
     }
   }
 
+  // Método para filtrar los formularios completados
+  List<FormEntity> _filterCompletedForms(List<FormEntity> forms) {
+    return forms.where((form) {
+      // Filtro por fenómeno amenazante
+      if (_selectedPhenomenon != 'Todos') {
+        if (form.riskEvent != _selectedPhenomenon) {
+          return false;
+        }
+      }
+      
+      // Filtro por rango de fechas
+      if (_startDate != null || _endDate != null) {
+        final formDate = form.lastModified;
+        
+        if (_startDate != null && formDate.isBefore(_startDate!)) {
+          return false;
+        }
+        
+        if (_endDate != null && formDate.isAfter(_endDate!.add(const Duration(days: 1)))) {
+          return false;
+        }
+      }
+      
+      // Filtro por número SIRE
+      if (_sireNumber.isNotEmpty) {
+        // TODO: Implementar filtro por número SIRE cuando esté disponible en FormEntity
+        // Por ahora, no filtrar por SIRE
+      }
+      
+      return true;
+    }).toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<HomeBloc, HomeState>(
@@ -373,7 +412,14 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
                                 isUserAuthenticated: isAuthenticated,
                               );
                               if (filters != null && mounted) {
-                                // TODO: Apply filters to the completed forms
+                                // Aplicar filtros
+                                setState(() {
+                                  _startDate = filters['startDate'];
+                                  _endDate = filters['endDate'];
+                                  _selectedPhenomenon = filters['phenomenon'] ?? 'Todos';
+                                  _sireNumber = filters['sireNumber'] ?? '';
+                                });
+                                
                                 CustomSnackBar.showInfo(
                                   context,
                                   message: 'Filtros aplicados',
@@ -391,7 +437,7 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
                 child: Text(
                   _tabIndex == 0
                       ? '${state.inProgressForms.length} formularios en proceso'
-                      : '${state.completedForms.length} formularios finalizados',
+                      : '${_filterCompletedForms(state.completedForms).length} formularios finalizados',
                   style: const TextStyle(
                     color: Colors.black,
                     fontFamily: 'Work Sans',
@@ -452,7 +498,7 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
                 }),
               ] else ...[
                 // Formularios completados
-                ...state.completedForms.asMap().entries.map((entry) {
+                ..._filterCompletedForms(state.completedForms).asMap().entries.map((entry) {
                   final index = entry.key;
                   final form = entry.value;
                   return Column(
