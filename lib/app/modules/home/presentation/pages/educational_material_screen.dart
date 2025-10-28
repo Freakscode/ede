@@ -1,5 +1,8 @@
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import 'package:caja_herramientas/app/core/icons/app_icons.dart';
+import 'package:caja_herramientas/app/modules/home/presentation/widgets/infographic_card_widget.dart';
+import 'package:caja_herramientas/app/modules/home/presentation/widgets/section_header_widget.dart';
+import 'package:caja_herramientas/app/modules/home/presentation/widgets/video_card_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -178,238 +181,59 @@ class _EducationalMaterialScreenState extends State<EducationalMaterialScreen> {
 
   Widget _buildContent() {
     if (_selectedTab == 0) {
-      // Mostrar card de infografía
-      return _buildInfographicCard();
+      // Mostrar encabezado y card de infografía
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SectionHeaderWidget(
+            title: _getTitleForTab(_selectedTab),
+            description: _getDescriptionForTab(_selectedTab),
+          ),
+          const SizedBox(height: 16),
+          _buildInfographicCard(),
+        ],
+      );
+    }
+    
+    if (_selectedTab == 1) {
+      // Mostrar encabezado y card de video
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SectionHeaderWidget(
+            title: _getTitleForTab(_selectedTab),
+            description: _getDescriptionForTab(_selectedTab),
+          ),
+          const SizedBox(height: 16),
+          _buildVideoCard(),
+        ],
+      );
     }
     
     // Para otros tabs, mostrar contenido simple
-    return Container(
+    return SectionHeaderWidget(
+      title: _getTitleForTab(_selectedTab),
+      description: _getDescriptionForTab(_selectedTab),
       margin: const EdgeInsets.symmetric(horizontal: 16),
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: const Color(0xFFEBF2F8),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            _getTitleForTab(_selectedTab),
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: const Color(0xFF2C3E50),
-              fontFamily: 'Work Sans',
-            ),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            _getDescriptionForTab(_selectedTab),
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w400,
-              color: const Color(0xFF5C6F80),
-              fontFamily: 'Work Sans',
-            ),
-          ),
-        ],
-      ),
     );
   }
 
   Widget _buildInfographicCard() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Sección de imagen con badge
-          Stack(
-            children: [
-              // Placeholder para imagen
-              Container(
-                height: 200,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(12),
-                    topRight: Radius.circular(12),
-                  ),
-                ),
-                child: const Center(
-                  child: Icon(
-                    Icons.image,
-                    size: 80,
-                    color: Colors.grey,
-                  ),
-                ),
-              ),
-              // Badge Evaluación EDE
-              _buildCategoryBadge('Evaluación EDE'),
-              // Botón de vista
-              Positioned(
-                right: 10,
-                bottom: 10,
-                child: Container(
-                  width: 40,
-                  height: 40,
-                  decoration: const BoxDecoration(
-                    color: DAGRDColors.azulDAGRD,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.visibility_outlined,
-                    color: Colors.white,
-                    size: 20,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          // Sección de contenido
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        'Gestión del Riesgo - Definiciones generales',
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
-                          color: DAGRDColors.negroDAGRD,
-                          fontFamily: 'Work Sans',
-                          height: 16 / 13,
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      width: 32,
-                      height: 32,
-                      child: IconButton(
-                        icon: const Icon(Icons.star_border),
-                        color: Colors.grey,
-                        iconSize: 32,
-                        padding: EdgeInsets.zero,
-                        onPressed: () {},
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Material educativo Gestión del Riesgo',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w400,
-                    color: DAGRDColors.negroDAGRD,
-                    fontFamily: 'Work Sans',
-                    height: 16 / 12,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Publicado: 10/jul/2025',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w400,
-                        color: const Color(0xFF706F6F),
-                        fontFamily: 'Work Sans',
-                        height: 16 / 12,
-                      ),
-                    ),
-                    Container(
-                      height: 32,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFDBEAFE),
-                        borderRadius: BorderRadius.circular(100),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          TextButton.icon(
-                            onPressed: () {},
-                            icon: SvgPicture.asset(
-                              AppIcons.download,
-                              width: 16,
-                              height: 16,
-                              colorFilter: const ColorFilter.mode(
-                                Color(0xFF2563EB),
-                                BlendMode.srcIn,
-                              ),
-                            ),
-                            label: const Text(
-                              'Descargar',
-                              style: TextStyle(
-                                color: Color(0xFF2563EB),
-                                fontFamily: 'Work Sans',
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                                height: 16 / 12,
-                              ),
-                            ),
-                            style: TextButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 8,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+    return const InfographicCardWidget(
+      title: 'Gestión del Riesgo - Definiciones generales',
+      description: 'Material educativo Gestión del Riesgo',
+      publishedDate: '10/jul/2025',
+      categoryBadge: 'Evaluación EDE',
     );
   }
 
-  /// Widget para el badge de categoría (ej: "Evaluación EDE")
-  Widget _buildCategoryBadge(String text) {
-    return Positioned(
-      left: 10,
-      top: 14,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-        decoration: BoxDecoration(
-          color: DAGRDColors.amarDAGRD,
-          borderRadius: BorderRadius.circular(100),
-        ),
-        child: Center(
-          child: Text(
-            text,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: Color(0xFF1E1E1E),
-              fontFamily: 'Work Sans',
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-              height: 16 / 12,
-            ),
-          ),
-        ),
-      ),
+  Widget _buildVideoCard() {
+    return const VideoCardWidget(
+      title: 'Protocolo de Seguridad en Emergencias',
+      description: 'Video educativo sobre procedimientos de seguridad',
+      duration: '12:45',
+      publishedDate: '15/sep/2025',
+      categoryBadge: 'Seguridad',
     );
   }
 
