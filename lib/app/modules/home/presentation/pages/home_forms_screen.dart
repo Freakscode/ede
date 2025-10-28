@@ -17,6 +17,8 @@ import '../../../../shared/models/complete_form_data_model.dart';
 import 'package:caja_herramientas/app/modules/risk_threat_analysis/presentation/bloc/risk_threat_analysis_bloc.dart';
 import 'package:caja_herramientas/app/modules/risk_threat_analysis/presentation/bloc/risk_threat_analysis_event.dart';
 import 'package:go_router/go_router.dart';
+import 'package:caja_herramientas/app/shared/widgets/dialogs/custom_action_dialog.dart';
+import 'package:caja_herramientas/app/shared/widgets/snackbars/custom_snackbar.dart';
 
 class HomeFormsScreen extends StatefulWidget {
   const HomeFormsScreen({super.key});
@@ -537,92 +539,65 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
       } else {
         // Si no se encuentra el formulario, mostrar error
         if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('No se pudo cargar el formulario'),
-            backgroundColor: Colors.red,
-          ),
+        CustomSnackBar.showError(
+          context,
+          message: 'No se pudo cargar el formulario',
+          title: 'Error',
         );
       }
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error al cargar el formulario: $e'),
-          backgroundColor: Colors.red,
-        ),
+      CustomSnackBar.showError(
+        context,
+        message: 'Error al cargar el formulario: $e',
+        title: 'Error',
       );
     }
   }
 
   void _deleteForm(BuildContext context, String formId, String formTitle) {
-    showDialog(
+    CustomActionDialog.show(
       context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text(
-            'Eliminar formulario',
-            style: TextStyle(
-              color: DAGRDColors.azulDAGRD,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          content: Text(
-            '¿Estás seguro de que deseas eliminar el formulario "$formTitle"?\n\nEsta acción no se puede deshacer.',
-            style: const TextStyle(fontSize: 16, height: 1.4),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              style: TextButton.styleFrom(foregroundColor: Colors.grey[600]),
-              child: const Text('Cancelar'),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                Navigator.of(context).pop();
-                try {
-                  // Eliminar formulario completo desde SQLite
-                  final persistenceService = FormPersistenceService();
-                  await persistenceService.deleteForm(formId);
+      title: 'Eliminar formulario',
+      message: '¿Está seguro que desea eliminar el borrador de este formulario?',
+      leftButtonText: 'Cancelar',
+      leftButtonIcon: Icons.close,
+      onLeftButtonPressed: () => Navigator.of(context).pop(),
+      rightButtonText: 'Eliminar',
+      rightButtonIcon: Icons.delete,
+      rightButtonColor: Colors.red,
+      onRightButtonPressed: () async {
+        Navigator.of(context).pop();
+        try {
+          // Eliminar formulario completo desde SQLite
+          final persistenceService = FormPersistenceService();
+          await persistenceService.deleteForm(formId);
 
-                  // Recargar la lista de formularios
-                  context.read<HomeBloc>().add(LoadForms());
+          // Recargar la lista de formularios
+          context.read<HomeBloc>().add(LoadForms());
 
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Formulario "$formTitle" eliminado'),
-                      backgroundColor: Colors.red,
-                      duration: const Duration(seconds: 2),
-                    ),
-                  );
-                } catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Error al eliminar formulario: $e'),
-                      backgroundColor: Colors.red,
-                    ),
-                  );
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                foregroundColor: Colors.white,
-              ),
-              child: const Text('Eliminar'),
-            ),
-          ],
-        );
+          CustomSnackBar.showSuccess(
+            context,
+            message: 'Formulario "$formTitle" eliminado',
+            title: 'Eliminado',
+            duration: const Duration(seconds: 2),
+          );
+        } catch (e) {
+          CustomSnackBar.showError(
+            context,
+            message: 'Error al eliminar formulario: $e',
+            title: 'Error',
+          );
+        }
       },
     );
   }
 
 
   void _showMessage(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.orange,
-      ),
+    CustomSnackBar.showWarning(
+      context,
+      message: message,
     );
   }
 }
