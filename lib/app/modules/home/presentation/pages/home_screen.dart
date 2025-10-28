@@ -1,5 +1,6 @@
 import 'package:caja_herramientas/app/modules/home/presentation/pages/home_forms_screen.dart';
 import 'package:caja_herramientas/app/modules/home/presentation/pages/settings_screen.dart';
+import 'package:caja_herramientas/app/modules/home/presentation/pages/educational_material_screen.dart';
 import 'package:caja_herramientas/app/modules/home/presentation/widgets/forms_help_content.dart';
 import 'package:caja_herramientas/app/modules/home/presentation/widgets/general_help_content.dart';
 import 'package:caja_herramientas/app/modules/home/presentation/widgets/home_main_section.dart';
@@ -162,7 +163,7 @@ class HomeScreen extends StatelessWidget {
       case 0: // Inicio
         return const HomeMainSection();
       case 1: // Material educativo
-        return _buildEducationalMaterialContent();
+        return const EducationalMaterialScreen();
       case 2: // Mis formularios
         return const HomeFormsScreen();
       case 3: // Configuración
@@ -172,84 +173,6 @@ class HomeScreen extends StatelessWidget {
       default:
         return null; // Pestaña no reconocida
     }
-  }
-
-  /// Construye el contenido del material educativo
-  Widget _buildEducationalMaterialContent() {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: DAGRDColors.azulDAGRD.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Icon(
-                Icons.school_outlined,
-                size: 80,
-                color: DAGRDColors.azulDAGRD,
-              ),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              'Material Educativo',
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                color: DAGRDColors.azulDAGRD,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              'Recursos de aprendizaje y capacitación',
-              style: TextStyle(
-                fontSize: 18,
-                color: Colors.grey.shade600,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 12,
-              ),
-              decoration: BoxDecoration(
-                color: Colors.orange.shade50,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                  color: Colors.orange.shade200,
-                  width: 1,
-                ),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.info_outline,
-                    color: Colors.orange.shade700,
-                    size: 20,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Próximamente disponible',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.orange.shade700,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 
   /// Construye un fallback de error para pestañas no reconocidas
