@@ -37,8 +37,21 @@ class DocumentCardWidget extends StatelessWidget {
       child: Column(
         children: [
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SvgPicture.asset(AppIcons.files, width: 48, height: 48),
+              SizedBox(
+                width: 30,
+                height: 30,
+                child: SvgPicture.asset(
+                  AppIcons.files,
+                  width: 30,
+                  height: 30,
+                  colorFilter: const ColorFilter.mode(
+                    Color(0xFF2563EB),
+                    BlendMode.srcIn,
+                  ),
+                ),
+              ),
               const SizedBox(width: 16),
               Expanded(
                 child: Column(
@@ -99,7 +112,7 @@ class DocumentCardWidget extends StatelessWidget {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: DAGRDColors.azulDAGRD.withOpacity(0.1),
+                    color: const Color(0xFF2563EB).withOpacity(0.1),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: const Row(
@@ -108,16 +121,17 @@ class DocumentCardWidget extends StatelessWidget {
                       Icon(
                         Icons.visibility_outlined,
                         size: 16,
-                        color: DAGRDColors.azulDAGRD,
+                        color: Color(0xFF2563EB),
                       ),
                       SizedBox(width: 6),
                       Text(
                         'Ver',
                         style: TextStyle(
-                          color: DAGRDColors.azulDAGRD,
+                          color: Color(0xFF2563EB),
                           fontFamily: 'Work Sans',
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
+                          height: 16 / 12,
                         ),
                       ),
                     ],
@@ -134,7 +148,7 @@ class DocumentCardWidget extends StatelessWidget {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: DAGRDColors.azulDAGRD.withOpacity(0.1),
+                    color: const Color(0xFF2563EB).withOpacity(0.1),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Row(
@@ -145,7 +159,7 @@ class DocumentCardWidget extends StatelessWidget {
                         width: 16,
                         height: 16,
                         colorFilter: const ColorFilter.mode(
-                          DAGRDColors.azulDAGRD,
+                          Color(0xFF2563EB),
                           BlendMode.srcIn,
                         ),
                       ),
@@ -153,10 +167,11 @@ class DocumentCardWidget extends StatelessWidget {
                       const Text(
                         'Descargar',
                         style: TextStyle(
-                          color: DAGRDColors.azulDAGRD,
+                          color: Color(0xFF2563EB),
                           fontFamily: 'Work Sans',
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
+                          height: 16 / 12,
                         ),
                       ),
                     ],
