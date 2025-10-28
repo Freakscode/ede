@@ -50,6 +50,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<ResetEvaluationsForEvent>(_onResetEvaluationsForEvent);
     on<HomeCheckAndShowTutorial>(_onCheckAndShowTutorial);
     on<HomeSetShowTutorial>(_onSetShowTutorial);
+    on<ChangeEducationalTab>(_onChangeEducationalTab);
+    on<ChangeEducationalFilter>(_onChangeEducationalFilter);
   }
 
   // ========== EVENT HANDLERS ==========
@@ -481,5 +483,21 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     // TODO: Implementar lógica real para obtener iconos
     // Por defecto usar Sismo.svg (que existe)
     return 'assets/icons/svg/Sismo.svg';
+  }
+
+  // ========== MATERIAL EDUCATIVO ==========
+
+  void _onChangeEducationalTab(
+    ChangeEducationalTab event,
+    Emitter<HomeState> emit,
+  ) {
+    emit(state.copyWith(educationalTabIndex: event.tabIndex));
+  }
+
+  void _onChangeEducationalFilter(
+    ChangeEducationalFilter event,
+    Emitter<HomeState> emit,
+  ) {
+    emit(state.copyWith(educationalFilter: event.filter));
   }
 }

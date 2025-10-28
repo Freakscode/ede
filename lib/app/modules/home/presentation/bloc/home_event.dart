@@ -215,3 +215,25 @@ class HomeSetShowTutorial extends HomeEvent {
   @override
   List<Object?> get props => [value];
 }
+
+// ========== MATERIAL EDUCATIVO ==========
+
+/// Evento para cambiar tab en material educativo
+class ChangeEducationalTab extends HomeEvent {
+  final int tabIndex;
+
+  const ChangeEducationalTab(this.tabIndex);
+
+  @override
+  List<Object?> get props => [tabIndex];
+}
+
+/// Evento para cambiar filtro en material educativo
+class ChangeEducationalFilter extends HomeEvent {
+  final String filter;
+
+  const ChangeEducationalFilter(this.filter);
+
+  @override
+  List<Object?> get props => [filter];
+}

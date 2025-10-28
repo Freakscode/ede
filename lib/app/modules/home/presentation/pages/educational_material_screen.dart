@@ -6,6 +6,10 @@ import 'package:caja_herramientas/app/modules/home/presentation/widgets/document
 import 'package:caja_herramientas/app/modules/home/presentation/widgets/material_tab_widget.dart';
 import 'package:caja_herramientas/app/modules/home/presentation/widgets/material_filter_chip_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../bloc/home_bloc.dart';
+import '../bloc/home_event.dart';
+import '../bloc/home_state.dart';
 
 /// Pantalla de Material Educativo que muestra recursos de aprendizaje
 /// y capacitación para los usuarios de la aplicación.
@@ -23,10 +27,6 @@ class _EducationalMaterialScreenState extends State<EducationalMaterialScreen> {
   static const int _videosTabIndex = 1;
   static const int _documentsTabIndex = 2;
 
-  // Estado
-  int _selectedTab = _infographicsTabIndex;
-  String _selectedFilter = 'Todos';
-
   // Datos estáticos
   static const List<String> _filters = [
     'Todos',
@@ -38,7 +38,12 @@ class _EducationalMaterialScreenState extends State<EducationalMaterialScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return BlocBuilder<HomeBloc, HomeState>(
+      builder: (context, state) {
+        final selectedTab = state.educationalTabIndex;
+        final selectedFilter = state.educationalFilter;
+        
+        return Column(
       children: [
         // Tabs de navegación - fijo arriba
         Padding(
@@ -55,6 +60,7 @@ class _EducationalMaterialScreenState extends State<EducationalMaterialScreen> {
                     index: _infographicsTabIndex,
                     label: 'Infografías',
                     iconAsset: AppIcons.images,
+                    selectedTab: selectedTab,
                   ),
                 ),
                 Expanded(
@@ -62,6 +68,7 @@ class _EducationalMaterialScreenState extends State<EducationalMaterialScreen> {
                     index: _videosTabIndex,
                     label: 'Videos',
                     iconAsset: AppIcons.video,
+                    selectedTab: selectedTab,
                   ),
                 ),
                 Expanded(
@@ -69,6 +76,7 @@ class _EducationalMaterialScreenState extends State<EducationalMaterialScreen> {
                     index: _documentsTabIndex,
                     label: 'Documentos',
                     iconAsset: AppIcons.files,
+                    selectedTab: selectedTab,
                   ),
                 ),
               ],
@@ -79,7 +87,7 @@ class _EducationalMaterialScreenState extends State<EducationalMaterialScreen> {
         // Filtros - fijo debajo de tabs
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: _buildFilters(),
+          child: _buildFilters(selectedFilter),
         ),
 
         const SizedBox(height: 24),
@@ -89,12 +97,14 @@ class _EducationalMaterialScreenState extends State<EducationalMaterialScreen> {
           child: ListView(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             children: [
-              _buildContent(),
+              _buildContent(selectedTab),
               const SizedBox(height: 24), // Espacio al final
             ],
           ),
         ),
       ],
+    );
+      },
     );
   }
 
@@ -104,21 +114,20 @@ class _EducationalMaterialScreenState extends State<EducationalMaterialScreen> {
     required int index,
     required String label,
     required String iconAsset,
+    required int selectedTab,
   }) {
     return MaterialTabWidget(
       index: index,
       label: label,
       iconAsset: iconAsset,
-      isSelected: _selectedTab == index,
+      isSelected: selectedTab == index,
       onTap: () {
-        setState(() {
-          _selectedTab = index;
-        });
+        context.read<HomeBloc>().add(ChangeEducationalTab(index));
       },
     );
   }
 
-  Widget _buildFilters() {
+  Widget _buildFilters(String selectedFilter) {
     return SizedBox(
       height: 40,
       child: ListView.separated(
@@ -130,11 +139,9 @@ class _EducationalMaterialScreenState extends State<EducationalMaterialScreen> {
 
           return MaterialFilterChipWidget(
             label: filter,
-            isSelected: _selectedFilter == filter,
+            isSelected: selectedFilter == filter,
             onTap: () {
-              setState(() {
-                _selectedFilter = filter;
-              });
+              context.read<HomeBloc>().add(ChangeEducationalFilter(filter));
             },
           );
         },
@@ -142,15 +149,15 @@ class _EducationalMaterialScreenState extends State<EducationalMaterialScreen> {
     );
   }
 
-  Widget _buildContent() {
-    if (_selectedTab == 0) {
+  Widget _buildContent(int selectedTab) {
+    if (selectedTab == 0) {
       // Mostrar encabezado y card de infografía
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SectionHeaderWidget(
-            title: _getTitleForTab(_selectedTab),
-            description: _getDescriptionForTab(_selectedTab),
+            title: _getTitleForTab(selectedTab),
+            description: _getDescriptionForTab(selectedTab),
           ),
           const SizedBox(height: 16),
           _buildInfographicCard(),
@@ -158,14 +165,14 @@ class _EducationalMaterialScreenState extends State<EducationalMaterialScreen> {
       );
     }
 
-    if (_selectedTab == 1) {
+    if (selectedTab == 1) {
       // Mostrar encabezado y card de video
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SectionHeaderWidget(
-            title: _getTitleForTab(_selectedTab),
-            description: _getDescriptionForTab(_selectedTab),
+            title: _getTitleForTab(selectedTab),
+            description: _getDescriptionForTab(selectedTab),
           ),
           const SizedBox(height: 16),
           _buildVideoCard(),
@@ -174,13 +181,13 @@ class _EducationalMaterialScreenState extends State<EducationalMaterialScreen> {
     }
 
     // Tab de Documentos
-    if (_selectedTab == 2) {
+    if (selectedTab == 2) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SectionHeaderWidget(
-            title: _getTitleForTab(_selectedTab),
-            description: _getDescriptionForTab(_selectedTab),
+            title: _getTitleForTab(selectedTab),
+            description: _getDescriptionForTab(selectedTab),
           ),
           const SizedBox(height: 16),
           _buildDocumentCard(),
@@ -190,8 +197,8 @@ class _EducationalMaterialScreenState extends State<EducationalMaterialScreen> {
 
     // Para otros tabs, mostrar contenido simple
     return SectionHeaderWidget(
-      title: _getTitleForTab(_selectedTab),
-      description: _getDescriptionForTab(_selectedTab),
+      title: _getTitleForTab(selectedTab),
+      description: _getDescriptionForTab(selectedTab),
       margin: const EdgeInsets.symmetric(horizontal: 16),
     );
   }
