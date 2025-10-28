@@ -3,6 +3,7 @@ import 'package:caja_herramientas/app/core/icons/app_icons.dart';
 import 'package:caja_herramientas/app/modules/home/presentation/widgets/infographic_card_widget.dart';
 import 'package:caja_herramientas/app/modules/home/presentation/widgets/section_header_widget.dart';
 import 'package:caja_herramientas/app/modules/home/presentation/widgets/video_card_widget.dart';
+import 'package:caja_herramientas/app/modules/home/presentation/widgets/document_card_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -210,11 +211,40 @@ class _EducationalMaterialScreenState extends State<EducationalMaterialScreen> {
       );
     }
     
+    // Tab de Documentos
+    if (_selectedTab == 2) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SectionHeaderWidget(
+            title: _getTitleForTab(_selectedTab),
+            description: _getDescriptionForTab(_selectedTab),
+          ),
+          const SizedBox(height: 16),
+          _buildDocumentCard(),
+        ],
+      );
+    }
+    
     // Para otros tabs, mostrar contenido simple
     return SectionHeaderWidget(
       title: _getTitleForTab(_selectedTab),
       description: _getDescriptionForTab(_selectedTab),
       margin: const EdgeInsets.symmetric(horizontal: 16),
+    );
+  }
+
+  Widget _buildDocumentCard() {
+    return DocumentCardWidget(
+      title: 'Manual de evaluación estructural',
+      description: 'Guía completa para la evaluación de daños estructurales post-sismo',
+      publishedDate: '10/jul/2025',
+      onView: () {
+        // TODO: Implementar visualización del documento
+      },
+      onDownload: () {
+        // TODO: Implementar descarga del documento
+      },
     );
   }
 
