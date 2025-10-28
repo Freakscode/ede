@@ -268,10 +268,14 @@ class _EducationalMaterialScreenState extends State<EducationalMaterialScreen> {
                     color: DAGRDColors.azulDAGRD,
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(
-                    Icons.visibility_outlined,
-                    color: Colors.white,
-                    size: 20,
+                  child: SvgPicture.asset(
+                    AppIcons.preview,
+                    width: 20,
+                    height: 20,
+                    colorFilter: const ColorFilter.mode(
+                      Colors.white,
+                      BlendMode.srcIn,
+                    ),
                   ),
                 ),
               ),
@@ -301,9 +305,15 @@ class _EducationalMaterialScreenState extends State<EducationalMaterialScreen> {
                       width: 32,
                       height: 32,
                       child: IconButton(
-                        icon: const Icon(Icons.star_border),
-                        color: Colors.grey,
-                        iconSize: 32,
+                        icon: SvgPicture.asset(
+                          AppIcons.star,
+                          width: 20,
+                          height: 20,
+                          colorFilter: const ColorFilter.mode(
+                            Colors.grey,
+                            BlendMode.srcIn,
+                          ),
+                        ),
                         padding: EdgeInsets.zero,
                         onPressed: () {},
                       ),
