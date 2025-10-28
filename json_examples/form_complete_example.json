@@ -1,0 +1,112 @@
+{
+    "id": "Avenida Torrencial_complete_1761609290316",
+    "eventName": "Avenida Torrencial",
+    "createdAt": "2025-01-28T10:00:00.000Z",
+    "updatedAt": "2025-01-28T10:30:00.000Z",
+    "isExplicitlyCompleted": false,
+    "amenazaSelections": {
+        "amenazaScores": {
+            "probabilidad": 2.05,
+            "intensidad": 1.65,
+            "global": 1.85
+        },
+        "probabilidad": {
+            "Categorización de Amenaza en Mapas de Torrencialidad": "1",
+            "Tipo de Material del Cauce": "2",
+            "Cambios en la Sección Hidráulica": "3",
+            "Profundidad del Cauce": "2",
+            "Estabilidad de los Taludes o Laderas Adyacentes del Cauce": "2"
+        },
+        "intensidad": {
+            "Potencial de Daño en Edificaciones": "1",
+            "Capacidad de Generar Pérdida de Vidas Humanas": "2",
+            "Alteración del Funcionamiento de Líneas Vitales y Espacio Público": "2"
+        },
+        "evidenceImages": [
+            {
+                "image": "/data/user/0/com.example.caja_herramientas/app_flutter/probabilidad_0.jpg",
+                "latitude": "4.6097",
+                "longitude": "-74.0817",
+                "altitude": "2600.0",
+                "accuracy": "10.5",
+                "timestamp": "2025-01-28T10:00:00.000Z"
+            },
+            {
+                "image": "/data/user/0/com.example.caja_herramientas/app_flutter/probabilidad_1.jpg",
+                "latitude": "4.6098",
+                "longitude": "-74.0818",
+                "altitude": "2610.0",
+                "accuracy": "12.3",
+                "timestamp": "2025-01-28T10:05:00.000Z"
+            },
+            {
+                "image": "/data/user/0/com.example.caja_herramientas/app_flutter/probabilidad_2.jpg",
+                "latitude": "4.6099",
+                "longitude": "-74.0819",
+                "altitude": "2620.0",
+                "accuracy": "15.0",
+                "timestamp": "2025-01-28T10:10:00.000Z"
+            }
+        ]
+    },
+    "vulnerabilidadSelections": {
+        "vulnerabilidadScores": {
+            "fragilidad_fisica": 2.10,
+            "fragilidad_personas": 1.40,
+            "exposicion": 2.25,
+            "global": 1.92
+        },
+        "fragilidad_fisica": {
+            "Calidad de los Materiales y Procesos Constructivos": "1",
+            "Estado de Conservación": "2",
+            "Tipología Estructural": "3"
+        },
+        "fragilidad_personas": {
+            "Nivel de Organización": "1",
+            "Suficiencia Económica": "2"
+        },
+        "exposicion": {
+            "Edificaciones Expuestas": "1",
+            "Otros Elementos Expuestos (Líneas vitales y drenajes)": "2",
+            "Escala de Afectación": "3"
+        },
+        "evidenceImages": [
+            {
+                "image": "/data/user/0/com.example.caja_herramientas/app_flutter/probabilidad_0.jpg",
+                "latitude": "4.6097",
+                "longitude": "-74.0817",
+                "altitude": "2600.0",
+                "accuracy": "10.5",
+                "timestamp": "2025-01-28T10:00:00.000Z"
+            },
+            {
+                "image": "/data/user/0/com.example.caja_herramientas/app_flutter/probabilidad_1.jpg",
+                "latitude": "4.6098",
+                "longitude": "-74.0818",
+                "altitude": "2610.0",
+                "accuracy": "12.3",
+                "timestamp": "2025-01-28T10:05:00.000Z"
+            },
+            {
+                "image": "/data/user/0/com.example.caja_herramientas/app_flutter/probabilidad_2.jpg",
+                "latitude": "4.6099",
+                "longitude": "-74.0819",
+                "altitude": "2620.0",
+                "accuracy": "15.0",
+                "timestamp": "2025-01-28T10:10:00.000Z"
+            }
+        ]
+    },
+    "contactData": {
+        "name": "Juan Pérez",
+        "phone": "+57 300 123 4567",
+        "email": "juan.perez@example.com",
+        "role": "Inspector DAGRD"
+    },
+    "inspectionData": {
+        "sireNumber": "SIRE-2025-001",
+        "location": "Calle 123 #45-67, Bogotá",
+        "date": "2025-01-28T10:00:00.000Z",
+        "inspector": "Juan Pérez"
+    }
+}
