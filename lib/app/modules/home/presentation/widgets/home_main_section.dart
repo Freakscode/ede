@@ -147,11 +147,8 @@ class _HomeMainSectionState extends State<HomeMainSection> {
           final homeBloc = context.read<HomeBloc>();
           final homeState = homeBloc.state;
 
-          // Contar formularios pendientes (evaluaciones completadas parcialmente)
-          int pendingFormsCount = 0;
-          homeState.completedEvaluations.forEach((key, value) {
-            if (value) pendingFormsCount++;
-          });
+          // Contar formularios pendientes (formularios en progreso)
+          final pendingFormsCount = homeState.inProgressForms.length;
 
           // Siempre mostrar el dialog
           showDialog(

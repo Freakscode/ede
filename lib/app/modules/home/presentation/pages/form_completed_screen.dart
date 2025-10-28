@@ -6,6 +6,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../presentation/bloc/home_bloc.dart';
 import '../../presentation/bloc/home_event.dart';
+import '../../presentation/bloc/home_state.dart';
 import '../../../auth/bloc/auth_bloc.dart';
 import '../../../auth/bloc/auth_state.dart';
 
@@ -14,14 +15,18 @@ class FormCompletedScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          // Título principal
-          const Text(
-            'Formulario finalizado correctamente',
+    return BlocBuilder<HomeBloc, HomeState>(
+      builder: (context, state) {
+        final pendingFormsCount = state.inProgressForms.length;
+        
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Título principal
+              const Text(
+                'Formulario finalizado correctamente',
             textAlign: TextAlign.center,
             style: TextStyle(
               color: DAGRDColors.azulDAGRD,
@@ -174,6 +179,47 @@ class FormCompletedScreen extends StatelessWidget {
 
           const SizedBox(height: 48),
 
+          // Mensaje de formularios pendientes
+          if (pendingFormsCount > 0)
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: DAGRDColors.amarDAGRD.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: DAGRDColors.amarDAGRD,
+                  width: 1,
+                ),
+              ),
+              child: Row(
+                children: [
+                  SvgPicture.asset(
+                    AppIcons.info,
+                    width: 20,
+                    height: 20,
+                    colorFilter: const ColorFilter.mode(
+                       Color(0xFF1E1E1E),
+                      BlendMode.srcIn,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      'Tienes $pendingFormsCount formulario${pendingFormsCount > 1 ? 's' : ''} en progreso',
+                      style: const TextStyle(
+                        color: Color(0xFF1E1E1E),
+                        fontFamily: 'Work Sans',
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+          const SizedBox(height: 48),
+
           // Enlace "Volver al inicio"
           GestureDetector(
             onTap: () {
@@ -189,7 +235,7 @@ class FormCompletedScreen extends StatelessWidget {
                   size: 20,
                 ),
                 SizedBox(width: 4),
-                Text(
+                 Text(
                   'Volver al inicio',
                   style: TextStyle(
                     color: DAGRDColors.negroDAGRD,
@@ -204,6 +250,8 @@ class FormCompletedScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+      },
     );
   }
 
