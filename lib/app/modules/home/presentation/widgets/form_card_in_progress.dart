@@ -178,11 +178,14 @@ class FormCardInProgress extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 4),
-          LinearProgressIndicator(
-            value: threat,
-            minHeight: 9,
-            backgroundColor: const Color(0xFFE5E5E5),
-            valueColor: const AlwaysStoppedAnimation(Color(0xFF2563EB)),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(4.5),
+            child: LinearProgressIndicator(
+              value: threat,
+              minHeight: 9,
+              backgroundColor: const Color(0xFFE5E5E5),
+              valueColor: const AlwaysStoppedAnimation(Color(0xFF2563EB)),
+            ),
           ),
           const SizedBox(height: 8),
           Row(
@@ -212,11 +215,14 @@ class FormCardInProgress extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 4),
-          LinearProgressIndicator(
-            value: vulnerability,
-            minHeight: 9,
-            backgroundColor: const Color(0xFFE5E5E5),
-            valueColor: const AlwaysStoppedAnimation(Color(0xFF2563EB)),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(4.5),
+            child: LinearProgressIndicator(
+              value: vulnerability,
+              minHeight: 9,
+              backgroundColor: const Color(0xFFE5E5E5),
+              valueColor: const AlwaysStoppedAnimation(Color(0xFF2563EB)),
+            ),
           ),
           const SizedBox(height: 16),
           SizedBox(

@@ -115,6 +115,7 @@ class _FilterDialogState extends State<FilterDialog> {
                     child: CustomDatePicker(
                       label: 'Desde',
                       selectedDate: _startDate,
+                      lastDate: DateTime.now(),
                       onDateSelected: (date) {
                         setState(() {
                           _startDate = date;
@@ -127,6 +128,7 @@ class _FilterDialogState extends State<FilterDialog> {
                     child: CustomDatePicker(
                       label: 'Hasta',
                       selectedDate: _endDate,
+                      lastDate: DateTime.now(),
                       onDateSelected: (date) {
                         setState(() {
                           _endDate = date;
