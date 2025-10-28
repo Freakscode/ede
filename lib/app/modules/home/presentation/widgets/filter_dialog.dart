@@ -34,13 +34,6 @@ class _FilterDialogState extends State<FilterDialog> {
   String _selectedPhenomenon = 'Todos';
   final TextEditingController _sireNumberController = TextEditingController();
   
-  // Decoración compartida para los inputs
-  static const BoxDecoration _inputDecoration = BoxDecoration(
-    color: Colors.white,
-    border: Border.fromBorderSide(BorderSide(color: Color(0xFFD1D5DB), width: 1)),
-    borderRadius: BorderRadius.all(Radius.circular(8)),
-  );
-  
   // Contar filtros activos
   int _getActiveFiltersCount() {
     int count = 0;
@@ -156,17 +149,24 @@ class _FilterDialogState extends State<FilterDialog> {
                 });
               },
               child: Container(
-                padding: const EdgeInsets.only(left: 12, right: 8),
-                decoration: _inputDecoration,
+                height: 50,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  border: Border.all(color: const Color(0xFFD1D5DB), width: 1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
                 child: DropdownButton<String>(
                   value: _selectedPhenomenon,
                   isExpanded: true,
                   underline: const SizedBox(),
+                  icon: const Icon(Icons.arrow_drop_down, color: Color(0xFF1E1E1E)),
                   style: const TextStyle(
-                    color: Colors.black,
+                    color: Color(0xFF1E1E1E),
                     fontFamily: 'Work Sans',
-                    fontSize: 14,
-                    fontWeight: FontWeight.w400,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    height: 24 / 16,
                   ),
                   items: _buildPhenomenonItems(),
                   onChanged: (String? newValue) {
@@ -192,6 +192,11 @@ class _FilterDialogState extends State<FilterDialog> {
                 child: TextField(
                   controller: _sireNumberController,
                   maxLines: 1,
+                  onChanged: (value) {
+                    setState(() {
+                      // Actualizar el estado para que se recalcule el contador
+                    });
+                  },
                   decoration: const InputDecoration(
                     hintText: 'Ingrese número de caso',
                     hintStyle: TextStyle(
@@ -336,19 +341,21 @@ class _FilterDialogState extends State<FilterDialog> {
     // Crear lista de nombres de eventos
     final eventNames = ['Todos'] + events.map((e) => e.name).toList();
     
-    // Convertir a DropdownMenuItem
+    // Convertir a DropdownMenuItem con estilo mejorado
     return eventNames.map((String value) {
       return DropdownMenuItem<String>(
         value: value,
-        child: Text(
-          value,
-          style: const TextStyle(
-            color: Color(0xFF1E1E1E), // Textos
-            fontFamily: 'Work Sans',
-            fontSize: 13,
-            fontStyle: FontStyle.normal,
-            fontWeight: FontWeight.w500,
-            height: 22 / 13, // 169.231%
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+          child: Text(
+            value,
+            style: const TextStyle(
+              color: Color(0xFF1E1E1E),
+              fontFamily: 'Work Sans',
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              height: 24 / 16,
+            ),
           ),
         ),
       );
