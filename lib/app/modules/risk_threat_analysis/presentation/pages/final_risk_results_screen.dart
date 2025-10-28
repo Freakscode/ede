@@ -426,17 +426,9 @@ class _FinalRiskResultsScreenState extends State<FinalRiskResultsScreen> {
         orElse: () => classification.subClassifications.first,
       );
       
-      // Debug: imprimir todas las dynamicSelections disponibles
-      print('DEBUG: state.dynamicSelections keys: ${state.dynamicSelections.keys.toList()}');
-      for (var key in state.dynamicSelections.keys) {
-        print('DEBUG: dynamicSelections[$key] = ${state.dynamicSelections[key]}');
-      }
-      
       for (final category in subClass.categories) {
         final selections = state.dynamicSelections[subClassId] ?? {};
         final selection = selections[category.title];
-        
-        print('DEBUG vulnerabilidad - category: ${category.title}, selection: $selection, all keys: ${selections.keys.toList()}');
         
         final rating = _getRatingFromSelection(selection);
         final color = _getColorFromRating(rating);
@@ -452,7 +444,6 @@ class _FinalRiskResultsScreenState extends State<FinalRiskResultsScreen> {
       }
     }
     
-    print('DEBUG _buildVulnerabilidadItems returning ${items.length} items');
     return items;
   }
   
