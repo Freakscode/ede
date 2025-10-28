@@ -12,12 +12,7 @@ import '../../../home/presentation/bloc/home_bloc.dart';
 import '../../../../shared/services/form_persistence_service.dart';
 
 class FinalRiskResultsScreen extends StatefulWidget {
-  final String eventName;
-
-  const FinalRiskResultsScreen({
-    super.key,
-    this.eventName = 'Evento de Prueba', // Valor por defecto para desarrollo
-  });
+  const FinalRiskResultsScreen({super.key});
 
   @override
   State<FinalRiskResultsScreen> createState() => _FinalRiskResultsScreenState();

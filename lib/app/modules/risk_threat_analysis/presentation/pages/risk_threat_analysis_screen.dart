@@ -193,7 +193,7 @@ class _RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
           }), // Índice 1 - Calificación
           const EvidenceScreen(), // Índice 2 - Evidencias
           const RatingResultsScreen(), // Índice 3 - Resultados
-          FinalRiskResultsScreen(eventName: state.selectedRiskEvent ?? ''), // Índice 4 - Resultados Finales
+          const FinalRiskResultsScreen(), // Índice 4 - Resultados Finales
         ];
 
         return Scaffold(
