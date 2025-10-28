@@ -573,6 +573,9 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
           final persistenceService = FormPersistenceService();
           await persistenceService.deleteForm(formId);
 
+          // Check if widget is still mounted before using context
+          if (!mounted) return;
+
           // Recargar la lista de formularios
           context.read<HomeBloc>().add(LoadForms());
 
@@ -583,6 +586,7 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
             duration: const Duration(seconds: 2),
           );
         } catch (e) {
+          if (!mounted) return;
           CustomSnackBar.showError(
             context,
             message: 'Error al eliminar formulario: $e',
