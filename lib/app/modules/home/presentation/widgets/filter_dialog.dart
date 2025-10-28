@@ -138,7 +138,7 @@ class _FilterDialogState extends State<FilterDialog> {
                 });
               },
               child: Container(
-                padding: const EdgeInsets.only(top: 6, right: 10, bottom: 6, left: 16),
+                padding: const EdgeInsets.only(top: 4, right: 10, bottom: 4, left: 16),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   border: Border.all(color: const Color(0xFFD1D5DB), width: 1),
@@ -186,7 +186,7 @@ class _FilterDialogState extends State<FilterDialog> {
                   });
                 },
                 child: Container(
-                  padding: const EdgeInsets.only(top: 6, right: 10, bottom: 6, left: 16),
+                  padding: const EdgeInsets.only(top: 5, right: 10, bottom: 5, left: 16),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     border: Border.all(color: const Color(0xFFD1D5DB), width: 1),

@@ -58,7 +58,7 @@ class CustomDatePicker extends StatelessWidget {
               children: [
                 SizedBox(
                   width: 36,
-                  height: 36,
+                  // height: 36,
                   child: Icon(
                     Icons.calendar_today,
                     color: errorMessage != null 
