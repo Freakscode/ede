@@ -40,8 +40,8 @@ class NavigationButtonsWidget extends StatelessWidget {
           onTap:
               onBackPressed ??
               () {
-                if (currentIndex == 3) {
-                  // Cuando estamos en FinalRiskResultsScreen (índice 3), volver a categorías (índice 0)
+                if (currentIndex == 4) {
+                  // Cuando estamos en FinalRiskResultsScreen (índice 4), volver a categorías (índice 0)
                   context.read<RiskThreatAnalysisBloc>().add(
                     ChangeBottomNavIndex(0),
                   );
@@ -81,7 +81,7 @@ class NavigationButtonsWidget extends StatelessWidget {
         ),
 
         // Botón Continuar o Finalizar
-        if (currentIndex < 3) // Botón Continuar para índices 0, 1, y 2
+        if (currentIndex < 4) // Botón Continuar para índices 0, 1, 2, y 3
           InkWell(
             onTap:
                 onContinuePressed ??
@@ -112,7 +112,7 @@ class NavigationButtonsWidget extends StatelessWidget {
               ],
             ),
           )
-        else // Botón Finalizar para la pestaña de Resultados (índice 3)
+        else // Botón Finalizar para la pestaña de Resultados Finales (índice 4)
           BlocBuilder<RiskThreatAnalysisBloc, RiskThreatAnalysisState>(
             builder: (context, state) {
               // Verificar si hay variables sin calificar
@@ -140,8 +140,8 @@ class NavigationButtonsWidget extends StatelessWidget {
                       }
                     : onContinuePressed ??
                     () async {
-                      // Si estamos en FinalRiskResultsScreen (índice 3), completar formulario
-                      if (currentIndex == 3) {
+                      // Si estamos en FinalRiskResultsScreen (índice 4), completar formulario
+                      if (currentIndex == 4) {
                         // Mostrar diálogo de confirmación para completar el formulario
                         CustomActionDialog.show(
                           context: context,
@@ -253,6 +253,9 @@ class NavigationButtonsWidget extends StatelessWidget {
                                   );
                                 }
                                 
+                                // Cerrar el diálogo primero
+                                Navigator.of(context).pop();
+                                
                                 // Mostrar mensaje de éxito
                                 CustomSnackBar.showSuccess(
                                   context,
@@ -264,9 +267,6 @@ class NavigationButtonsWidget extends StatelessWidget {
                                 context.read<RiskThreatAnalysisBloc>().add(
                                   ChangeBottomNavIndex(0),
                                 );
-                                
-                                // Cerrar el diálogo
-                                Navigator.of(context).pop();
                               } else {
                                 // No existe el formulario, crear uno nuevo
                                 final formData = riskBloc.getCurrentFormData();
@@ -353,6 +353,9 @@ class NavigationButtonsWidget extends StatelessWidget {
                                   SetActiveFormId(formId: newCompleteForm.id, isCreatingNew: false),
                                 );
 
+                                // Cerrar el diálogo primero
+                                Navigator.of(context).pop();
+                                
                                 // Mostrar mensaje de éxito
                                 CustomSnackBar.showSuccess(
                                   context,
@@ -364,15 +367,12 @@ class NavigationButtonsWidget extends StatelessWidget {
                                 context.read<RiskThreatAnalysisBloc>().add(
                                   ChangeBottomNavIndex(0),
                                 );
-                                
-                                // Cerrar el diálogo
-                                Navigator.of(context).pop();
                               }
                             }
                           },
                         );
                       }
-                      // Solo ejecutar la lógica de finalización en índice 3 (Resultados)
+                      // Solo ejecutar la lógica de finalización en índice 4 (Resultados Finales)
                     },
                 child: Container(
                   width: 185,
@@ -418,7 +418,7 @@ class NavigationButtonsWidget extends StatelessWidget {
 
   /// Método no utilizado actualmente (guardado para referencia futura)
   /// TODO: Eliminar o re-implementar según necesidades
-  @Deprecated('Ya no se usa, la lógica de guardado está en índice 3')
+  @Deprecated('Ya no se usa, la lógica de guardado está en índice 4')
   Future<void> _saveProgressBeforeFinalize(
     BuildContext context,
     RiskThreatAnalysisState state,
