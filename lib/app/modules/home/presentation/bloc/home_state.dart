@@ -24,6 +24,10 @@ class HomeState extends Equatable {
   final FormNavigationData? navigationData;
   final Map<String, Map<String, double>> formProgressData;
   
+  // Material Educativo
+  final int educationalTabIndex;
+  final String educationalFilter;
+  
   // Estados de UI específicos
   final bool isLoading;
   final String? error;
@@ -47,6 +51,8 @@ class HomeState extends Equatable {
     this.savedRiskEventModels = const {},
     this.navigationData,
     this.formProgressData = const {},
+    this.educationalTabIndex = 0,
+    this.educationalFilter = 'Todos',
     this.isLoading = false,
     this.error,
     this.hasError = false,
@@ -123,6 +129,8 @@ class HomeState extends Equatable {
     Map<String, Map<String, dynamic>>? savedRiskEventModels,
     FormNavigationData? navigationData,
     Map<String, Map<String, double>>? formProgressData,
+    int? educationalTabIndex,
+    String? educationalFilter,
     bool? isLoading,
     String? error,
     bool? hasError,
@@ -145,6 +153,8 @@ class HomeState extends Equatable {
       savedRiskEventModels: savedRiskEventModels ?? this.savedRiskEventModels,
       navigationData: navigationData ?? this.navigationData,
       formProgressData: formProgressData ?? this.formProgressData,
+      educationalTabIndex: educationalTabIndex ?? this.educationalTabIndex,
+      educationalFilter: educationalFilter ?? this.educationalFilter,
       isLoading: isLoading ?? this.isLoading,
       error: error ?? this.error,
       hasError: hasError ?? this.hasError,
@@ -251,6 +261,8 @@ class HomeState extends Equatable {
         savedRiskEventModels,
         navigationData,
         formProgressData,
+        educationalTabIndex,
+        educationalFilter,
         isLoading,
         error,
         hasError,

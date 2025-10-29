@@ -10,6 +10,7 @@ class VideoCardWidget extends StatelessWidget {
   final String duration;
   final String publishedDate;
   final String categoryBadge;
+  final String? videoUrl;
   final VoidCallback? onFavorite;
   final VoidCallback? onView;
 
@@ -20,6 +21,7 @@ class VideoCardWidget extends StatelessWidget {
     required this.duration,
     required this.publishedDate,
     required this.categoryBadge,
+    this.videoUrl,
     this.onFavorite,
     this.onView,
   });
@@ -44,7 +46,7 @@ class VideoCardWidget extends StatelessWidget {
           // Sección de imagen con badge e icono de video
           Stack(
             children: [
-              // Placeholder para imagen
+              // Preview del video de YouTube
               Container(
                 height: 200,
                 width: double.infinity,
@@ -55,13 +57,7 @@ class VideoCardWidget extends StatelessWidget {
                     topRight: Radius.circular(12),
                   ),
                 ),
-                child: const Center(
-                  child: Icon(
-                    Icons.image,
-                    size: 80,
-                    color: Colors.grey,
-                  ),
-                ),
+                child: _buildVideoThumbnail(),
               ),
               // Badge de categoría
               _CategoryBadge(text: categoryBadge),
@@ -97,14 +93,14 @@ class VideoCardWidget extends StatelessWidget {
                   child: Container(
                     width: 40,
                     height: 40,
+                    padding: const EdgeInsets.all(8),
                     decoration: const BoxDecoration(
                       color: DAGRDColors.azulDAGRD,
                       shape: BoxShape.circle,
                     ),
                     child: SvgPicture.asset(
                       AppIcons.preview,
-                      width: 20,
-                      height: 20,
+                     
                       colorFilter: const ColorFilter.mode(
                         Colors.white,
                         BlendMode.srcIn,
@@ -191,6 +187,80 @@ class VideoCardWidget extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  /// Construye el thumbnail del video de YouTube
+  Widget _buildVideoThumbnail() {
+    // Si no hay videoUrl, mostrar placeholder
+    if (videoUrl == null || videoUrl!.isEmpty) {
+      return const Center(
+        child: Icon(
+          Icons.image,
+          size: 80,
+          color: Colors.grey,
+        ),
+      );
+    }
+
+    // Extraer el ID del video de YouTube
+    final videoId = _extractYouTubeVideoId(videoUrl!);
+    
+    if (videoId == null) {
+      return const Center(
+        child: Icon(
+          Icons.image,
+          size: 80,
+          color: Colors.grey,
+        ),
+      );
+    }
+
+    // Construir la URL del thumbnail de YouTube
+    final thumbnailUrl = 'https://img.youtube.com/vi/$videoId/maxresdefault.jpg';
+
+    return ClipRRect(
+      borderRadius: const BorderRadius.only(
+        topLeft: Radius.circular(12),
+        topRight: Radius.circular(12),
+      ),
+      child: Image.network(
+        thumbnailUrl,
+        fit: BoxFit.cover,
+        width: double.infinity,
+        height: 200,
+        errorBuilder: (context, error, stackTrace) {
+          // Si falla al cargar el thumbnail, mostrar placeholder
+          return const Center(
+            child: Icon(
+              Icons.image,
+              size: 80,
+              color: Colors.grey,
+            ),
+          );
+        },
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) return child;
+          return Center(
+            child: CircularProgressIndicator(
+              value: loadingProgress.expectedTotalBytes != null
+                  ? loadingProgress.cumulativeBytesLoaded /
+                      loadingProgress.expectedTotalBytes!
+                  : null,
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  /// Extrae el ID del video de YouTube desde la URL
+  String? _extractYouTubeVideoId(String url) {
+    // Formato: https://www.youtube.com/watch?v=VIDEO_ID
+    final regExp = RegExp(
+      r'(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})',
+    );
+    final match = regExp.firstMatch(url);
+    return match?.group(1);
   }
 }
 

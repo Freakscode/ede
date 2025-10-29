@@ -9,6 +9,7 @@ class InfographicCardWidget extends StatelessWidget {
   final String description;
   final String publishedDate;
   final String categoryBadge;
+  final String? imageUrl;
   final VoidCallback? onFavorite;
   final VoidCallback? onView;
   final VoidCallback? onDownload;
@@ -19,6 +20,7 @@ class InfographicCardWidget extends StatelessWidget {
     required this.description,
     required this.publishedDate,
     required this.categoryBadge,
+    this.imageUrl,
     this.onFavorite,
     this.onView,
     this.onDownload,
@@ -55,13 +57,7 @@ class InfographicCardWidget extends StatelessWidget {
                     topRight: Radius.circular(12),
                   ),
                 ),
-                child: const Center(
-                  child: Icon(
-                    Icons.image,
-                    size: 80,
-                    color: Colors.grey,
-                  ),
-                ),
+                child: _buildInfographicImage(),
               ),
               // Badge de categoría
               _CategoryBadge(text: categoryBadge),
@@ -81,8 +77,6 @@ class InfographicCardWidget extends StatelessWidget {
                     ),
                     child: SvgPicture.asset(
                       AppIcons.preview,
-                      // width: 20,
-                      // height: 20,
                       colorFilter: const ColorFilter.mode(
                         Colors.white,
                         BlendMode.srcIn,
@@ -203,6 +197,54 @@ class InfographicCardWidget extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  /// Construye la imagen de la infografía o muestra un placeholder
+  Widget _buildInfographicImage() {
+    // Si no hay imageUrl, mostrar placeholder
+    if (imageUrl == null || imageUrl!.isEmpty) {
+      return const Center(
+        child: Icon(
+          Icons.image,
+          size: 80,
+          color: Colors.grey,
+        ),
+      );
+    }
+
+    return ClipRRect(
+      borderRadius: const BorderRadius.only(
+        topLeft: Radius.circular(12),
+        topRight: Radius.circular(12),
+      ),
+      child: Image.network(
+        imageUrl!,
+        fit: BoxFit.cover,
+        width: double.infinity,
+        height: 200,
+        errorBuilder: (context, error, stackTrace) {
+          // Si falla al cargar la imagen, mostrar placeholder
+          return const Center(
+            child: Icon(
+              Icons.image,
+              size: 80,
+              color: Colors.grey,
+            ),
+          );
+        },
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) return child;
+          return Center(
+            child: CircularProgressIndicator(
+              value: loadingProgress.expectedTotalBytes != null
+                  ? loadingProgress.cumulativeBytesLoaded /
+                      loadingProgress.expectedTotalBytes!
+                  : null,
+            ),
+          );
+        },
       ),
     );
   }
