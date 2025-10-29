@@ -286,75 +286,7 @@ class _FinalRiskResultsScreenState extends State<FinalRiskResultsScreen> {
 
               NavigationButtonsWidget(
                 currentIndex: state.currentBottomNavIndex,
-                onContinuePressed: () {
-                  CustomActionDialog.show(
-                    context: context,
-                    title: 'Finalizar formulario',
-                    message:
-                        '¿Deseas finalizar el formulario? Antes de finalizar, puedes revisar tus respuestas.',
-                    leftButtonText: 'Revisar  ',
-                    leftButtonIcon: Icons.close,
-                    rightButtonText: 'Finalizar  ',
-                    rightButtonIcon: Icons.check_circle,
-                    onRightButtonPressed: () async {
-                      // Guardar y completar el formulario
-                      final homeBloc = context.read<HomeBloc>();
-                      final homeState = homeBloc.state;
-                      final persistenceService = FormPersistenceService();
-
-                      if (homeState.activeFormId != null) {
-                        // Actualizar formulario existente
-                        final completeForm = await persistenceService
-                            .getCompleteForm(homeState.activeFormId!);
-
-                        if (completeForm != null) {
-                          final now = DateTime.now();
-
-                          CompleteFormDataModel updatedForm = completeForm
-                              .copyWith(updatedAt: now);
-
-                          await persistenceService.saveCompleteForm(
-                            updatedForm,
-                          );
-
-                          if (context.mounted) {
-                            context.read<HomeBloc>().add(
-                              SetActiveFormId(
-                                formId: updatedForm.id,
-                                isCreatingNew: false,
-                              ),
-                            );
-
-                            context.read<HomeBloc>().add(
-                              CompleteForm(updatedForm.id),
-                            );
-                          }
-
-                          // Cerrar el diálogo
-                          Navigator.of(context).pop();
-
-                          // Mostrar mensaje de éxito
-                          CustomSnackBar.showSuccess(
-                            context,
-                            title: 'Formulario completado',
-                            message:
-                                'El formulario ha sido guardado y completado exitosamente',
-                          );
-
-                          // Volver a Categorías (índice 0)
-                          context.read<RiskThreatAnalysisBloc>().add(
-                            ChangeBottomNavIndex(0),
-                          );
-                        }
-                      }
-                    },
-                    onLeftButtonPressed: () {
-                      // Cerrar el diálogo
-                      Navigator.of(context).pop();
-                    },
-                  );
-
-                },
+               
               ),
 
               const SizedBox(height: 50),

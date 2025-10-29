@@ -15,6 +15,24 @@ class SireApiService {
   /// Transforma CompleteFormDataModel al formato JSON requerido por la API de SIRE
   Map<String, dynamic> transformFormToSireJson(CompleteFormDataModel form, {String? sireNumber}) {
     try {
+      // Log completo del formulario para debug
+      developer.log('=== CONTENIDO COMPLETO DEL FORMULARIO ===', name: 'SireApiService');
+      developer.log('ID: ${form.id}', name: 'SireApiService');
+      developer.log('EventName: ${form.eventName}', name: 'SireApiService');
+      developer.log('amenazaSelections: ${form.amenazaSelections}', name: 'SireApiService');
+      developer.log('amenazaProbabilidadSelections: ${form.amenazaProbabilidadSelections}', name: 'SireApiService');
+      developer.log('amenazaIntensidadSelections: ${form.amenazaIntensidadSelections}', name: 'SireApiService');
+      developer.log('amenazaScores: ${form.amenazaScores}', name: 'SireApiService');
+      developer.log('vulnerabilidadSelections: ${form.vulnerabilidadSelections}', name: 'SireApiService');
+      developer.log('vulnerabilidadProbabilidadSelections: ${form.vulnerabilidadProbabilidadSelections}', name: 'SireApiService');
+      developer.log('vulnerabilidadIntensidadSelections: ${form.vulnerabilidadIntensidadSelections}', name: 'SireApiService');
+      developer.log('vulnerabilidadScores: ${form.vulnerabilidadScores}', name: 'SireApiService');
+      developer.log('evidenceImages: ${form.evidenceImages}', name: 'SireApiService');
+      developer.log('evidenceCoordinates: ${form.evidenceCoordinates}', name: 'SireApiService');
+      developer.log('contactData: ${form.contactData}', name: 'SireApiService');
+      developer.log('inspectionData: ${form.inspectionData}', name: 'SireApiService');
+      developer.log('=== FIN DEL CONTENIDO ===', name: 'SireApiService');
+      
       final eventModel = RiskEventFactory.getEventByName(form.eventName);
       if (eventModel == null) {
         throw Exception('Evento no encontrado: ${form.eventName}');
@@ -166,40 +184,164 @@ class SireApiService {
     // Construir indicators array con formato {id, label, value}
     final indicators = <Map<String, dynamic>>[];
     
+    developer.log(
+      'Transformando subclasificación: $subClassificationId para categoría: $categoryId',
+      name: 'SireApiService',
+    );
+    
+    // Log de debug: mostrar qué datos tenemos disponibles
+    if (categoryId == 'amenaza') {
+      developer.log(
+        'amenazaSelections keys: ${form.amenazaSelections.keys.toList()}',
+        name: 'SireApiService',
+      );
+      developer.log(
+        'amenazaProbabilidadSelections keys: ${form.amenazaProbabilidadSelections.keys.toList()}',
+        name: 'SireApiService',
+      );
+      developer.log(
+        'amenazaIntensidadSelections keys: ${form.amenazaIntensidadSelections.keys.toList()}',
+        name: 'SireApiService',
+      );
+      for (final entry in form.amenazaSelections.entries) {
+        developer.log(
+          'amenazaSelections[$entry.key] keys: ${entry.value.keys.toList()}',
+          name: 'SireApiService',
+        );
+      }
+    } else {
+      developer.log(
+        'vulnerabilidadSelections keys: ${form.vulnerabilidadSelections.keys.toList()}',
+        name: 'SireApiService',
+      );
+      developer.log(
+        'vulnerabilidadProbabilidadSelections keys: ${form.vulnerabilidadProbabilidadSelections.keys.toList()}',
+        name: 'SireApiService',
+      );
+      developer.log(
+        'vulnerabilidadIntensidadSelections keys: ${form.vulnerabilidadIntensidadSelections.keys.toList()}',
+        name: 'SireApiService',
+      );
+      for (final entry in form.vulnerabilidadSelections.entries) {
+        developer.log(
+          'vulnerabilidadSelections[$entry.key] keys: ${entry.value.keys.toList()}',
+          name: 'SireApiService',
+        );
+      }
+    }
+    
     for (final category in subClassification.categories) {
-      // Obtener el valor de la categoría
-      // 1) Buscar en valueSelections (mapeos directos id -> valor)
-      // 2) Buscar dentro de cualquier submap de selections
-      String? valueStr = valueSelections[category.id] ?? selections[category.id];
-      if (valueStr == null || valueStr.isEmpty) {
-        // Buscar en todos los mapas internos
-        for (final entry in form.amenazaSelections.entries) {
-          final found = entry.value[category.id];
-          if (found != null && found.toString().isNotEmpty) {
-            valueStr = found;
-            break;
+      String? valueStr;
+      
+      // Función helper para buscar con coincidencia flexible de IDs y títulos
+      String? findValueWithFlexibleMatching(RiskCategory category, Map<String, String> searchMap) {
+        final searchId = category.id;
+        final searchTitle = category.title;
+        
+        // 1. Búsqueda exacta por ID
+        if (searchMap.containsKey(searchId)) {
+          return searchMap[searchId];
+        }
+        
+        // 2. Búsqueda exacta por título (los datos se guardan con el título como key)
+        if (searchMap.containsKey(searchTitle)) {
+          return searchMap[searchTitle];
+        }
+        
+        // 3. Búsqueda ignorando sufijos (_torrencial, _inundacion, etc.) en ID
+        final baseId = searchId.split('_').take(2).join('_'); // Tomar primeros 2 segmentos
+        for (final key in searchMap.keys) {
+          if (key.startsWith(baseId)) {
+            return searchMap[key];
           }
         }
-        if (valueStr == null || valueStr.isEmpty) {
-          for (final entry in form.vulnerabilidadSelections.entries) {
-            final found = entry.value[category.id];
-            if (found != null && found.toString().isNotEmpty) {
-              valueStr = found;
-              break;
-            }
+        
+        // 4. Búsqueda por coincidencia parcial en título (caso común)
+        for (final key in searchMap.keys) {
+          // Normalizar para comparación: quitar espacios y convertir a minúsculas
+          final normalizedKey = key.replaceAll(' ', '').toLowerCase();
+          final normalizedTitle = searchTitle.replaceAll(' ', '').toLowerCase();
+          if (normalizedKey == normalizedTitle || 
+              normalizedKey.contains(normalizedTitle) || 
+              normalizedTitle.contains(normalizedKey)) {
+            return searchMap[key];
+          }
+        }
+        
+        // 5. Búsqueda por coincidencia parcial en ID
+        for (final key in searchMap.keys) {
+          if (key.contains(searchId) || searchId.contains(key)) {
+            return searchMap[key];
+          }
+        }
+        
+        return null;
+      }
+      
+      // Estrategia de búsqueda según la estructura de datos:
+      // 1) Primero buscar en los mapas específicos (valueSelections)
+      valueStr = findValueWithFlexibleMatching(category, valueSelections);
+      
+      // 2) Si no está, buscar en selections (mapa pasado como parámetro)
+      if (valueStr == null || valueStr.isEmpty) {
+        valueStr = findValueWithFlexibleMatching(category, selections);
+      }
+      
+      // 3) Si aún no está, buscar en la estructura anidada según la categoría
+      if (valueStr == null || valueStr.isEmpty) {
+        if (categoryId == 'amenaza') {
+          // Buscar en amenazaSelections[subClassificationId][categoryId]
+          final subClassMap = form.amenazaSelections[subClassificationId];
+          if (subClassMap != null) {
+            valueStr = findValueWithFlexibleMatching(category, subClassMap);
+          }
+          // También buscar en los mapas planos
+          if ((valueStr == null || valueStr.isEmpty) && subClassificationId == 'probabilidad') {
+            valueStr = findValueWithFlexibleMatching(category, form.amenazaProbabilidadSelections);
+          }
+          if ((valueStr == null || valueStr.isEmpty) && subClassificationId == 'intensidad') {
+            valueStr = findValueWithFlexibleMatching(category, form.amenazaIntensidadSelections);
+          }
+        } else if (categoryId == 'vulnerabilidad') {
+          // Buscar en vulnerabilidadSelections[subClassificationId][categoryId]
+          final subClassMap = form.vulnerabilidadSelections[subClassificationId];
+          if (subClassMap != null) {
+            valueStr = findValueWithFlexibleMatching(category, subClassMap);
+          }
+          // También buscar en los mapas planos según corresponda
+          if (valueStr == null || valueStr.isEmpty) {
+            valueStr = findValueWithFlexibleMatching(category, form.vulnerabilidadProbabilidadSelections);
+          }
+          if (valueStr == null || valueStr.isEmpty) {
+            valueStr = findValueWithFlexibleMatching(category, form.vulnerabilidadIntensidadSelections);
           }
         }
       }
       
-      if (valueStr != null) {
+      // Si encontramos un valor, agregarlo a indicators
+      if (valueStr != null && valueStr.isNotEmpty) {
         final value = int.tryParse(valueStr) ?? 0;
         indicators.add({
           'id': category.id,
           'label': category.title,
           'value': value,
         });
+        developer.log(
+          'Indicador encontrado: ${category.id} = $value (valor original: $valueStr)',
+          name: 'SireApiService',
+        );
+      } else {
+        developer.log(
+          'Indicador NO encontrado para: ${category.id} en $categoryId/$subClassificationId',
+          name: 'SireApiService',
+        );
       }
     }
+    
+    developer.log(
+      'Total de indicadores encontrados para $subClassificationId: ${indicators.length}',
+      name: 'SireApiService',
+    );
 
     // Obtener el score de la subclasificación
     final calification = scores[subClassificationId] ?? 0.0;
