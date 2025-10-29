@@ -141,6 +141,29 @@ class NavigationButtonsWidget extends StatelessWidget {
                     : onContinuePressed ??
                     () async {
                       // Si estamos en FinalRiskResultsScreen (índice 3), completar formulario
+                      if(currentIndex == 4){
+                        print('FinalRiskResultsScreen');
+                        CustomActionDialog.show(
+                          context: context,
+                          title: 'Finalizar formulario',
+                          message: '¿Deseas finalizar el formulario? Antes de finalizar, puedes revisar tus respuestas.',
+                          leftButtonText: 'Revisar  ',
+                          leftButtonIcon: Icons.close,
+                          rightButtonText: 'Finalizar  ',
+                          rightButtonIcon: Icons.check_circle,
+                          onRightButtonPressed: () {
+                            // Cerrar el diálogo
+                            print('Finalizar formulario');
+                            Navigator.of(context).pop();
+                          },
+                          onLeftButtonPressed: () {
+                            // Cerrar el diálogo
+                            Navigator.of(context).pop();
+                          },
+                        );
+
+                      }
+
                       if (currentIndex == 3) {
                         // Mostrar diálogo de confirmación para completar el formulario
                         CustomActionDialog.show(
@@ -415,282 +438,7 @@ class NavigationButtonsWidget extends StatelessWidget {
       ],
     );
   }
-
-  /// Método no utilizado actualmente (guardado para referencia futura)
-  /// TODO: Eliminar o re-implementar según necesidades
-  @Deprecated('Ya no se usa, la lógica de guardado está en índice 3')
-  Future<void> _saveProgressBeforeFinalize(
-    BuildContext context,
-    RiskThreatAnalysisState state,
-    RiskThreatAnalysisBloc riskBloc,
-  ) async {
-    try {
-      print('=== GUARDANDO AVANCE ANTES DE FINALIZAR ===');
-      print('Clasificación: ${state.selectedClassification ?? ''}');
-      print('Evento: ${state.selectedRiskEvent ?? ''}');
-
-      final homeBloc = context.read<HomeBloc>();
-      final homeState = homeBloc.state;
-      final authService = AuthService();
-      final persistenceService = FormPersistenceService();
-
-      // Obtener datos de contacto e inspección
-      Map<String, dynamic> contactData = {};
-      Map<String, dynamic> inspectionData = {};
-
-      if (authService.isLoggedIn) {
-        // Usuario logueado - datos de contacto vienen de la API
-        final user = authService.currentUser;
-        contactData = {
-          'names': user?.nombre ?? '',
-          'cellPhone': user?.cedula ?? '',
-          'landline': '',
-          'email': user?.email ?? '',
-        };
-        inspectionData = {};
-      } else {
-        // Usuario no logueado - datos por defecto
-        contactData = {};
-        inspectionData = {};
-      }
-
-      // Obtener datos actuales del formulario
-      final formData = riskBloc.getCurrentFormData();
-      final now = DateTime.now();
-
-      // Crear o actualizar formulario completo
-      CompleteFormDataModel completeForm;
-      
-      print('=== DEBUG FINALIZAR FORMULARIO ===');
-      print('isCreatingNew: ${homeState.isCreatingNew}');
-      print('activeFormId: ${homeState.activeFormId}');
-      print('selectedClassification: ${state.selectedClassification}');
-      print('selectedRiskEvent: ${state.selectedRiskEvent}');
-      
-      if (homeState.isCreatingNew || homeState.activeFormId == null || homeState.activeFormId!.isEmpty) {
-        // Crear nuevo formulario
-        print('Creando nuevo formulario');
-        final formId = '${state.selectedRiskEvent ?? ''}_complete_${now.millisecondsSinceEpoch}';
-        completeForm = CompleteFormDataModel(
-          id: formId,
-          eventName: state.selectedRiskEvent ?? '',
-          contactData: contactData,
-          inspectionData: inspectionData,
-          amenazaSelections: (state.selectedClassification ?? '').toLowerCase() == 'amenaza' 
-              ? (formData['dynamicSelections'] ?? {}) : {},
-          amenazaScores: (state.selectedClassification ?? '').toLowerCase() == 'amenaza'
-              ? (formData['subClassificationScores'] ?? {}) : {},
-          amenazaColors: (state.selectedClassification ?? '').toLowerCase() == 'amenaza'
-              ? (formData['subClassificationColors'] ?? {}) : {},
-          amenazaProbabilidadSelections: (state.selectedClassification ?? '').toLowerCase() == 'amenaza'
-              ? (formData['probabilidadSelections'] ?? {}) : {},
-          amenazaIntensidadSelections: (state.selectedClassification ?? '').toLowerCase() == 'amenaza'
-              ? (formData['intensidadSelections'] ?? {}) : {},
-          amenazaSelectedProbabilidad: (state.selectedClassification ?? '').toLowerCase() == 'amenaza'
-              ? formData['selectedProbabilidad'] : null,
-          amenazaSelectedIntensidad: (state.selectedClassification ?? '').toLowerCase() == 'amenaza'
-              ? formData['selectedIntensidad'] : null,
-          vulnerabilidadSelections: (state.selectedClassification ?? '').toLowerCase() == 'vulnerabilidad'
-              ? (formData['dynamicSelections'] ?? {}) : {},
-          vulnerabilidadScores: (state.selectedClassification ?? '').toLowerCase() == 'vulnerabilidad'
-              ? (formData['subClassificationScores'] ?? {}) : {},
-          vulnerabilidadColors: (state.selectedClassification ?? '').toLowerCase() == 'vulnerabilidad'
-              ? (formData['subClassificationColors'] ?? {}) : {},
-          vulnerabilidadProbabilidadSelections: (state.selectedClassification ?? '').toLowerCase() == 'vulnerabilidad'
-              ? (formData['probabilidadSelections'] ?? {}) : {},
-          vulnerabilidadIntensidadSelections: (state.selectedClassification ?? '').toLowerCase() == 'vulnerabilidad'
-              ? (formData['intensidadSelections'] ?? {}) : {},
-          vulnerabilidadSelectedProbabilidad: (state.selectedClassification ?? '').toLowerCase() == 'vulnerabilidad'
-              ? formData['selectedProbabilidad'] : null,
-          vulnerabilidadSelectedIntensidad: (state.selectedClassification ?? '').toLowerCase() == 'vulnerabilidad'
-              ? formData['selectedIntensidad'] : null,
-          evidenceImages: state.evidenceImages,
-          evidenceCoordinates: state.evidenceCoordinates,
-          createdAt: now,
-          updatedAt: now,
-        );
-      } else {
-        // Actualizar formulario existente
-        print('Actualizando formulario existente: ${homeState.activeFormId}');
-        final existingForm = await persistenceService.getCompleteForm(homeState.activeFormId!);
-        if (existingForm == null) {
-          print('ERROR: Formulario no encontrado, creando nuevo');
-          // Si no se encuentra el formulario, crear uno nuevo
-          final formId = '${state.selectedRiskEvent ?? ''}_complete_${now.millisecondsSinceEpoch}';
-          completeForm = CompleteFormDataModel(
-            id: formId,
-            eventName: state.selectedRiskEvent ?? '',
-            contactData: contactData,
-            inspectionData: inspectionData,
-            amenazaSelections: (state.selectedClassification ?? '').toLowerCase() == 'amenaza' 
-                ? (formData['dynamicSelections'] ?? {}) : {},
-            amenazaScores: (state.selectedClassification ?? '').toLowerCase() == 'amenaza'
-                ? (formData['subClassificationScores'] ?? {}) : {},
-            amenazaColors: (state.selectedClassification ?? '').toLowerCase() == 'amenaza'
-                ? (formData['subClassificationColors'] ?? {}) : {},
-            amenazaProbabilidadSelections: (state.selectedClassification ?? '').toLowerCase() == 'amenaza'
-                ? (formData['probabilidadSelections'] ?? {}) : {},
-            amenazaIntensidadSelections: (state.selectedClassification ?? '').toLowerCase() == 'amenaza'
-                ? (formData['intensidadSelections'] ?? {}) : {},
-            amenazaSelectedProbabilidad: (state.selectedClassification ?? '').toLowerCase() == 'amenaza'
-                ? formData['selectedProbabilidad'] : null,
-            amenazaSelectedIntensidad: (state.selectedClassification ?? '').toLowerCase() == 'amenaza'
-                ? formData['selectedIntensidad'] : null,
-            vulnerabilidadSelections: (state.selectedClassification ?? '').toLowerCase() == 'vulnerabilidad'
-                ? (formData['dynamicSelections'] ?? {}) : {},
-            vulnerabilidadScores: (state.selectedClassification ?? '').toLowerCase() == 'vulnerabilidad'
-                ? (formData['subClassificationScores'] ?? {}) : {},
-            vulnerabilidadColors: (state.selectedClassification ?? '').toLowerCase() == 'vulnerabilidad'
-                ? (formData['subClassificationColors'] ?? {}) : {},
-            vulnerabilidadProbabilidadSelections: (state.selectedClassification ?? '').toLowerCase() == 'vulnerabilidad'
-                ? (formData['probabilidadSelections'] ?? {}) : {},
-            vulnerabilidadIntensidadSelections: (state.selectedClassification ?? '').toLowerCase() == 'vulnerabilidad'
-                ? (formData['intensidadSelections'] ?? {}) : {},
-            vulnerabilidadSelectedProbabilidad: (state.selectedClassification ?? '').toLowerCase() == 'vulnerabilidad'
-                ? formData['selectedProbabilidad'] : null,
-            vulnerabilidadSelectedIntensidad: (state.selectedClassification ?? '').toLowerCase() == 'vulnerabilidad'
-                ? formData['selectedIntensidad'] : null,
-            evidenceImages: state.evidenceImages,
-            evidenceCoordinates: state.evidenceCoordinates,
-            createdAt: now,
-            updatedAt: now,
-          );
-        } else {
-          completeForm = existingForm;
-        // Obtener scores y filtrar solo los relevantes para la clasificación actual
-        final allScores = formData['subClassificationScores'] as Map<String, double>? ?? {};
-        final allColors = formData['subClassificationColors'] as Map<String, Color>? ?? {};
-        
-        if ((state.selectedClassification ?? '').toLowerCase() == 'amenaza') {
-          // Para amenaza, solo guardar scores de probabilidad e intensidad
-          final amenazaScoresOnly = Map<String, double>.from(completeForm.amenazaScores);
-          final amenazaColorsOnly = Map<String, Color>.from(completeForm.amenazaColors);
-          
-          if (allScores.containsKey('probabilidad')) {
-            amenazaScoresOnly['probabilidad'] = allScores['probabilidad']!;
-          }
-          if (allScores.containsKey('intensidad')) {
-            amenazaScoresOnly['intensidad'] = allScores['intensidad']!;
-          }
-          if (allColors.containsKey('probabilidad')) {
-            amenazaColorsOnly['probabilidad'] = allColors['probabilidad']!;
-          }
-          if (allColors.containsKey('intensidad')) {
-            amenazaColorsOnly['intensidad'] = allColors['intensidad']!;
-          }
-          
-          completeForm = completeForm.copyWith(
-            amenazaSelections: formData['dynamicSelections'] ?? completeForm.amenazaSelections,
-            amenazaScores: amenazaScoresOnly,
-            amenazaColors: amenazaColorsOnly,
-            amenazaProbabilidadSelections: formData['probabilidadSelections'] ?? completeForm.amenazaProbabilidadSelections,
-            amenazaIntensidadSelections: formData['intensidadSelections'] ?? completeForm.amenazaIntensidadSelections,
-            amenazaSelectedProbabilidad: formData['selectedProbabilidad'] ?? completeForm.amenazaSelectedProbabilidad,
-            amenazaSelectedIntensidad: formData['selectedIntensidad'] ?? completeForm.amenazaSelectedIntensidad,
-            contactData: contactData,
-            inspectionData: inspectionData,
-            evidenceImages: state.evidenceImages,
-            evidenceCoordinates: state.evidenceCoordinates,
-            updatedAt: now,
-          );
-        } else if ((state.selectedClassification ?? '').toLowerCase() == 'vulnerabilidad') {
-          // Para vulnerabilidad, solo guardar scores de fragilidad_fisica, fragilidad_personas, exposicion
-          final vulnerabilidadScoresOnly = Map<String, double>.from(completeForm.vulnerabilidadScores);
-          final vulnerabilidadColorsOnly = Map<String, Color>.from(completeForm.vulnerabilidadColors);
-          
-          final vulnerabilidadKeys = ['fragilidad_fisica', 'fragilidad_personas', 'exposicion'];
-          for (final key in vulnerabilidadKeys) {
-            if (allScores.containsKey(key)) {
-              vulnerabilidadScoresOnly[key] = allScores[key]!;
-            }
-            if (allColors.containsKey(key)) {
-              vulnerabilidadColorsOnly[key] = allColors[key]!;
-            }
-          }
-          
-          completeForm = completeForm.copyWith(
-            vulnerabilidadSelections: formData['dynamicSelections'] ?? completeForm.vulnerabilidadSelections,
-            vulnerabilidadScores: vulnerabilidadScoresOnly,
-            vulnerabilidadColors: vulnerabilidadColorsOnly,
-            vulnerabilidadProbabilidadSelections: formData['probabilidadSelections'] ?? completeForm.vulnerabilidadProbabilidadSelections,
-            vulnerabilidadIntensidadSelections: formData['intensidadSelections'] ?? completeForm.vulnerabilidadIntensidadSelections,
-            vulnerabilidadSelectedProbabilidad: formData['selectedProbabilidad'] ?? completeForm.vulnerabilidadSelectedProbabilidad,
-            vulnerabilidadSelectedIntensidad: formData['selectedIntensidad'] ?? completeForm.vulnerabilidadSelectedIntensidad,
-            contactData: contactData,
-            inspectionData: inspectionData,
-            evidenceImages: state.evidenceImages,
-            evidenceCoordinates: state.evidenceCoordinates,
-            updatedAt: now,
-          );
-        }
-        }
-      }
-
-      // Guardar formulario completo
-      await persistenceService.saveCompleteForm(completeForm);
-      await persistenceService.setActiveFormId(completeForm.id);
-
-      // Actualizar estado del HomeBloc
-      if (homeState.isCreatingNew) {
-            homeBloc.add(SetActiveFormId(formId: completeForm.id, isCreatingNew: false));
-      }
-
-      print('Avance guardado exitosamente');
-
-      // Guardar datos del formulario antes de marcar como completada
-      final formDataForBloc = riskBloc.getCurrentFormData();
-
-      context.read<HomeBloc>().add(
-        SaveRiskEventModel(
-          eventName: state.selectedRiskEvent ?? '',
-          classificationType: (state.selectedClassification ?? '').toLowerCase(),
-          evaluationData: formDataForBloc,
-        ),
-      );
-
-      // Marcar como completada
-      context.read<HomeBloc>().add(
-        MarkEvaluationCompleted(
-          eventName: state.selectedRiskEvent ?? '',
-          classificationType: (state.selectedClassification ?? '').toLowerCase(),
-        ),
-      );
-
-      // Mostrar diálogo de finalización
-      CustomActionDialog.show(
-        context: context,
-        title: 'Finalizar formulario',
-        message: '¿Está seguro que desea finalizar el formulario para la categoría de ${state.selectedClassification ?? ''}?',
-        leftButtonText: 'Revisar',
-        leftButtonIcon: Icons.close,
-        rightButtonText: 'Finalizar',
-        rightButtonIcon: Icons.check,
-        onRightButtonPressed: () {
-          if ((state.selectedClassification ?? '').toLowerCase() == 'amenaza') {
-            // Si es amenaza, volver a categorías (índice 0)
-            context.read<RiskThreatAnalysisBloc>().add(
-              ChangeBottomNavIndex(0),
-            );
-          } else {
-            // Si es vulnerabilidad, volver al home
-            final navigationData = homeNavigationType.toNavigationData(tabIndex: homeTabIndex);
-            context.go('/home', extra: navigationData);
-          }
-          Navigator.of(context).pop(); // Cerrar el diálogo
-        },
-      );
-
-    } catch (e) {
-      if (context.mounted) {
-        CustomSnackBar.showError(
-          context,
-          title: 'Error al guardar',
-          message: 'Error al guardar avance: $e',
-        );
-      }
-    }
-  }
-
+  
   /// Verificar si hay variables sin calificar
   bool _hasUnqualifiedVariables(
     Map<String, dynamic> formData,
