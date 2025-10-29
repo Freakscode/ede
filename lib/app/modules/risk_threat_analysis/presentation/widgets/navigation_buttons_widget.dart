@@ -138,10 +138,7 @@ class NavigationButtonsWidget extends StatelessWidget {
                         );
                       }
                     : onContinuePressed ??
-                    () async {
-                     
-                      
-                    },
+                    () {},
                 child: Container(
                   width: 185,
                   height: 48,
