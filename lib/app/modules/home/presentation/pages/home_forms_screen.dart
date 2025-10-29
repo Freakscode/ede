@@ -20,6 +20,9 @@ import 'package:go_router/go_router.dart';
 import 'package:caja_herramientas/app/shared/widgets/dialogs/custom_action_dialog.dart';
 import 'package:caja_herramientas/app/shared/widgets/snackbars/custom_snackbar.dart';
 import 'package:caja_herramientas/app/modules/home/presentation/widgets/filter_dialog.dart';
+import 'package:caja_herramientas/app/core/data/datasources/remote_datasource.dart';
+import 'package:caja_herramientas/app/shared/services/sire_api_service.dart';
+import 'dart:developer' as developer;
 
 class HomeFormsScreen extends StatefulWidget {
   const HomeFormsScreen({super.key});
@@ -509,7 +512,7 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
                           return CompletedFormCardWidget(
                             form: form,
                             onDownload: () => _showMessage(context, 'Funcionalidad de descarga en desarrollo'),
-                            onAssociateToSIRE: () => _showMessage(context, 'Funcionalidad de asociación a SIRE en desarrollo'),
+                            onAssociateToSIRE: () => _associateFormToSIRE(context, form),
                             onSendEmail: () => _showMessage(context, 'Funcionalidad de envío por email en desarrollo'),
                             onDelete: () => _deleteForm(context, form.id, form.title),
                             getFormProgress: _getFormProgress,
@@ -667,5 +670,125 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
       context,
       message: message,
     );
+  }
+
+  /// Asocia un formulario completado a SIRE
+  Future<void> _associateFormToSIRE(BuildContext context, FormEntity form) async {
+    try {
+      // Mostrar diálogo de confirmación
+      final shouldProceed = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Asociar a SIRE'),
+          content: const Text(
+            '¿Está seguro que desea asociar este formulario a SIRE?\n\n'
+            'Esta acción enviará los datos del formulario a la plataforma SIRE.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Cancelar'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: DAGRDColors.azulDAGRD,
+              ),
+              child: const Text('Asociar'),
+            ),
+          ],
+        ),
+      );
+
+      if (shouldProceed != true || !mounted) return;
+
+      // Mostrar indicador de carga
+      if (!mounted) return;
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+
+      // Obtener el formulario completo desde la base de datos
+      final persistenceService = FormPersistenceService();
+      final completeForm = await persistenceService.getCompleteForm(form.id);
+
+      if (completeForm == null) {
+        if (!mounted) return;
+        Navigator.of(context).pop(); // Cerrar diálogo de carga
+        CustomSnackBar.showError(
+          context,
+          message: 'No se pudo encontrar el formulario completo',
+          title: 'Error',
+        );
+        return;
+      }
+
+      // Obtener token de autenticación si está disponible
+      String? authToken;
+      try {
+        final authBloc = context.read<AuthBloc>();
+        final authState = authBloc.state;
+        if (authState is AuthAuthenticated) {
+          // Intentar obtener el token desde el repositorio
+          // Necesitamos acceder al repositorio, pero por ahora usaremos null
+          // y el servicio usará autenticación básica como fallback
+        }
+      } catch (e) {
+        developer.log('Error obteniendo token: $e', name: 'HomeFormsScreen');
+      }
+
+      // Crear servicio de API de SIRE
+      final remoteDatasource = await RemoteDatasource.create();
+      final sireApiService = SireApiService(remoteDatasource);
+
+      // Transformar y enviar el formulario (simulado)
+      final response = await sireApiService.sendFormToSIRE(
+        completeForm,
+        authToken: authToken,
+        simulate: true,
+      );
+
+      if (!mounted) return;
+      Navigator.of(context).pop(); // Cerrar diálogo de carga
+
+      // Mostrar mensaje de éxito (simulación)
+      CustomSnackBar.showSuccess(
+        context,
+        message: 'Simulación exitosa: se imprimió el JSON en consola',
+        title: 'Simulado',
+        duration: const Duration(seconds: 3),
+      );
+
+      // Si la respuesta incluye un número SIRE, podríamos actualizarlo en el formulario
+      if (response.containsKey('sireNumber')) {
+        developer.log(
+          'Número SIRE recibido: ${response['sireNumber']}',
+          name: 'HomeFormsScreen',
+        );
+      }
+    } catch (e) {
+      developer.log(
+        'Error asociando formulario a SIRE: $e',
+        name: 'HomeFormsScreen',
+      );
+
+      if (!mounted) return;
+      // Cerrar diálogo de carga si está abierto
+      if (Navigator.of(context).canPop()) {
+        Navigator.of(context).pop();
+      }
+
+      // Mostrar mensaje de error
+      CustomSnackBar.showError(
+        context,
+        message: 'Error al asociar formulario a SIRE: ${e.toString()}',
+        title: 'Error',
+        duration: const Duration(seconds: 4),
+      );
+    }
   }
 }

@@ -171,6 +171,69 @@ class RemoteDatasource {
       throw DatabaseException('Token refresh failed: $e');
     }
   }
+
+  /// Envía un formulario completo a la API de SIRE
+  Future<Map<String, dynamic>> sendFormToSIRE(
+    Map<String, dynamic> formData, {
+    String? authToken,
+  }) async {
+    try {
+      final url = Uri.parse('$baseUrl/forms/sire/');
+      
+      final headers = <String, String>{
+        'Content-Type': 'application/json',
+      };
+
+      // Agregar token de autenticación si está disponible
+      if (authToken != null) {
+        headers['Authorization'] = 'Bearer $authToken';
+      } else {
+        // Usar autenticación básica como fallback
+        headers['Authorization'] = _authHeader;
+      }
+
+      developer.log(
+        'Enviando formulario a SIRE: $url',
+        name: 'RemoteDatasource',
+      );
+      developer.log(
+        'Datos del formulario: ${jsonEncode(formData).substring(0, jsonEncode(formData).length > 500 ? 500 : jsonEncode(formData).length)}...',
+        name: 'RemoteDatasource',
+      );
+
+      final response = await client.post(
+        url,
+        headers: headers,
+        body: jsonEncode(formData),
+      );
+
+      developer.log(
+        'Response status: ${response.statusCode}, body: ${response.body.substring(0, response.body.length > 500 ? 500 : response.body.length)}...',
+        name: 'RemoteDatasource',
+      );
+
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        final data = jsonDecode(response.body);
+        return data as Map<String, dynamic>;
+      } else {
+        final errorBody = response.body;
+        throw DatabaseException(
+          'Error al enviar formulario a SIRE: ${response.statusCode}\n$errorBody',
+        );
+      }
+    } catch (e, stackTrace) {
+      developer.log(
+        'Error enviando formulario a SIRE',
+        name: 'RemoteDatasource',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      if (e is DatabaseException) {
+        rethrow;
+      }
+      throw DatabaseException('Error de red al enviar formulario a SIRE: $e');
+    }
+  }
 }
 
 class DatabaseException implements Exception {
