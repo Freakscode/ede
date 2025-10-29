@@ -1113,12 +1113,12 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
   }
 
   /// Método de compatibilidad temporal
-  void loadExistingFormData() {
-    add(LoadFormData(
-      eventName: state.selectedRiskEvent ?? '',
-      classificationType: state.selectedClassification ?? '',
-    ));
-  }
+  // void loadExistingFormData() {
+  //   add(LoadFormData(
+  //     eventName: state.selectedRiskEvent ?? '',
+  //     classificationType: state.selectedClassification ?? '',
+  //   ));
+  // }
 
   /// Método de compatibilidad temporal
   bool hasUnqualifiedVariables() {
@@ -1303,18 +1303,7 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     };
   }
 
-  /// Método centralizado para obtener datos optimizados para widgets
-  Map<String, dynamic> getOptimizedDataForWidgets() {
-    return {
-      'selectedRiskEvent': state.selectedRiskEvent ?? '',
-      'selectedClassification': state.selectedClassification ?? '',
-      'currentBottomNavIndex': state.currentBottomNavIndex,
-      'isLoading': state.isLoading,
-      'amenazaStatus': getCategoryStatus('amenaza'),
-      'vulnerabilidadStatus': getCategoryStatus('vulnerabilidad'),
-      'totalEvidenceCount': state.evidenceImages.values.fold(0, (sum, images) => sum + images.length),
-    };
-  }
+ 
 
   /// Método de compatibilidad temporal - Restaurar funcionalidad original
   Color getSubClassificationColor(String subClassificationId) {
@@ -1634,17 +1623,5 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
   /// Obtener el estado actual como entidad de dominio
   RiskAnalysisEntity get currentEntity => state.toEntity();
 
-  /// Verificar si el análisis está completo
-  bool get isAnalysisComplete => currentEntity.isFullyCompleted;
-
-  /// Obtener progreso del análisis
-  double get analysisProgress {
-    final entity = currentEntity;
-    if (entity.isEmpty) return 0.0;
-    
-    final totalFields = entity.selections.length;
-    final completedFields = entity.selections.values.where((v) => v != null && v.toString().isNotEmpty).length;
-    
-    return totalFields > 0 ? completedFields / totalFields : 0.0;
-  }
+ 
 }
