@@ -141,29 +141,6 @@ class NavigationButtonsWidget extends StatelessWidget {
                     : onContinuePressed ??
                     () async {
                       // Si estamos en FinalRiskResultsScreen (índice 3), completar formulario
-                      if(currentIndex == 4){
-                        print('FinalRiskResultsScreen');
-                        CustomActionDialog.show(
-                          context: context,
-                          title: 'Finalizar formulario',
-                          message: '¿Deseas finalizar el formulario? Antes de finalizar, puedes revisar tus respuestas.',
-                          leftButtonText: 'Revisar  ',
-                          leftButtonIcon: Icons.close,
-                          rightButtonText: 'Finalizar  ',
-                          rightButtonIcon: Icons.check_circle,
-                          onRightButtonPressed: () {
-                            // Cerrar el diálogo
-                            print('Finalizar formulario');
-                            Navigator.of(context).pop();
-                          },
-                          onLeftButtonPressed: () {
-                            // Cerrar el diálogo
-                            Navigator.of(context).pop();
-                          },
-                        );
-
-                      }
-
                       if (currentIndex == 3) {
                         // Mostrar diálogo de confirmación para completar el formulario
                         CustomActionDialog.show(

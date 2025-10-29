@@ -227,7 +227,7 @@ class FormPersistenceService {
       {
         'id': form.id,
         'event_name': form.eventName,
-        'classification_type': 'complete', // Tipo especial para formularios completos
+        'classification_type': 'complete', 
         'form_data': formDataJson,
         'created_at': now,
         'updated_at': now,
