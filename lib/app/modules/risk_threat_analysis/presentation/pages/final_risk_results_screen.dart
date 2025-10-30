@@ -118,37 +118,31 @@ class FinalRiskResultsScreen extends StatelessWidget {
                     rightButtonText: 'Finalizar  ',
                     rightButtonIcon: Icons.check_circle,
                     onRightButtonPressed: () async {
-                      final homeBloc = context.read<HomeBloc>();
-                      final homeState = homeBloc.state;
                       final persistenceService = FormPersistenceService();
+                      final activeFormId = await persistenceService.getActiveFormId();
 
-                      if (homeState.activeFormId != null) {
-                        final completeForm = await persistenceService
-                            .getCompleteForm(homeState.activeFormId!);
+                      if (activeFormId != null && context.mounted) {
+                        // Cerrar el diálogo
+                        Navigator.of(context).pop();
 
-                        if (completeForm != null && context.mounted) {
-                          // Completar el formulario
-                          context.read<HomeBloc>().add(
-                            CompleteForm(completeForm.id),
-                          );
+                        // Mostrar mensaje de éxito
+                        CustomSnackBar.showSuccess(
+                          context,
+                          title: 'Formulario completado',
+                          message:
+                              'El formulario ha sido guardado y completado exitosamente',
+                        );
 
-                          // Cerrar el diálogo
-                          Navigator.of(context).pop();
+                        // Completar el formulario
+                        context.read<HomeBloc>().add(
+                          CompleteForm(activeFormId),
+                        );
 
-                          // Mostrar mensaje de éxito
-                          CustomSnackBar.showSuccess(
-                            context,
-                            title: 'Formulario completado',
-                            message:
-                                'El formulario ha sido guardado y completado exitosamente',
-                          );
-
-                          // Navegar a Home y mostrar FormCompletedScreen
-                          context.read<HomeBloc>().add(
-                            const HomeShowFormCompletedScreen(),
-                          );
-                          context.go('/home');
-                        }
+                        // Navegar a Home y mostrar FormCompletedScreen
+                        context.read<HomeBloc>().add(
+                          const HomeShowFormCompletedScreen(),
+                        );
+                        context.go('/home');
                       }
                     },
                   );
