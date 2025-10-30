@@ -1134,6 +1134,22 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     return classification.subClassifications;
   }
 
+  /// Obtener IDs de subclasificaciones por tipo
+  List<String> getSubClassificationIds(String classificationType) {
+    final subClassifications = _getSubClassificationsByType(classificationType);
+    return subClassifications.map((s) => s.id).toList();
+  }
+
+  /// Obtener nombre de una subclasificación por su ID y tipo
+  String getSubClassificationName(String subClassificationId, String classificationType) {
+    final subClassifications = _getSubClassificationsByType(classificationType);
+    final subClass = subClassifications.firstWhere(
+      (s) => s.id == subClassificationId,
+      orElse: () => subClassifications.first,
+    );
+    return subClass.name;
+  }
+
   /// Helper para calcular score de vulnerabilidad con promedio ponderado
   Map<String, dynamic> _calculateVulnerabilidadScore() {
     const Map<String, double> pesos = {

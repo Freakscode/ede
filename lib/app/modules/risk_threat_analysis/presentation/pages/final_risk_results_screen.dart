@@ -4,8 +4,6 @@ import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import '../bloc/risk_threat_analysis_bloc.dart';
 import '../bloc/risk_threat_analysis_state.dart';
 import '../widgets/widgets.dart';
-import 'package:caja_herramientas/app/shared/models/risk_event_model.dart';
-import 'package:caja_herramientas/app/shared/models/risk_event_factory.dart';
 
 class FinalRiskResultsScreen extends StatelessWidget {
   const FinalRiskResultsScreen({super.key});
@@ -117,11 +115,6 @@ class FinalRiskResultsScreen extends StatelessWidget {
     return ClassificationRatingCardWidget(classificationType: classificationType);
   }
 
-
-  static RiskEventModel? _getRiskEventByName(String eventName) {
-    return RiskEventFactory.getEventByName(eventName);
-  }
-
   /// Helper genérico para construir secciones de clasificación (amenaza o vulnerabilidad)
   static Widget _buildClassificationSections(
     BuildContext context,
@@ -130,43 +123,18 @@ class FinalRiskResultsScreen extends StatelessWidget {
   ) {
     final bloc = context.read<RiskThreatAnalysisBloc>();
 
-    // Obtener subclasificaciones desde el evento
-    final riskEvent = _getRiskEventByName(state.selectedRiskEvent ?? '');
-    List<String> subClassifications = [];
-
-    if (riskEvent != null) {
-      final classification = riskEvent.classifications.firstWhere(
-        (c) => c.id == classificationType,
-        orElse: () => riskEvent.classifications.first,
-      );
-      subClassifications = classification.subClassifications
-          .map((s) => s.id)
-          .toList();
-    }
+    // Obtener IDs de subclasificaciones desde el BLoC
+    final subClassificationIds = bloc.getSubClassificationIds(classificationType);
 
     return Column(
-      children: subClassifications.asMap().entries.map((entry) {
+      children: subClassificationIds.asMap().entries.map((entry) {
         final index = entry.key;
         final subClassId = entry.value;
 
-        // Construir items usando el método centralizado del BLoC
-        // Pasar classificationType explícitamente para evitar filtrado por selectedClassification
+        // Obtener datos usando métodos del BLoC
         final items = bloc.getItemsForSubClassification(subClassId, classificationType);
         final score = bloc.calculateSectionScore(subClassId, classificationType);
-
-        // Obtener el nombre de la subclasificación
-        String title = subClassId;
-        if (riskEvent != null) {
-          final classification = riskEvent.classifications.firstWhere(
-            (c) => c.id == classificationType,
-            orElse: () => riskEvent.classifications.first,
-          );
-          final subClass = classification.subClassifications.firstWhere(
-            (s) => s.id == subClassId,
-            orElse: () => classification.subClassifications.first,
-          );
-          title = subClass.name;
-        }
+        final title = bloc.getSubClassificationName(subClassId, classificationType);
 
         return Column(
           children: [
