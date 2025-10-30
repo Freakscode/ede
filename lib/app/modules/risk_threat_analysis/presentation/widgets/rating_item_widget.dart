@@ -104,19 +104,28 @@ class _RatingItemWidgetState extends State<RatingItemWidget> {
             ],
           ),
         ),
-        SizedBox(height: 8),
         if (_isExpanded && widget.detailedItems != null)
-          ...widget.detailedItems!.map((item) => _buildDetailItem(item)),
-        if (_isExpanded && widget.detailedItems != null) SizedBox(height: 8),
-        if (_isExpanded && widget.detailedItems != null)
-          Divider(color: DAGRDColors.outline, height: 1),
+          Container(
+            color: const Color(0xFFF9FAFB),
+            // padding: const EdgeInsets.symmetric(vertical: 6),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ...widget.detailedItems!
+                    .map((item) => _buildDetailItem(item))
+                    .toList(),
+                Divider(color: DAGRDColors.outline, height: 1),
+              ],
+            ),
+          ),
+        
       ],
     );
   }
 
   Widget _buildDetailItem(String item) {
     return Padding(
-      padding: const EdgeInsets.only(left: 16),
+      padding: const EdgeInsets.fromLTRB(16, 2, 16, 2),
       child: Text(
         item,
         textAlign: TextAlign.left,
