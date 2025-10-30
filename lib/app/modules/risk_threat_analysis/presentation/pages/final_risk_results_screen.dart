@@ -141,7 +141,7 @@ class FinalRiskResultsScreen extends StatelessWidget {
         // Construir items usando el método centralizado del BLoC
         // Pasar 'amenaza' explícitamente para evitar filtrado por selectedClassification
         final items = bloc.getItemsForSubClassification(subClassId, 'amenaza');
-        final score = bloc.calculateSectionScore(subClassId);
+        final score = bloc.calculateSectionScore(subClassId, 'amenaza');
 
         // Obtener el nombre de la subclasificación
         String title = subClassId;
@@ -203,7 +203,7 @@ class FinalRiskResultsScreen extends StatelessWidget {
         // Construir items usando el método centralizado del BLoC
         // Pasar 'vulnerabilidad' explícitamente para evitar filtrado por selectedClassification
         final items = bloc.getItemsForSubClassification(subClassId, 'vulnerabilidad');
-        final score = bloc.calculateSectionScore(subClassId);
+        final score = bloc.calculateSectionScore(subClassId, 'vulnerabilidad');
 
         // Obtener el nombre de la subclasificación
         String title = subClassId;

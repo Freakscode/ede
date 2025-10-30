@@ -1089,7 +1089,7 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     // Convertir categorías a formato compatible usando el adaptador
     return RiskModelAdapter.convertToDropdownCategories(subClassification.categories);
   }
-
+    
   /// Método de compatibilidad temporal
   List<dynamic> getCategoriesForCurrentSubClassification(String subClassificationId) {
     return getCategoriesForSubClassificationById(subClassificationId, null);
@@ -1448,8 +1448,11 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
   }
 
   /// Método centralizado para calcular el score de una sección
-  String calculateSectionScore(String subClassificationId) {
-    final categories = getCategoriesForCurrentSubClassification(subClassificationId);
+  /// [classificationType] es opcional y permite especificar la clasificación explícitamente
+  String calculateSectionScore(String subClassificationId, [String? classificationType]) {
+    final categories = classificationType != null 
+        ? getCategoriesForSubClassificationById(subClassificationId, classificationType)
+        : getCategoriesForCurrentSubClassification(subClassificationId);
     
     // Si existe un score pre-calculado en el state, usarlo
     if (state.subClassificationScores.containsKey(subClassificationId)) {
