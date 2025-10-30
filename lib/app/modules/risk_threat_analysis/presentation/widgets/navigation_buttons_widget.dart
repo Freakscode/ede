@@ -580,11 +580,12 @@ class NavigationButtonsWidget extends StatelessWidget {
                                             'El formulario ha sido guardado y completado exitosamente',
                                       );
 
-                                      // Volver a Categorías (índice 0)
+                                      // Navegar a Home y mostrar FormCompletedScreen
                                       if (context.mounted) {
-                                        context
-                                            .read<RiskThreatAnalysisBloc>()
-                                            .add(ChangeBottomNavIndex(0));
+                                        context.read<HomeBloc>().add(
+                                          const HomeShowFormCompletedScreen(),
+                                        );
+                                        context.go('/home');
                                       }
                                     }
                                   }
