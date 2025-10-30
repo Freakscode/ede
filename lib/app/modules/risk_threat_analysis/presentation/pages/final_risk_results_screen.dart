@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
-import 'package:caja_herramientas/app/core/utils/logger.dart';
-import 'package:caja_herramientas/app/modules/home/presentation/bloc/home_bloc.dart';
-import 'package:caja_herramientas/app/shared/services/form_persistence_service.dart';
 import '../bloc/risk_threat_analysis_bloc.dart';
 import '../bloc/risk_threat_analysis_state.dart';
 import '../bloc/risk_threat_analysis_event.dart';
@@ -195,48 +192,19 @@ class FinalRiskResultsScreen extends StatelessWidget {
     );
   }
 
-  /// Maneja el tap del botón de análisis (igual que en CategoriesScreen)
+  /// Maneja el tap del botón de análisis
   static void _handleAnalysisButtonTap(
     BuildContext context,
     RiskThreatAnalysisState state,
     String classificationType,
-  ) async {
+  ) {
     final riskBloc = context.read<RiskThreatAnalysisBloc>();
 
     // Configurar la clasificación seleccionada
     riskBloc.add(SelectClassification(classificationType.toLowerCase()));
 
-    // Si estamos en modo edición, cargar los datos del formulario para esta clasificación
-    final homeBloc = context.read<HomeBloc>();
-    final homeState = homeBloc.state;
-
-    if (homeState.activeFormId != null && homeState.activeFormId!.isNotEmpty) {
-      // Estamos en modo edición, cargar datos específicos para esta clasificación
-      try {
-        final persistenceService = FormPersistenceService();
-        final completeForm = await persistenceService.getCompleteForm(
-          homeState.activeFormId!,
-        );
-
-        if (completeForm != null) {
-          final evaluationData = completeForm.toJson();
-          riskBloc.add(
-            LoadFormData(
-              eventName: completeForm.eventName,
-              classificationType: classificationType.toLowerCase(),
-              evaluationData: evaluationData,
-            ),
-          );
-        }
-      } catch (e) {
-        Logger.error(
-          'Error loading form data for ${classificationType.toLowerCase()}: $e',
-          name: 'FinalRiskResultsScreen',
-        );
-      }
-    }
-
     // Navegar a RatingScreen (índice 1)
+    // Los datos ya están en el estado del BLoC, no necesitamos recargarlos
     riskBloc.add(ChangeBottomNavIndex(1));
   }
 }
