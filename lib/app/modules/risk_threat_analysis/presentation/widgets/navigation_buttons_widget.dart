@@ -562,12 +562,11 @@ class NavigationButtonsWidget extends StatelessWidget {
                                               homeState.activeFormId!,
                                             );
 
-                                    if (completeForm != null) {
-                                      if (context.mounted) {
-                                        context.read<HomeBloc>().add(
-                                          CompleteForm(completeForm.id),
-                                        );
-                                      }
+                                    if (completeForm != null && context.mounted) {
+                                      // Completar el formulario
+                                      context.read<HomeBloc>().add(
+                                        CompleteForm(completeForm.id),
+                                      );
 
                                       // Cerrar el diálogo
                                       Navigator.of(context).pop();
@@ -581,12 +580,10 @@ class NavigationButtonsWidget extends StatelessWidget {
                                       );
 
                                       // Navegar a Home y mostrar FormCompletedScreen
-                                      if (context.mounted) {
-                                        context.read<HomeBloc>().add(
-                                          const HomeShowFormCompletedScreen(),
-                                        );
-                                        context.go('/home');
-                                      }
+                                      context.read<HomeBloc>().add(
+                                        const HomeShowFormCompletedScreen(),
+                                      );
+                                      context.go('/home');
                                     }
                                   }
                                 },
