@@ -254,7 +254,6 @@ class NavigationButtonsWidget extends StatelessWidget {
                                               .state
                                               .evidenceCoordinates,
                                           updatedAt: now,
-                                          
                                         );
                                       } else if (classification ==
                                           'vulnerabilidad') {
@@ -319,7 +318,6 @@ class NavigationButtonsWidget extends StatelessWidget {
                                               .state
                                               .evidenceCoordinates,
                                           updatedAt: now,
-                                          
                                         );
                                       } else {
                                         // Si no hay clasificación clara, actualizar ambos
@@ -330,7 +328,6 @@ class NavigationButtonsWidget extends StatelessWidget {
                                               .state
                                               .evidenceCoordinates,
                                           updatedAt: now,
-                                          
                                         );
                                       }
 
@@ -499,7 +496,6 @@ class NavigationButtonsWidget extends StatelessWidget {
                                             state.evidenceCoordinates,
                                         createdAt: now,
                                         updatedAt: now,
-                                        
                                       );
 
                                       // Guardar el nuevo formulario
@@ -535,61 +531,6 @@ class NavigationButtonsWidget extends StatelessWidget {
                                           .add(ChangeBottomNavIndex(0));
                                     }
                                   }
-                                },
-                              );
-                            } else if (currentIndex == 4) {
-                              CustomActionDialog.show(
-                                context: context,
-                                title: 'Finalizar formulario',
-                                message:
-                                    '¿Deseas finalizar el formulario? Antes de finalizar, puedes revisar tus respuestas.',
-                                leftButtonText: 'Revisar  ',
-                                leftButtonIcon: Icons.close,
-                                rightButtonText: 'Finalizar  ',
-                                rightButtonIcon: Icons.check_circle,
-                                onRightButtonPressed: () async {
-                                  // Guardar y completar el formulario
-                                  final homeBloc = context.read<HomeBloc>();
-                                  final homeState = homeBloc.state;
-                                  final persistenceService =
-                                      FormPersistenceService();
-
-                                  if (homeState.activeFormId != null) {
-                                    // Actualizar formulario existente
-                                    final completeForm =
-                                        await persistenceService
-                                            .getCompleteForm(
-                                              homeState.activeFormId!,
-                                            );
-
-                                    if (completeForm != null && context.mounted) {
-                                      // Completar el formulario
-                                      context.read<HomeBloc>().add(
-                                        CompleteForm(completeForm.id),
-                                      );
-
-                                      // Cerrar el diálogo
-                                      Navigator.of(context).pop();
-
-                                      // Mostrar mensaje de éxito
-                                      CustomSnackBar.showSuccess(
-                                        context,
-                                        title: 'Formulario completado',
-                                        message:
-                                            'El formulario ha sido guardado y completado exitosamente',
-                                      );
-
-                                      // Navegar a Home y mostrar FormCompletedScreen
-                                      context.read<HomeBloc>().add(
-                                        const HomeShowFormCompletedScreen(),
-                                      );
-                                      context.go('/home');
-                                    }
-                                  }
-                                },
-                                onLeftButtonPressed: () {
-                                  // Cerrar el diálogo
-                                  Navigator.of(context).pop();
                                 },
                               );
                             }

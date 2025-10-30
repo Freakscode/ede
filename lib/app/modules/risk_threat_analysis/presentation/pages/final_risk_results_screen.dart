@@ -1,6 +1,12 @@
+import 'package:caja_herramientas/app/modules/home/presentation/bloc/home_bloc.dart';
+import 'package:caja_herramientas/app/modules/home/presentation/bloc/home_event.dart';
+import 'package:caja_herramientas/app/shared/services/form_persistence_service.dart';
+import 'package:caja_herramientas/app/shared/widgets/dialogs/custom_action_dialog.dart';
+import 'package:caja_herramientas/app/shared/widgets/snackbars/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
+import 'package:go_router/go_router.dart';
 import '../bloc/risk_threat_analysis_bloc.dart';
 import '../bloc/risk_threat_analysis_state.dart';
 import '../bloc/risk_threat_analysis_event.dart';
@@ -101,6 +107,52 @@ class FinalRiskResultsScreen extends StatelessWidget {
 
               NavigationButtonsWidget(
                 currentIndex: state.currentBottomNavIndex,
+                onContinuePressed: () {
+                  CustomActionDialog.show(
+                    context: context,
+                    title: 'Finalizar formulario',
+                    message:
+                        '¿Deseas finalizar el formulario? Antes de finalizar, puedes revisar tus respuestas.',
+                    leftButtonText: 'Revisar  ',
+                    leftButtonIcon: Icons.close,
+                    rightButtonText: 'Finalizar  ',
+                    rightButtonIcon: Icons.check_circle,
+                    onRightButtonPressed: () async {
+                      final homeBloc = context.read<HomeBloc>();
+                      final homeState = homeBloc.state;
+                      final persistenceService = FormPersistenceService();
+
+                      if (homeState.activeFormId != null) {
+                        final completeForm = await persistenceService
+                            .getCompleteForm(homeState.activeFormId!);
+
+                        if (completeForm != null && context.mounted) {
+                          // Completar el formulario
+                          context.read<HomeBloc>().add(
+                            CompleteForm(completeForm.id),
+                          );
+
+                          // Cerrar el diálogo
+                          Navigator.of(context).pop();
+
+                          // Mostrar mensaje de éxito
+                          CustomSnackBar.showSuccess(
+                            context,
+                            title: 'Formulario completado',
+                            message:
+                                'El formulario ha sido guardado y completado exitosamente',
+                          );
+
+                          // Navegar a Home y mostrar FormCompletedScreen
+                          context.read<HomeBloc>().add(
+                            const HomeShowFormCompletedScreen(),
+                          );
+                          context.go('/home');
+                        }
+                      }
+                    },
+                  );
+                },
               ),
 
               const SizedBox(height: 50),
@@ -113,7 +165,9 @@ class FinalRiskResultsScreen extends StatelessWidget {
 
   /// Helper para construir rating cards
   static Widget _buildRatingCard(String classificationType) {
-    return ClassificationRatingCardWidget(classificationType: classificationType);
+    return ClassificationRatingCardWidget(
+      classificationType: classificationType,
+    );
   }
 
   /// Helper genérico para construir secciones de clasificación (amenaza o vulnerabilidad)
@@ -125,7 +179,9 @@ class FinalRiskResultsScreen extends StatelessWidget {
     final bloc = context.read<RiskThreatAnalysisBloc>();
 
     // Obtener IDs de subclasificaciones desde el BLoC
-    final subClassificationIds = bloc.getSubClassificationIds(classificationType);
+    final subClassificationIds = bloc.getSubClassificationIds(
+      classificationType,
+    );
 
     return Column(
       children: subClassificationIds.asMap().entries.map((entry) {
@@ -133,9 +189,18 @@ class FinalRiskResultsScreen extends StatelessWidget {
         final subClassId = entry.value;
 
         // Obtener datos usando métodos del BLoC
-        final items = bloc.getItemsForSubClassification(subClassId, classificationType);
-        final score = bloc.calculateSectionScore(subClassId, classificationType);
-        final title = bloc.getSubClassificationName(subClassId, classificationType);
+        final items = bloc.getItemsForSubClassification(
+          subClassId,
+          classificationType,
+        );
+        final score = bloc.calculateSectionScore(
+          subClassId,
+          classificationType,
+        );
+        final title = bloc.getSubClassificationName(
+          subClassId,
+          classificationType,
+        );
 
         return Column(
           children: [
