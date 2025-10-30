@@ -1,14 +1,9 @@
-import 'package:caja_herramientas/app/modules/home/presentation/bloc/home_event.dart';
-import 'package:caja_herramientas/app/shared/models/complete_form_data_model.dart';
-import 'package:caja_herramientas/app/shared/widgets/dialogs/custom_action_dialog.dart';
-import 'package:caja_herramientas/app/shared/widgets/snackbars/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import '../bloc/risk_threat_analysis_bloc.dart';
 import '../bloc/risk_threat_analysis_state.dart';
 import '../bloc/risk_threat_analysis_event.dart';
-import '../widgets/risk_matrix_widget.dart';
 import '../widgets/widgets.dart';
 import 'package:caja_herramientas/app/shared/models/risk_event_model.dart';
 import 'package:caja_herramientas/app/shared/models/risk_event_factory.dart';
@@ -28,176 +23,12 @@ class _FinalRiskResultsScreenState extends State<FinalRiskResultsScreen> {
   @override
   void initState() {
     super.initState();
-    // Cargar todos los datos de amenaza y vulnerabilidad
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!_hasLoadedData && context.mounted) {
-        _loadAllFormDataFromHome();
-        _hasLoadedData = true;
-      }
-    });
-  }
-
-  void _loadAllFormDataFromHome() {
-    final bloc = context.read<RiskThreatAnalysisBloc>();
-    final homeBloc = context.read<HomeBloc>();
-
-    final formId = homeBloc.state.activeFormId;
-    if (formId != null && formId.isNotEmpty) {
-      _loadAllFormData(formId, bloc);
-    }
-  }
-
-  Future<void> _loadAllFormData(
-    String formId,
-    RiskThreatAnalysisBloc bloc,
-  ) async {
-    try {
-      final persistenceService = FormPersistenceService();
-      final completeForm = await persistenceService.getCompleteForm(formId);
-
-      if (completeForm != null) {
-        final evaluationData = completeForm.toJson();
-
-        // Cargar datos de amenaza primero
-        bloc.add(
-          LoadFormData(
-            eventName: completeForm.eventName,
-            classificationType: 'amenaza',
-            evaluationData: evaluationData,
-          ),
-        );
-
-        // Esperar un poco antes de cargar vulnerabilidad para que no se sobrescriban
-        await Future.delayed(const Duration(milliseconds: 100));
-
-        // Cargar datos de vulnerabilidad
-        bloc.add(
-          LoadFormData(
-            eventName: completeForm.eventName,
-            classificationType: 'vulnerabilidad',
-            evaluationData: evaluationData,
-          ),
-        );
-      }
-    } catch (e) {
-      print('Error loading all form data: $e');
-    }
   }
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<RiskThreatAnalysisBloc, RiskThreatAnalysisState>(
       builder: (context, state) {
-        // PRINT DINÁMICO DEL ESTADO EN FINAL RISK RESULTS
-        print('=== EVALUACIÓN COMPLETA DE RIESGO ===');
-        print('Evento = ${state.selectedRiskEvent ?? ''}');
-
-        // Obtener datos dinámicamente basados en el evento
-        final riskEvent = _getRiskEventByName(state.selectedRiskEvent ?? '');
-        if (riskEvent != null) {
-          // Datos de Amenaza
-          final amenazaClassification = riskEvent.classifications.firstWhere(
-            (c) => c.name.toLowerCase() == 'amenaza',
-            orElse: () => riskEvent.classifications.first,
-          );
-
-          print('\n--- AMENAZA ---');
-          print(
-            'Subclasificaciones disponibles: ${amenazaClassification.subClassifications.map((s) => s.name).join(", ")}',
-          );
-
-          // Calcular calificación general de Amenaza
-          double amenazaGeneralScore = 0.0;
-          int amenazaSubClassCount = 0;
-
-          // Mostrar cada subclasificación de Amenaza usando métodos centralizados
-          final bloc = context.read<RiskThreatAnalysisBloc>();
-          for (final subClass in amenazaClassification.subClassifications) {
-            final score = bloc.getSubClassificationScore(subClass.id);
-            print(
-              'Calificación de ${subClass.name} = ${score.toStringAsFixed(2)}',
-            );
-
-            if (score > 0) {
-              amenazaGeneralScore += score;
-              amenazaSubClassCount++;
-            }
-
-            // Mostrar secciones de esta subclasificación usando método centralizado
-            final items = bloc.getItemsForSubClassification(subClass.id);
-            if (items.isNotEmpty) {
-              print('Calificaciones de cada sección de ${subClass.name}:');
-              for (final item in items) {
-                print('  - ${item['title']} = ${item['rating']}');
-              }
-            }
-          }
-
-          // Mostrar calificación general de Amenaza
-          final amenazaGeneral = amenazaSubClassCount > 0
-              ? amenazaGeneralScore / amenazaSubClassCount
-              : 0.0;
-          print(
-            'CALIFICACIÓN GENERAL DE AMENAZA = ${amenazaGeneral.toStringAsFixed(2)}',
-          );
-
-          // Datos de Vulnerabilidad
-          final vulnerabilidadClassification = riskEvent.classifications
-              .firstWhere(
-                (c) => c.name.toLowerCase() == 'vulnerabilidad',
-                orElse: () => riskEvent.classifications.length > 1
-                    ? riskEvent.classifications[1]
-                    : riskEvent.classifications.first,
-              );
-
-          print('\n--- VULNERABILIDAD ---');
-          print(
-            'Subclasificaciones disponibles: ${vulnerabilidadClassification.subClassifications.map((s) => s.name).join(", ")}',
-          );
-
-          // Calcular calificación general de Vulnerabilidad
-          double vulnerabilidadGeneralScore = 0.0;
-          int vulnerabilidadSubClassCount = 0;
-
-          // Mostrar cada subclasificación de Vulnerabilidad usando métodos centralizados
-          for (final subClass
-              in vulnerabilidadClassification.subClassifications) {
-            final score = bloc.getSubClassificationScore(subClass.id);
-            print(
-              'Calificación de ${subClass.name} = ${score.toStringAsFixed(2)}',
-            );
-
-            if (score > 0) {
-              vulnerabilidadGeneralScore += score;
-              vulnerabilidadSubClassCount++;
-            }
-
-            // Mostrar secciones de esta subclasificación usando método centralizado
-            final items = bloc.getItemsForSubClassification(subClass.id);
-            if (items.isNotEmpty) {
-              print('Calificaciones de cada sección de ${subClass.name}:');
-              for (final item in items) {
-                print('  - ${item['title']} = ${item['rating']}');
-              }
-            }
-          }
-
-          // Mostrar calificación general de Vulnerabilidad
-          final vulnerabilidadGeneral = vulnerabilidadSubClassCount > 0
-              ? vulnerabilidadGeneralScore / vulnerabilidadSubClassCount
-              : 0.0;
-          print(
-            'CALIFICACIÓN GENERAL DE VULNERABILIDAD = ${vulnerabilidadGeneral.toStringAsFixed(2)}',
-          );
-        }
-
-        // También imprimir datos guardados en HomeBloc para verificación
-        // final homeBloc = context.read<HomeBloc>();
-        // TODO: Implementar método getSavedRiskEventModel en HomeBloc
-
-        print('\n=== DATOS PERSISTIDOS ===');
-        print('Datos guardados: Verificar implementación en HomeBloc');
-        print('=== FIN EVALUACIÓN ===');
         return SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 28),
           child: Column(
@@ -286,7 +117,6 @@ class _FinalRiskResultsScreenState extends State<FinalRiskResultsScreen> {
 
               NavigationButtonsWidget(
                 currentIndex: state.currentBottomNavIndex,
-               
               ),
 
               const SizedBox(height: 50),
@@ -449,8 +279,19 @@ class _FinalRiskResultsScreenState extends State<FinalRiskResultsScreen> {
         } else if (rating == 0) {
           title = '${category.title} - Sin calificar';
         }
+        List<String>? detailedItems;
+        if (rating > 0 && rating <= category.detailedLevels.length) {
+          final levelIndex = rating - 1;
+          final level = category.detailedLevels[levelIndex];
+          detailedItems = level.items;
+        }
 
-        items.add({'rating': rating, 'title': title, 'color': color});
+        items.add({
+          'rating': rating,
+          'title': title,
+          'color': color,
+          'detailedItems': detailedItems,
+        });
       }
     }
 
