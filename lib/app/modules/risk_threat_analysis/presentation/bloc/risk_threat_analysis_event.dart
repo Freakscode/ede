@@ -202,6 +202,48 @@ class SaveFormData extends RiskThreatAnalysisEvent {
   List<Object?> get props => [eventName, classificationType, data];
 }
 
+/// Evento para cargar datos completos de Amenaza
+class LoadAmenazaData extends RiskThreatAnalysisEvent {
+  final String eventName;
+  final Map<String, dynamic>? data;
+
+  const LoadAmenazaData({
+    required this.eventName,
+    this.data,
+  });
+
+  @override
+  List<Object?> get props => [eventName, data];
+}
+
+/// Evento para cargar datos completos de Vulnerabilidad
+class LoadVulnerabilidadData extends RiskThreatAnalysisEvent {
+  final String eventName;
+  final Map<String, dynamic>? data;
+
+  const LoadVulnerabilidadData({
+    required this.eventName,
+    this.data,
+  });
+
+  @override
+  List<Object?> get props => [eventName, data];
+}
+
+/// Evento para cargar datos completos (Amenaza + Vulnerabilidad)
+class LoadCompleteData extends RiskThreatAnalysisEvent {
+  final String eventName;
+  final Map<String, dynamic>? data;
+
+  const LoadCompleteData({
+    required this.eventName,
+    this.data,
+  });
+
+  @override
+  List<Object?> get props => [eventName, data];
+}
+
 // ========== EVIDENCIAS ==========
 
 /// Evento para actualizar coordenadas de imagen

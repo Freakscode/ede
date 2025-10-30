@@ -56,6 +56,9 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     on<ShowFinalResults>(_onShowFinalResults);
     on<LoadFormData>(_onLoadFormData);
     on<SaveFormData>(_onSaveFormData);
+    on<LoadAmenazaData>(_onLoadAmenazaData);
+    on<LoadVulnerabilidadData>(_onLoadVulnerabilidadData);
+    on<LoadCompleteData>(_onLoadCompleteData);
     on<UpdateImageCoordinates>(_onUpdateImageCoordinates);
     on<GetCurrentLocationForImage>(_onGetCurrentLocationForImage);
     on<SelectLocationFromMapForImage>(_onSelectLocationFromMapForImage);
@@ -681,8 +684,349 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     }
   }
 
-  // ========== MÉTODOS DE COMPATIBILIDAD TEMPORAL ==========
-  // TODO: Refactorizar pantallas para usar nueva arquitectura
+  // ========== HANDLERS PARA CARGAR DATOS COMPLETOS ==========
+
+  Future<void> _onLoadAmenazaData(
+    LoadAmenazaData event,
+    Emitter<RiskThreatAnalysisState> emit,
+  ) async {
+    try {
+      emit(state.setLoading(true));
+
+      // Si hay datos específicos, usarlos directamente
+      if (event.data != null) {
+        final amenazaData = event.data!;
+        
+        // Mapear selecciones de amenaza
+        final probabilidadSelections = Map<String, String>.from(
+          amenazaData['amenazaProbabilidadSelections'] ?? 
+          amenazaData['probabilidadSelections'] ?? {}
+        );
+        final intensidadSelections = Map<String, String>.from(
+          amenazaData['amenazaIntensidadSelections'] ?? 
+          amenazaData['intensidadSelections'] ?? {}
+        );
+        
+        // Mapear scores
+        final amenazaScores = Map<String, double>.from(
+          amenazaData['amenazaScores'] ?? {}
+        );
+        
+        // Mapear evidencias relacionadas con amenaza
+        final evidenceImages = Map<String, List<String>>.from(
+          amenazaData['evidenceImages'] ?? {}
+        );
+        final evidenceCoordinates = Map<String, Map<int, Map<String, String>>>.from(
+          (amenazaData['evidenceCoordinates'] as Map?)?.map(
+            (key, value) => MapEntry(
+              key as String,
+              (value as Map).map(
+                (k, v) => MapEntry(
+                  int.parse(k.toString()),
+                  Map<String, String>.from(v as Map)
+                )
+              )
+            )
+          ) ?? {}
+        );
+
+        // Actualizar solo los datos de amenaza, preservando vulnerabilidad
+        final newState = state.copyWith(
+          selectedRiskEvent: event.eventName,
+          probabilidadSelections: probabilidadSelections,
+          intensidadSelections: intensidadSelections,
+          subClassificationScores: {
+            ...state.subClassificationScores,
+            ...amenazaScores,
+          },
+          evidenceImages: {...state.evidenceImages, ...evidenceImages},
+          evidenceCoordinates: {...state.evidenceCoordinates, ...evidenceCoordinates},
+          isLoading: false,
+          error: null,
+        );
+        
+        emit(newState);
+        return;
+      }
+
+      // Si no hay datos específicos, intentar cargar desde el use case
+      final entity = await _loadRiskAnalysisUseCase.execute(
+        event.eventName,
+        'amenaza',
+      );
+
+      if (entity != null) {
+        // Convertir Map<String, dynamic> a Map<String, String>
+        final stringSelections = entity.selections.map(
+          (key, value) => MapEntry(key, value.toString())
+        );
+        
+        // Cargar solo los datos de amenaza
+        emit(state.copyWith(
+          selectedRiskEvent: entity.eventName,
+          probabilidadSelections: stringSelections,
+          intensidadSelections: stringSelections,
+          evidenceImages: entity.evidenceImages,
+          evidenceCoordinates: entity.evidenceCoordinates,
+          isLoading: false,
+          error: null,
+        ));
+      }
+    } catch (e) {
+      emit(state.setError('Error al cargar datos de amenaza: $e'));
+    } finally {
+      emit(state.setLoading(false));
+    }
+  }
+
+  Future<void> _onLoadVulnerabilidadData(
+    LoadVulnerabilidadData event,
+    Emitter<RiskThreatAnalysisState> emit,
+  ) async {
+    try {
+      emit(state.setLoading(true));
+
+      // Si hay datos específicos, usarlos directamente
+      if (event.data != null) {
+        final vulnerabilidadData = event.data!;
+        
+        // Mapear selecciones de vulnerabilidad
+        final dynamicSelections = Map<String, Map<String, String>>.from(
+          (vulnerabilidadData['vulnerabilidadSelections'] as Map?)?.map(
+            (key, value) => MapEntry(
+              key as String,
+              Map<String, String>.from(value as Map)
+            )
+          ) ?? {}
+        );
+        
+        // Mapear scores
+        final vulnerabilidadScores = Map<String, double>.from(
+          vulnerabilidadData['vulnerabilidadScores'] ?? {}
+        );
+        
+        // Mapear evidencias relacionadas con vulnerabilidad
+        final evidenceImages = Map<String, List<String>>.from(
+          vulnerabilidadData['evidenceImages'] ?? {}
+        );
+        final evidenceCoordinates = Map<String, Map<int, Map<String, String>>>.from(
+          (vulnerabilidadData['evidenceCoordinates'] as Map?)?.map(
+            (key, value) => MapEntry(
+              key as String,
+              (value as Map).map(
+                (k, v) => MapEntry(
+                  int.parse(k.toString()),
+                  Map<String, String>.from(v as Map)
+                )
+              )
+            )
+          ) ?? {}
+        );
+
+        // Actualizar solo los datos de vulnerabilidad, preservando amenaza
+        final newState = state.copyWith(
+          selectedRiskEvent: event.eventName,
+          dynamicSelections: {
+            ...state.dynamicSelections,
+            ...dynamicSelections,
+          },
+          subClassificationScores: {
+            ...state.subClassificationScores,
+            ...vulnerabilidadScores,
+          },
+          evidenceImages: {...state.evidenceImages, ...evidenceImages},
+          evidenceCoordinates: {...state.evidenceCoordinates, ...evidenceCoordinates},
+          isLoading: false,
+          error: null,
+        );
+        
+        emit(newState);
+        return;
+      }
+
+      // Si no hay datos específicos, intentar cargar desde el use case
+      final entity = await _loadRiskAnalysisUseCase.execute(
+        event.eventName,
+        'vulnerabilidad',
+      );
+
+      if (entity != null) {
+        // Convertir Map<String, dynamic> a Map<String, String>
+        final stringSelections = entity.selections.map(
+          (key, value) => MapEntry(key, value.toString())
+        );
+        
+        // Cargar solo los datos de vulnerabilidad
+        emit(state.copyWith(
+          selectedRiskEvent: entity.eventName,
+          dynamicSelections: {
+            'fragilidad_fisica': stringSelections,
+            'fragilidad_personas': stringSelections,
+            'exposicion': stringSelections,
+          },
+          evidenceImages: entity.evidenceImages,
+          evidenceCoordinates: entity.evidenceCoordinates,
+          isLoading: false,
+          error: null,
+        ));
+      }
+    } catch (e) {
+      emit(state.setError('Error al cargar datos de vulnerabilidad: $e'));
+    } finally {
+      emit(state.setLoading(false));
+    }
+  }
+
+  Future<void> _onLoadCompleteData(
+    LoadCompleteData event,
+    Emitter<RiskThreatAnalysisState> emit,
+  ) async {
+    try {
+      emit(state.setLoading(true));
+
+      // Si hay datos específicos, usarlos directamente
+      if (event.data != null) {
+        final completeData = event.data!;
+        
+        // Mapear datos de amenaza
+        final probabilidadSelections = Map<String, String>.from(
+          completeData['amenazaProbabilidadSelections'] ?? 
+          completeData['probabilidadSelections'] ?? {}
+        );
+        final intensidadSelections = Map<String, String>.from(
+          completeData['amenazaIntensidadSelections'] ?? 
+          completeData['intensidadSelections'] ?? {}
+        );
+        
+        // Mapear datos de vulnerabilidad
+        final dynamicSelections = Map<String, Map<String, String>>.from(
+          (completeData['vulnerabilidadSelections'] as Map?)?.map(
+            (key, value) => MapEntry(
+              key as String,
+              Map<String, String>.from(value as Map)
+            )
+          ) ?? 
+          (completeData['dynamicSelections'] as Map?)?.map(
+            (key, value) => MapEntry(
+              key as String,
+              Map<String, String>.from(value as Map)
+            )
+          ) ?? {}
+        );
+        
+        // Mapear scores combinados
+        final amenazaScores = Map<String, double>.from(
+          completeData['amenazaScores'] ?? {}
+        );
+        final vulnerabilidadScores = Map<String, double>.from(
+          completeData['vulnerabilidadScores'] ?? {}
+        );
+        
+        // Mapear evidencias
+        final evidenceImages = Map<String, List<String>>.from(
+          completeData['evidenceImages'] ?? {}
+        );
+        final evidenceCoordinates = Map<String, Map<int, Map<String, String>>>.from(
+          (completeData['evidenceCoordinates'] as Map?)?.map(
+            (key, value) => MapEntry(
+              key as String,
+              (value as Map).map(
+                (k, v) => MapEntry(
+                  int.parse(k.toString()),
+                  Map<String, String>.from(v as Map)
+                )
+              )
+            )
+          ) ?? {}
+        );
+
+        // Actualizar todos los datos
+        final newState = state.copyWith(
+          selectedRiskEvent: event.eventName,
+          probabilidadSelections: probabilidadSelections,
+          intensidadSelections: intensidadSelections,
+          dynamicSelections: dynamicSelections,
+          subClassificationScores: {
+            ...amenazaScores,
+            ...vulnerabilidadScores,
+          },
+          evidenceImages: evidenceImages,
+          evidenceCoordinates: evidenceCoordinates,
+          isLoading: false,
+          error: null,
+        );
+        
+        emit(newState);
+        return;
+      }
+
+      // Si no hay datos específicos, cargar ambos desde el use case
+      final amenazaEntity = await _loadRiskAnalysisUseCase.execute(
+        event.eventName,
+        'amenaza',
+      );
+      final vulnerabilidadEntity = await _loadRiskAnalysisUseCase.execute(
+        event.eventName,
+        'vulnerabilidad',
+      );
+
+      if (amenazaEntity != null || vulnerabilidadEntity != null) {
+        // Convertir Map<String, dynamic> a Map<String, String> para amenaza
+        final amenazaStringSelections = amenazaEntity?.selections.map(
+          (key, value) => MapEntry(key, value.toString())
+        ) ?? {};
+        
+        // Convertir Map<String, dynamic> a Map<String, String> para vulnerabilidad
+        final vulnerabilidadStringSelections = vulnerabilidadEntity?.selections.map(
+          (key, value) => MapEntry(key, value.toString())
+        ) ?? {};
+        
+        emit(state.copyWith(
+          selectedRiskEvent: event.eventName,
+          probabilidadSelections: amenazaStringSelections,
+          intensidadSelections: amenazaStringSelections,
+          dynamicSelections: vulnerabilidadStringSelections.isNotEmpty
+            ? {
+                'fragilidad_fisica': vulnerabilidadStringSelections,
+                'fragilidad_personas': vulnerabilidadStringSelections,
+                'exposicion': vulnerabilidadStringSelections,
+              }
+            : state.dynamicSelections,
+          evidenceImages: {
+            ...(amenazaEntity?.evidenceImages ?? {}),
+            ...(vulnerabilidadEntity?.evidenceImages ?? {}),
+          },
+          evidenceCoordinates: {
+            ...(amenazaEntity?.evidenceCoordinates ?? {}),
+            ...(vulnerabilidadEntity?.evidenceCoordinates ?? {}),
+          },
+          isLoading: false,
+          error: null,
+        ));
+      }
+    } catch (e) {
+      emit(state.setError('Error al cargar datos completos: $e'));
+    } finally {
+      emit(state.setLoading(false));
+    }
+  }
+
+  // ========== MÉTODOS PÚBLICOS PARA CARGAR DATOS ==========
+
+  /// Carga los datos completos de amenaza
+  void loadAmenazaData(String eventName, {Map<String, dynamic>? data}) {
+    add(LoadAmenazaData(eventName: eventName, data: data));
+  }
+
+  /// Carga los datos completos de vulnerabilidad
+  void loadVulnerabilidadData(String eventName, {Map<String, dynamic>? data}) {
+    add(LoadVulnerabilidadData(eventName: eventName, data: data));
+  }
+
+  /// Carga los datos completos (amenaza + vulnerabilidad)
+  void loadCompleteData(String eventName, {Map<String, dynamic>? data}) {
+    add(LoadCompleteData(eventName: eventName, data: data));
+  }
 
   /// Método de compatibilidad temporal
   List<RiskSubClassification> getCurrentSubClassifications() {
