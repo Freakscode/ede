@@ -1227,7 +1227,20 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
         title = '${category.title} - Sin calificar';
       }
 
-      items.add({'rating': rating, 'title': title, 'color': color});
+      // Obtener detailedItems del RiskLevel correspondiente
+      List<String>? detailedItems;
+      if (rating > 0 && rating <= category.detailedLevels.length) {
+        final levelIndex = rating - 1;
+        final level = category.detailedLevels[levelIndex];
+        detailedItems = level.items;
+      }
+
+      items.add({
+        'rating': rating,
+        'title': title,
+        'color': color,
+        'detailedItems': detailedItems,
+      });
     }
     
     return items;

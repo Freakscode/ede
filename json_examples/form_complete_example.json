@@ -8,6 +8,7 @@
         {
             "id": "amenaza",
             "name": "Amenaza",
+            "calification": 1.85,
             "subClassifications": [
                 {
                     "id": "probabilidad",
@@ -64,7 +65,6 @@
                     ]
                 }
             ],
-            "calification": 1.85,
             "evidences": [
                 {
                     "file": {

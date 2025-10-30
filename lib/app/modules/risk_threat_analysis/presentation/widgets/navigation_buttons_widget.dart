@@ -254,7 +254,7 @@ class NavigationButtonsWidget extends StatelessWidget {
                                               .state
                                               .evidenceCoordinates,
                                           updatedAt: now,
-                                          isExplicitlyCompleted: false,
+                                          
                                         );
                                       } else if (classification ==
                                           'vulnerabilidad') {
@@ -319,7 +319,7 @@ class NavigationButtonsWidget extends StatelessWidget {
                                               .state
                                               .evidenceCoordinates,
                                           updatedAt: now,
-                                          isExplicitlyCompleted: false,
+                                          
                                         );
                                       } else {
                                         // Si no hay clasificación clara, actualizar ambos
@@ -330,7 +330,7 @@ class NavigationButtonsWidget extends StatelessWidget {
                                               .state
                                               .evidenceCoordinates,
                                           updatedAt: now,
-                                          isExplicitlyCompleted: false,
+                                          
                                         );
                                       }
 
@@ -499,7 +499,7 @@ class NavigationButtonsWidget extends StatelessWidget {
                                             state.evidenceCoordinates,
                                         createdAt: now,
                                         updatedAt: now,
-                                        isExplicitlyCompleted: false,
+                                        
                                       );
 
                                       // Guardar el nuevo formulario

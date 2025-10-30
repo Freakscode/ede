@@ -84,11 +84,16 @@ class RatingSectionWidget extends StatelessWidget {
             ),
           ),
           child: Column(
-            children: items.map((item) => RatingItemWidget(
-              rating: item['rating'] as int,
-              title: item['title'] as String,
-              color: item['color'] as Color,
-            )).toList(),
+            children: [
+              for (int i = 0; i < items.length; i++)
+                RatingItemWidget(
+                  rating: items[i]['rating'] as int,
+                  title: items[i]['title'] as String,
+                  color: items[i]['color'] as Color,
+                  detailedItems: items[i]['detailedItems'] as List<String>?,
+                  isLastItem: i == items.length - 1,
+                ),
+            ],
           ),
         ),
       ],
