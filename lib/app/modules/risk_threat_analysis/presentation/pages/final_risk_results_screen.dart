@@ -7,19 +7,8 @@ import '../widgets/widgets.dart';
 import 'package:caja_herramientas/app/shared/models/risk_event_model.dart';
 import 'package:caja_herramientas/app/shared/models/risk_event_factory.dart';
 
-class FinalRiskResultsScreen extends StatefulWidget {
+class FinalRiskResultsScreen extends StatelessWidget {
   const FinalRiskResultsScreen({super.key});
-
-  @override
-  State<FinalRiskResultsScreen> createState() => _FinalRiskResultsScreenState();
-}
-
-class _FinalRiskResultsScreenState extends State<FinalRiskResultsScreen> {
-
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -124,7 +113,7 @@ class _FinalRiskResultsScreenState extends State<FinalRiskResultsScreen> {
   }
 
   // Métodos para construir secciones de Amenaza
-  Widget _buildAmenazaSections(
+  static Widget _buildAmenazaSections(
     BuildContext context,
     RiskThreatAnalysisState state,
   ) {
@@ -178,7 +167,7 @@ class _FinalRiskResultsScreenState extends State<FinalRiskResultsScreen> {
     );
   }
 
-  Widget _buildAmenazaRatingCard(
+  static Widget _buildAmenazaRatingCard(
     BuildContext context,
     RiskThreatAnalysisState state,
   ) {
@@ -186,7 +175,7 @@ class _FinalRiskResultsScreenState extends State<FinalRiskResultsScreen> {
   }
 
   // Métodos para construir secciones de Vulnerabilidad
-  Widget _buildVulnerabilidadSections(
+  static Widget _buildVulnerabilidadSections(
     BuildContext context,
     RiskThreatAnalysisState state,
   ) {
@@ -240,7 +229,7 @@ class _FinalRiskResultsScreenState extends State<FinalRiskResultsScreen> {
     );
   }
 
-  Widget _buildVulnerabilidadRatingCard(
+  static Widget _buildVulnerabilidadRatingCard(
     BuildContext context,
     RiskThreatAnalysisState state,
   ) {
@@ -250,11 +239,11 @@ class _FinalRiskResultsScreenState extends State<FinalRiskResultsScreen> {
   }
 
 
-  RiskEventModel? _getRiskEventByName(String eventName) {
+  static RiskEventModel? _getRiskEventByName(String eventName) {
     return RiskEventFactory.getEventByName(eventName);
   }
 
-  Widget _buildAnalysisButton(
+  static Widget _buildAnalysisButton(
     BuildContext context,
     String text,
     VoidCallback onPressed,
