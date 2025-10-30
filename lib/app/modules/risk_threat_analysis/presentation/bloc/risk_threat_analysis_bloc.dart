@@ -742,19 +742,18 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     return state.dropdownOpenStates[subClassificationId] ?? false;
   }
 
-  /// Método de compatibilidad temporal
-  List<dynamic> getCategoriesForCurrentSubClassification(String subClassificationId) {
-    // Usar el evento seleccionado dinámicamente
+  /// Obtener categorías de una subclasificación específica sin depender de selectedClassification
+  List<dynamic> getCategoriesForSubClassificationById(String subClassificationId, String? classificationType) {
     final riskEvent = RiskEventFactory.getEventByName(state.selectedRiskEvent ?? '') ??
         RiskEventFactory.createMovimientoEnMasa();
     
-    // Buscar la clasificación actual
+    // Buscar la clasificación específica si se proporciona
     final classification = riskEvent.classifications.firstWhere(
-      (c) => c.name.toLowerCase() == (state.selectedClassification ?? '').toLowerCase(),
+      (c) => c.name.toLowerCase() == (classificationType ?? state.selectedClassification ?? '').toLowerCase(),
       orElse: () => riskEvent.classifications.first,
     );
     
-    // Buscar la subclasificación actual
+    // Buscar la subclasificación
     final subClassification = classification.subClassifications.firstWhere(
       (s) => s.id == subClassificationId,
       orElse: () => classification.subClassifications.first,
@@ -764,6 +763,11 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     final dropdownCategories = RiskModelAdapter.convertToDropdownCategories(subClassification.categories);
     
     return dropdownCategories;
+  }
+
+  /// Método de compatibilidad temporal
+  List<dynamic> getCategoriesForCurrentSubClassification(String subClassificationId) {
+    return getCategoriesForSubClassificationById(subClassificationId, null);
   }
 
   /// Método de compatibilidad temporal
@@ -1211,8 +1215,11 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
   }
 
   /// Método centralizado para obtener items de una subclasificación
-  List<Map<String, dynamic>> getItemsForSubClassification(String subClassificationId) {
-    final categories = getCategoriesForCurrentSubClassification(subClassificationId);
+  /// [classificationType] es opcional y permite especificar la clasificación explícitamente
+  List<Map<String, dynamic>> getItemsForSubClassification(String subClassificationId, [String? classificationType]) {
+    final categories = classificationType != null 
+        ? getCategoriesForSubClassificationById(subClassificationId, classificationType)
+        : getCategoriesForCurrentSubClassification(subClassificationId);
     final items = <Map<String, dynamic>>[];
     
     for (final category in categories) {
