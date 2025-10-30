@@ -49,12 +49,12 @@ class FinalRiskResultsScreen extends StatelessWidget {
               const SizedBox(height: 24),
 
               // Secciones de Amenaza
-              _buildAmenazaSections(context, state),
+              _buildClassificationSections(context, state, 'amenaza'),
 
               const SizedBox(height: 24),
 
               // Calificación de Amenaza
-              _buildAmenazaRatingCard(context, state),
+              _buildRatingCard('amenaza'),
 
               const SizedBox(height: 32),
 
@@ -80,12 +80,12 @@ class FinalRiskResultsScreen extends StatelessWidget {
               const SizedBox(height: 24),
 
               // Secciones de Vulnerabilidad
-              _buildVulnerabilidadSections(context, state),
+              _buildClassificationSections(context, state, 'vulnerabilidad'),
 
               const SizedBox(height: 24),
 
               // Calificación de Vulnerabilidad
-              _buildVulnerabilidadRatingCard(context, state),
+              _buildRatingCard('vulnerabilidad'),
               const SizedBox(height: 24),
 
               _buildAnalysisButton(
@@ -112,135 +112,70 @@ class FinalRiskResultsScreen extends StatelessWidget {
     );
   }
 
-  // Métodos para construir secciones de Amenaza
-  static Widget _buildAmenazaSections(
-    BuildContext context,
-    RiskThreatAnalysisState state,
-  ) {
-    final bloc = context.read<RiskThreatAnalysisBloc>();
-
-    // Obtener subclasificaciones de amenaza desde el evento
-    final riskEvent = _getRiskEventByName(state.selectedRiskEvent ?? '');
-    List<String> amenazaSubClassifications = [];
-
-    if (riskEvent != null) {
-      final classification = riskEvent.classifications.firstWhere(
-        (c) => c.id == 'amenaza',
-        orElse: () => riskEvent.classifications.first,
-      );
-      amenazaSubClassifications = classification.subClassifications
-          .map((s) => s.id)
-          .toList();
-    }
-
-    return Column(
-      children: amenazaSubClassifications.asMap().entries.map((entry) {
-        final index = entry.key;
-        final subClassId = entry.value;
-
-        // Construir items usando el método centralizado del BLoC
-        // Pasar 'amenaza' explícitamente para evitar filtrado por selectedClassification
-        final items = bloc.getItemsForSubClassification(subClassId, 'amenaza');
-        final score = bloc.calculateSectionScore(subClassId, 'amenaza');
-
-        // Obtener el nombre de la subclasificación
-        String title = subClassId;
-        if (riskEvent != null) {
-          final classification = riskEvent.classifications.firstWhere(
-            (c) => c.id == 'amenaza',
-            orElse: () => riskEvent.classifications.first,
-          );
-          final subClass = classification.subClassifications.firstWhere(
-            (s) => s.id == subClassId,
-            orElse: () => classification.subClassifications.first,
-          );
-          title = subClass.name;
-        }
-
-        return Column(
-          children: [
-            if (index > 0) const SizedBox(height: 24),
-            RatingSectionWidget(title: title, score: score, items: items),
-          ],
-        );
-      }).toList(),
-    );
-  }
-
-  static Widget _buildAmenazaRatingCard(
-    BuildContext context,
-    RiskThreatAnalysisState state,
-  ) {
-    return const ClassificationRatingCardWidget(classificationType: 'amenaza');
-  }
-
-  // Métodos para construir secciones de Vulnerabilidad
-  static Widget _buildVulnerabilidadSections(
-    BuildContext context,
-    RiskThreatAnalysisState state,
-  ) {
-    final bloc = context.read<RiskThreatAnalysisBloc>();
-
-    // Obtener subclasificaciones de vulnerabilidad desde el evento
-    final riskEvent = _getRiskEventByName(state.selectedRiskEvent ?? '');
-    List<String> vulnerabilidadSubClassifications = [];
-
-    if (riskEvent != null) {
-      final classification = riskEvent.classifications.firstWhere(
-        (c) => c.id == 'vulnerabilidad',
-        orElse: () => riskEvent.classifications.first,
-      );
-      vulnerabilidadSubClassifications = classification.subClassifications
-          .map((s) => s.id)
-          .toList();
-    }
-
-    return Column(
-      children: vulnerabilidadSubClassifications.asMap().entries.map((entry) {
-        final index = entry.key;
-        final subClassId = entry.value;
-
-        // Construir items usando el método centralizado del BLoC
-        // Pasar 'vulnerabilidad' explícitamente para evitar filtrado por selectedClassification
-        final items = bloc.getItemsForSubClassification(subClassId, 'vulnerabilidad');
-        final score = bloc.calculateSectionScore(subClassId, 'vulnerabilidad');
-
-        // Obtener el nombre de la subclasificación
-        String title = subClassId;
-        if (riskEvent != null) {
-          final classification = riskEvent.classifications.firstWhere(
-            (c) => c.id == 'vulnerabilidad',
-            orElse: () => riskEvent.classifications.first,
-          );
-          final subClass = classification.subClassifications.firstWhere(
-            (s) => s.id == subClassId,
-            orElse: () => classification.subClassifications.first,
-          );
-          title = subClass.name;
-        }
-
-        return Column(
-          children: [
-            if (index > 0) const SizedBox(height: 24),
-            RatingSectionWidget(title: title, score: score, items: items),
-          ],
-        );
-      }).toList(),
-    );
-  }
-
-  static Widget _buildVulnerabilidadRatingCard(
-    BuildContext context,
-    RiskThreatAnalysisState state,
-  ) {
-    return const ClassificationRatingCardWidget(
-      classificationType: 'vulnerabilidad',
-    );
+  /// Helper para construir rating cards
+  static Widget _buildRatingCard(String classificationType) {
+    return ClassificationRatingCardWidget(classificationType: classificationType);
   }
 
 
   static RiskEventModel? _getRiskEventByName(String eventName) {
     return RiskEventFactory.getEventByName(eventName);
+  }
+
+  /// Helper genérico para construir secciones de clasificación (amenaza o vulnerabilidad)
+  static Widget _buildClassificationSections(
+    BuildContext context,
+    RiskThreatAnalysisState state,
+    String classificationType,
+  ) {
+    final bloc = context.read<RiskThreatAnalysisBloc>();
+
+    // Obtener subclasificaciones desde el evento
+    final riskEvent = _getRiskEventByName(state.selectedRiskEvent ?? '');
+    List<String> subClassifications = [];
+
+    if (riskEvent != null) {
+      final classification = riskEvent.classifications.firstWhere(
+        (c) => c.id == classificationType,
+        orElse: () => riskEvent.classifications.first,
+      );
+      subClassifications = classification.subClassifications
+          .map((s) => s.id)
+          .toList();
+    }
+
+    return Column(
+      children: subClassifications.asMap().entries.map((entry) {
+        final index = entry.key;
+        final subClassId = entry.value;
+
+        // Construir items usando el método centralizado del BLoC
+        // Pasar classificationType explícitamente para evitar filtrado por selectedClassification
+        final items = bloc.getItemsForSubClassification(subClassId, classificationType);
+        final score = bloc.calculateSectionScore(subClassId, classificationType);
+
+        // Obtener el nombre de la subclasificación
+        String title = subClassId;
+        if (riskEvent != null) {
+          final classification = riskEvent.classifications.firstWhere(
+            (c) => c.id == classificationType,
+            orElse: () => riskEvent.classifications.first,
+          );
+          final subClass = classification.subClassifications.firstWhere(
+            (s) => s.id == subClassId,
+            orElse: () => classification.subClassifications.first,
+          );
+          title = subClass.name;
+        }
+
+        return Column(
+          children: [
+            if (index > 0) const SizedBox(height: 24),
+            RatingSectionWidget(title: title, score: score, items: items),
+          ],
+        );
+      }).toList(),
+    );
   }
 
   static Widget _buildAnalysisButton(
