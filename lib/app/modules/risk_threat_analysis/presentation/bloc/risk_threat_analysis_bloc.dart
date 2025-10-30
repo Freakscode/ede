@@ -686,18 +686,7 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
 
   /// Método de compatibilidad temporal
   List<RiskSubClassification> getCurrentSubClassifications() {
-    // Usar el evento seleccionado dinámicamente
-    final riskEvent = RiskEventFactory.getEventByName(state.selectedRiskEvent ?? '') ??
-        RiskEventFactory.createMovimientoEnMasa();
-    
-    // Buscar la clasificación actual
-    final classification = riskEvent.classifications.firstWhere(
-      (c) => c.name.toLowerCase() == (state.selectedClassification ?? '').toLowerCase(),
-      orElse: () => riskEvent.classifications.first,
-    );
-    
-    // Retornar los objetos completos para que tengan acceso a categories
-    return classification.subClassifications;
+    return _getSubClassificationsByType(state.selectedClassification ?? '');
   }
 
   /// Método para obtener el valor seleccionado de una subclasificación
@@ -744,25 +733,17 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
 
   /// Obtener categorías de una subclasificación específica sin depender de selectedClassification
   List<dynamic> getCategoriesForSubClassificationById(String subClassificationId, String? classificationType) {
-    final riskEvent = RiskEventFactory.getEventByName(state.selectedRiskEvent ?? '') ??
-        RiskEventFactory.createMovimientoEnMasa();
-    
-    // Buscar la clasificación específica si se proporciona
-    final classification = riskEvent.classifications.firstWhere(
-      (c) => c.name.toLowerCase() == (classificationType ?? state.selectedClassification ?? '').toLowerCase(),
-      orElse: () => riskEvent.classifications.first,
-    );
+    final classificationTypeToUse = classificationType ?? state.selectedClassification ?? '';
+    final subClassifications = _getSubClassificationsByType(classificationTypeToUse);
     
     // Buscar la subclasificación
-    final subClassification = classification.subClassifications.firstWhere(
+    final subClassification = subClassifications.firstWhere(
       (s) => s.id == subClassificationId,
-      orElse: () => classification.subClassifications.first,
+      orElse: () => subClassifications.first,
     );
     
     // Convertir categorías a formato compatible usando el adaptador
-    final dropdownCategories = RiskModelAdapter.convertToDropdownCategories(subClassification.categories);
-    
-    return dropdownCategories;
+    return RiskModelAdapter.convertToDropdownCategories(subClassification.categories);
   }
 
   /// Método de compatibilidad temporal
@@ -790,28 +771,64 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
 
   /// Método de compatibilidad temporal para obtener subclasificaciones de amenaza
   List<RiskSubClassification> getAmenazaSubClassifications() {
-    final riskEvent = RiskEventFactory.getEventByName(state.selectedRiskEvent ?? '') ??
-        RiskEventFactory.createMovimientoEnMasa();
-    final amenazaClassification = riskEvent.classifications.firstWhere(
-      (c) => c.name.toLowerCase() == 'amenaza',
-      orElse: () => riskEvent.classifications.first,
-    );
-    
-    // Retornar los objetos completos para que tengan acceso a categories
-    return amenazaClassification.subClassifications;
+    return _getSubClassificationsByType('amenaza');
   }
 
   /// Método de compatibilidad temporal para obtener subclasificaciones de vulnerabilidad
   List<RiskSubClassification> getVulnerabilidadSubClassifications() {
+    return _getSubClassificationsByType('vulnerabilidad');
+  }
+
+  /// Método helper para obtener subclasificaciones por tipo
+  List<RiskSubClassification> _getSubClassificationsByType(String classificationType) {
     final riskEvent = RiskEventFactory.getEventByName(state.selectedRiskEvent ?? '') ??
         RiskEventFactory.createMovimientoEnMasa();
-    final vulnerabilidadClassification = riskEvent.classifications.firstWhere(
-      (c) => c.name.toLowerCase() == 'vulnerabilidad',
+    final classification = riskEvent.classifications.firstWhere(
+      (c) => c.name.toLowerCase() == classificationType,
       orElse: () => riskEvent.classifications.first,
     );
+    return classification.subClassifications;
+  }
+
+  /// Helper para calcular score de vulnerabilidad con promedio ponderado
+  Map<String, dynamic> _calculateVulnerabilidadScore() {
+    const Map<String, double> pesos = {
+      'fragilidad_fisica': 0.45,
+      'fragilidad_personas': 0.10,
+      'exposicion': 0.45,
+    };
     
-    // Retornar los objetos completos para que tengan acceso a categories
-    return vulnerabilidadClassification.subClassifications;
+    double weightedSum = 0.0;
+    int count = 0;
+    
+    for (final entry in state.subClassificationScores.entries) {
+      final subClassificationId = entry.key;
+      final subScore = entry.value;
+      final peso = pesos[subClassificationId] ?? 0.0;
+      
+      if (subScore > 0 && peso > 0) {
+        weightedSum += (subScore * peso);
+        count++;
+      }
+    }
+    
+    if (count > 0 && weightedSum > 0) {
+      return {'score': weightedSum, 'valid': true};
+    }
+    
+    return {'score': 0.0, 'valid': false};
+  }
+
+  /// Helper para verificar si hay selecciones válidas
+  bool _hasValidSelections() {
+    bool hasValidSelections = false;
+    for (final entry in state.dynamicSelections.entries) {
+      if (entry.value.isNotEmpty) {
+        hasValidSelections = true;
+        break;
+      }
+    }
+    return hasValidSelections;
   }
 
   /// Método de compatibilidad temporal
@@ -847,47 +864,14 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
         color = globalScoreInfo['amenazaColor'] ?? DAGRDColors.outlineVariant;
       } else if ((state.selectedClassification ?? '').toLowerCase() == 'vulnerabilidad') {
         // Verificar si hay selecciones REALES del usuario
-        if (state.dynamicSelections.isEmpty) {
+        if (state.dynamicSelections.isEmpty || !_hasValidSelections()) {
           return DAGRDColors.outlineVariant;
         }
         
-        // Verificar si hay al menos una selección no vacía
-        bool hasValidSelections = false;
-        for (final entry in state.dynamicSelections.entries) {
-          if (entry.value.isNotEmpty) {
-            hasValidSelections = true;
-            break;
-          }
-        }
-        
-        if (!hasValidSelections) {
-          return DAGRDColors.outlineVariant;
-        }
-        
-        // Para vulnerabilidad, calcular con promedio PONDERADO
-        // Pesos según Excel: FRAGILIDAD FÍSICA: 45%, FRAGILIDAD EN PERSONAS: 10%, EXPOSICIÓN: 45%
-        final Map<String, double> pesos = {
-          'fragilidad_fisica': 0.45,
-          'fragilidad_personas': 0.10,
-          'exposicion': 0.45,
-        };
-        
-        double weightedSum = 0.0;
-        int count = 0;
-        
-        for (final entry in state.subClassificationScores.entries) {
-          final subClassificationId = entry.key;
-          final subScore = entry.value;
-          final peso = pesos[subClassificationId] ?? 0.0;
-          
-          if (subScore > 0 && peso > 0) {
-            weightedSum += (subScore * peso);
-            count++;
-          }
-        }
-        
-        if (count > 0 && weightedSum > 0) {
-          score = weightedSum; // Los pesos ya suman 1.0
+        // Calcular score de vulnerabilidad con promedio ponderado
+        final vulnResult = _calculateVulnerabilidadScore();
+        if (vulnResult['valid'] == true) {
+          score = vulnResult['score'] as double;
           color = _getColorFromScore(score);
         } else {
           score = 0.0;
@@ -945,47 +929,14 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
         level = globalScoreInfo['amenazaLevel'] ?? 'SIN CALIFICAR';
       } else if ((state.selectedClassification ?? '').toLowerCase() == 'vulnerabilidad') {
         // Para vulnerabilidad, verificar si hay selecciones REALES del usuario
-        if (state.dynamicSelections.isEmpty) {
+        if (state.dynamicSelections.isEmpty || !_hasValidSelections()) {
           return 'SIN CALIFICAR';
         }
         
-        // Verificar si hay al menos una selección no vacía
-        bool hasValidSelections = false;
-        for (final entry in state.dynamicSelections.entries) {
-          if (entry.value.isNotEmpty) {
-            hasValidSelections = true;
-            break;
-          }
-        }
-        
-        if (!hasValidSelections) {
-          return 'SIN CALIFICAR';
-        }
-        
-        // Usar los scores ya calculados en el state con promedio PONDERADO
-        // Pesos según Excel: FRAGILIDAD FÍSICA: 45%, FRAGILIDAD EN PERSONAS: 10%, EXPOSICIÓN: 45%
-        final Map<String, double> pesos = {
-          'fragilidad_fisica': 0.45,
-          'fragilidad_personas': 0.10,
-          'exposicion': 0.45,
-        };
-        
-        double weightedSum = 0.0;
-        int count = 0;
-        
-        for (final entry in state.subClassificationScores.entries) {
-          final subClassificationId = entry.key;
-          final subScore = entry.value;
-          final peso = pesos[subClassificationId] ?? 0.0;
-          
-          if (subScore > 0 && peso > 0) {
-            weightedSum += (subScore * peso);
-            count++;
-          }
-        }
-        
-        if (count > 0 && weightedSum > 0) {
-          score = weightedSum; // Los pesos ya suman 1.0, no necesitamos dividir
+        // Calcular score de vulnerabilidad con promedio ponderado
+        final vulnResult = _calculateVulnerabilidadScore();
+        if (vulnResult['valid'] == true) {
+          score = vulnResult['score'] as double;
           level = _getLevelFromScore(score);
         } else {
           score = 0.0;
@@ -1050,47 +1001,14 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
         bgColor = globalScoreInfo['amenazaColor'] ?? Colors.grey;
       } else if ((state.selectedClassification ?? '').toLowerCase() == 'vulnerabilidad') {
         // Verificar si hay selecciones REALES del usuario
-        if (state.dynamicSelections.isEmpty) {
+        if (state.dynamicSelections.isEmpty || !_hasValidSelections()) {
           return Colors.black;
         }
         
-        // Verificar si hay al menos una selección no vacía
-        bool hasValidSelections = false;
-        for (final entry in state.dynamicSelections.entries) {
-          if (entry.value.isNotEmpty) {
-            hasValidSelections = true;
-            break;
-          }
-        }
-        
-        if (!hasValidSelections) {
-          return Colors.black;
-        }
-        
-        // Para vulnerabilidad, calcular con promedio PONDERADO
-        // Pesos según Excel: FRAGILIDAD FÍSICA: 45%, FRAGILIDAD EN PERSONAS: 10%, EXPOSICIÓN: 45%
-        final Map<String, double> pesos = {
-          'fragilidad_fisica': 0.45,
-          'fragilidad_personas': 0.10,
-          'exposicion': 0.45,
-        };
-        
-        double weightedSum = 0.0;
-        int count = 0;
-        
-        for (final entry in state.subClassificationScores.entries) {
-          final subClassificationId = entry.key;
-          final subScore = entry.value;
-          final peso = pesos[subClassificationId] ?? 0.0;
-          
-          if (subScore > 0 && peso > 0) {
-            weightedSum += (subScore * peso);
-            count++;
-          }
-        }
-        
-        if (count > 0 && weightedSum > 0) {
-          score = weightedSum; // Los pesos ya suman 1.0
+        // Calcular score de vulnerabilidad con promedio ponderado
+        final vulnResult = _calculateVulnerabilidadScore();
+        if (vulnResult['valid'] == true) {
+          score = vulnResult['score'] as double;
           bgColor = _getColorFromScore(score);
         } else {
           score = 0.0;
