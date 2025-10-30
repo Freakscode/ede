@@ -60,7 +60,6 @@ class FinalRiskResultsScreen extends StatelessWidget {
               // Botón Ir a Análisis de la Amenaza
               _buildAnalysisButton(
                 context,
-                state,
                 'Ir a Análisis de la Amenaza',
                 'amenaza',
               ),
@@ -90,7 +89,6 @@ class FinalRiskResultsScreen extends StatelessWidget {
 
               _buildAnalysisButton(
                 context,
-                state,
                 'Ir a Análisis de la Vulnerabilidad',
                 'vulnerabilidad',
               ),
@@ -151,18 +149,17 @@ class FinalRiskResultsScreen extends StatelessWidget {
 
   static Widget _buildAnalysisButton(
     BuildContext context,
-    RiskThreatAnalysisState state,
     String text,
     String classificationType,
   ) {
     return SizedBox(
       width: double.infinity,
       child: TextButton(
-        onPressed: () => _handleAnalysisButtonTap(
-          context,
-          state,
-          classificationType,
-        ),
+        onPressed: () {
+          final bloc = context.read<RiskThreatAnalysisBloc>();
+          bloc.add(SelectClassification(classificationType.toLowerCase()));
+          bloc.add(ChangeBottomNavIndex(1));
+        },
         style: TextButton.styleFrom(
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
           backgroundColor: Colors.transparent,
@@ -190,21 +187,5 @@ class FinalRiskResultsScreen extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  /// Maneja el tap del botón de análisis
-  static void _handleAnalysisButtonTap(
-    BuildContext context,
-    RiskThreatAnalysisState state,
-    String classificationType,
-  ) {
-    final riskBloc = context.read<RiskThreatAnalysisBloc>();
-
-    // Configurar la clasificación seleccionada
-    riskBloc.add(SelectClassification(classificationType.toLowerCase()));
-
-    // Navegar a RatingScreen (índice 1)
-    // Los datos ya están en el estado del BLoC, no necesitamos recargarlos
-    riskBloc.add(ChangeBottomNavIndex(1));
   }
 }
