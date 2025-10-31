@@ -7,6 +7,8 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 // Core
 import 'app/core/network/network_info.dart';
+import 'app/core/http/app_interceptors.dart';
+import 'app/core/utils/env.dart';
 
 // Features - Auth
 import 'app/modules/auth/data/repositories_impl/auth_repository_implementation.dart';
@@ -57,7 +59,6 @@ Future<void> initializeDependencies() async {
   final sharedPreferences = await SharedPreferences.getInstance();
   sl.registerLazySingleton(() => sharedPreferences);
   
-  sl.registerLazySingleton(() => Dio());
   sl.registerLazySingleton(() => Connectivity());
 
   // Core
@@ -65,12 +66,24 @@ Future<void> initializeDependencies() async {
     () => NetworkInfoImpl(connectivity: sl()),
   );
 
-
-
   // Data sources
   // Auth Data Sources
   sl.registerLazySingleton<AuthLocalDataSource>(() => AuthLocalDataSourceImpl());
-  sl.registerLazySingleton<AuthRemoteDataSource>(() => AuthRemoteDataSourceImpl(dio: sl()));
+  
+  // HTTP Client con interceptores
+  sl.registerLazySingleton<Dio>(() {
+    final dio = Dio(
+      BaseOptions(
+        baseUrl: Environment.apiUrl,
+      ),
+    );
+    dio.interceptors.add(
+      AppInterceptors(authLocalDataSource: sl<AuthLocalDataSource>()),
+    );
+    return dio;
+  });
+  
+  sl.registerLazySingleton<AuthRemoteDataSource>(() => AuthRemoteDataSourceImpl());
 
   // Services
   sl.registerLazySingleton(() => FormPersistenceService());

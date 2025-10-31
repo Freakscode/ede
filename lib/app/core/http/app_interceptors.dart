@@ -1,9 +1,13 @@
 import 'dart:developer';
 
 import 'package:dio/dio.dart';
+import 'package:caja_herramientas/app/modules/auth/data/datasources/auth_local_data_source.dart';
 
 class AppInterceptors extends Interceptor {
-  // final LocalAuthService _localAuthService = LocalAuthService();
+  final AuthLocalDataSource _localAuthService;
+
+  AppInterceptors({required AuthLocalDataSource authLocalDataSource})
+      : _localAuthService = authLocalDataSource;
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
@@ -16,18 +20,12 @@ class AppInterceptors extends Interceptor {
     );
 
     if (requiresToken == -1) {
-      // Token quemado para pruebas
-      const hardcodedToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTQ1LCJ1aWQiOiJ4c1NTS3UwOXNKYW9QdVJFcUNEYWphSkVTVGJwZDNhWjRJVUQiLCJpZEVtcHJlc2EiOjIsImF1dGhvcml6ZWQiOjEsInJvbCI6IkFkbWluaXN0cmFkb3IiLCJpYXQiOjE3NTMxOTc3MDksImV4cCI6MTc1MzI4NDEwOX0.VVdkTtZt_e-8Y1So_xgxBeSQfK8kj3drP2PErYBk-EM';
-      options.headers.addAll({"Authorization": "Bearer $hardcodedToken"});
-      // --- Para uso futuro: autenticación dinámica ---
-      /*
       try {
         final token = await _localAuthService.getToken();
         if (token != null && token.isNotEmpty) {
           options.headers.addAll({"Authorization": "Bearer $token"});
         }
       } catch (_) {}
-      */
     }
 
     super.onRequest(options, handler);
