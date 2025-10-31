@@ -66,6 +66,13 @@ Future<void> initializeDependencies() async {
     () => NetworkInfoImpl(connectivity: sl()),
   );
 
+  // Initialize Hive
+  await Hive.initFlutter();
+  
+  // Open Hive boxes
+  await Hive.openBox(DatabaseConfig.authStorageBox);
+  await Hive.openBox(DatabaseConfig.tutorialHomeKey);
+
   // Data sources
   // Auth Data Sources
   sl.registerLazySingleton<AuthLocalDataSource>(() => AuthLocalDataSourceImpl());
@@ -155,14 +162,4 @@ Future<void> initializeDependencies() async {
   
   // Note: EvaluacionGlobalBloc is created directly in MultiBlocProvider 
   // since it requires access to other BLoC instances from context
-
-  await Hive.initFlutter();
-
-  // Open Hive boxes
-  await Hive.openBox(DatabaseConfig.tutorialHomeKey);
-  await Hive.openBox('auth_storage');
-
-
-
-
 }

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:hive/hive.dart';
+import 'package:caja_herramientas/app/core/database/database_config.dart';
 import '../../domain/entities/user_entity.dart';
 import '../models/user_model.dart';
 
@@ -25,36 +26,25 @@ abstract class AuthLocalDataSource {
 }
 
 class AuthLocalDataSourceImpl implements AuthLocalDataSource {
-  static const String _boxName = 'auth_storage';
   static const String _tokenKey = 'auth_token';
   static const String _userKey = 'auth_user';
   
-  Box? _box;
-
-  /// Inicializar box de Hive
-  Future<void> init() async {
-    if (_box == null) {
-      _box = await Hive.openBox(_boxName);
-    }
-  }
+  Box get _box => Hive.box(DatabaseConfig.authStorageBox);
 
   @override
   Future<String?> getToken() async {
-    await init();
-    return _box?.get(_tokenKey);
+    return _box.get(_tokenKey);
   }
 
   @override
   Future<void> saveToken(String token) async {
-    await init();
-    await _box?.put(_tokenKey, token);
+    await _box.put(_tokenKey, token);
   }
 
   @override
   Future<UserEntity?> getCurrentUser() async {
-    await init();
     try {
-      final userJson = _box?.get(_userKey);
+      final userJson = _box.get(_userKey);
       if (userJson != null) {
         final userMap = json.decode(userJson) as Map<String, dynamic>;
         final userModel = UserModel.fromJson(userMap);
@@ -68,9 +58,8 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
 
   @override
   Future<void> saveUser(UserEntity user) async {
-    await init();
     final userModel = UserModel.fromEntity(user);
-    await _box?.put(_userKey, json.encode(userModel.toJson()));
+    await _box.put(_userKey, json.encode(userModel.toJson()));
   }
 
   @override
@@ -82,8 +71,7 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
 
   @override
   Future<void> clearAuthData() async {
-    await init();
-    await _box?.delete(_tokenKey);
-    await _box?.delete(_userKey);
+    await _box.delete(_tokenKey);
+    await _box.delete(_userKey);
   }
 }

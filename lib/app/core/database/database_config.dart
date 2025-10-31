@@ -5,8 +5,7 @@ class DatabaseConfig {
   static const username = String.fromEnvironment('DB_USER', defaultValue: 'postgres');
   static const password = String.fromEnvironment('DB_PASSWORD', defaultValue: 'admin123');
 
-  // Constante para la clave del tutorial
+  // Constantes para Hive boxes
   static const tutorialHomeKey = 'tutorial_home_shown';
-
-  
+  static const authStorageBox = 'auth_storage';
 }
