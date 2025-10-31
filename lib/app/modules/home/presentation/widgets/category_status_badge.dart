@@ -55,34 +55,34 @@ class CategoryStatusBadge extends StatelessWidget {
     switch (status.toLowerCase()) {
       case 'completed':
         return BadgeData(
-          backgroundColor: DAGRDColors.success.withOpacity(0.1),
-          borderColor: DAGRDColors.success,
-          iconColor: DAGRDColors.success,
-          textColor: DAGRDColors.success,
+          backgroundColor: ThemeColors.success.withOpacity(0.1),
+          borderColor: ThemeColors.success,
+          iconColor: ThemeColors.success,
+          textColor: ThemeColors.success,
           icon: Icons.check_circle,
         );
       case 'available':
         return BadgeData(
-          backgroundColor: DAGRDColors.azulSecundario.withOpacity(0.1),
-          borderColor: DAGRDColors.azulSecundario,
-          iconColor: DAGRDColors.azulSecundario,
-          textColor: DAGRDColors.azulSecundario,
+          backgroundColor: ThemeColors.azulSecundario.withOpacity(0.1),
+          borderColor: ThemeColors.azulSecundario,
+          iconColor: ThemeColors.azulSecundario,
+          textColor: ThemeColors.azulSecundario,
           icon: Icons.play_circle,
         );
       case 'locked':
         return BadgeData(
-          backgroundColor: DAGRDColors.grisMedio.withOpacity(0.1),
-          borderColor: DAGRDColors.grisMedio,
-          iconColor: DAGRDColors.grisMedio,
-          textColor: DAGRDColors.grisMedio,
+          backgroundColor: ThemeColors.grisMedio.withOpacity(0.1),
+          borderColor: ThemeColors.grisMedio,
+          iconColor: ThemeColors.grisMedio,
+          textColor: ThemeColors.grisMedio,
           icon: Icons.lock,
         );
       default:
         return BadgeData(
-          backgroundColor: DAGRDColors.grisClaro,
-          borderColor: DAGRDColors.grisMedio,
-          iconColor: DAGRDColors.grisMedio,
-          textColor: DAGRDColors.grisMedio,
+          backgroundColor: ThemeColors.grisClaro,
+          borderColor: ThemeColors.grisMedio,
+          iconColor: ThemeColors.grisMedio,
+          textColor: ThemeColors.grisMedio,
           icon: Icons.help,
         );
     }

@@ -32,7 +32,7 @@ class ProfileScreen extends StatelessWidget {
                     'Perfil',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: DAGRDColors.azulDAGRD,
+                      color: ThemeColors.azulDAGRD,
                       fontFamily: 'Work Sans',
                       fontSize: 20,
                       fontWeight: FontWeight.w600,
@@ -48,10 +48,10 @@ class ProfileScreen extends StatelessWidget {
                     width: 100,
                     height: 100,
                     decoration: BoxDecoration(
-                      color: DAGRDColors.azulSecundario.withOpacity(0.1),
+                      color: ThemeColors.azulSecundario.withOpacity(0.1),
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: DAGRDColors.azulSecundario,
+                        color: ThemeColors.azulSecundario,
                         width: 3,
                       ),
                     ),
@@ -61,7 +61,7 @@ class ProfileScreen extends StatelessWidget {
                         width: 50,
                         height: 50,
                         colorFilter: ColorFilter.mode(
-                          DAGRDColors.azulSecundario,
+                          ThemeColors.azulSecundario,
                           BlendMode.srcIn,
                         ),
                       ),
@@ -75,7 +75,7 @@ class ProfileScreen extends StatelessWidget {
                   child: Text(
                     user.nombre,
                     style: const TextStyle(
-                      color: DAGRDColors.negroDAGRD,
+                      color: ThemeColors.negroDAGRD,
                       fontFamily: 'Work Sans',
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
@@ -93,13 +93,13 @@ class ProfileScreen extends StatelessWidget {
                     ),
                     decoration: BoxDecoration(
                       color: user.isDagrdUser
-                          ? DAGRDColors.azulSecundario.withOpacity(0.1)
-                          : DAGRDColors.grisMedio.withOpacity(0.1),
+                          ? ThemeColors.azulSecundario.withOpacity(0.1)
+                          : ThemeColors.grisMedio.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
                         color: user.isDagrdUser
-                            ? DAGRDColors.azulSecundario
-                            : DAGRDColors.grisMedio,
+                            ? ThemeColors.azulSecundario
+                            : ThemeColors.grisMedio,
                         width: 1,
                       ),
                     ),
@@ -107,8 +107,8 @@ class ProfileScreen extends StatelessWidget {
                       user.isDagrdUser ? 'Usuario DAGRD' : 'Usuario General',
                       style: TextStyle(
                         color: user.isDagrdUser
-                            ? DAGRDColors.azulSecundario
-                            : DAGRDColors.grisOscuro,
+                            ? ThemeColors.azulSecundario
+                            : ThemeColors.grisOscuro,
                         fontFamily: 'Work Sans',
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
@@ -124,7 +124,7 @@ class ProfileScreen extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: DAGRDColors.outline),
+                    border: Border.all(color: ThemeColors.outline),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -132,7 +132,7 @@ class ProfileScreen extends StatelessWidget {
                       const Text(
                         'Información Personal',
                         style: TextStyle(
-                          color: DAGRDColors.negroDAGRD,
+                          color: ThemeColors.negroDAGRD,
                           fontFamily: 'Work Sans',
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
@@ -141,7 +141,7 @@ class ProfileScreen extends StatelessWidget {
                       const SizedBox(height: 16),
                       ProfileInfoTile(
                         icon: AppIcons.persona,
-                        iconColor: DAGRDColors.azulSecundario,
+                        iconColor: ThemeColors.azulSecundario,
                         label: 'Cédula',
                         value: user.cedula,
                       ),
@@ -149,7 +149,7 @@ class ProfileScreen extends StatelessWidget {
                         const SizedBox(height: 12),
                         ProfileInfoTile(
                           icon: AppIcons.wrench,
-                          iconColor: DAGRDColors.azulSecundario,
+                          iconColor: ThemeColors.azulSecundario,
                           label: 'Profesión',
                           value: user.cargo!,
                         ),
@@ -158,7 +158,7 @@ class ProfileScreen extends StatelessWidget {
                         const SizedBox(height: 12),
                         ProfileInfoTile(
                           icon: AppIcons.message,
-                          iconColor: DAGRDColors.azulSecundario,
+                          iconColor: ThemeColors.azulSecundario,
                           label: 'Email',
                           value: user.email!,
                         ),
@@ -167,7 +167,7 @@ class ProfileScreen extends StatelessWidget {
                         const SizedBox(height: 12),
                         ProfileInfoTile(
                           icon: AppIcons.message,
-                          iconColor: DAGRDColors.azulSecundario,
+                          iconColor: ThemeColors.azulSecundario,
                           label: 'Teléfono',
                           value: user.telefono!,
                         ),
@@ -183,7 +183,7 @@ class ProfileScreen extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: DAGRDColors.outline),
+                    border: Border.all(color: ThemeColors.outline),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -191,7 +191,7 @@ class ProfileScreen extends StatelessWidget {
                       const Text(
                         'Permisos',
                         style: TextStyle(
-                          color: DAGRDColors.negroDAGRD,
+                          color: ThemeColors.negroDAGRD,
                           fontFamily: 'Work Sans',
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
@@ -200,14 +200,14 @@ class ProfileScreen extends StatelessWidget {
                       const SizedBox(height: 16),
                       ProfilePermissionTile(
                         icon: AppIcons.info,
-                        iconColor: DAGRDColors.azulSecundario,
+                        iconColor: ThemeColors.azulSecundario,
                         label: 'Funcionalidades DAGRD',
                         isEnabled: user.canAccessDagrdFeatures,
                       ),
                       const SizedBox(height: 12),
                       ProfilePermissionTile(
                         icon: AppIcons.home,
-                        iconColor: DAGRDColors.azulSecundario,
+                        iconColor: ThemeColors.azulSecundario,
                         label: 'Funcionalidades Generales',
                         isEnabled: user.canAccessGeneralFeatures,
                       ),
@@ -228,7 +228,7 @@ class ProfileScreen extends StatelessWidget {
                   width: 80,
                   height: 80,
                   colorFilter: ColorFilter.mode(
-                    DAGRDColors.grisMedio,
+                    ThemeColors.grisMedio,
                     BlendMode.srcIn,
                   ),
                 ),
@@ -236,7 +236,7 @@ class ProfileScreen extends StatelessWidget {
                 const Text(
                   'No hay usuario autenticado',
                   style: TextStyle(
-                    color: DAGRDColors.grisOscuro,
+                    color: ThemeColors.grisOscuro,
                     fontFamily: 'Work Sans',
                     fontSize: 18,
                     fontWeight: FontWeight.w500,
@@ -290,7 +290,7 @@ class ProfileInfoTile extends StatelessWidget {
               Text(
                 label,
                 style: const TextStyle(
-                  color: DAGRDColors.grisOscuro,
+                  color: ThemeColors.grisOscuro,
                   fontFamily: 'Work Sans',
                   fontSize: 12,
                   fontWeight: FontWeight.w400,
@@ -300,7 +300,7 @@ class ProfileInfoTile extends StatelessWidget {
               Text(
                 value,
                 style: const TextStyle(
-                  color: DAGRDColors.negroDAGRD,
+                  color: ThemeColors.negroDAGRD,
                   fontFamily: 'Work Sans',
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
@@ -350,7 +350,7 @@ class ProfilePermissionTile extends StatelessWidget {
           child: Text(
             label,
             style: const TextStyle(
-              color: DAGRDColors.negroDAGRD,
+              color: ThemeColors.negroDAGRD,
               fontFamily: 'Work Sans',
               fontSize: 13,
               fontWeight: FontWeight.w500,
@@ -362,14 +362,14 @@ class ProfilePermissionTile extends StatelessWidget {
           padding: const EdgeInsets.all(4),
           decoration: BoxDecoration(
             color: isEnabled
-                ? DAGRDColors.success.withOpacity(0.1)
+                ? ThemeColors.success.withOpacity(0.1)
                 : Colors.grey.withOpacity(0.1),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(
             isEnabled ? Icons.check : Icons.close,
             size: 16,
-            color: isEnabled ? DAGRDColors.success : Colors.grey,
+            color: isEnabled ? ThemeColors.success : Colors.grey,
           ),
         ),
       ],

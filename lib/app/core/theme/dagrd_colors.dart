@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 /// Colores oficiales de DAGRD para la aplicación Caja de Herramientas
 /// Organizados por categorías para mejor mantenimiento
-class DAGRDColors {
-  DAGRDColors._(); // Constructor privado para evitar instancias
+class ThemeColors {
+  ThemeColors._(); // Constructor privado para evitar instancias
 
   // ============================================================================
   // COLORES PRINCIPALES DAGRD

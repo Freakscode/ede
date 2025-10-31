@@ -34,7 +34,7 @@ class ThreatRatingCardWidget extends StatelessWidget {
             width: double.infinity,
             padding: const EdgeInsets.all(10),
             decoration: const BoxDecoration(
-              color: DAGRDColors.azulDAGRD,
+              color: ThemeColors.azulDAGRD,
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(8),
                 topRight: Radius.circular(8),
@@ -45,7 +45,7 @@ class ThreatRatingCardWidget extends StatelessWidget {
                 title,
                 textAlign: TextAlign.center,
                 style: const TextStyle(
-                  color: DAGRDColors.blancoDAGRD,
+                  color: ThemeColors.blancoDAGRD,
                   fontFamily: 'Work Sans',
                   fontSize: 16,
                   fontStyle: FontStyle.normal,
@@ -61,7 +61,7 @@ class ThreatRatingCardWidget extends StatelessWidget {
             height: 40,
             padding: const EdgeInsets.fromLTRB(50, 10, 40, 10),
             decoration: const BoxDecoration(
-              color: DAGRDColors.amarilloDAGRD,
+              color: ThemeColors.amarilloDAGRD,
               borderRadius: BorderRadius.only(
                 bottomLeft: Radius.circular(8),
                 bottomRight: Radius.circular(8),
@@ -73,7 +73,7 @@ class ThreatRatingCardWidget extends StatelessWidget {
                   score,
                   textAlign: TextAlign.center,
                   style: const TextStyle(
-                    color: DAGRDColors.negroDAGRD,
+                    color: ThemeColors.negroDAGRD,
                     fontFamily: 'Work Sans',
                     fontSize: 16,
                     fontStyle: FontStyle.normal,
@@ -86,7 +86,7 @@ class ThreatRatingCardWidget extends StatelessWidget {
                   ratingText,
                   textAlign: TextAlign.center,
                   style: const TextStyle(
-                    color: DAGRDColors.negroDAGRD,
+                    color: ThemeColors.negroDAGRD,
                     fontFamily: 'Work Sans',
                     fontSize: 16,
                     fontStyle: FontStyle.normal,

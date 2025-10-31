@@ -10,9 +10,9 @@ class InfoNoteWidget extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
       decoration: BoxDecoration(
-        color: DAGRDColors.surfaceVariant,
+        color: ThemeColors.surfaceVariant,
         borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: DAGRDColors.outlineVariant, width: 1),
+        border: Border.all(color: ThemeColors.outlineVariant, width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -23,7 +23,7 @@ class InfoNoteWidget extends StatelessWidget {
                 TextSpan(
                   text: 'Nota: ',
                   style: TextStyle(
-                    color: DAGRDColors.azulSecundario,
+                    color: ThemeColors.azulSecundario,
                     fontFamily: 'Work Sans',
                     fontSize: 13,
                     fontStyle: FontStyle.normal,
@@ -35,7 +35,7 @@ class InfoNoteWidget extends StatelessWidget {
                   text:
                       'Máximo 3 imágenes permitidas. Cada imagen debe ser georreferenciada.',
                   style: TextStyle(
-                    color: DAGRDColors.azulSecundario,
+                    color: ThemeColors.azulSecundario,
                     fontFamily: 'Work Sans',
                     fontSize: 13,
                     fontStyle: FontStyle.normal,

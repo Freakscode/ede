@@ -20,7 +20,7 @@ class RatingResultsScreen extends StatelessWidget {
                 'Metodología de Análisis del Riesgo',
                 textAlign: TextAlign.center,
                 style: const TextStyle(
-                  color: DAGRDColors.azulDAGRD,
+                  color: ThemeColors.azulDAGRD,
                   fontFamily: 'Work Sans',
                   fontSize: 20,
                   fontStyle: FontStyle.normal,

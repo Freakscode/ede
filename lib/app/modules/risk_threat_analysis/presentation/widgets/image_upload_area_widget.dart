@@ -19,9 +19,9 @@ class ImageUploadAreaWidget extends StatelessWidget {
       width: double.infinity,
       height: 120,
       decoration: BoxDecoration(
-        color: DAGRDColors.surface,
+        color: ThemeColors.surface,
         border: Border.all(
-          color: DAGRDColors.outlineVariant,
+          color: ThemeColors.outlineVariant,
           width: 1,
           style: BorderStyle.solid,
         ),
@@ -63,7 +63,7 @@ class ImageUploadAreaWidget extends StatelessWidget {
               width: 46,
               height: 46,
               colorFilter: const ColorFilter.mode(
-                DAGRDColors.grisMedio,
+                ThemeColors.grisMedio,
                 BlendMode.srcIn,
               ),
             ),
@@ -72,7 +72,7 @@ class ImageUploadAreaWidget extends StatelessWidget {
               label,
               textAlign: TextAlign.center,
               style: const TextStyle(
-                color: DAGRDColors.grisMedio,
+                color: ThemeColors.grisMedio,
                 fontFamily: 'Work Sans',
                 fontSize: 13,
                 fontStyle: FontStyle.normal,

@@ -210,7 +210,7 @@ class _InspectionFormWidgetState extends State<InspectionFormWidget> {
             child: Text(
               error,
               style: const TextStyle(
-                color: DAGRDColors.error,
+                color: ThemeColors.error,
                 fontFamily: 'Work Sans',
                 fontSize: 12,
               ),

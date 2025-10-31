@@ -39,7 +39,7 @@ class ResultsRiskSectionWidget extends StatelessWidget {
               horizontal: 20,
             ),
             decoration: BoxDecoration(
-              color: isEnabled ? DAGRDColors.amarDAGRD : DAGRDColors.outline,
+              color: isEnabled ? ThemeColors.amarDAGRD : ThemeColors.outline,
               borderRadius: BorderRadius.circular(8),
             ),
             child: Row(
@@ -49,7 +49,7 @@ class ResultsRiskSectionWidget extends StatelessWidget {
                   height: 48,
                   padding: const EdgeInsets.all(9.882),
                   decoration: BoxDecoration(
-                    color: isEnabled ? DAGRDColors.azulDAGRD : DAGRDColors.outlineVariant,
+                    color: isEnabled ? ThemeColors.azulDAGRD : ThemeColors.outlineVariant,
                     borderRadius: BorderRadius.circular(24),
                   ),
                   child: SvgPicture.asset(
@@ -57,7 +57,7 @@ class ResultsRiskSectionWidget extends StatelessWidget {
                     width: 24.707,
                     height: 22.059,
                     colorFilter: ColorFilter.mode(
-                      isEnabled ? DAGRDColors.amarDAGRD : DAGRDColors.onSurfaceVariant,
+                      isEnabled ? ThemeColors.amarDAGRD : ThemeColors.onSurfaceVariant,
                       BlendMode.srcIn,
                     ),
                   ),
@@ -71,7 +71,7 @@ class ResultsRiskSectionWidget extends StatelessWidget {
                         'Resultados Riesgo',
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          color: isEnabled ? const Color(0xFF1E1E1E) : DAGRDColors.onSurfaceVariant,
+                          color: isEnabled ? const Color(0xFF1E1E1E) : ThemeColors.onSurfaceVariant,
                           fontFamily: 'Work Sans',
                           fontSize: 18,
                           fontStyle: FontStyle.normal,
@@ -83,7 +83,7 @@ class ResultsRiskSectionWidget extends StatelessWidget {
                         selectedEvent,
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          color: isEnabled ? const Color(0xFF1E1E1E) : DAGRDColors.onSurfaceVariant,
+                          color: isEnabled ? const Color(0xFF1E1E1E) : ThemeColors.onSurfaceVariant,
                           fontFamily: 'Work Sans',
                           fontSize: 18,
                           fontStyle: FontStyle.normal,

@@ -10,11 +10,11 @@ class LinesPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final p = Paint()
-      ..color = DAGRDColors.amarDAGRD
+      ..color = ThemeColors.amarDAGRD
       ..strokeWidth = 2
       ..style = PaintingStyle.stroke;
 
-    final dot = Paint()..color = DAGRDColors.amarDAGRD;
+    final dot = Paint()..color = ThemeColors.amarDAGRD;
 
     for (final line in lines) {
       canvas.drawLine(line.from, line.to, p);

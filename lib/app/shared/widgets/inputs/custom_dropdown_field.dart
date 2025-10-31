@@ -27,7 +27,7 @@ class CustomDropdownField<T> extends StatelessWidget {
         Text(
           label,
           style: const TextStyle(
-            color: DAGRDColors.azulDAGRD,
+            color: ThemeColors.azulDAGRD,
             fontFamily: 'Work Sans',
             fontSize: 12,
             fontWeight: FontWeight.w500,
@@ -54,7 +54,7 @@ class CustomDropdownField<T> extends StatelessWidget {
           }).toList(),
           onChanged: onChanged,
           validator: validator,
-          dropdownColor: DAGRDColors.blancoDAGRD,
+          dropdownColor: ThemeColors.blancoDAGRD,
           menuMaxHeight: 200,
           decoration: InputDecoration(
             hintText: value == null ? 'Seleccione una opción' : null,
@@ -65,27 +65,27 @@ class CustomDropdownField<T> extends StatelessWidget {
               fontWeight: FontWeight.w400,
             ),
             filled: true,
-            fillColor: DAGRDColors.blancoDAGRD,
+            fillColor: ThemeColors.blancoDAGRD,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: DAGRDColors.grisMedio, width: 1),
+              borderSide: const BorderSide(color: ThemeColors.grisMedio, width: 1),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: DAGRDColors.grisMedio, width: 1),
+              borderSide: const BorderSide(color: ThemeColors.grisMedio, width: 1),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: DAGRDColors.azulDAGRD, width: 2),
+              borderSide: const BorderSide(color: ThemeColors.azulDAGRD, width: 2),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: DAGRDColors.error, width: 1),
+              borderSide: const BorderSide(color: ThemeColors.error, width: 1),
             ),
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             suffixIcon: const Icon(
               Icons.keyboard_arrow_down,
-              color: DAGRDColors.grisMedio,
+              color: ThemeColors.grisMedio,
             ),
           ),
         ),

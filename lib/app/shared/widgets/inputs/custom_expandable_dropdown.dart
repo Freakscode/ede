@@ -108,7 +108,7 @@ class _CustomExpandableDropdownState<T>
           border: !isLast
               ? Border(
                   bottom: BorderSide(
-                    color: DAGRDColors.grisMedio.withOpacity(0.3),
+                    color: ThemeColors.grisMedio.withOpacity(0.3),
                     width: 0.5,
                   ),
                 )
@@ -136,7 +136,7 @@ class _CustomExpandableDropdownState<T>
         Text(
           widget.label,
           style: const TextStyle(
-            color: DAGRDColors.azulDAGRD,
+            color: ThemeColors.azulDAGRD,
             fontFamily: 'Work Sans',
             fontSize: 12,
             fontWeight: FontWeight.w500,
@@ -155,8 +155,8 @@ class _CustomExpandableDropdownState<T>
             child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             decoration: BoxDecoration(
-              color: DAGRDColors.blancoDAGRD,
-              border: Border.all(color: DAGRDColors.grisMedio, width: 1),
+              color: ThemeColors.blancoDAGRD,
+              border: Border.all(color: ThemeColors.grisMedio, width: 1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Row(
@@ -183,7 +183,7 @@ class _CustomExpandableDropdownState<T>
                   duration: Duration(milliseconds: _animationDuration.round()),
                   child: Icon(
                     Icons.keyboard_arrow_down,
-                    color: DAGRDColors.grisMedio,
+                    color: ThemeColors.grisMedio,
                     size: 20,
                   ),
                 ),
@@ -200,7 +200,7 @@ class _CustomExpandableDropdownState<T>
             child: Text(
               _errorText!,
               style: const TextStyle(
-                color: DAGRDColors.error,
+                color: ThemeColors.error,
                 fontFamily: 'Work Sans',
                 fontSize: 12,
               ),
@@ -217,8 +217,8 @@ class _CustomExpandableDropdownState<T>
                     maxHeight: _maxDropdownHeight,
                   ),
                   decoration: BoxDecoration(
-                    color: DAGRDColors.blancoDAGRD,
-                    border: Border.all(color: DAGRDColors.grisMedio, width: 1),
+                    color: ThemeColors.blancoDAGRD,
+                    border: Border.all(color: ThemeColors.grisMedio, width: 1),
                     borderRadius: BorderRadius.circular(8),
                     boxShadow: [
                       BoxShadow(

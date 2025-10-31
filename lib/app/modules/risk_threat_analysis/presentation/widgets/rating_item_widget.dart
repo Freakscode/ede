@@ -36,13 +36,13 @@ class _RatingItemWidgetState extends State<RatingItemWidget> {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           decoration: BoxDecoration(
             color: (isUnrated || isNotApplicable)
-                ? DAGRDColors.surfaceVariant
-                : DAGRDColors.surface,
+                ? ThemeColors.surfaceVariant
+                : ThemeColors.surface,
             border: Border(
               bottom: BorderSide(
                 color: widget.isLastItem
                     ? Colors.transparent
-                    : DAGRDColors.outline,
+                    : ThemeColors.outline,
                 width: 1,
               ),
             ),
@@ -62,8 +62,8 @@ class _RatingItemWidgetState extends State<RatingItemWidget> {
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: isUnrated
-                          ? DAGRDColors.blancoDAGRD
-                          : DAGRDColors.negroDAGRD,
+                          ? ThemeColors.blancoDAGRD
+                          : ThemeColors.negroDAGRD,
                       fontFamily: 'Work Sans',
                       fontSize: isNotApplicable ? 16 : 20,
                       fontStyle: FontStyle.normal,
@@ -78,7 +78,7 @@ class _RatingItemWidgetState extends State<RatingItemWidget> {
                 child: Text(
                   widget.title,
                   style: const TextStyle(
-                    color: DAGRDColors.negroDAGRD,
+                    color: ThemeColors.negroDAGRD,
                     fontFamily: 'Work Sans',
                     fontSize: 15,
                     fontStyle: FontStyle.normal,
@@ -97,7 +97,7 @@ class _RatingItemWidgetState extends State<RatingItemWidget> {
                   _isExpanded
                       ? Icons.keyboard_arrow_up
                       : Icons.keyboard_arrow_down,
-                  color: DAGRDColors.grisMedio,
+                  color: ThemeColors.grisMedio,
                   size: 24,
                 ),
               ),
@@ -114,7 +114,7 @@ class _RatingItemWidgetState extends State<RatingItemWidget> {
                 ...widget.detailedItems!
                     .map((item) => _buildDetailItem(item))
                     .toList(),
-                Divider(color: DAGRDColors.outline, height: 1),
+                Divider(color: ThemeColors.outline, height: 1),
               ],
             ),
           ),

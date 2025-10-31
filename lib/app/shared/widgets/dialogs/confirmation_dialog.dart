@@ -113,7 +113,7 @@ class ConfirmationDialog extends StatelessWidget {
         return SvgPicture.asset(
           AppIcons.info,
           colorFilter: ColorFilter.mode(
-            DAGRDColors.azulDAGRD,
+            ThemeColors.azulDAGRD,
             BlendMode.srcIn,
           ),
         );      

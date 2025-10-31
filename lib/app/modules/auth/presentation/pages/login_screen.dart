@@ -53,7 +53,7 @@ class _LoginScreenState extends State<LoginScreen> {
           return Scaffold(
             backgroundColor: theme.colorScheme.surface,
             appBar: AppBar(
-              backgroundColor: DAGRDColors.azulDAGRD,
+              backgroundColor: ThemeColors.azulDAGRD,
               elevation: 0,
               automaticallyImplyLeading: false,
               toolbarHeight: 80,
@@ -97,7 +97,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       width: 38,
                       height: 38,
                       decoration: const BoxDecoration(
-                        color: DAGRDColors.amarDAGRD,
+                        color: ThemeColors.amarDAGRD,
                         shape: BoxShape.circle,
                       ),
                       child: Center(
@@ -105,7 +105,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           AppIcons.arrowLeft,
                           width: 26,
                           height: 26,
-                          color: DAGRDColors.azulDAGRD,
+                          color: ThemeColors.azulDAGRD,
                         ),
                       ),
                     ),
@@ -130,7 +130,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             Text(
                               'INICIAR SESIÓN',
                               style: theme.textTheme.titleLarge?.copyWith(
-                                color: DAGRDColors.azulDAGRD,
+                                color: ThemeColors.azulDAGRD,
                                 fontFamily: 'Roboto',
                                 fontSize: 24,
                                 fontWeight: FontWeight.w600,
@@ -148,7 +148,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             Text(
                               'Inicie sesión para gestión de datos usuario DAGRD',
                               style: theme.textTheme.titleMedium?.copyWith(
-                                color: DAGRDColors.azulDAGRD,
+                                color: ThemeColors.azulDAGRD,
                                 fontFamily: 'Roboto',
                                 fontSize: 20,
                                 fontWeight: FontWeight.w400,
@@ -289,7 +289,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 child: Text(
                                   '¿Olvidaste la contraseña?',
                                   style: TextStyle(
-                                    color: DAGRDColors.azulDAGRD,
+                                    color: ThemeColors.azulDAGRD,
                                     fontFamily: 'Roboto',
                                     fontSize: 13,
                                     fontWeight: FontWeight.w500,
@@ -327,7 +327,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   width: double.infinity,
                   height: 110,
                   decoration: BoxDecoration(
-                    color: DAGRDColors.azulDAGRD,
+                    color: ThemeColors.azulDAGRD,
                     borderRadius: const BorderRadius.vertical(
                       top: Radius.circular(24),
                     ),

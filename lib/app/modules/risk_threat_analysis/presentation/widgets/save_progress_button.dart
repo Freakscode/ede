@@ -44,7 +44,7 @@ class SaveProgressButton extends StatelessWidget {
               width: 20,
               height: 20,
               colorFilter: const ColorFilter.mode(
-                DAGRDColors.blancoDAGRD,
+                ThemeColors.blancoDAGRD,
                 BlendMode.srcIn,
               ),
             ),
@@ -52,7 +52,7 @@ class SaveProgressButton extends StatelessWidget {
               text ?? 'Guardar avance',
               textAlign: TextAlign.center,
               style: const TextStyle(
-                color: DAGRDColors.blancoDAGRD, // #FFF
+                color: ThemeColors.blancoDAGRD, // #FFF
                 fontFamily: 'Work Sans',
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
@@ -60,7 +60,7 @@ class SaveProgressButton extends StatelessWidget {
               ),
             ),
             style: ElevatedButton.styleFrom(
-              backgroundColor: DAGRDColors.azulSecundario,
+              backgroundColor: ThemeColors.azulSecundario,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),

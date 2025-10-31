@@ -82,7 +82,7 @@ class _RatingScreenState extends State<RatingScreen> {
                 'Metodología de Análisis del Riesgo',
                 textAlign: TextAlign.center,
                 style: const TextStyle(
-                  color: DAGRDColors.azulDAGRD,
+                  color: ThemeColors.azulDAGRD,
                   fontFamily: 'Work Sans',
                   fontSize: 20,
                   fontStyle: FontStyle.normal,
@@ -105,7 +105,7 @@ class _RatingScreenState extends State<RatingScreen> {
                     title: Text(
                       subtitle,
                       style: const TextStyle(
-                        color: DAGRDColors.grisMedio,
+                        color: ThemeColors.grisMedio,
                         fontFamily: 'Work Sans',
                         fontSize: 18,
                         fontStyle: FontStyle.normal,
@@ -118,7 +118,7 @@ class _RatingScreenState extends State<RatingScreen> {
                       width: 30,
                       height: 30,
                       colorFilter: ColorFilter.mode(
-                        DAGRDColors.amarDAGRD,
+                        ThemeColors.amarDAGRD,
                         BlendMode.srcIn,
                       ),
                     ),
@@ -136,7 +136,7 @@ class _RatingScreenState extends State<RatingScreen> {
                   return CustomElevatedButton(
                     text: buttonText,
                     onPressed: () {}, // Solo informativo, no hace nada
-                    backgroundColor: DAGRDColors.azulDAGRD,
+                    backgroundColor: ThemeColors.azulDAGRD,
                     textColor: Colors.white,
                     fontSize: 18,
                     fontWeight: FontWeight.w500,
@@ -196,9 +196,9 @@ class _RatingScreenState extends State<RatingScreen> {
                 height: 44,
                 padding: const EdgeInsets.fromLTRB(20, 10, 10, 10),
                 decoration: BoxDecoration(
-                  border: Border.all(color: DAGRDColors.azulSecundario),
+                  border: Border.all(color: ThemeColors.azulSecundario),
                   borderRadius: BorderRadius.circular(6),
-                  color: DAGRDColors.surfaceVariant, // background: #EFF6FF
+                  color: ThemeColors.surfaceVariant, // background: #EFF6FF
                 ),
                 child: InkWell(
                   onTap: () {
@@ -212,7 +212,7 @@ class _RatingScreenState extends State<RatingScreen> {
                         width: 20,
                         height: 20,
                         colorFilter: const ColorFilter.mode(
-                          DAGRDColors.azulSecundario,
+                          ThemeColors.azulSecundario,
                           BlendMode.srcIn,
                         ),
                       ),
@@ -227,7 +227,7 @@ class _RatingScreenState extends State<RatingScreen> {
                             return Text(
                               displayText,
                               style: const TextStyle(
-                                color: DAGRDColors.azulSecundario,
+                                color: ThemeColors.azulSecundario,
                                 fontFamily: 'Work Sans',
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
@@ -243,7 +243,7 @@ class _RatingScreenState extends State<RatingScreen> {
                         width: 20,
                         height: 20,
                         colorFilter: const ColorFilter.mode(
-                          DAGRDColors.azulSecundario,
+                          ThemeColors.azulSecundario,
                           BlendMode.srcIn,
                         ),
                       ),
@@ -274,7 +274,7 @@ class _RatingScreenState extends State<RatingScreen> {
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
-                            color: DAGRDColors.azulDAGRD,
+                            color: ThemeColors.azulDAGRD,
                             fontFamily: 'Work Sans',
                             fontSize: 16,
                             fontWeight: FontWeight.w500,

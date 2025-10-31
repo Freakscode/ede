@@ -85,7 +85,7 @@ class RiskCategoriesContainer extends StatelessWidget {
           width: 18,
           height: 17,
           colorFilter: const ColorFilter.mode(
-            DAGRDColors.azulSecundario, // Azul informativo
+            ThemeColors.azulSecundario, // Azul informativo
             BlendMode.srcIn,
           ),
         ),

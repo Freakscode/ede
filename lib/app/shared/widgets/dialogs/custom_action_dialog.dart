@@ -154,7 +154,7 @@ class CustomActionDialog extends StatelessWidget {
                       ),
                     ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: rightButtonColor ?? DAGRDColors.azulDAGRD,
+                      backgroundColor: rightButtonColor ?? ThemeColors.azulDAGRD,
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(4),
@@ -222,7 +222,7 @@ class CustomActionDialog extends StatelessWidget {
       message:
           '¿Está seguro que desea finalizar el formulario para la categoría de $category?',
       iconText: 'T',
-      iconColor: DAGRDColors.azulDAGRD,
+      iconColor: ThemeColors.azulDAGRD,
       showIconBorder: true,
       leftButtonText: 'Revisar',
       leftButtonIcon: Icons.edit,

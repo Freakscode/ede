@@ -25,10 +25,10 @@ class RiskMatrixWidget extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              _buildLegendItem('BAJO', DAGRDColors.nivelBajo),
-              _buildLegendItem('MEDIO\nBAJO', DAGRDColors.nivelMedioBajo),
-              _buildLegendItem('MEDIO\nALTO', DAGRDColors.nivelMedioAlto),
-              _buildLegendItem('ALTO', DAGRDColors.nivelAlto),
+              _buildLegendItem('BAJO', ThemeColors.nivelBajo),
+              _buildLegendItem('MEDIO\nBAJO', ThemeColors.nivelMedioBajo),
+              _buildLegendItem('MEDIO\nALTO', ThemeColors.nivelMedioAlto),
+              _buildLegendItem('ALTO', ThemeColors.nivelAlto),
             ],
           ),
           
@@ -76,7 +76,7 @@ class RiskMatrixWidget extends StatelessWidget {
                           'Amenaza',
                           textAlign: TextAlign.center,
                           style: const TextStyle(
-                            color: DAGRDColors.negroDAGRD,
+                            color: ThemeColors.negroDAGRD,
                             fontFamily: 'Work Sans',
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
@@ -133,7 +133,7 @@ class RiskMatrixWidget extends StatelessWidget {
                     'Vulnerabilidad',
                     textAlign: TextAlign.center,
                     style: const TextStyle(
-                      color: DAGRDColors.negroDAGRD,
+                      color: ThemeColors.negroDAGRD,
                       fontFamily: 'Work Sans',
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
@@ -263,7 +263,7 @@ class RiskMatrixWidget extends StatelessWidget {
           text,
           textAlign: TextAlign.center,
           style: const TextStyle(
-            color: DAGRDColors.negroDAGRD, // Textos
+            color: ThemeColors.negroDAGRD, // Textos
             fontFamily: 'Work Sans',
             fontSize: 12,
             fontWeight: FontWeight.w600,
@@ -292,7 +292,7 @@ class HeatmapPainter extends CustomPainter {
       )
       ..close();
     
-    canvas.drawPath(pathVerde, Paint()..color = DAGRDColors.nivelBajo);
+    canvas.drawPath(pathVerde, Paint()..color = ThemeColors.nivelBajo);
     
     // Amarillo - banda central amplia
     final pathAmarillo = Path()
@@ -312,7 +312,7 @@ class HeatmapPainter extends CustomPainter {
       ..lineTo(0, 0)
       ..close();
     
-    canvas.drawPath(pathAmarillo, Paint()..color = DAGRDColors.nivelMedioBajo);
+    canvas.drawPath(pathAmarillo, Paint()..color = ThemeColors.nivelMedioBajo);
     
     // Naranja - banda superior
     final pathNaranja = Path()
@@ -330,7 +330,7 @@ class HeatmapPainter extends CustomPainter {
       )
       ..close();
     
-    canvas.drawPath(pathNaranja, Paint()..color = DAGRDColors.nivelMedioAlto);
+    canvas.drawPath(pathNaranja, Paint()..color = ThemeColors.nivelMedioAlto);
     
     // Rojo - esquina superior derecha
     final pathRojo = Path()
@@ -343,7 +343,7 @@ class HeatmapPainter extends CustomPainter {
       ..lineTo(w, 0)
       ..close();
     
-    canvas.drawPath(pathRojo, Paint()..color = DAGRDColors.nivelAlto);
+    canvas.drawPath(pathRojo, Paint()..color = ThemeColors.nivelAlto);
   }
 
   @override

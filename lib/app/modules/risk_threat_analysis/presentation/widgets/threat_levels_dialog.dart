@@ -50,7 +50,7 @@ class ThreatLevelsDialog extends StatelessWidget {
                     Text(
                       title,
                       style: const TextStyle(
-                        color: DAGRDColors.negroDAGRD,
+                        color: ThemeColors.negroDAGRD,
                         fontFamily: 'Work Sans',
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
@@ -60,7 +60,7 @@ class ThreatLevelsDialog extends StatelessWidget {
                       onPressed: () => Navigator.of(context).pop(),
                       icon: const Icon(
                         Icons.close,
-                        color: DAGRDColors.negroDAGRD,
+                        color: ThemeColors.negroDAGRD,
                         size: 24,
                       ),
                     ),
@@ -106,7 +106,7 @@ class ThreatLevelsDialog extends StatelessWidget {
           Text(
             title,
             style: const TextStyle(
-              color: DAGRDColors.negroDAGRD,
+              color: ThemeColors.negroDAGRD,
               fontFamily: 'Work Sans',
               fontSize: 18,
               fontWeight: FontWeight.w600,
@@ -125,7 +125,7 @@ class ThreatLevelsDialog extends StatelessWidget {
                 color: level.backgroundColor,
                 borderRadius: BorderRadius.circular(6),
                 border: Border.all(
-                  color: DAGRDColors.outlineVariant, 
+                  color: ThemeColors.outlineVariant, 
                   width: 1,
                 ),
               ),
@@ -139,7 +139,7 @@ class ThreatLevelsDialog extends StatelessWidget {
                       child: Text(
                         level.title,
                         style: const TextStyle(
-                          color: DAGRDColors.negroDAGRD,
+                          color: ThemeColors.negroDAGRD,
                           fontFamily: 'Work Sans',
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
@@ -163,7 +163,7 @@ class ThreatLevelsDialog extends StatelessWidget {
                     child: Text(
                       level.description,
                       style: const TextStyle(
-                        color: DAGRDColors.negroDAGRD,
+                        color: ThemeColors.negroDAGRD,
                         fontFamily: 'Work Sans',
                         fontSize: 12,
                         fontWeight: FontWeight.w400,
@@ -184,22 +184,22 @@ class ThreatLevelsDialog extends StatelessWidget {
     return [
       LevelInfo(
         title: 'BAJO',
-        backgroundColor: DAGRDColors.nivelBajo,
+        backgroundColor: ThemeColors.nivelBajo,
         description: 'Las características del escenario sugieren que la probabilidad de que se presente el evento es mínima, pero en caso de materializarse, éste no tiene potencial para generar impactos negativos sobre los elementos expuestos.',
       ),
       LevelInfo(
         title: 'MEDIO - BAJO',
-        backgroundColor: DAGRDColors.nivelMedioBajo,
+        backgroundColor: ThemeColors.nivelMedioBajo,
         description: 'Las características del escenario sugieren que es poco probable que se presente el evento, pero en caso de materializarse, éste tiene poco potencial para generar impactos negativos sobre los elementos expuestos.',
       ),
       LevelInfo(
         title: 'MEDIO - ALTO',
-        backgroundColor: DAGRDColors.nivelMedioAlto,
+        backgroundColor: ThemeColors.nivelMedioAlto,
         description: 'Las características del escenario sugieren la probabilidad de que se presente el evento, así que, en caso de materializarse, éste tiene potencial para generar impactos negativos sobre los elementos expuestos.',
       ),
       LevelInfo(
         title: 'ALTO',
-        backgroundColor: DAGRDColors.nivelAlto,
+        backgroundColor: ThemeColors.nivelAlto,
         description: 'Las características del escenario sugieren que la probabilidad de que se presente el evento es muy alta, además éste tiene gran potencial para generar impactos negativos sobre los elementos expuestos.',
       ),
     ];
@@ -209,22 +209,22 @@ class ThreatLevelsDialog extends StatelessWidget {
     return [
       LevelInfo(
         title: 'BAJO',
-        backgroundColor: DAGRDColors.nivelBajo,
+        backgroundColor: ThemeColors.nivelBajo,
         description: 'Las características del escenario sugieren que los elementos expuestos tienen una capacidad de resistencia alta y baja susceptibilidad ante el evento.',
       ),
       LevelInfo(
         title: 'MEDIO - BAJO',
-        backgroundColor: DAGRDColors.nivelMedioBajo,
+        backgroundColor: ThemeColors.nivelMedioBajo,
         description: 'Las características del escenario sugieren que los elementos expuestos tienen una capacidad de resistencia moderada y susceptibilidad media-baja ante el evento.',
       ),
       LevelInfo(
         title: 'MEDIO - ALTO',
-        backgroundColor: DAGRDColors.nivelMedioAlto,
+        backgroundColor: ThemeColors.nivelMedioAlto,
         description: 'Las características del escenario sugieren que los elementos expuestos tienen una capacidad de resistencia baja y susceptibilidad media-alta ante el evento.',
       ),
       LevelInfo(
         title: 'ALTO',
-        backgroundColor: DAGRDColors.nivelAlto,
+        backgroundColor: ThemeColors.nivelAlto,
         description: 'Las características del escenario sugieren que los elementos expuestos tienen una capacidad de resistencia muy baja y alta susceptibilidad ante el evento.',
       ),
     ];

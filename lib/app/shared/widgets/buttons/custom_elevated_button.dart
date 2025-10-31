@@ -33,7 +33,7 @@ class CustomElevatedButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: backgroundColor ?? DAGRDColors.amarDAGRD, // background: var(--AmarDAGRD, #FC0)
+          backgroundColor: backgroundColor ?? ThemeColors.amarDAGRD, // background: var(--AmarDAGRD, #FC0)
           foregroundColor: textColor ?? const Color(0xFF1E1E1E), // color: var(--Textos, #1E1E1E)
           padding: padding ?? const EdgeInsets.symmetric(horizontal: 10, vertical: 8), // padding: 8px 10px
           shape: RoundedRectangleBorder(

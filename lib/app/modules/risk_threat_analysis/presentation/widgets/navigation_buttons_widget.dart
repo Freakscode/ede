@@ -63,14 +63,14 @@ class NavigationButtonsWidget extends StatelessWidget {
             children: [
               const Icon(
                 Icons.arrow_back_ios,
-                color: DAGRDColors.negroDAGRD,
+                color: ThemeColors.negroDAGRD,
                 size: 18,
               ),
               const SizedBox(width: 8),
               const Text(
                 'Volver',
                 style: TextStyle(
-                  color: DAGRDColors.negroDAGRD,
+                  color: ThemeColors.negroDAGRD,
                   fontFamily: 'Work Sans',
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
@@ -97,7 +97,7 @@ class NavigationButtonsWidget extends StatelessWidget {
                 const Text(
                   'Continuar',
                   style: TextStyle(
-                    color: DAGRDColors.negroDAGRD,
+                    color: ThemeColors.negroDAGRD,
                     fontFamily: 'Work Sans',
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -107,7 +107,7 @@ class NavigationButtonsWidget extends StatelessWidget {
                 const SizedBox(width: 8),
                 const Icon(
                   Icons.arrow_forward_ios,
-                  color: DAGRDColors.negroDAGRD,
+                  color: ThemeColors.negroDAGRD,
                   size: 18,
                 ),
               ],
@@ -545,7 +545,7 @@ class NavigationButtonsWidget extends StatelessWidget {
                     vertical: 8,
                   ),
                   decoration: BoxDecoration(
-                    color: DAGRDColors.azulDAGRD,
+                    color: ThemeColors.azulDAGRD,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
@@ -553,7 +553,7 @@ class NavigationButtonsWidget extends StatelessWidget {
                     children: [
                       const Icon(
                         Icons.check_circle_outline,
-                        color: DAGRDColors.blancoDAGRD,
+                        color: ThemeColors.blancoDAGRD,
                         size: 18,
                       ),
                       const SizedBox(width: 10),
@@ -561,7 +561,7 @@ class NavigationButtonsWidget extends StatelessWidget {
                         'Finalizar formulario',
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          color: DAGRDColors.blancoDAGRD,
+                          color: ThemeColors.blancoDAGRD,
                           fontFamily: 'Work Sans',
                           fontSize: 14,
                           fontStyle: FontStyle.normal,

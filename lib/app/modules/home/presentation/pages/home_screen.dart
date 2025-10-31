@@ -236,8 +236,8 @@ class HomeScreen extends StatelessWidget {
                               icon: const Icon(Icons.home),
                               label: const Text('Volver al inicio'),
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: DAGRDColors.azulDAGRD,
-                                foregroundColor: DAGRDColors.blancoDAGRD,
+                                backgroundColor: ThemeColors.azulDAGRD,
+                                foregroundColor: ThemeColors.blancoDAGRD,
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 24,
                                   vertical: 12,
@@ -274,10 +274,10 @@ class HomeScreen extends StatelessWidget {
                     iconAsset: AppIcons.gear,
                   ),
                 ],
-                backgroundColor: DAGRDColors.azulDAGRD,
-                selectedColor: DAGRDColors.blancoDAGRD,
+                backgroundColor: ThemeColors.azulDAGRD,
+                selectedColor: ThemeColors.blancoDAGRD,
                 unselectedColor: Colors.white60,
-                selectedIconBgColor: DAGRDColors.blancoDAGRD,
+                selectedIconBgColor: ThemeColors.blancoDAGRD,
               ),
             );
           },

@@ -237,7 +237,7 @@ class _RiskThreatAnalysisScreenState extends State<RiskThreatAnalysisScreen> {
                       iconAsset: AppIcons.hoja,
                     ),
                   ],
-                  backgroundColor: DAGRDColors.azulDAGRD,
+                  backgroundColor: ThemeColors.azulDAGRD,
                   selectedColor: Colors.white,
                   unselectedColor: Colors.white60,
                   selectedIconBgColor: Colors.white,

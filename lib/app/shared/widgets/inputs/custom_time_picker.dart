@@ -27,7 +27,7 @@ class CustomTimePicker extends StatelessWidget {
         Text(
           label,
           style: const TextStyle(
-            color: DAGRDColors.azulDAGRD,
+            color: ThemeColors.azulDAGRD,
             fontFamily: 'Work Sans',
             fontSize: 12,
             fontWeight: FontWeight.w500,
@@ -40,11 +40,11 @@ class CustomTimePicker extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             decoration: BoxDecoration(
-              color: DAGRDColors.blancoDAGRD,
+              color: ThemeColors.blancoDAGRD,
               border: Border.all(
                 color: errorMessage != null 
                     ? const Color(0xFFE53E3E) // Rojo para error
-                    : DAGRDColors.grisMedio, 
+                    : ThemeColors.grisMedio, 
                 width: 1
               ),
               borderRadius: BorderRadius.circular(8),
@@ -55,7 +55,7 @@ class CustomTimePicker extends StatelessWidget {
                   Icons.access_time,
                   color: errorMessage != null 
                       ? const Color(0xFFE53E3E) // Rojo para error
-                      : DAGRDColors.grisMedio,
+                      : ThemeColors.grisMedio,
                   size: 20,
                 ),
                 const SizedBox(width: 12),

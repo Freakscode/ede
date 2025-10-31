@@ -397,9 +397,9 @@ class _LocationDialogState extends State<LocationDialog> {
       margin: const EdgeInsets.symmetric(horizontal: 20),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
       decoration: BoxDecoration(
-        color: DAGRDColors.surfaceVariant,
+        color: ThemeColors.surfaceVariant,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: DAGRDColors.outline),
+        border: Border.all(color: ThemeColors.outline),
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(8),
@@ -554,7 +554,7 @@ class _LocationDialogState extends State<LocationDialog> {
             const Text(
               'Coordenadas actuales',
               style: TextStyle(
-                color: DAGRDColors.grisMedio,
+                color: ThemeColors.grisMedio,
                 fontFamily: 'Work Sans',
                 fontSize: 12,
                 fontStyle: FontStyle.normal,
@@ -566,7 +566,7 @@ class _LocationDialogState extends State<LocationDialog> {
             const Text(
               'Latitud',
               style: TextStyle(
-                color: DAGRDColors.azulDAGRD,
+                color: ThemeColors.azulDAGRD,
                 fontFamily: 'Work Sans',
                 fontSize: 12,
                 fontWeight: FontWeight.w500,
@@ -582,9 +582,9 @@ class _LocationDialogState extends State<LocationDialog> {
                   vertical: 10,
                 ),
                 decoration: BoxDecoration(
-                  color: DAGRDColors.blancoDAGRD,
+                  color: ThemeColors.blancoDAGRD,
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: DAGRDColors.grisMedio, width: 1),
+                  border: Border.all(color: ThemeColors.grisMedio, width: 1),
                 ),
                 child: Text(
                   _latController.text.isEmpty
@@ -606,7 +606,7 @@ class _LocationDialogState extends State<LocationDialog> {
             const Text(
               'Longitud',
               style: TextStyle(
-                color: DAGRDColors.azulDAGRD,
+                color: ThemeColors.azulDAGRD,
                 fontFamily: 'Work Sans',
                 fontSize: 12,
                 fontWeight: FontWeight.w500,
@@ -622,9 +622,9 @@ class _LocationDialogState extends State<LocationDialog> {
                   vertical: 10,
                 ),
                 decoration: BoxDecoration(
-                  color: DAGRDColors.blancoDAGRD,
+                  color: ThemeColors.blancoDAGRD,
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: DAGRDColors.grisMedio, width: 1),
+                  border: Border.all(color: ThemeColors.grisMedio, width: 1),
                 ),
                 child: Text(
                   _lngController.text.isEmpty
@@ -739,7 +739,7 @@ class _LocationDialogState extends State<LocationDialog> {
                       width: 40 + (value * 20),
                       height: 40 + (value * 20),
                       decoration: BoxDecoration(
-                        color: DAGRDColors.success.withOpacity(0.3),
+                        color: ThemeColors.success.withOpacity(0.3),
                         shape: BoxShape.circle,
                       ),
                     );
@@ -751,10 +751,10 @@ class _LocationDialogState extends State<LocationDialog> {
                 height: 50,
                 decoration: BoxDecoration(
                   color: isCurrentLocation
-                      ? DAGRDColors.success
-                      : DAGRDColors.azulDAGRD,
+                      ? ThemeColors.success
+                      : ThemeColors.azulDAGRD,
                   shape: BoxShape.circle,
-                  border: Border.all(color: DAGRDColors.blancoDAGRD, width: 3),
+                  border: Border.all(color: ThemeColors.blancoDAGRD, width: 3),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.3),
@@ -765,7 +765,7 @@ class _LocationDialogState extends State<LocationDialog> {
                 ),
                 child: Icon(
                   isCurrentLocation ? Icons.my_location : Icons.location_on,
-                  color: DAGRDColors.blancoDAGRD,
+                  color: ThemeColors.blancoDAGRD,
                   size: 28,
                 ),
               ),
@@ -816,7 +816,7 @@ class _LocationDialogState extends State<LocationDialog> {
             Text('Obteniendo ubicación GPS...'),
           ],
         ),
-        backgroundColor: DAGRDColors.azulDAGRD,
+        backgroundColor: ThemeColors.azulDAGRD,
         duration: const Duration(seconds: 3),
       ),
     );
@@ -856,7 +856,7 @@ class _LocationDialogState extends State<LocationDialog> {
             Text('Ubicación GPS obtenida exitosamente'),
           ],
         ),
-        backgroundColor: DAGRDColors.success,
+        backgroundColor: ThemeColors.success,
         duration: const Duration(seconds: 2),
       ),
     );

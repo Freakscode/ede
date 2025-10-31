@@ -133,7 +133,7 @@ class FormsInProgressDialog extends StatelessWidget {
                         onViewForms?.call();
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: DAGRDColors.azulDAGRD,
+                        backgroundColor: ThemeColors.azulDAGRD,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
@@ -179,7 +179,7 @@ class FormsInProgressDialog extends StatelessWidget {
                         onCreateNew?.call();
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: DAGRDColors.amarDAGRD,
+                        backgroundColor: ThemeColors.amarDAGRD,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),

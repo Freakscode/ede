@@ -7,7 +7,7 @@ import 'dagrd_colors.dart';
 /// Extensión para acceder a colores DAGRD desde el contexto
 extension DAGRDThemeExtension on BuildContext {
   /// Obtener colores DAGRD desde el tema
-  Type get dagrdColors => DAGRDColors;
+  Type get ThemeColors => ThemeColors;
   
   /// Obtener colores del esquema de colores
   ColorScheme get colorScheme => Theme.of(this).colorScheme;
@@ -23,39 +23,39 @@ extension DAGRDThemeExtension on BuildContext {
 extension DAGRDTextStyles on BuildContext {
   /// Estilo para títulos principales
   TextStyle get titleStyle => textTheme.titleLarge!.copyWith(
-    color: DAGRDColors.onSurface,
+    color: ThemeColors.onSurface,
     fontWeight: FontWeight.w600,
   );
   
   /// Estilo para subtítulos
   TextStyle get subtitleStyle => textTheme.titleMedium!.copyWith(
-    color: DAGRDColors.onSurfaceVariant,
+    color: ThemeColors.onSurfaceVariant,
     fontWeight: FontWeight.w500,
   );
   
   /// Estilo para texto del cuerpo
   TextStyle get bodyStyle => textTheme.bodyMedium!.copyWith(
-    color: DAGRDColors.onSurface,
+    color: ThemeColors.onSurface,
   );
   
   /// Estilo para texto secundario
   TextStyle get captionStyle => textTheme.bodySmall!.copyWith(
-    color: DAGRDColors.onSurfaceVariant,
+    color: ThemeColors.onSurfaceVariant,
   );
   
   /// Estilo para texto de error
   TextStyle get errorStyle => textTheme.bodyMedium!.copyWith(
-    color: DAGRDColors.error,
+    color: ThemeColors.error,
   );
   
   /// Estilo para texto de éxito
   TextStyle get successStyle => textTheme.bodyMedium!.copyWith(
-    color: DAGRDColors.success,
+    color: ThemeColors.success,
   );
   
   /// Estilo para texto de advertencia
   TextStyle get warningStyle => textTheme.bodyMedium!.copyWith(
-    color: DAGRDColors.warning,
+    color: ThemeColors.warning,
   );
 }
 
@@ -63,8 +63,8 @@ extension DAGRDTextStyles on BuildContext {
 extension DAGRDButtonStyles on BuildContext {
   /// Estilo para botón primario
   ButtonStyle get primaryButtonStyle => ElevatedButton.styleFrom(
-    backgroundColor: DAGRDColors.azulDAGRD,
-    foregroundColor: DAGRDColors.onPrimary,
+    backgroundColor: ThemeColors.azulDAGRD,
+    foregroundColor: ThemeColors.onPrimary,
     elevation: 2,
     padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
     shape: RoundedRectangleBorder(
@@ -74,8 +74,8 @@ extension DAGRDButtonStyles on BuildContext {
   
   /// Estilo para botón secundario
   ButtonStyle get secondaryButtonStyle => ElevatedButton.styleFrom(
-    backgroundColor: DAGRDColors.amarilloDAGRD,
-    foregroundColor: DAGRDColors.onSecondary,
+    backgroundColor: ThemeColors.amarilloDAGRD,
+    foregroundColor: ThemeColors.onSecondary,
     elevation: 2,
     padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
     shape: RoundedRectangleBorder(
@@ -85,14 +85,14 @@ extension DAGRDButtonStyles on BuildContext {
   
   /// Estilo para botón de texto
   ButtonStyle get textButtonStyle => TextButton.styleFrom(
-    foregroundColor: DAGRDColors.azulDAGRD,
+    foregroundColor: ThemeColors.azulDAGRD,
     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
   );
   
   /// Estilo para botón outlined
   ButtonStyle get outlinedButtonStyle => OutlinedButton.styleFrom(
-    foregroundColor: DAGRDColors.azulDAGRD,
-    side: const BorderSide(color: DAGRDColors.azulDAGRD),
+    foregroundColor: ThemeColors.azulDAGRD,
+    side: const BorderSide(color: ThemeColors.azulDAGRD),
     padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(8),
@@ -104,11 +104,11 @@ extension DAGRDButtonStyles on BuildContext {
 extension DAGRDCardStyles on BuildContext {
   /// Estilo para card estándar
   BoxDecoration get cardDecoration => BoxDecoration(
-    color: DAGRDColors.surface,
+    color: ThemeColors.surface,
     borderRadius: BorderRadius.circular(12),
     boxShadow: [
       BoxShadow(
-        color: DAGRDColors.grisOscuro.withOpacity(0.1),
+        color: ThemeColors.grisOscuro.withOpacity(0.1),
         blurRadius: 4,
         offset: const Offset(0, 2),
       ),
@@ -117,11 +117,11 @@ extension DAGRDCardStyles on BuildContext {
   
   /// Estilo para card elevada
   BoxDecoration get elevatedCardDecoration => BoxDecoration(
-    color: DAGRDColors.surface,
+    color: ThemeColors.surface,
     borderRadius: BorderRadius.circular(12),
     boxShadow: [
       BoxShadow(
-        color: DAGRDColors.grisOscuro.withOpacity(0.15),
+        color: ThemeColors.grisOscuro.withOpacity(0.15),
         blurRadius: 8,
         offset: const Offset(0, 4),
       ),
@@ -130,9 +130,9 @@ extension DAGRDCardStyles on BuildContext {
   
   /// Estilo para card con borde
   BoxDecoration get borderedCardDecoration => BoxDecoration(
-    color: DAGRDColors.surface,
+    color: ThemeColors.surface,
     borderRadius: BorderRadius.circular(12),
-    border: Border.all(color: DAGRDColors.outline),
+    border: Border.all(color: ThemeColors.outline),
   );
 }
 
@@ -141,22 +141,22 @@ extension DAGRDInputStyles on BuildContext {
   /// Decoración para input estándar
   InputDecoration get standardInputDecoration => InputDecoration(
     filled: true,
-    fillColor: DAGRDColors.surface,
+    fillColor: ThemeColors.surface,
     border: OutlineInputBorder(
       borderRadius: BorderRadius.circular(8),
-      borderSide: const BorderSide(color: DAGRDColors.outline),
+      borderSide: const BorderSide(color: ThemeColors.outline),
     ),
     enabledBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(8),
-      borderSide: const BorderSide(color: DAGRDColors.outline),
+      borderSide: const BorderSide(color: ThemeColors.outline),
     ),
     focusedBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(8),
-      borderSide: const BorderSide(color: DAGRDColors.azulDAGRD, width: 2),
+      borderSide: const BorderSide(color: ThemeColors.azulDAGRD, width: 2),
     ),
     errorBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(8),
-      borderSide: const BorderSide(color: DAGRDColors.error),
+      borderSide: const BorderSide(color: ThemeColors.error),
     ),
     contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
   );
@@ -165,7 +165,7 @@ extension DAGRDInputStyles on BuildContext {
   InputDecoration inputDecorationWithLabel(String label) => standardInputDecoration.copyWith(
     labelText: label,
     labelStyle: TextStyle(
-      color: DAGRDColors.onSurfaceVariant,
+      color: ThemeColors.onSurfaceVariant,
       fontSize: 14,
     ),
   );
@@ -174,7 +174,7 @@ extension DAGRDInputStyles on BuildContext {
   InputDecoration inputDecorationWithHint(String hint) => standardInputDecoration.copyWith(
     hintText: hint,
     hintStyle: TextStyle(
-      color: DAGRDColors.onSurfaceVariant,
+      color: ThemeColors.onSurfaceVariant,
       fontSize: 14,
     ),
   );
@@ -183,7 +183,7 @@ extension DAGRDInputStyles on BuildContext {
 /// Extensión para crear estilos de nivel de amenaza/vulnerabilidad
 extension DAGRDLevelStyles on BuildContext {
   /// Obtener color de nivel
-  Color getLevelColor(String nivel) => DAGRDColors.getNivelColor(nivel);
+  Color getLevelColor(String nivel) => ThemeColors.getNivelColor(nivel);
   
   /// Obtener estilo de texto para nivel
   TextStyle getLevelTextStyle(String nivel) => textTheme.bodyMedium!.copyWith(
@@ -201,7 +201,7 @@ extension DAGRDLevelStyles on BuildContext {
   /// Obtener decoración para botón de nivel
   ButtonStyle getLevelButtonStyle(String nivel) => ElevatedButton.styleFrom(
     backgroundColor: getLevelColor(nivel),
-    foregroundColor: DAGRDColors.getTextColorForBackground(getLevelColor(nivel)),
+    foregroundColor: ThemeColors.getTextColorForBackground(getLevelColor(nivel)),
     elevation: 2,
     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
     shape: RoundedRectangleBorder(

@@ -10,10 +10,10 @@ class RiskInfoContainer extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: DAGRDColors.surfaceVariant,
+        color: ThemeColors.surfaceVariant,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: DAGRDColors.azulSecundario.withOpacity(0.2),
+          color: ThemeColors.azulSecundario.withOpacity(0.2),
           width: 1,
         ),
       ),
@@ -24,14 +24,14 @@ class RiskInfoContainer extends StatelessWidget {
             children: [
               Icon(
                 Icons.info_outline,
-                color: DAGRDColors.azulSecundario,
+                color: ThemeColors.azulSecundario,
                 size: 20,
               ),
               const SizedBox(width: 8),
               const Text(
                 'Información del Análisis',
                 style: TextStyle(
-                  color: DAGRDColors.azulDAGRD,
+                  color: ThemeColors.azulDAGRD,
                   fontFamily: 'Work Sans',
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
@@ -43,7 +43,7 @@ class RiskInfoContainer extends StatelessWidget {
           const Text(
             'El análisis de riesgo se compone de dos categorías principales:',
             style: TextStyle(
-              color: DAGRDColors.grisOscuro,
+              color: ThemeColors.grisOscuro,
               fontFamily: 'Work Sans',
               fontSize: 14,
               fontWeight: FontWeight.w400,
@@ -68,7 +68,7 @@ class RiskInfoContainer extends StatelessWidget {
           height: 6,
           margin: const EdgeInsets.only(top: 6, right: 8),
           decoration: const BoxDecoration(
-            color: DAGRDColors.azulSecundario,
+            color: ThemeColors.azulSecundario,
             shape: BoxShape.circle,
           ),
         ),
@@ -76,7 +76,7 @@ class RiskInfoContainer extends StatelessWidget {
           child: RichText(
             text: TextSpan(
               style: const TextStyle(
-                color: DAGRDColors.grisOscuro,
+                color: ThemeColors.grisOscuro,
                 fontFamily: 'Work Sans',
                 fontSize: 14,
                 fontWeight: FontWeight.w400,

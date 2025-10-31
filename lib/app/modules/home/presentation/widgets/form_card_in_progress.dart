@@ -46,7 +46,7 @@ class FormCardInProgress extends StatelessWidget {
                 width: 24,
                 height: 24,
                 colorFilter: const ColorFilter.mode(
-                  DAGRDColors.azulDAGRD,
+                  ThemeColors.azulDAGRD,
                   BlendMode.srcIn,
                 ),
               ),
@@ -132,7 +132,7 @@ class FormCardInProgress extends StatelessWidget {
               const Text(
                 'Progreso',
                 style: TextStyle(
-                  color: DAGRDColors.azulDAGRD,
+                  color: ThemeColors.azulDAGRD,
                   fontFamily: 'Work Sans',
                   fontWeight: FontWeight.w500,
                   fontSize: 13,
@@ -229,7 +229,7 @@ class FormCardInProgress extends StatelessWidget {
             width: double.infinity,
             child: ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
-                backgroundColor: DAGRDColors.azulDAGRD,
+                backgroundColor: ThemeColors.azulDAGRD,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),

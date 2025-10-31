@@ -30,10 +30,10 @@ class CategoryCard extends StatelessWidget {
           vertical: _verticalPadding,
         ),
         decoration: BoxDecoration(
-          color: DAGRDColors.surface,
+          color: ThemeColors.surface,
           borderRadius: BorderRadius.circular(_borderRadius),
           border: Border.all(
-            color: DAGRDColors.outline,
+            color: ThemeColors.outline,
             width: _borderWidth,
           ),
           boxShadow: [
@@ -50,7 +50,7 @@ class CategoryCard extends StatelessWidget {
               child: Text(
                 title,
                 style: const TextStyle(
-                  color: DAGRDColors.azulDAGRD,
+                  color: ThemeColors.azulDAGRD,
                   fontFamily: 'Work Sans',
                   fontSize: 16,
                   fontWeight: FontWeight.w600,

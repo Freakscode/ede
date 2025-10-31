@@ -28,7 +28,7 @@ class FinalRiskResultsScreen extends StatelessWidget {
                 'Perfil del Riesgo',
                 textAlign: TextAlign.center,
                 style: const TextStyle(
-                  color: DAGRDColors.azulDAGRD,
+                  color: ThemeColors.azulDAGRD,
                   fontFamily: 'Work Sans',
                   fontSize: 20,
                   fontWeight: FontWeight.w600,
@@ -43,7 +43,7 @@ class FinalRiskResultsScreen extends StatelessWidget {
                 'Amenaza',
                 textAlign: TextAlign.center,
                 style: const TextStyle(
-                  color: DAGRDColors.azulDAGRD, // AzulDAGRD
+                  color: ThemeColors.azulDAGRD, // AzulDAGRD
                   fontFamily: 'Work Sans',
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
@@ -75,7 +75,7 @@ class FinalRiskResultsScreen extends StatelessWidget {
                 'Vulnerabilidad',
                 textAlign: TextAlign.center,
                 style: const TextStyle(
-                  color: DAGRDColors.azulDAGRD, // AzulDAGRD
+                  color: ThemeColors.azulDAGRD, // AzulDAGRD
                   fontFamily: 'Work Sans',
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
@@ -229,13 +229,13 @@ class FinalRiskResultsScreen extends StatelessWidget {
             const Icon(
               Icons.arrow_back_ios,
               size: 16,
-              color: DAGRDColors.azulSecundario, // Azul informativo
+              color: ThemeColors.azulSecundario, // Azul informativo
             ),
             const SizedBox(width: 8),
             Text(
               text,
               style: const TextStyle(
-                color: DAGRDColors.azulSecundario, // Azul informativo
+                color: ThemeColors.azulSecundario, // Azul informativo
                 fontFamily: 'Work Sans',
                 fontSize: 15,
                 fontWeight: FontWeight.w500,

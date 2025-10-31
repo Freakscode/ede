@@ -177,8 +177,8 @@ class _ContactFormWidgetState extends State<ContactFormWidget> {
                     // Disparar evento de envío en el bloc (lógica separada)
                     context.read<DataRegistrationBloc>().add(const ContactFormSubmit());
                   },
-                  backgroundColor: DAGRDColors.azulDAGRD,
-                  textColor: DAGRDColors.blancoDAGRD,
+                  backgroundColor: ThemeColors.azulDAGRD,
+                  textColor: ThemeColors.blancoDAGRD,
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                   borderRadius: 4,

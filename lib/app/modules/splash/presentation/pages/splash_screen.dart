@@ -101,7 +101,7 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: DAGRDColors.azulDAGRD, // Fondo azul DAGRD
+      backgroundColor: ThemeColors.azulDAGRD, // Fondo azul DAGRD
       body: SafeArea(
         child: Column(
           children: [
@@ -200,7 +200,7 @@ class _SplashScreenState extends State<SplashScreen>
               width: 300, // Ocupa todo el ancho
               height: 110,
               decoration: BoxDecoration(
-                color: DAGRDColors.amarDAGRD, // Color amarillo DAGRD
+                color: ThemeColors.amarDAGRD, // Color amarillo DAGRD
                 borderRadius: const BorderRadius.vertical(
                   top: Radius.circular(24), // Bordes redondeados arriba
                 ),

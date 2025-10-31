@@ -1214,18 +1214,18 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
       if ((state.selectedClassification ?? '').toLowerCase() == 'amenaza') {
         // Verificar si hay selecciones REALES del usuario
         if (state.probabilidadSelections.isEmpty && state.intensidadSelections.isEmpty) {
-          return DAGRDColors.outlineVariant;
+          return ThemeColors.outlineVariant;
         }
         
         // Para amenaza, usar el use case
         final formData = getCurrentFormData();
         final globalScoreInfo = _calculateGlobalScoreUseCase.getGlobalScoreInfo(formData);
         score = globalScoreInfo['amenazaScore'] ?? 0.0;
-        color = globalScoreInfo['amenazaColor'] ?? DAGRDColors.outlineVariant;
+        color = globalScoreInfo['amenazaColor'] ?? ThemeColors.outlineVariant;
       } else if ((state.selectedClassification ?? '').toLowerCase() == 'vulnerabilidad') {
         // Verificar si hay selecciones REALES del usuario
         if (state.dynamicSelections.isEmpty || !_hasValidSelections()) {
-          return DAGRDColors.outlineVariant;
+          return ThemeColors.outlineVariant;
         }
         
         // Calcular score de vulnerabilidad con promedio ponderado
@@ -1235,36 +1235,36 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
           color = _getColorFromScore(score);
         } else {
           score = 0.0;
-          color = DAGRDColors.outlineVariant;
+          color = ThemeColors.outlineVariant;
         }
       } else {
         final formData = getCurrentFormData();
         final globalScoreInfo = _calculateGlobalScoreUseCase.getGlobalScoreInfo(formData);
         score = globalScoreInfo['finalScore'] ?? 0.0;
-        color = globalScoreInfo['finalColor'] ?? DAGRDColors.outlineVariant;
+        color = globalScoreInfo['finalColor'] ?? ThemeColors.outlineVariant;
       }
       
       // Si no hay score (0.0), devolver el color de borde específico
       if (score == 0.0) {
-        return DAGRDColors.outlineVariant; // #D1D5DB
+        return ThemeColors.outlineVariant; // #D1D5DB
       }
       
       return color;
     } catch (e) {
-      return DAGRDColors.outlineVariant; // #D1D5DB
+      return ThemeColors.outlineVariant; // #D1D5DB
     }
   }
   
   /// Helper para obtener color desde score
   Color _getColorFromScore(double score) {
     if (score <= 1.5) {
-      return DAGRDColors.nivelBajo;
+      return ThemeColors.nivelBajo;
     } else if (score <= 2.5) {
-      return DAGRDColors.nivelMedioBajo;
+      return ThemeColors.nivelMedioBajo;
     } else if (score <= 3.5) {
-      return DAGRDColors.nivelMedioAlto;
+      return ThemeColors.nivelMedioAlto;
     } else if (score <= 4.5) {
-      return DAGRDColors.nivelAlto;
+      return ThemeColors.nivelAlto;
     } else {
       return Colors.deepPurple;
     }
@@ -1372,7 +1372,7 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
           bgColor = _getColorFromScore(score);
         } else {
           score = 0.0;
-          bgColor = DAGRDColors.outlineVariant;
+          bgColor = ThemeColors.outlineVariant;
         }
       } else {
         final formData = getCurrentFormData();
@@ -1388,7 +1388,7 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
       
       // Retornar color de texto basado en el color de fondo
       // Todos los colores DAGRD usan texto blanco excepto el gris
-      return bgColor == DAGRDColors.outlineVariant ? Colors.black : Colors.white;
+      return bgColor == ThemeColors.outlineVariant ? Colors.black : Colors.white;
     } catch (e) {
       return Colors.black;
     }
@@ -1447,7 +1447,7 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
 
   /// Método centralizado para obtener el color basado en el rating
   Color getColorFromRating(int rating) {
-    return DAGRDColors.getNivelColorFromRating(rating);
+    return ThemeColors.getNivelColorFromRating(rating);
   }
 
   /// Método centralizado para obtener la selección de una categoría
@@ -1623,13 +1623,13 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     if (score == 0) {
       return Colors.transparent; 
     } else if (score <= 1.75) {
-      return DAGRDColors.nivelBajo; 
+      return ThemeColors.nivelBajo; 
     } else if (score <= 2.50) {
-      return DAGRDColors.nivelMedioBajo; 
+      return ThemeColors.nivelMedioBajo; 
     } else if (score <= 3.25) {
-      return DAGRDColors.nivelMedioAlto; 
+      return ThemeColors.nivelMedioAlto; 
     } else {
-      return DAGRDColors.nivelAlto; 
+      return ThemeColors.nivelAlto; 
     }
   }
 

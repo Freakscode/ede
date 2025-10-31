@@ -38,7 +38,7 @@ class SettingsScreen extends StatelessWidget {
                   'Configuración',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: DAGRDColors.azulDAGRD,
+                    color: ThemeColors.azulDAGRD,
                     fontFamily: 'Work Sans',
                     fontSize: 20,
                     fontWeight: FontWeight.w600,
@@ -52,7 +52,7 @@ class SettingsScreen extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: DAGRDColors.outline),
+                  border: Border.all(color: ThemeColors.outline),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -60,7 +60,7 @@ class SettingsScreen extends StatelessWidget {
                     const Text(
                       'Preferencias',
                       style: TextStyle(
-                        color: DAGRDColors.negroDAGRD,
+                        color: ThemeColors.negroDAGRD,
                         fontFamily: 'Work Sans',
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
@@ -69,7 +69,7 @@ class SettingsScreen extends StatelessWidget {
                     const SizedBox(height: 8),
                     SettingsTile(
                       icon: AppIcons.bell,
-                      iconColor: DAGRDColors.azulSecundario,
+                      iconColor: ThemeColors.azulSecundario,
                       title: 'Notificaciones',
                       subtitle: 'Recibir alertas y notificaciones',
                       trailing: CustomSvgSwitch(
@@ -81,7 +81,7 @@ class SettingsScreen extends StatelessWidget {
                     ),
                     SettingsTile(
                       icon: AppIcons.moon,
-                      iconColor: DAGRDColors.azulSecundario,
+                      iconColor: ThemeColors.azulSecundario,
                       title: 'Modo oscuro',
                       subtitle: 'Cambiar color de la aplicación',
                       trailing: CustomSvgSwitch(
@@ -93,14 +93,14 @@ class SettingsScreen extends StatelessWidget {
                     ),
                     SettingsTile(
                       icon: AppIcons.globe,
-                      iconColor: DAGRDColors.azulSecundario,
+                      iconColor: ThemeColors.azulSecundario,
                       title: 'Idioma',
                       subtitle: 'Seleccionar idioma de la app',
                       trailing: Container(
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(4),
-                          border: Border.all(color: DAGRDColors.outlineVariant, width: 1),
-                          color: DAGRDColors.surfaceVariant,
+                          border: Border.all(color: ThemeColors.outlineVariant, width: 1),
+                          color: ThemeColors.surfaceVariant,
                         ),
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                         child: DropdownButton<String>(
@@ -111,7 +111,7 @@ class SettingsScreen extends StatelessWidget {
                               child: Text(
                                 'Español',
                                 style: TextStyle(
-                                  color: DAGRDColors.grisOscuro,
+                                  color: ThemeColors.grisOscuro,
                                   fontFamily: 'Work Sans',
                                   fontSize: 13,
                                   fontWeight: FontWeight.w400,
@@ -124,7 +124,7 @@ class SettingsScreen extends StatelessWidget {
                               child: Text(
                                 'English',
                                 style: TextStyle(
-                                  color: DAGRDColors.grisOscuro,
+                                  color: ThemeColors.grisOscuro,
                                   fontFamily: 'Work Sans',
                                   fontSize: 13,
                                   fontWeight: FontWeight.w400,
@@ -145,7 +145,7 @@ class SettingsScreen extends StatelessWidget {
                     ),
                     SettingsTile(
                       icon: AppIcons.database,
-                      iconColor: DAGRDColors.azulSecundario,
+                      iconColor: ThemeColors.azulSecundario,
                       showBorder: true,
                       title: 'Almacenamiento',
                       subtitle: 'Uso de almacenamiento',
@@ -153,7 +153,7 @@ class SettingsScreen extends StatelessWidget {
                         '18,8MB',
                         textAlign: TextAlign.right,
                         style: TextStyle(
-                          color: DAGRDColors.azulSecundario,
+                          color: ThemeColors.azulSecundario,
                           fontFamily: 'Work Sans',
                           fontSize: 14,
                           fontWeight: FontWeight.w400,
@@ -174,7 +174,7 @@ class SettingsScreen extends StatelessWidget {
                         child: const Text(
                           'Limpiar Datos ahora',
                           style: TextStyle(
-                            color: DAGRDColors.azulSecundario,
+                            color: ThemeColors.azulSecundario,
                             fontFamily: 'Work Sans',
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
@@ -192,13 +192,13 @@ class SettingsScreen extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: DAGRDColors.outline),
+                  border: Border.all(color: ThemeColors.outline),
                 ),
                 child: Column(
                   children: [
                     SettingsTile(
                       icon: AppIcons.question,
-                      iconColor: DAGRDColors.azulSecundario,
+                      iconColor: ThemeColors.azulSecundario,
                       title: 'Ayuda',
                       subtitle: 'Centro de ayuda, contáctanos, política de privacidad',
                       onTap: () {
@@ -207,7 +207,7 @@ class SettingsScreen extends StatelessWidget {
                     ),
                     SettingsTile(
                       icon: AppIcons.info,
-                      iconColor: DAGRDColors.azulSecundario,
+                      iconColor: ThemeColors.azulSecundario,
                       title: 'Acerca de',
                       subtitle: 'Caja de Herramientas DAGRD App v1.0.1',
                       onTap: () {
@@ -226,7 +226,7 @@ class SettingsScreen extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: DAGRDColors.outline),
+                        border: Border.all(color: ThemeColors.outline),
                       ),
                       child: Column(
                         children: [
@@ -294,7 +294,7 @@ class SettingsTile extends StatelessWidget {
       decoration: showBorder
           ? const BoxDecoration(
               border: Border(
-                bottom: BorderSide(color: DAGRDColors.outlineVariant, width: 1),
+                bottom: BorderSide(color: ThemeColors.outlineVariant, width: 1),
               ),
             )
           : null,
@@ -328,7 +328,7 @@ class SettingsTile extends StatelessWidget {
                     Text(
                       title,
                       style: const TextStyle(
-                        color: DAGRDColors.negroDAGRD,
+                        color: ThemeColors.negroDAGRD,
                         fontFamily: 'Work Sans',
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
@@ -339,7 +339,7 @@ class SettingsTile extends StatelessWidget {
                     Text(
                       subtitle,
                       style: const TextStyle(
-                        color: DAGRDColors.negroDAGRD,
+                        color: ThemeColors.negroDAGRD,
                         fontFamily: 'Work Sans',
                         fontSize: 12,
                         fontWeight: FontWeight.w400,
@@ -386,7 +386,7 @@ class CustomSvgSwitch extends StatelessWidget {
                   width: 45,
                   height: 45,
                   colorFilter: ColorFilter.mode(
-                    DAGRDColors.azulSecundario,
+                    ThemeColors.azulSecundario,
                     BlendMode.srcIn,
                   ),
                 )

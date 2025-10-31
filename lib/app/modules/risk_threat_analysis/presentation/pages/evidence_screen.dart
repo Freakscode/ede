@@ -39,7 +39,7 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
                 'Evidencia Fotográfica - ${(state.selectedClassification ?? '').toUpperCase()}',
                 textAlign: TextAlign.center,
                 style: const TextStyle(
-                  color: DAGRDColors.azulDAGRD,
+                  color: ThemeColors.azulDAGRD,
                   fontFamily: 'Work Sans',
                   fontSize: 20,
                   fontStyle: FontStyle.normal,
@@ -59,7 +59,7 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
                     title: Text(
                       subtitle,
                       style: const TextStyle(
-                        color: DAGRDColors.grisMedio,
+                        color: ThemeColors.grisMedio,
                         fontFamily: 'Work Sans',
                         fontSize: 18,
                         fontStyle: FontStyle.normal,
@@ -72,7 +72,7 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
                       width: 30,
                       height: 30,
                       colorFilter: ColorFilter.mode(
-                        DAGRDColors.amarDAGRD,
+                        ThemeColors.amarDAGRD,
                         BlendMode.srcIn,
                       ),
                     ),
@@ -85,8 +85,8 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
                 padding: const EdgeInsets.all(15),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: DAGRDColors.outlineVariant, width: 1),
-                  color: DAGRDColors.surface,
+                  border: Border.all(color: ThemeColors.outlineVariant, width: 1),
+                  color: ThemeColors.surface,
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -97,7 +97,7 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
                         Text(
                           'Evidencia fotográfica',
                           style: const TextStyle(
-                            color: DAGRDColors.negroDAGRD,
+                            color: ThemeColors.negroDAGRD,
                             fontFamily: 'Work Sans',
                             fontSize: 16,
                             fontStyle: FontStyle.normal,
@@ -111,7 +111,7 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
                           width: 20,
                           height: 20,
                           colorFilter: ColorFilter.mode(
-                            DAGRDColors.negroDAGRD,
+                            ThemeColors.negroDAGRD,
                             BlendMode.srcIn,
                           ),
                         ),
@@ -172,8 +172,8 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
       // width: 200,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: DAGRDColors.azulSecundario, width: 1),
-        color: DAGRDColors.blancoDAGRD,
+        border: Border.all(color: ThemeColors.azulSecundario, width: 1),
+        color: ThemeColors.blancoDAGRD,
       ),
       child: Column(
         children: [
@@ -186,7 +186,7 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
                 topLeft: Radius.circular(6), // border-radius: 6px 6px 0 0
                 topRight: Radius.circular(6),
               ),
-              color: DAGRDColors.grisClaro, // background: lightgray
+              color: ThemeColors.grisClaro, // background: lightgray
             ),
             child: Stack(
               children: [
@@ -204,10 +204,10 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
                       return Container(
                         width: double.infinity,
                         height: 150,
-                        color: DAGRDColors.grisClaro,
+                        color: ThemeColors.grisClaro,
                         child: const Icon(
                           Icons.image,
-                          color: DAGRDColors.grisMedio,
+                          color: ThemeColors.grisMedio,
                           size: 32,
                         ),
                       );
@@ -234,7 +234,7 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
                       ),
                       child: const Icon(
                         Icons.close,
-                        color: DAGRDColors.blancoDAGRD, // stroke: #FFF
+                        color: ThemeColors.blancoDAGRD, // stroke: #FFF
                         size: 12, // stroke-width: 2px (ajustado para el tamaño)
                       ),
                     ),
@@ -253,7 +253,7 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
                 const Text(
                   'Coordenadas',
                   style: TextStyle(
-                    color: DAGRDColors.negroDAGRD, // color: #1E1E1E
+                    color: ThemeColors.negroDAGRD, // color: #1E1E1E
                     fontFamily: 'Work Sans', // font-family: "Work Sans"
                     fontSize: 14, // font-size: 14px
                     fontStyle: FontStyle.normal, // font-style: normal
@@ -275,7 +275,7 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
                         height: 48, // height: 48px
                         child: ElevatedButton.icon(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: DAGRDColors.azulDAGRD, // background: var(--AzulDAGRD, #232B48)
+                            backgroundColor: ThemeColors.azulDAGRD, // background: var(--AzulDAGRD, #232B48)
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(
                                 4,
@@ -290,13 +290,13 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
                           icon: const Icon(
                             Icons
                                 .location_on_outlined, // icono de ubicación outline
-                            color: DAGRDColors.blancoDAGRD,
+                            color: ThemeColors.blancoDAGRD,
                             size: 20,
                           ),
                           label: const Text(
                             'Georreferenciar imagen',
                             style: TextStyle(
-                              color: DAGRDColors.blancoDAGRD,
+                              color: ThemeColors.blancoDAGRD,
                               fontFamily: 'Work Sans',
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
@@ -317,17 +317,17 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
                               ),
                               decoration: BoxDecoration(
                                 border: Border.all(
-                                  color: DAGRDColors.outlineVariant,
+                                  color: ThemeColors.outlineVariant,
                                 ),
                                 borderRadius: BorderRadius.circular(4),
-                                color: DAGRDColors.blancoDAGRD,
+                                color: ThemeColors.blancoDAGRD,
                               ),
                               child: Align(
                                 alignment: Alignment.centerLeft,
                                 child: Text(
                                   '${currentCoordinates['lat']}, ${currentCoordinates['lng']}',
                                   style: const TextStyle(
-                                    color: DAGRDColors.grisOscuro,
+                                    color: ThemeColors.grisOscuro,
                                     fontFamily: 'Work Sans',
                                     fontSize: 12,
                                     fontWeight: FontWeight.w500,
@@ -352,7 +352,7 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
                               ),
                               child: const Icon(
                                 Icons.location_on,
-                                color: DAGRDColors.blancoDAGRD,
+                                color: ThemeColors.blancoDAGRD,
                                 size: 20,
                               ),
                             ),

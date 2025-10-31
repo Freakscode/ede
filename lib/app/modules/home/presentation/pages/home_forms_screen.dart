@@ -295,7 +295,7 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
                   'Mis Formularios',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: DAGRDColors.azulDAGRD,
+                    color: ThemeColors.azulDAGRD,
                     fontFamily: 'Work Sans',
                     fontSize: 20,
                     fontWeight: FontWeight.w600,
@@ -324,8 +324,8 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   color: _tabIndex == 0
-                                      ? DAGRDColors.azulDAGRD
-                                      : DAGRDColors.grisMedio,
+                                      ? ThemeColors.azulDAGRD
+                                      : ThemeColors.grisMedio,
                                   fontFamily: 'Work Sans',
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500,
@@ -344,8 +344,8 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   color: _tabIndex == 1
-                                      ? DAGRDColors.azulDAGRD
-                                      : DAGRDColors.grisMedio,
+                                      ? ThemeColors.azulDAGRD
+                                      : ThemeColors.grisMedio,
                                   fontFamily: 'Work Sans',
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500,
@@ -370,7 +370,7 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
                       child: Container(
                         height: 5,
                         decoration: BoxDecoration(
-                          color: DAGRDColors.azulDAGRD,
+                          color: ThemeColors.azulDAGRD,
                           borderRadius: BorderRadius.circular(2),
                         ),
                       ),
@@ -388,7 +388,7 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
                           Text(
                             'Filtros',
                             style: TextStyle(
-                              color: DAGRDColors.azulDAGRD,
+                              color: ThemeColors.azulDAGRD,
                               fontFamily: 'Work Sans',
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
@@ -402,7 +402,7 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
                               width: 29,
                               height: 27,
                               colorFilter: const ColorFilter.mode(
-                                DAGRDColors.azulDAGRD,
+                                ThemeColors.azulDAGRD,
                                 BlendMode.srcIn,
                               ),
                             ),
@@ -695,7 +695,7 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
             ElevatedButton(
               onPressed: () => Navigator.of(context).pop(true),
               style: ElevatedButton.styleFrom(
-                backgroundColor: DAGRDColors.azulDAGRD,
+                backgroundColor: ThemeColors.azulDAGRD,
               ),
               child: const Text('Asociar'),
             ),
