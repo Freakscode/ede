@@ -30,17 +30,14 @@ class _LoginScreenState extends State<LoginScreen> {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state is AuthAuthenticated) {
-          // Mostrar mensaje de éxito
           CustomSnackBar.showSuccess(
             context,
             title: 'Login exitoso',
             message: state.message,
             duration: const Duration(seconds: 2),
           );
-          // Navegar a home
           context.go('/home');
         } else if (state is AuthError) {
-          // Mostrar mensaje de error
           CustomSnackBar.showError(
             context,
             title: 'Error de login',
@@ -54,11 +51,11 @@ class _LoginScreenState extends State<LoginScreen> {
           return Scaffold(
             backgroundColor: theme.colorScheme.surface,
             appBar: AppBar(
-              backgroundColor: DAGRDColors.azulDAGRD, // Color azul DAGRD
+              backgroundColor: DAGRDColors.azulDAGRD,
               elevation: 0,
               automaticallyImplyLeading: false,
-              toolbarHeight: 80, // height: 110px
-              centerTitle: true, // Centrar el título
+              toolbarHeight: 80,
+              centerTitle: true,
               title: const Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -84,7 +81,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.vertical(
-                  bottom: Radius.circular(24), // ajusta el radio a tu diseño
+                  bottom: Radius.circular(24),
                 ),
               ),
               leading: Padding(
@@ -99,7 +96,6 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             body: Column(
               children: [
-                // Contenido con scroll
                 Expanded(
                   child: SingleChildScrollView(
                     child: Padding(
@@ -112,15 +108,14 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            // const SizedBox(height: 27),
                             Text(
                               'INICIAR SESIÓN',
                               style: theme.textTheme.titleLarge?.copyWith(
-                                color: DAGRDColors.azulDAGRD, // #1E1E1E
+                                color: DAGRDColors.azulDAGRD,
                                 fontFamily: 'Roboto',
                                 fontSize: 24,
                                 fontWeight: FontWeight.w600,
-                                height: 1.167, // line-height: 116.667%
+                                height: 1.167,
                               ),
                               textAlign: TextAlign.center,
                             ),
@@ -138,7 +133,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 fontFamily: 'Roboto',
                                 fontSize: 20,
                                 fontWeight: FontWeight.w400,
-                                height: 1.4, // line-height: 140%
+                                height: 1.4,
                               ),
                               textAlign: TextAlign.center,
                             ),
@@ -148,11 +143,11 @@ class _LoginScreenState extends State<LoginScreen> {
                               decoration: InputDecoration(
                                 labelText: 'Número de cédula',
                                 labelStyle: const TextStyle(
-                                  color: Color(0xFFCCCCCC), // Texto-inputs #CCC
+                                  color: Color(0xFFCCCCCC),
                                   fontFamily: 'Work Sans',
                                   fontSize: 14,
                                   fontWeight: FontWeight.w500,
-                                  height: 1.429, // line-height: 142.857%
+                                  height: 1.429,
                                 ),
                                 prefixIcon: Padding(
                                   padding: const EdgeInsets.all(12.0),
@@ -167,15 +162,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ),
                                 ),
                                 filled: true,
-                                fillColor: Colors.white, // background: #FFF
+                                fillColor: Colors.white,
                                 border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(
-                                    6,
-                                  ), // border-radius: 6px
+                                  borderRadius: BorderRadius.circular(6),
                                   borderSide: const BorderSide(
-                                    color: Color(
-                                      0xFFD1D5DB,
-                                    ), // Color-bordes #D1D5DB
+                                    color: Color(0xFFD1D5DB),
                                     width: 1,
                                   ),
                                 ),
@@ -211,11 +202,11 @@ class _LoginScreenState extends State<LoginScreen> {
                               decoration: InputDecoration(
                                 labelText: 'Contraseña',
                                 labelStyle: const TextStyle(
-                                  color: Color(0xFFCCCCCC), // Texto-inputs #CCC
+                                  color: Color(0xFFCCCCCC),
                                   fontFamily: 'Work Sans',
                                   fontSize: 14,
                                   fontWeight: FontWeight.w500,
-                                  height: 1.429, // line-height: 142.857%
+                                  height: 1.429,
                                 ),
                                 prefixIcon: Padding(
                                   padding: const EdgeInsets.all(12.0),
@@ -230,15 +221,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ),
                                 ),
                                 filled: true,
-                                fillColor: Colors.white, // background: #FFF
+                                fillColor: Colors.white,
                                 border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(
-                                    6,
-                                  ), // border-radius: 6px
+                                  borderRadius: BorderRadius.circular(6),
                                   borderSide: const BorderSide(
-                                    color: Color(
-                                      0xFFD1D5DB,
-                                    ), // Color-bordes #D1D5DB
+                                    color: Color(0xFFD1D5DB),
                                     width: 1,
                                   ),
                                 ),
@@ -267,8 +254,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             const SizedBox(height: 5),
                             Align(
-                              alignment:
-                                  Alignment.centerRight, // text-align: right
+                              alignment: Alignment.centerRight,
                               child: TextButton(
                                 onPressed: () {
                                   // TODO: Implementar recuperación de contraseña
@@ -276,14 +262,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                 child: Text(
                                   '¿Olvidaste la contraseña?',
                                   style: TextStyle(
-                                    color: DAGRDColors
-                                        .azulDAGRD, // color: var(--AzulDAGRD, #232B48)
-                                    fontFamily: 'Roboto', // font-family: Roboto
-                                    fontSize: 13, // font-size: 13px
-                                    fontWeight:
-                                        FontWeight.w500, // font-weight: 500
-                                    height:
-                                        1.538, // line-height: 20px / 13px = 153.846%
+                                    color: DAGRDColors.azulDAGRD,
+                                    fontFamily: 'Roboto',
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w500,
+                                    height: 1.538,
                                   ),
                                 ),
                               ),
@@ -313,20 +296,19 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                 ),
-                // Contenedor para logos fuera del scroll, ocupando todo el ancho
                 Container(
-                  width: double.infinity, // Ocupa todo el ancho
-                  height: 110, // height: 129px
+                  width: double.infinity,
+                  height: 110,
                   decoration: BoxDecoration(
-                    color: DAGRDColors.azulDAGRD, // Mismo color del AppBar
+                    color: DAGRDColors.azulDAGRD,
                     borderRadius: const BorderRadius.vertical(
-                      top: Radius.circular(24), // Bordes redondeados arriba
+                      top: Radius.circular(24),
                     ),
                   ),
                   child: Center(
                     child: Image.asset(
                       AppAssets.logoDagrdBomberosAlcaldia,
-                      height: 100, // Ajusta la altura según necesites
+                      height: 100,
                       fit: BoxFit.contain,
                     ),
                   ),
