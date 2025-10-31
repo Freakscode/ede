@@ -86,11 +86,28 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               leading: Padding(
                 padding: const EdgeInsets.only(left: 10),
-                child: _circleButton(
-                  assetName: AppIcons.arrowLeft,
-                  onTap: () {
-                    context.go('/home');
-                  },
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () => context.go('/home'),
+                    borderRadius: BorderRadius.circular(100),
+                    child: Container(
+                      width: 38,
+                      height: 38,
+                      decoration: const BoxDecoration(
+                        color: DAGRDColors.amarDAGRD,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Center(
+                        child: SvgPicture.asset(
+                          AppIcons.arrowLeft,
+                          width: 26,
+                          height: 26,
+                          color: DAGRDColors.azulDAGRD,
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -326,31 +343,5 @@ class _LoginScreenState extends State<LoginScreen> {
     _cedulaController.dispose();
     _passwordController.dispose();
     super.dispose();
-  }
-
-  Widget _circleButton({required String assetName, VoidCallback? onTap}) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(100),
-        child: Container(
-          width: 38,
-          height: 38,
-          decoration: const BoxDecoration(
-            color: DAGRDColors.amarDAGRD,
-            shape: BoxShape.circle,
-          ),
-          child: Center(
-            child: SvgPicture.asset(
-              assetName,
-              width: 26,
-              height: 26,
-              color: DAGRDColors.azulDAGRD,
-            ),
-          ),
-        ),
-      ),
-    );
   }
 }
