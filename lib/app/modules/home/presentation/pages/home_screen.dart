@@ -42,70 +42,6 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  /// Determina el contenido de ayuda basado en el estado actual
-  Map<String, dynamic> _getHelpContent(HomeState state) {
-    if (state.showRiskEvents) {
-      return {
-        'categoryTitle': "Ayuda Eventos de Riesgo",
-        'contentTitle': "Eventos de Riesgo",
-        'content': HomeHelpContent.build(),
-      };
-    } else if (state.showFormCompleted) {
-      return {
-        'categoryTitle': "Ayuda Formulario Completado",
-        'contentTitle': "Formulario Completado",
-        'content': HomeHelpContent.build(),
-      };
-    }
-
-    // Contenido de ayuda para las pestañas principales
-    switch (state.selectedIndex) {
-      case 0:
-        return {
-          'categoryTitle': "Ayuda Inicio",
-          'contentTitle': "Inicio Caja de Herramientas",
-          'content': HomeHelpContent.build(),
-        };
-      case 1:
-        return {
-          'categoryTitle': "Ayuda Material Educativo",
-          'contentTitle': "Ayuda general",
-          'content': GeneralHelpContent.build(),
-        };
-      case 2:
-        return {
-          'categoryTitle': "Ayuda Mis Formularios",
-          'contentTitle': "Mis Formularios",
-          'content': FormsHelpContent.build(),
-        };
-      case 3:
-        return {
-          'categoryTitle': "Ayuda Configuración",
-          'contentTitle': "Ayuda general",
-          'content': GeneralHelpContent.build(),
-        };
-      default:
-        return {
-          'categoryTitle': "Ayuda",
-          'contentTitle': "Ayuda",
-          'content': HomeHelpContent.build(),
-        };
-    }
-  }
-
-  /// Muestra el diálogo de ayuda con el contenido apropiado
-  void _showHelpDialog(BuildContext context) {
-    final state = context.read<HomeBloc>().state;
-    final helpContent = _getHelpContent(state);
-    
-    HelpDialog.show(
-      context: context,
-      categoryTitle: helpContent['categoryTitle'] as String,
-      contentTitle: helpContent['contentTitle'] as String,
-      content: helpContent['content'] as Widget,
-    );
-  }
-
   /// Maneja la lógica de navegación basada en los datos de navegación
   void _handleNavigationData(BuildContext context) {
     if (navigationData == null) return;
@@ -128,54 +64,6 @@ class HomeScreen extends StatelessWidget {
     }
   }
 
-  /// Determina el contenido del cuerpo basado en el estado actual
-  Widget _buildBodyContent(BuildContext context, HomeState state) {
-    // Priorizar secciones especiales sobre las pestañas principales
-    final specialSectionContent = _buildSpecialSectionContent(state);
-    if (specialSectionContent != null) {
-      return specialSectionContent;
-    }
-
-    // Construir contenido de pestañas principales
-    return _buildMainTabContent(context, state.selectedIndex);
-  }
-
-  /// Construye el contenido para secciones especiales (eventos de riesgo, formulario completado)
-  Widget? _buildSpecialSectionContent(HomeState state) {
-    if (state.showRiskEvents) {
-      return const RiskEventsScreen();
-    }
-    
-    if (state.showFormCompleted) {
-      return const FormCompletedScreen();
-    }
-    
-    return null; // No hay sección especial activa
-  }
-
-  /// Construye el contenido para las pestañas principales
-  Widget _buildMainTabContent(BuildContext context, int selectedIndex) {
-    final tabContent = _getTabContent(selectedIndex);
-    return tabContent ?? _buildErrorFallback(context, selectedIndex);
-  }
-
-  /// Obtiene el contenido específico para cada pestaña
-  Widget? _getTabContent(int tabIndex) {
-    switch (tabIndex) {
-      case 0: // Inicio
-        return const HomeMainSection();
-      case 1: // Material educativo
-        return const EducationalMaterialScreen();
-      case 2: // Mis formularios
-        return const HomeFormsScreen();
-      case 3: // Configuración
-        return const SettingsScreen();
-      case 4: // Eventos de riesgo (legacy)
-        return const RiskEventsScreen();
-      default:
-        return null; // Pestaña no reconocida
-    }
-  }
 
   /// Construye un fallback de error para pestañas no reconocidas
   Widget _buildErrorFallback(BuildContext context, int invalidIndex) {
@@ -248,38 +136,6 @@ class HomeScreen extends StatelessWidget {
     }
   }
 
-  /// Construye la barra de navegación inferior
-  Widget _buildBottomNavigationBar(BuildContext context, HomeState state) {
-    return CustomBottomNavBar(
-      currentIndex: state.isShowingSpecialSection ? -1 : state.selectedIndex,
-      onTap: (index) {
-        context.read<HomeBloc>().add(HomeNavBarTapped(index));
-      },
-      items: const [
-        CustomBottomNavBarItem(
-          label: 'Inicio',
-          iconAsset: AppIcons.home,
-        ),
-        CustomBottomNavBarItem(
-          label: 'Material\neducativo',
-          iconAsset: AppIcons.book,
-        ),
-        CustomBottomNavBarItem(
-          label: 'Mis formularios',
-          iconAsset: AppIcons.files,
-        ),
-        CustomBottomNavBarItem(
-          label: 'Configuración',
-          iconAsset: AppIcons.gear,
-        ),
-      ],
-      backgroundColor: DAGRDColors.azulDAGRD,
-      selectedColor: Colors.white,
-      unselectedColor: Colors.white60,
-      selectedIconBgColor: Colors.white,
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     // Manejar datos de navegación después del primer frame
@@ -313,10 +169,124 @@ class HomeScreen extends StatelessWidget {
                     context.go('/login');
                   }
                 },
-                onInfo: () => _showHelpDialog(context),
+                onInfo: () {
+                  final state = context.read<HomeBloc>().state;
+                  Map<String, dynamic> helpContent;
+                  if (state.showRiskEvents) {
+                    helpContent = {
+                      'categoryTitle': "Ayuda Eventos de Riesgo",
+                      'contentTitle': "Eventos de Riesgo",
+                      'content': HomeHelpContent.build(),
+                    };
+                  } else if (state.showFormCompleted) {
+                    helpContent = {
+                      'categoryTitle': "Ayuda Formulario Completado",
+                      'contentTitle': "Formulario Completado",
+                      'content': HomeHelpContent.build(),
+                    };
+                  } else {
+                    switch (state.selectedIndex) {
+                      case 0:
+                        helpContent = {
+                          'categoryTitle': "Ayuda Inicio",
+                          'contentTitle': "Inicio Caja de Herramientas",
+                          'content': HomeHelpContent.build(),
+                        };
+                        break;
+                      case 1:
+                        helpContent = {
+                          'categoryTitle': "Ayuda Material Educativo",
+                          'contentTitle': "Ayuda general",
+                          'content': GeneralHelpContent.build(),
+                        };
+                        break;
+                      case 2:
+                        helpContent = {
+                          'categoryTitle': "Ayuda Mis Formularios",
+                          'contentTitle': "Mis Formularios",
+                          'content': FormsHelpContent.build(),
+                        };
+                        break;
+                      case 3:
+                        helpContent = {
+                          'categoryTitle': "Ayuda Configuración",
+                          'contentTitle': "Ayuda general",
+                          'content': GeneralHelpContent.build(),
+                        };
+                        break;
+                      default:
+                        helpContent = {
+                          'categoryTitle': "Ayuda",
+                          'contentTitle': "Ayuda",
+                          'content': HomeHelpContent.build(),
+                        };
+                    }
+                  }
+                  HelpDialog.show(
+                    context: context,
+                    categoryTitle: helpContent['categoryTitle'] as String,
+                    contentTitle: helpContent['contentTitle'] as String,
+                    content: helpContent['content'] as Widget,
+                  );
+                },
               ),
-              body: _buildBodyContent(context, homeState),
-              bottomNavigationBar: _buildBottomNavigationBar(context, homeState),
+              body: () {
+                // Priorizar secciones especiales sobre las pestañas principales
+                if (homeState.showRiskEvents) {
+                  return const RiskEventsScreen();
+                }
+                if (homeState.showFormCompleted) {
+                  return const FormCompletedScreen();
+                }
+                // Construir contenido de pestañas principales
+                Widget? content;
+                switch (homeState.selectedIndex) {
+                  case 0:
+                    content = const HomeMainSection();
+                    break;
+                  case 1:
+                    content = const EducationalMaterialScreen();
+                    break;
+                  case 2:
+                    content = const HomeFormsScreen();
+                    break;
+                  case 3:
+                    content = const SettingsScreen();
+                    break;
+                  case 4:
+                    content = const RiskEventsScreen();
+                    break;
+                }
+                return content ?? _buildErrorFallback(context, homeState.selectedIndex);
+              }(),
+              bottomNavigationBar: CustomBottomNavBar(
+                currentIndex: homeState.isShowingSpecialSection ? -1 : homeState.selectedIndex,
+                onTap: (index) {
+                  context.read<HomeBloc>().add(HomeNavBarTapped(index));
+                },
+                items: const [
+                  CustomBottomNavBarItem(
+                    label: 'Inicio',
+                    iconAsset: AppIcons.home,
+                  ),
+                  CustomBottomNavBarItem(
+                    label: 'Material\neducativo',
+                    iconAsset: AppIcons.book,
+                  ),
+                  CustomBottomNavBarItem(
+                    label: 'Mis formularios',
+                    iconAsset: AppIcons.files,
+                  ),
+                  CustomBottomNavBarItem(
+                    label: 'Configuración',
+                    iconAsset: AppIcons.gear,
+                  ),
+                ],
+                backgroundColor: DAGRDColors.azulDAGRD,
+                selectedColor: Colors.white,
+                unselectedColor: Colors.white60,
+                selectedIconBgColor: Colors.white,
+              ),
             );
           },
         );
