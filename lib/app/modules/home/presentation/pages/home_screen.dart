@@ -26,7 +26,7 @@ import 'package:go_router/go_router.dart';
 /// entre diferentes secciones y herramientas de la caja de herramientas.
 class HomeScreen extends StatelessWidget {
   final Map<String, dynamic>? navigationData;
-  
+
   const HomeScreen({super.key, this.navigationData});
 
   /// Muestra el overlay de tutorial cuando es necesario
@@ -45,9 +45,9 @@ class HomeScreen extends StatelessWidget {
   /// Maneja la lógica de navegación basada en los datos de navegación
   void _handleNavigationData(BuildContext context) {
     if (navigationData == null) return;
-    
+
     final bloc = context.read<HomeBloc>();
-    
+
     if (navigationData!['showRiskCategories'] == true) {
       // Navegar a la nueva pantalla de categorías integrada
       context.go('/risk-categories');
@@ -64,7 +64,6 @@ class HomeScreen extends StatelessWidget {
     }
   }
 
-
   /// Construye un fallback de error para pestañas no reconocidas
   Widget _buildErrorFallback(BuildContext context, int invalidIndex) {
     return Center(
@@ -73,11 +72,7 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.error_outline,
-              size: 64,
-              color: Colors.red.shade400,
-            ),
+            Icon(Icons.error_outline, size: 64, color: Colors.red.shade400),
             const SizedBox(height: 16),
             Text(
               'Error de navegación',
@@ -90,10 +85,7 @@ class HomeScreen extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               'Pestaña no válida: $invalidIndex',
-              style: const TextStyle(
-                fontSize: 16,
-                color: Colors.grey,
-              ),
+              style: const TextStyle(fontSize: 16, color: Colors.grey),
             ),
             const SizedBox(height: 24),
             ElevatedButton.icon(
@@ -123,26 +115,14 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  /// Maneja la acción de retroceso basada en el estado actual
-  void _handleBackAction(BuildContext context, HomeState state) {
-    final bloc = context.read<HomeBloc>();
-    
-    if (state.showRiskEvents) {
-      bloc.add(HomeShowRiskEventsSection());
-    } else if (state.showFormCompleted) {
-      // Volver a la pantalla de formularios y resetear estado
-      bloc.add(HomeResetRiskSections());
-      bloc.add(HomeNavBarTapped(2));
-    }
-  }
-
+  
   @override
   Widget build(BuildContext context) {
     // Manejar datos de navegación después del primer frame
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _handleNavigationData(context);
     });
-    
+
     return BlocConsumer<HomeBloc, HomeState>(
       listenWhen: (previous, current) =>
           !previous.tutorialShown && current.tutorialShown,
@@ -159,7 +139,17 @@ class HomeScreen extends StatelessWidget {
             return Scaffold(
               appBar: CustomAppBar(
                 showBack: homeState.isShowingSpecialSection,
-                onBack: () => _handleBackAction(context, homeState),
+                onBack: () {
+                  final bloc = context.read<HomeBloc>();
+
+                  if (homeState.showRiskEvents) {
+                    bloc.add(HomeShowRiskEventsSection());
+                  } else if (homeState.showFormCompleted) {
+                    // Volver a la pantalla de formularios y resetear estado
+                    bloc.add(HomeResetRiskSections());
+                    bloc.add(HomeNavBarTapped(2));
+                  }
+                },
                 showInfo: true,
                 showProfile: true,
                 onProfile: () {
@@ -257,10 +247,13 @@ class HomeScreen extends StatelessWidget {
                     content = const RiskEventsScreen();
                     break;
                 }
-                return content ?? _buildErrorFallback(context, homeState.selectedIndex);
+                return content ??
+                    _buildErrorFallback(context, homeState.selectedIndex);
               }(),
               bottomNavigationBar: CustomBottomNavBar(
-                currentIndex: homeState.isShowingSpecialSection ? -1 : homeState.selectedIndex,
+                currentIndex: homeState.isShowingSpecialSection
+                    ? -1
+                    : homeState.selectedIndex,
                 onTap: (index) {
                   context.read<HomeBloc>().add(HomeNavBarTapped(index));
                 },
