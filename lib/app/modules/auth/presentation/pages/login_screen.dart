@@ -19,8 +19,8 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _cedulaController = TextEditingController();
-  final _passwordController = TextEditingController();
+  final _cedulaController = TextEditingController(text: 'ronel.gomez@medellin.gov.co');
+  final _passwordController = TextEditingController(text: 'C@mametro21.');
   final _formKey = GlobalKey<FormState>();
 
   @override
@@ -158,7 +158,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             TextFormField(
                               controller: _cedulaController,
                               decoration: InputDecoration(
-                                labelText: 'Número de cédula',
+                                labelText: 'Usuario',
                                 labelStyle: const TextStyle(
                                   color: Color(0xFFCCCCCC),
                                   fontFamily: 'Work Sans',
@@ -202,13 +202,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ),
                                 ),
                               ),
-                              keyboardType: TextInputType.number,
+                              keyboardType: TextInputType.text,
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
-                                  return 'Por favor ingrese su cédula';
-                                }
-                                if (!RegExp(r'^[0-9]{8,10}$').hasMatch(value)) {
-                                  return 'Cédula inválida';
+                                  return 'Por favor ingrese su usuario';
                                 }
                                 return null;
                               },

@@ -15,7 +15,7 @@ class LoginUseCase implements UseCase<AuthResultEntity, LoginParams> {
   Future<Either<Failure, AuthResultEntity>> call(LoginParams params) async {
     // Validaciones de negocio
     if (params.cedula.isEmpty) {
-      return Left(ValidationFailure('La cédula es requerida'));
+      return Left(ValidationFailure('La email es requerida'));
     }
 
     if (params.password.isEmpty) {

@@ -1,9 +1,9 @@
 import 'package:caja_herramientas/app/core/icons/app_icons.dart';
 import 'package:caja_herramientas/app/shared/widgets/widgets.dart';
+import 'package:caja_herramientas/app/shared/widgets/dialogs/custom_action_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:go_router/go_router.dart';
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import 'package:caja_herramientas/app/modules/home/presentation/bloc/home_bloc.dart';
 import 'package:caja_herramientas/app/modules/home/presentation/bloc/home_event.dart';
@@ -17,9 +17,20 @@ class SettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<HomeBloc, HomeState>(
-      builder: (context, state) {
-        return ListView(
+    return BlocListener<AuthBloc, AuthState>(
+      listener: (context, authState) {
+        if (authState is AuthUnauthenticated && authState.message != null) {
+          CustomSnackBar.showSuccess(
+            context,
+            title: 'Sesión cerrada',
+            message: authState.message!,
+            duration: const Duration(seconds: 2),
+          );
+        }
+      },
+      child: BlocBuilder<HomeBloc, HomeState>(
+        builder: (context, state) {
+          return ListView(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
           children: [
             // Título principal
@@ -276,106 +287,35 @@ class SettingsScreen extends StatelessWidget {
           ],
         );
       },
+      ),
     );
   }
 
   /// Mostrar diálogo de confirmación para cerrar sesión
   void _showLogoutDialog(BuildContext context) {
-    showDialog(
+    CustomActionDialog.show(
       context: context,
-      barrierDismissible: true,
-      builder: (BuildContext dialogContext) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          title: const Text(
-            'Cerrar Sesión',
-            style: TextStyle(
-              color: DAGRDColors.negroDAGRD,
-              fontFamily: 'Work Sans',
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          content: const Text(
-            '¿Estás seguro de que deseas cerrar sesión?',
-            style: TextStyle(
-              color: DAGRDColors.grisMedio,
-              fontFamily: 'Work Sans',
-              fontSize: 14,
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(dialogContext).pop();
-              },
-              child: const Text(
-                'Cancelar',
-                style: TextStyle(
-                  color: DAGRDColors.grisMedio,
-                  fontFamily: 'Work Sans',
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(dialogContext).pop();
-                _performLogout(context);
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              ),
-              child: const Text(
-                'Cerrar Sesión',
-                style: TextStyle(
-                  fontFamily: 'Work Sans',
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-          ],
-        );
+      title: 'Cerrar Sesión',
+      message: '¿Estás seguro de que deseas cerrar sesión?',
+      leftButtonText: 'Cancelar',
+      leftButtonIcon: Icons.close,
+      rightButtonText: 'Cerrar Sesión',
+      rightButtonIcon: Icons.logout,
+      rightButtonColor: Colors.red,
+      onRightButtonPressed: () {
+        Navigator.of(context).pop();
+        _performLogout(context);
       },
     );
   }
 
   /// Ejecutar logout
   void _performLogout(BuildContext context) {
-    try {
-      // Limpiar datos del HomeBloc
-      context.read<HomeBloc>().add(HomeClearData());
-      
-      // Ejecutar logout en AuthBloc
-      context.read<AuthBloc>().add(const AuthLogoutRequested());
-      
-      // Mostrar mensaje de confirmación
-      CustomSnackBar.showSuccess(
-        context,
-        title: 'Sesión cerrada',
-        message: 'La sesión ha sido cerrada exitosamente',
-      );
-      
-      // Navegar a la pantalla de login
-      context.go('/login');
-    } catch (e) {
-      // Mostrar error si algo falla
-      CustomSnackBar.showError(
-        context,
-        title: 'Error al cerrar sesión',
-        message: 'Error al cerrar sesión: $e',
-      );
-    }
+    // Limpiar datos del HomeBloc
+    context.read<HomeBloc>().add(HomeClearData());
+    
+    // Ejecutar logout en AuthBloc - la navegación se maneja en el listener
+    context.read<AuthBloc>().add(const AuthLogoutRequested());
   }
 
   Widget _buildSettingsTile({

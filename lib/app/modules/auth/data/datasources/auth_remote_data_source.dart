@@ -35,7 +35,7 @@ class AuthRemoteDataSourceImpl extends ApiProvider implements AuthRemoteDataSour
       final response = await dio.post(
         '/auth/login',
         data: {
-          'cedula': loginRequest.cedula,
+          'email': loginRequest.cedula,
           'password': loginRequest.password,
         },
       );
@@ -84,11 +84,13 @@ class AuthRemoteDataSourceImpl extends ApiProvider implements AuthRemoteDataSour
   @override
   Future<void> logout() async {
     try {
-      await dio.post(
-        '/auth/logout', // TODO: Configurar endpoint correcto
-      );
+      final response = await dio.post('/auth/logout');
+      
+      if (response.statusCode == 200) {
+        final responseData = response.data;
+        log('Logout exitoso: ${responseData['message']}', name: 'AuthRemoteDataSource');
+      }
     } on DioException catch (e) {
-      // Log error but don't throw - logout should succeed even if API fails
       log('Error during logout: ${e.message}', name: 'AuthRemoteDataSource');
     }
   }

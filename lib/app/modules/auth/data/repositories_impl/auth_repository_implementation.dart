@@ -42,6 +42,14 @@ class AuthRepositoryImplementation implements IAuthRepository {
 
   @override
   Future<void> logout() async {
+    // Intentar logout contra la API (no crítico si falla)
+    try {
+      await _authRemoteDataSource.logout();
+    } catch (e) {
+      // Log error but don't throw - logout should succeed locally even if API fails
+    }
+    
+    // Limpiar datos localmente (siempre se ejecuta)
     await clearAuthData();
   }
 
