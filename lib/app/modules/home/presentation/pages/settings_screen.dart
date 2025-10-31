@@ -31,303 +31,265 @@ class SettingsScreen extends StatelessWidget {
       child: BlocBuilder<HomeBloc, HomeState>(
         builder: (context, state) {
           return ListView(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-          children: [
-            // Título principal
-            const Center(
-              child: Text(
-                'Configuración',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: DAGRDColors.azulDAGRD,
-                  fontFamily: 'Work Sans',
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                  height: 28 / 20,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+            children: [
+              const Center(
+                child: Text(
+                  'Configuración',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: DAGRDColors.azulDAGRD,
+                    fontFamily: 'Work Sans',
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                    height: 28 / 20,
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 32),
-
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: DAGRDColors.outline),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Preferencias',
-                    style: TextStyle(
-                      color: DAGRDColors.negroDAGRD,
-                      fontFamily: 'Work Sans',
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-
-                  // Notificaciones
-                  _buildSettingsTile(
-                    context: context,
-                    icon: AppIcons.bell,
-                    iconColor: DAGRDColors.azulSecundario,
-                    title: 'Notificaciones',
-                    subtitle: 'Recibir alertas y notificaciones',
-                    trailing: CustomSvgSwitch(
-                      value: state.notificationsEnabled,
-                      onChanged: (value) {
-                        context.read<HomeBloc>().add(
-                          HomeToggleNotifications(value),
-                        );
-                      },
-                    ),
-                  ),
-
-                  // Modo oscuro
-                  _buildSettingsTile(
-                    context: context,
-                    icon: AppIcons.moon,
-                    iconColor: DAGRDColors.azulSecundario,
-                    title: 'Modo oscuro',
-                    subtitle: 'Cambiar color de la aplicación',
-                    trailing: CustomSvgSwitch(
-                      value: state.darkModeEnabled,
-                      onChanged: (value) {
-                        context.read<HomeBloc>().add(HomeToggleDarkMode(value));
-                      },
-                    ),
-                  ),
-
-                  // Idioma
-                  _buildSettingsTile(
-                    context: context,
-                    icon: AppIcons.globe,
-                    iconColor: DAGRDColors.azulSecundario,
-                    title: 'Idioma',
-                    subtitle: 'Seleccionar idioma de la app',
-                    trailing: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(4),
-                        border: Border.all(
-                          color: DAGRDColors.outlineVariant,
-                          width: 1,
-                        ),
-                        color: DAGRDColors.surfaceVariant,
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
-                      child: DropdownButton<String>(
-                        value: state.selectedLanguage,
-                        items: const [
-                          DropdownMenuItem(
-                            value: 'Español',
-                            child: Text(
-                              'Español',
-                              style: TextStyle(
-                                color: DAGRDColors.grisOscuro,
-                                fontFamily: 'Work Sans',
-                                fontSize: 13,
-                                fontWeight: FontWeight.w400,
-                                height: 1.0,
-                              ),
-                            ),
-                          ),
-                          DropdownMenuItem(
-                            value: 'English',
-                            child: Text(
-                              'English',
-                              style: TextStyle(
-                                color: DAGRDColors.grisOscuro,
-                                fontFamily: 'Work Sans',
-                                fontSize: 13,
-                                fontWeight: FontWeight.w400,
-                                height: 1.0,
-                              ),
-                            ),
-                          ),
-                        ],
-                        onChanged: (value) {
-                          if (value != null) {
-                            context.read<HomeBloc>().add(
-                              HomeChangeLanguage(value),
-                            );
-                          }
-                        },
-                        underline: const SizedBox(),
-                        isDense: true,
-                      ),
-                    ),
-                  ),
-                  // Almacenamiento
-                  _buildSettingsTile(
-                    context: context,
-                    icon: AppIcons.database,
-                    iconColor: DAGRDColors.azulSecundario,
-                    showBorder: true,
-                    title: 'Almacenamiento',
-                    subtitle: 'Uso de almacenamiento',
-                    trailing: const Text(
-                      '18,8MB',
-                      textAlign: TextAlign.right,
+              const SizedBox(height: 32),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: DAGRDColors.outline),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Preferencias',
                       style: TextStyle(
-                        color: DAGRDColors.azulSecundario,
+                        color: DAGRDColors.negroDAGRD,
                         fontFamily: 'Work Sans',
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
-                        height: 16 / 14,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
-                  ),
-
-                  // Limpiar Datos
-                  Center(
-                    child: TextButton(
-                      onPressed: () {
-                        context.read<HomeBloc>().add(HomeClearData());
-                        CustomSnackBar.showSuccess(
-                          context,
-                          title: 'Datos limpiados',
-                          message: 'Los datos han sido limpiados correctamente',
-                        );
-                      },
-                      child: const Text(
-                        'Limpiar Datos ahora',
+                    const SizedBox(height: 8),
+                    SettingsTile(
+                      icon: AppIcons.bell,
+                      iconColor: DAGRDColors.azulSecundario,
+                      title: 'Notificaciones',
+                      subtitle: 'Recibir alertas y notificaciones',
+                      trailing: CustomSvgSwitch(
+                        value: state.notificationsEnabled,
+                        onChanged: (value) {
+                          context.read<HomeBloc>().add(HomeToggleNotifications(value));
+                        },
+                      ),
+                    ),
+                    SettingsTile(
+                      icon: AppIcons.moon,
+                      iconColor: DAGRDColors.azulSecundario,
+                      title: 'Modo oscuro',
+                      subtitle: 'Cambiar color de la aplicación',
+                      trailing: CustomSvgSwitch(
+                        value: state.darkModeEnabled,
+                        onChanged: (value) {
+                          context.read<HomeBloc>().add(HomeToggleDarkMode(value));
+                        },
+                      ),
+                    ),
+                    SettingsTile(
+                      icon: AppIcons.globe,
+                      iconColor: DAGRDColors.azulSecundario,
+                      title: 'Idioma',
+                      subtitle: 'Seleccionar idioma de la app',
+                      trailing: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(4),
+                          border: Border.all(color: DAGRDColors.outlineVariant, width: 1),
+                          color: DAGRDColors.surfaceVariant,
+                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        child: DropdownButton<String>(
+                          value: state.selectedLanguage,
+                          items: const [
+                            DropdownMenuItem(
+                              value: 'Español',
+                              child: Text(
+                                'Español',
+                                style: TextStyle(
+                                  color: DAGRDColors.grisOscuro,
+                                  fontFamily: 'Work Sans',
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w400,
+                                  height: 1.0,
+                                ),
+                              ),
+                            ),
+                            DropdownMenuItem(
+                              value: 'English',
+                              child: Text(
+                                'English',
+                                style: TextStyle(
+                                  color: DAGRDColors.grisOscuro,
+                                  fontFamily: 'Work Sans',
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w400,
+                                  height: 1.0,
+                                ),
+                              ),
+                            ),
+                          ],
+                          onChanged: (value) {
+                            if (value != null) {
+                              context.read<HomeBloc>().add(HomeChangeLanguage(value));
+                            }
+                          },
+                          underline: const SizedBox(),
+                          isDense: true,
+                        ),
+                      ),
+                    ),
+                    SettingsTile(
+                      icon: AppIcons.database,
+                      iconColor: DAGRDColors.azulSecundario,
+                      showBorder: true,
+                      title: 'Almacenamiento',
+                      subtitle: 'Uso de almacenamiento',
+                      trailing: const Text(
+                        '18,8MB',
+                        textAlign: TextAlign.right,
                         style: TextStyle(
                           color: DAGRDColors.azulSecundario,
                           fontFamily: 'Work Sans',
                           fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          height: 20 / 14,
+                          fontWeight: FontWeight.w400,
+                          height: 16 / 14,
                         ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 14),
-
-            // Sección Ayuda
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: DAGRDColors.outline),
-              ),
-              child: Column(
-                children: [
-                  // Ayuda
-                  _buildSettingsTile(
-                    context: context,
-                    icon: AppIcons.question,
-                    iconColor: DAGRDColors.azulSecundario,
-                    title: 'Ayuda',
-                    subtitle:
-                        'Centro de ayuda, contáctanos, política de privacidad',
-                    onTap: () {
-                      // Implementar navegación a ayuda
-                    },
-                  ),
-
-                  // Acerca de
-                  _buildSettingsTile(
-                    context: context,
-                    icon: AppIcons.info,
-                    iconColor: DAGRDColors.azulSecundario,
-                    title: 'Acerca de',
-                    subtitle: 'Caja de Herramientas DAGRD App v1.0.1',
-                    onTap: () {
-                      // Implementar diálogo de acerca de
-                    },
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 14),
-
-            // Sección Sesión (solo si está autenticado)
-            BlocBuilder<AuthBloc, AuthState>(
-              builder: (context, authState) {
-                if (authState is AuthAuthenticated) {
-                  return Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: DAGRDColors.outline),
-                    ),
-                    child: Column(
-                      children: [
-                        // Cerrar Sesión
-                        _buildSettingsTile(
-                          context: context,
-                          icon: AppIcons.signOut,
-                          iconColor: Colors.red,
-                          title: 'Cerrar Sesión',
-                          subtitle: 'Salir de tu cuenta actual',
-                          onTap: () {
-                            _showLogoutDialog(context);
-                          },
+                    Center(
+                      child: TextButton(
+                        onPressed: () {
+                          context.read<HomeBloc>().add(HomeClearData());
+                          CustomSnackBar.showSuccess(
+                            context,
+                            title: 'Datos limpiados',
+                            message: 'Los datos han sido limpiados correctamente',
+                          );
+                        },
+                        child: const Text(
+                          'Limpiar Datos ahora',
+                          style: TextStyle(
+                            color: DAGRDColors.azulSecundario,
+                            fontFamily: 'Work Sans',
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            height: 20 / 14,
+                          ),
                         ),
-                      ],
+                      ),
                     ),
-                  );
-                }
-                return const SizedBox.shrink(); // No mostrar nada si no está autenticado
-              },
-            ),
-          ],
-        );
-      },
+                  ],
+                ),
+              ),
+              const SizedBox(height: 14),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: DAGRDColors.outline),
+                ),
+                child: Column(
+                  children: [
+                    SettingsTile(
+                      icon: AppIcons.question,
+                      iconColor: DAGRDColors.azulSecundario,
+                      title: 'Ayuda',
+                      subtitle: 'Centro de ayuda, contáctanos, política de privacidad',
+                      onTap: () {
+                        // TODO: Implementar navegación a ayuda
+                      },
+                    ),
+                    SettingsTile(
+                      icon: AppIcons.info,
+                      iconColor: DAGRDColors.azulSecundario,
+                      title: 'Acerca de',
+                      subtitle: 'Caja de Herramientas DAGRD App v1.0.1',
+                      onTap: () {
+                        // TODO: Implementar diálogo de acerca de
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 14),
+              BlocBuilder<AuthBloc, AuthState>(
+                builder: (context, authState) {
+                  if (authState is AuthAuthenticated) {
+                    return Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: DAGRDColors.outline),
+                      ),
+                      child: Column(
+                        children: [
+                          SettingsTile(
+                            icon: AppIcons.signOut,
+                            iconColor: Colors.red,
+                            title: 'Cerrar Sesión',
+                            subtitle: 'Salir de tu cuenta actual',
+                            onTap: () {
+                              CustomActionDialog.show(
+                                context: context,
+                                title: 'Cerrar Sesión',
+                                message: '¿Estás seguro de que deseas cerrar sesión?',
+                                leftButtonText: 'Cancelar',
+                                leftButtonIcon: Icons.close,
+                                rightButtonText: 'Cerrar Sesión',
+                                rightButtonIcon: Icons.logout,
+                                rightButtonColor: Colors.red,
+                                onRightButtonPressed: () {
+                                  Navigator.of(context).pop();
+                                  context.read<HomeBloc>().add(HomeClearData());
+                                  context.read<AuthBloc>().add(const AuthLogoutRequested());
+                                },
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+                  return const SizedBox.shrink();
+                },
+              ),
+            ],
+          );
+        },
       ),
     );
   }
+}
 
-  /// Mostrar diálogo de confirmación para cerrar sesión
-  void _showLogoutDialog(BuildContext context) {
-    CustomActionDialog.show(
-      context: context,
-      title: 'Cerrar Sesión',
-      message: '¿Estás seguro de que deseas cerrar sesión?',
-      leftButtonText: 'Cancelar',
-      leftButtonIcon: Icons.close,
-      rightButtonText: 'Cerrar Sesión',
-      rightButtonIcon: Icons.logout,
-      rightButtonColor: Colors.red,
-      onRightButtonPressed: () {
-        Navigator.of(context).pop();
-        _performLogout(context);
-      },
-    );
-  }
+class SettingsTile extends StatelessWidget {
+  final String icon;
+  final Color iconColor;
+  final String title;
+  final String subtitle;
+  final Widget? trailing;
+  final VoidCallback? onTap;
+  final bool showBorder;
 
-  /// Ejecutar logout
-  void _performLogout(BuildContext context) {
-    // Limpiar datos del HomeBloc
-    context.read<HomeBloc>().add(HomeClearData());
-    
-    // Ejecutar logout en AuthBloc - la navegación se maneja en el listener
-    context.read<AuthBloc>().add(const AuthLogoutRequested());
-  }
+  const SettingsTile({
+    super.key,
+    required this.icon,
+    required this.iconColor,
+    required this.title,
+    required this.subtitle,
+    this.trailing,
+    this.onTap,
+    this.showBorder = false,
+  });
 
-  Widget _buildSettingsTile({
-    required BuildContext context,
-    required String icon,
-    required Color iconColor,
-    required String title,
-    required String subtitle,
-    Widget? trailing,
-    VoidCallback? onTap,
-    bool showBorder = false,
-  }) {
+  @override
+  Widget build(BuildContext context) {
     return Container(
       decoration: showBorder
           ? const BoxDecoration(
@@ -352,7 +314,6 @@ class SettingsScreen extends StatelessWidget {
                   padding: const EdgeInsets.all(10),
                   child: SvgPicture.asset(
                     icon,
-                    key: const ValueKey('active'),
                     width: 20,
                     height: 20,
                     colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
@@ -388,7 +349,7 @@ class SettingsScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              if (trailing != null) trailing,
+              if (trailing != null) trailing!,
             ],
           ),
         ),
