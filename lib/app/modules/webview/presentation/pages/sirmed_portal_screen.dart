@@ -132,13 +132,13 @@ class _SirmedPortalScreenState extends State<SirmedPortalScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(DAGRDColors.azulDAGRD),
+                        valueColor: AlwaysStoppedAnimation<Color>(ThemeColors.azulDAGRD),
                       ),
                       SizedBox(height: 16),
                       Text(
                         'Cargando configuración...',
                         style: TextStyle(
-                          color: DAGRDColors.azulDAGRD,
+                          color: ThemeColors.azulDAGRD,
                           fontFamily: 'Work Sans',
                           fontSize: 16,
                         ),
@@ -165,7 +165,7 @@ class _SirmedPortalScreenState extends State<SirmedPortalScreen> {
         // Barra de navegación
         Container(
           height: 48,
-          color: DAGRDColors.azulDAGRD.withOpacity(0.1),
+          color: ThemeColors.azulDAGRD.withOpacity(0.1),
           child: Row(
             children: [
               IconButton(
@@ -203,7 +203,7 @@ class _SirmedPortalScreenState extends State<SirmedPortalScreen> {
                   height: 16,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation<Color>(DAGRDColors.azulDAGRD),
+                    valueColor: AlwaysStoppedAnimation<Color>(ThemeColors.azulDAGRD),
                   ),
                 ),
               const SizedBox(width: 8),
@@ -224,13 +224,13 @@ class _SirmedPortalScreenState extends State<SirmedPortalScreen> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             CircularProgressIndicator(
-                              valueColor: AlwaysStoppedAnimation<Color>(DAGRDColors.azulDAGRD),
+                              valueColor: AlwaysStoppedAnimation<Color>(ThemeColors.azulDAGRD),
                             ),
                             SizedBox(height: 16),
                             Text(
                               'Cargando portal SIRMED...',
                               style: TextStyle(
-                                color: DAGRDColors.azulDAGRD,
+                                color: ThemeColors.azulDAGRD,
                                 fontFamily: 'Work Sans',
                                 fontSize: 16,
                               ),
@@ -285,7 +285,7 @@ class _SirmedPortalScreenState extends State<SirmedPortalScreen> {
               icon: const Icon(Icons.refresh),
               label: const Text('Reintentar'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: DAGRDColors.azulDAGRD,
+                backgroundColor: ThemeColors.azulDAGRD,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               ),

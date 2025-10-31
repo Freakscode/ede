@@ -65,7 +65,7 @@ class _DataRegistrationScreenState extends State<DataRegistrationScreen> {
                 width: double.infinity,
                 height: 110,
                 decoration: BoxDecoration(
-                  color: DAGRDColors.azulDAGRD,
+                  color: ThemeColors.azulDAGRD,
                   borderRadius: const BorderRadius.vertical(
                     top: Radius.circular(24),
                   ),

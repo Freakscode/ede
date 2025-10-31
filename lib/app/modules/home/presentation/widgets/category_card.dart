@@ -55,7 +55,7 @@ class CategoryCard extends StatelessWidget {
       color: Colors.white,
       borderRadius: BorderRadius.circular(_borderRadius),
       border: Border.all(
-        color: DAGRDColors.azulDAGRD,
+        color: ThemeColors.azulDAGRD,
         width: _borderWidth,
       ),
     );
@@ -63,7 +63,7 @@ class CategoryCard extends StatelessWidget {
 
   TextStyle _getTextStyle() {
     return const TextStyle(
-      color: DAGRDColors.azulDAGRD,
+      color: ThemeColors.azulDAGRD,
       fontFamily: 'Work Sans',
       fontSize: 16,
       fontStyle: FontStyle.normal,

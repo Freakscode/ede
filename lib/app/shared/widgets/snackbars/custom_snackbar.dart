@@ -26,7 +26,7 @@ class CustomSnackBar {
                   SvgPicture.asset(
                     AppIcons.checkCirclev2,
                     colorFilter: const ColorFilter.mode(
-                      DAGRDColors.success,
+                      ThemeColors.success,
                       BlendMode.srcIn,
                     ),
                     width: 24,
@@ -36,7 +36,7 @@ class CustomSnackBar {
                   Text(
                     title ?? 'Ubicación guardada',
                     style: const TextStyle(
-                      color: DAGRDColors.onSurface,
+                      color: ThemeColors.onSurface,
                       fontFamily: 'Work Sans',
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
@@ -50,7 +50,7 @@ class CustomSnackBar {
                 Text(
                   message,
                   style: const TextStyle(
-                    color: DAGRDColors.onSurface,
+                    color: ThemeColors.onSurface,
                     fontFamily: 'Work Sans',
                     fontSize: 14,
                     fontWeight: FontWeight.w400,
@@ -67,7 +67,7 @@ class CustomSnackBar {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
           side: BorderSide(
-            color: DAGRDColors.outline.withOpacity(0.1),
+            color: ThemeColors.outline.withOpacity(0.1),
             width: 1,
           ),
         ),
@@ -96,7 +96,7 @@ class CustomSnackBar {
                   SvgPicture.asset(
                     AppIcons.siren,
                     colorFilter: const ColorFilter.mode(
-                      DAGRDColors.error,
+                      ThemeColors.error,
                       BlendMode.srcIn,
                     ),
                     width: 24,
@@ -106,7 +106,7 @@ class CustomSnackBar {
                   Text(
                     title ?? 'Error',
                     style: const TextStyle(
-                      color: DAGRDColors.onSurface,
+                      color: ThemeColors.onSurface,
                       fontFamily: 'Work Sans',
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
@@ -120,7 +120,7 @@ class CustomSnackBar {
                 Text(
                   message,
                   style: const TextStyle(
-                    color: DAGRDColors.onSurface,
+                    color: ThemeColors.onSurface,
                     fontFamily: 'Work Sans',
                     fontSize: 14,
                     fontWeight: FontWeight.w400,
@@ -137,7 +137,7 @@ class CustomSnackBar {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
           side: BorderSide(
-            color: DAGRDColors.outline.withOpacity(0.1),
+            color: ThemeColors.outline.withOpacity(0.1),
             width: 1,
           ),
         ),
@@ -166,7 +166,7 @@ class CustomSnackBar {
                   SvgPicture.asset(
                     AppIcons.warning,
                     colorFilter: const ColorFilter.mode(
-                      DAGRDColors.warning,
+                      ThemeColors.warning,
                       BlendMode.srcIn,
                     ),
                     width: 24,
@@ -176,7 +176,7 @@ class CustomSnackBar {
                   Text(
                     title ?? 'Advertencia',
                     style: const TextStyle(
-                      color: DAGRDColors.onSurface,
+                      color: ThemeColors.onSurface,
                       fontFamily: 'Work Sans',
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
@@ -190,7 +190,7 @@ class CustomSnackBar {
                 Text(
                   message,
                   style: const TextStyle(
-                    color: DAGRDColors.onSurface,
+                    color: ThemeColors.onSurface,
                     fontFamily: 'Work Sans',
                     fontSize: 14,
                     fontWeight: FontWeight.w400,
@@ -207,7 +207,7 @@ class CustomSnackBar {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
           side: BorderSide(
-            color: DAGRDColors.outline.withOpacity(0.1),
+            color: ThemeColors.outline.withOpacity(0.1),
             width: 1,
           ),
         ),
@@ -236,7 +236,7 @@ class CustomSnackBar {
                   SvgPicture.asset(
                     AppIcons.info,
                     colorFilter: const ColorFilter.mode(
-                      DAGRDColors.info,
+                      ThemeColors.info,
                       BlendMode.srcIn,
                     ),
                     width: 24,
@@ -246,7 +246,7 @@ class CustomSnackBar {
                   Text(
                     title ?? 'Información',
                     style: const TextStyle(
-                      color: DAGRDColors.onSurface,
+                      color: ThemeColors.onSurface,
                       fontFamily: 'Work Sans',
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
@@ -260,7 +260,7 @@ class CustomSnackBar {
                 Text(
                   message,
                   style: const TextStyle(
-                    color: DAGRDColors.onSurface,
+                    color: ThemeColors.onSurface,
                     fontFamily: 'Work Sans',
                     fontSize: 14,
                     fontWeight: FontWeight.w400,
@@ -277,7 +277,7 @@ class CustomSnackBar {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
           side: BorderSide(
-            color: DAGRDColors.outline.withOpacity(0.1),
+            color: ThemeColors.outline.withOpacity(0.1),
             width: 1,
           ),
         ),
@@ -308,7 +308,7 @@ class CustomSnackBar {
             RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
               side: BorderSide(
-                color: DAGRDColors.outline.withOpacity(0.1),
+                color: ThemeColors.outline.withOpacity(0.1),
                 width: 1,
               ),
             ),

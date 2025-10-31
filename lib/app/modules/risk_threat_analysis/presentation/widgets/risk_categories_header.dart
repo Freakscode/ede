@@ -20,7 +20,7 @@ class RiskCategoriesHeader extends StatelessWidget {
           'Metodología de Análisis del Riesgo',
           textAlign: TextAlign.center,
           style: TextStyle(
-            color: DAGRDColors.azulDAGRD,
+            color: ThemeColors.azulDAGRD,
             fontFamily: 'Work Sans',
             fontSize: 20,
             fontStyle: FontStyle.normal,
@@ -33,7 +33,7 @@ class RiskCategoriesHeader extends StatelessWidget {
           'Evento: $selectedEvent',
           textAlign: TextAlign.center,
           style: const TextStyle(
-            color: DAGRDColors.grisMedio,
+            color: ThemeColors.grisMedio,
             fontFamily: 'Work Sans',
             fontSize: 16,
             fontStyle: FontStyle.normal,
@@ -46,7 +46,7 @@ class RiskCategoriesHeader extends StatelessWidget {
           'Selecciona una categoría para comenzar el análisis',
           textAlign: TextAlign.center,
           style: TextStyle(
-            color: DAGRDColors.grisMedio,
+            color: ThemeColors.grisMedio,
             fontFamily: 'Work Sans',
             fontSize: 14,
             fontStyle: FontStyle.normal,

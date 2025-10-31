@@ -56,6 +56,9 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     on<ShowFinalResults>(_onShowFinalResults);
     on<LoadFormData>(_onLoadFormData);
     on<SaveFormData>(_onSaveFormData);
+    on<LoadAmenazaData>(_onLoadAmenazaData);
+    on<LoadVulnerabilidadData>(_onLoadVulnerabilidadData);
+    on<LoadCompleteData>(_onLoadCompleteData);
     on<UpdateImageCoordinates>(_onUpdateImageCoordinates);
     on<GetCurrentLocationForImage>(_onGetCurrentLocationForImage);
     on<SelectLocationFromMapForImage>(_onSelectLocationFromMapForImage);
@@ -681,23 +684,353 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     }
   }
 
-  // ========== MÉTODOS DE COMPATIBILIDAD TEMPORAL ==========
-  // TODO: Refactorizar pantallas para usar nueva arquitectura
+  // ========== HANDLERS PARA CARGAR DATOS COMPLETOS ==========
+
+  Future<void> _onLoadAmenazaData(
+    LoadAmenazaData event,
+    Emitter<RiskThreatAnalysisState> emit,
+  ) async {
+    try {
+      emit(state.setLoading(true));
+
+      // Si hay datos específicos, usarlos directamente
+      if (event.data != null) {
+        final amenazaData = event.data!;
+        
+        // Mapear selecciones de amenaza
+        final probabilidadSelections = Map<String, String>.from(
+          amenazaData['amenazaProbabilidadSelections'] ?? 
+          amenazaData['probabilidadSelections'] ?? {}
+        );
+        final intensidadSelections = Map<String, String>.from(
+          amenazaData['amenazaIntensidadSelections'] ?? 
+          amenazaData['intensidadSelections'] ?? {}
+        );
+        
+        // Mapear scores
+        final amenazaScores = Map<String, double>.from(
+          amenazaData['amenazaScores'] ?? {}
+        );
+        
+        // Mapear evidencias relacionadas con amenaza
+        final evidenceImages = Map<String, List<String>>.from(
+          amenazaData['evidenceImages'] ?? {}
+        );
+        final evidenceCoordinates = Map<String, Map<int, Map<String, String>>>.from(
+          (amenazaData['evidenceCoordinates'] as Map?)?.map(
+            (key, value) => MapEntry(
+              key as String,
+              (value as Map).map(
+                (k, v) => MapEntry(
+                  int.parse(k.toString()),
+                  Map<String, String>.from(v as Map)
+                )
+              )
+            )
+          ) ?? {}
+        );
+
+        // Actualizar solo los datos de amenaza, preservando vulnerabilidad
+        final newState = state.copyWith(
+          selectedRiskEvent: event.eventName,
+          probabilidadSelections: probabilidadSelections,
+          intensidadSelections: intensidadSelections,
+          subClassificationScores: {
+            ...state.subClassificationScores,
+            ...amenazaScores,
+          },
+          evidenceImages: {...state.evidenceImages, ...evidenceImages},
+          evidenceCoordinates: {...state.evidenceCoordinates, ...evidenceCoordinates},
+          isLoading: false,
+          error: null,
+        );
+        
+        emit(newState);
+        return;
+      }
+
+      // Si no hay datos específicos, intentar cargar desde el use case
+      final entity = await _loadRiskAnalysisUseCase.execute(
+        event.eventName,
+        'amenaza',
+      );
+
+      if (entity != null) {
+        // Convertir Map<String, dynamic> a Map<String, String>
+        final stringSelections = entity.selections.map(
+          (key, value) => MapEntry(key, value.toString())
+        );
+        
+        // Cargar solo los datos de amenaza
+        emit(state.copyWith(
+          selectedRiskEvent: entity.eventName,
+          probabilidadSelections: stringSelections,
+          intensidadSelections: stringSelections,
+          evidenceImages: entity.evidenceImages,
+          evidenceCoordinates: entity.evidenceCoordinates,
+          isLoading: false,
+          error: null,
+        ));
+      }
+    } catch (e) {
+      emit(state.setError('Error al cargar datos de amenaza: $e'));
+    } finally {
+      emit(state.setLoading(false));
+    }
+  }
+
+  Future<void> _onLoadVulnerabilidadData(
+    LoadVulnerabilidadData event,
+    Emitter<RiskThreatAnalysisState> emit,
+  ) async {
+    try {
+      emit(state.setLoading(true));
+
+      // Si hay datos específicos, usarlos directamente
+      if (event.data != null) {
+        final vulnerabilidadData = event.data!;
+        
+        // Mapear selecciones de vulnerabilidad
+        final dynamicSelections = Map<String, Map<String, String>>.from(
+          (vulnerabilidadData['vulnerabilidadSelections'] as Map?)?.map(
+            (key, value) => MapEntry(
+              key as String,
+              Map<String, String>.from(value as Map)
+            )
+          ) ?? {}
+        );
+        
+        // Mapear scores
+        final vulnerabilidadScores = Map<String, double>.from(
+          vulnerabilidadData['vulnerabilidadScores'] ?? {}
+        );
+        
+        // Mapear evidencias relacionadas con vulnerabilidad
+        final evidenceImages = Map<String, List<String>>.from(
+          vulnerabilidadData['evidenceImages'] ?? {}
+        );
+        final evidenceCoordinates = Map<String, Map<int, Map<String, String>>>.from(
+          (vulnerabilidadData['evidenceCoordinates'] as Map?)?.map(
+            (key, value) => MapEntry(
+              key as String,
+              (value as Map).map(
+                (k, v) => MapEntry(
+                  int.parse(k.toString()),
+                  Map<String, String>.from(v as Map)
+                )
+              )
+            )
+          ) ?? {}
+        );
+
+        // Actualizar solo los datos de vulnerabilidad, preservando amenaza
+        final newState = state.copyWith(
+          selectedRiskEvent: event.eventName,
+          dynamicSelections: {
+            ...state.dynamicSelections,
+            ...dynamicSelections,
+          },
+          subClassificationScores: {
+            ...state.subClassificationScores,
+            ...vulnerabilidadScores,
+          },
+          evidenceImages: {...state.evidenceImages, ...evidenceImages},
+          evidenceCoordinates: {...state.evidenceCoordinates, ...evidenceCoordinates},
+          isLoading: false,
+          error: null,
+        );
+        
+        emit(newState);
+        return;
+      }
+
+      // Si no hay datos específicos, intentar cargar desde el use case
+      final entity = await _loadRiskAnalysisUseCase.execute(
+        event.eventName,
+        'vulnerabilidad',
+      );
+
+      if (entity != null) {
+        // Convertir Map<String, dynamic> a Map<String, String>
+        final stringSelections = entity.selections.map(
+          (key, value) => MapEntry(key, value.toString())
+        );
+        
+        // Cargar solo los datos de vulnerabilidad
+        emit(state.copyWith(
+          selectedRiskEvent: entity.eventName,
+          dynamicSelections: {
+            'fragilidad_fisica': stringSelections,
+            'fragilidad_personas': stringSelections,
+            'exposicion': stringSelections,
+          },
+          evidenceImages: entity.evidenceImages,
+          evidenceCoordinates: entity.evidenceCoordinates,
+          isLoading: false,
+          error: null,
+        ));
+      }
+    } catch (e) {
+      emit(state.setError('Error al cargar datos de vulnerabilidad: $e'));
+    } finally {
+      emit(state.setLoading(false));
+    }
+  }
+
+  Future<void> _onLoadCompleteData(
+    LoadCompleteData event,
+    Emitter<RiskThreatAnalysisState> emit,
+  ) async {
+    try {
+      emit(state.setLoading(true));
+
+      // Si hay datos específicos, usarlos directamente
+      if (event.data != null) {
+        final completeData = event.data!;
+        
+        // Mapear datos de amenaza
+        final probabilidadSelections = Map<String, String>.from(
+          completeData['amenazaProbabilidadSelections'] ?? 
+          completeData['probabilidadSelections'] ?? {}
+        );
+        final intensidadSelections = Map<String, String>.from(
+          completeData['amenazaIntensidadSelections'] ?? 
+          completeData['intensidadSelections'] ?? {}
+        );
+        
+        // Mapear datos de vulnerabilidad
+        final dynamicSelections = Map<String, Map<String, String>>.from(
+          (completeData['vulnerabilidadSelections'] as Map?)?.map(
+            (key, value) => MapEntry(
+              key as String,
+              Map<String, String>.from(value as Map)
+            )
+          ) ?? 
+          (completeData['dynamicSelections'] as Map?)?.map(
+            (key, value) => MapEntry(
+              key as String,
+              Map<String, String>.from(value as Map)
+            )
+          ) ?? {}
+        );
+        
+        // Mapear scores combinados
+        final amenazaScores = Map<String, double>.from(
+          completeData['amenazaScores'] ?? {}
+        );
+        final vulnerabilidadScores = Map<String, double>.from(
+          completeData['vulnerabilidadScores'] ?? {}
+        );
+        
+        // Mapear evidencias
+        final evidenceImages = Map<String, List<String>>.from(
+          completeData['evidenceImages'] ?? {}
+        );
+        final evidenceCoordinates = Map<String, Map<int, Map<String, String>>>.from(
+          (completeData['evidenceCoordinates'] as Map?)?.map(
+            (key, value) => MapEntry(
+              key as String,
+              (value as Map).map(
+                (k, v) => MapEntry(
+                  int.parse(k.toString()),
+                  Map<String, String>.from(v as Map)
+                )
+              )
+            )
+          ) ?? {}
+        );
+
+        // Actualizar todos los datos
+        final newState = state.copyWith(
+          selectedRiskEvent: event.eventName,
+          probabilidadSelections: probabilidadSelections,
+          intensidadSelections: intensidadSelections,
+          dynamicSelections: dynamicSelections,
+          subClassificationScores: {
+            ...amenazaScores,
+            ...vulnerabilidadScores,
+          },
+          evidenceImages: evidenceImages,
+          evidenceCoordinates: evidenceCoordinates,
+          isLoading: false,
+          error: null,
+        );
+        
+        emit(newState);
+        return;
+      }
+
+      // Si no hay datos específicos, cargar ambos desde el use case
+      final amenazaEntity = await _loadRiskAnalysisUseCase.execute(
+        event.eventName,
+        'amenaza',
+      );
+      final vulnerabilidadEntity = await _loadRiskAnalysisUseCase.execute(
+        event.eventName,
+        'vulnerabilidad',
+      );
+
+      if (amenazaEntity != null || vulnerabilidadEntity != null) {
+        // Convertir Map<String, dynamic> a Map<String, String> para amenaza
+        final amenazaStringSelections = amenazaEntity?.selections.map(
+          (key, value) => MapEntry(key, value.toString())
+        ) ?? {};
+        
+        // Convertir Map<String, dynamic> a Map<String, String> para vulnerabilidad
+        final vulnerabilidadStringSelections = vulnerabilidadEntity?.selections.map(
+          (key, value) => MapEntry(key, value.toString())
+        ) ?? {};
+        
+        emit(state.copyWith(
+          selectedRiskEvent: event.eventName,
+          probabilidadSelections: amenazaStringSelections,
+          intensidadSelections: amenazaStringSelections,
+          dynamicSelections: vulnerabilidadStringSelections.isNotEmpty
+            ? {
+                'fragilidad_fisica': vulnerabilidadStringSelections,
+                'fragilidad_personas': vulnerabilidadStringSelections,
+                'exposicion': vulnerabilidadStringSelections,
+              }
+            : state.dynamicSelections,
+          evidenceImages: {
+            ...(amenazaEntity?.evidenceImages ?? {}),
+            ...(vulnerabilidadEntity?.evidenceImages ?? {}),
+          },
+          evidenceCoordinates: {
+            ...(amenazaEntity?.evidenceCoordinates ?? {}),
+            ...(vulnerabilidadEntity?.evidenceCoordinates ?? {}),
+          },
+          isLoading: false,
+          error: null,
+        ));
+      }
+    } catch (e) {
+      emit(state.setError('Error al cargar datos completos: $e'));
+    } finally {
+      emit(state.setLoading(false));
+    }
+  }
+
+  // ========== MÉTODOS PÚBLICOS PARA CARGAR DATOS ==========
+
+  /// Carga los datos completos de amenaza
+  void loadAmenazaData(String eventName, {Map<String, dynamic>? data}) {
+    add(LoadAmenazaData(eventName: eventName, data: data));
+  }
+
+  /// Carga los datos completos de vulnerabilidad
+  void loadVulnerabilidadData(String eventName, {Map<String, dynamic>? data}) {
+    add(LoadVulnerabilidadData(eventName: eventName, data: data));
+  }
+
+  /// Carga los datos completos (amenaza + vulnerabilidad)
+  void loadCompleteData(String eventName, {Map<String, dynamic>? data}) {
+    add(LoadCompleteData(eventName: eventName, data: data));
+  }
 
   /// Método de compatibilidad temporal
   List<RiskSubClassification> getCurrentSubClassifications() {
-    // Usar el evento seleccionado dinámicamente
-    final riskEvent = RiskEventFactory.getEventByName(state.selectedRiskEvent ?? '') ??
-        RiskEventFactory.createMovimientoEnMasa();
-    
-    // Buscar la clasificación actual
-    final classification = riskEvent.classifications.firstWhere(
-      (c) => c.name.toLowerCase() == (state.selectedClassification ?? '').toLowerCase(),
-      orElse: () => riskEvent.classifications.first,
-    );
-    
-    // Retornar los objetos completos para que tengan acceso a categories
-    return classification.subClassifications;
+    return _getSubClassificationsByType(state.selectedClassification ?? '');
   }
 
   /// Método para obtener el valor seleccionado de una subclasificación
@@ -742,28 +1075,24 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     return state.dropdownOpenStates[subClassificationId] ?? false;
   }
 
-  /// Método de compatibilidad temporal
-  List<dynamic> getCategoriesForCurrentSubClassification(String subClassificationId) {
-    // Usar el evento seleccionado dinámicamente
-    final riskEvent = RiskEventFactory.getEventByName(state.selectedRiskEvent ?? '') ??
-        RiskEventFactory.createMovimientoEnMasa();
+  /// Obtener categorías de una subclasificación específica sin depender de selectedClassification
+  List<dynamic> getCategoriesForSubClassificationById(String subClassificationId, String? classificationType) {
+    final classificationTypeToUse = classificationType ?? state.selectedClassification ?? '';
+    final subClassifications = _getSubClassificationsByType(classificationTypeToUse);
     
-    // Buscar la clasificación actual
-    final classification = riskEvent.classifications.firstWhere(
-      (c) => c.name.toLowerCase() == (state.selectedClassification ?? '').toLowerCase(),
-      orElse: () => riskEvent.classifications.first,
-    );
-    
-    // Buscar la subclasificación actual
-    final subClassification = classification.subClassifications.firstWhere(
+    // Buscar la subclasificación
+    final subClassification = subClassifications.firstWhere(
       (s) => s.id == subClassificationId,
-      orElse: () => classification.subClassifications.first,
+      orElse: () => subClassifications.first,
     );
     
     // Convertir categorías a formato compatible usando el adaptador
-    final dropdownCategories = RiskModelAdapter.convertToDropdownCategories(subClassification.categories);
+    return RiskModelAdapter.convertToDropdownCategories(subClassification.categories);
+  }
     
-    return dropdownCategories;
+  /// Método de compatibilidad temporal
+  List<dynamic> getCategoriesForCurrentSubClassification(String subClassificationId) {
+    return getCategoriesForSubClassificationById(subClassificationId, null);
   }
 
   /// Método de compatibilidad temporal
@@ -786,28 +1115,80 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
 
   /// Método de compatibilidad temporal para obtener subclasificaciones de amenaza
   List<RiskSubClassification> getAmenazaSubClassifications() {
-    final riskEvent = RiskEventFactory.getEventByName(state.selectedRiskEvent ?? '') ??
-        RiskEventFactory.createMovimientoEnMasa();
-    final amenazaClassification = riskEvent.classifications.firstWhere(
-      (c) => c.name.toLowerCase() == 'amenaza',
-      orElse: () => riskEvent.classifications.first,
-    );
-    
-    // Retornar los objetos completos para que tengan acceso a categories
-    return amenazaClassification.subClassifications;
+    return _getSubClassificationsByType('amenaza');
   }
 
   /// Método de compatibilidad temporal para obtener subclasificaciones de vulnerabilidad
   List<RiskSubClassification> getVulnerabilidadSubClassifications() {
+    return _getSubClassificationsByType('vulnerabilidad');
+  }
+
+  /// Método helper para obtener subclasificaciones por tipo
+  List<RiskSubClassification> _getSubClassificationsByType(String classificationType) {
     final riskEvent = RiskEventFactory.getEventByName(state.selectedRiskEvent ?? '') ??
         RiskEventFactory.createMovimientoEnMasa();
-    final vulnerabilidadClassification = riskEvent.classifications.firstWhere(
-      (c) => c.name.toLowerCase() == 'vulnerabilidad',
+    final classification = riskEvent.classifications.firstWhere(
+      (c) => c.name.toLowerCase() == classificationType,
       orElse: () => riskEvent.classifications.first,
     );
+    return classification.subClassifications;
+  }
+
+  /// Obtener IDs de subclasificaciones por tipo
+  List<String> getSubClassificationIds(String classificationType) {
+    final subClassifications = _getSubClassificationsByType(classificationType);
+    return subClassifications.map((s) => s.id).toList();
+  }
+
+  /// Obtener nombre de una subclasificación por su ID y tipo
+  String getSubClassificationName(String subClassificationId, String classificationType) {
+    final subClassifications = _getSubClassificationsByType(classificationType);
+    final subClass = subClassifications.firstWhere(
+      (s) => s.id == subClassificationId,
+      orElse: () => subClassifications.first,
+    );
+    return subClass.name;
+  }
+
+  /// Helper para calcular score de vulnerabilidad con promedio ponderado
+  Map<String, dynamic> _calculateVulnerabilidadScore() {
+    const Map<String, double> pesos = {
+      'fragilidad_fisica': 0.45,
+      'fragilidad_personas': 0.10,
+      'exposicion': 0.45,
+    };
     
-    // Retornar los objetos completos para que tengan acceso a categories
-    return vulnerabilidadClassification.subClassifications;
+    double weightedSum = 0.0;
+    int count = 0;
+    
+    for (final entry in state.subClassificationScores.entries) {
+      final subClassificationId = entry.key;
+      final subScore = entry.value;
+      final peso = pesos[subClassificationId] ?? 0.0;
+      
+      if (subScore > 0 && peso > 0) {
+        weightedSum += (subScore * peso);
+        count++;
+      }
+    }
+    
+    if (count > 0 && weightedSum > 0) {
+      return {'score': weightedSum, 'valid': true};
+    }
+    
+    return {'score': 0.0, 'valid': false};
+  }
+
+  /// Helper para verificar si hay selecciones válidas
+  bool _hasValidSelections() {
+    bool hasValidSelections = false;
+    for (final entry in state.dynamicSelections.entries) {
+      if (entry.value.isNotEmpty) {
+        hasValidSelections = true;
+        break;
+      }
+    }
+    return hasValidSelections;
   }
 
   /// Método de compatibilidad temporal
@@ -833,90 +1214,57 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
       if ((state.selectedClassification ?? '').toLowerCase() == 'amenaza') {
         // Verificar si hay selecciones REALES del usuario
         if (state.probabilidadSelections.isEmpty && state.intensidadSelections.isEmpty) {
-          return DAGRDColors.outlineVariant;
+          return ThemeColors.outlineVariant;
         }
         
         // Para amenaza, usar el use case
         final formData = getCurrentFormData();
         final globalScoreInfo = _calculateGlobalScoreUseCase.getGlobalScoreInfo(formData);
         score = globalScoreInfo['amenazaScore'] ?? 0.0;
-        color = globalScoreInfo['amenazaColor'] ?? DAGRDColors.outlineVariant;
+        color = globalScoreInfo['amenazaColor'] ?? ThemeColors.outlineVariant;
       } else if ((state.selectedClassification ?? '').toLowerCase() == 'vulnerabilidad') {
         // Verificar si hay selecciones REALES del usuario
-        if (state.dynamicSelections.isEmpty) {
-          return DAGRDColors.outlineVariant;
+        if (state.dynamicSelections.isEmpty || !_hasValidSelections()) {
+          return ThemeColors.outlineVariant;
         }
         
-        // Verificar si hay al menos una selección no vacía
-        bool hasValidSelections = false;
-        for (final entry in state.dynamicSelections.entries) {
-          if (entry.value.isNotEmpty) {
-            hasValidSelections = true;
-            break;
-          }
-        }
-        
-        if (!hasValidSelections) {
-          return DAGRDColors.outlineVariant;
-        }
-        
-        // Para vulnerabilidad, calcular con promedio PONDERADO
-        // Pesos según Excel: FRAGILIDAD FÍSICA: 45%, FRAGILIDAD EN PERSONAS: 10%, EXPOSICIÓN: 45%
-        final Map<String, double> pesos = {
-          'fragilidad_fisica': 0.45,
-          'fragilidad_personas': 0.10,
-          'exposicion': 0.45,
-        };
-        
-        double weightedSum = 0.0;
-        int count = 0;
-        
-        for (final entry in state.subClassificationScores.entries) {
-          final subClassificationId = entry.key;
-          final subScore = entry.value;
-          final peso = pesos[subClassificationId] ?? 0.0;
-          
-          if (subScore > 0 && peso > 0) {
-            weightedSum += (subScore * peso);
-            count++;
-          }
-        }
-        
-        if (count > 0 && weightedSum > 0) {
-          score = weightedSum; // Los pesos ya suman 1.0
+        // Calcular score de vulnerabilidad con promedio ponderado
+        final vulnResult = _calculateVulnerabilidadScore();
+        if (vulnResult['valid'] == true) {
+          score = vulnResult['score'] as double;
           color = _getColorFromScore(score);
         } else {
           score = 0.0;
-          color = DAGRDColors.outlineVariant;
+          color = ThemeColors.outlineVariant;
         }
       } else {
         final formData = getCurrentFormData();
         final globalScoreInfo = _calculateGlobalScoreUseCase.getGlobalScoreInfo(formData);
         score = globalScoreInfo['finalScore'] ?? 0.0;
-        color = globalScoreInfo['finalColor'] ?? DAGRDColors.outlineVariant;
+        color = globalScoreInfo['finalColor'] ?? ThemeColors.outlineVariant;
       }
       
       // Si no hay score (0.0), devolver el color de borde específico
       if (score == 0.0) {
-        return DAGRDColors.outlineVariant; // #D1D5DB
+        return ThemeColors.outlineVariant; // #D1D5DB
       }
       
       return color;
     } catch (e) {
-      return DAGRDColors.outlineVariant; // #D1D5DB
+      return ThemeColors.outlineVariant; // #D1D5DB
     }
   }
   
   /// Helper para obtener color desde score
   Color _getColorFromScore(double score) {
     if (score <= 1.5) {
-      return DAGRDColors.nivelBajo;
+      return ThemeColors.nivelBajo;
     } else if (score <= 2.5) {
-      return DAGRDColors.nivelMedioBajo;
+      return ThemeColors.nivelMedioBajo;
     } else if (score <= 3.5) {
-      return DAGRDColors.nivelMedioAlto;
+      return ThemeColors.nivelMedioAlto;
     } else if (score <= 4.5) {
-      return DAGRDColors.nivelAlto;
+      return ThemeColors.nivelAlto;
     } else {
       return Colors.deepPurple;
     }
@@ -941,47 +1289,14 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
         level = globalScoreInfo['amenazaLevel'] ?? 'SIN CALIFICAR';
       } else if ((state.selectedClassification ?? '').toLowerCase() == 'vulnerabilidad') {
         // Para vulnerabilidad, verificar si hay selecciones REALES del usuario
-        if (state.dynamicSelections.isEmpty) {
+        if (state.dynamicSelections.isEmpty || !_hasValidSelections()) {
           return 'SIN CALIFICAR';
         }
         
-        // Verificar si hay al menos una selección no vacía
-        bool hasValidSelections = false;
-        for (final entry in state.dynamicSelections.entries) {
-          if (entry.value.isNotEmpty) {
-            hasValidSelections = true;
-            break;
-          }
-        }
-        
-        if (!hasValidSelections) {
-          return 'SIN CALIFICAR';
-        }
-        
-        // Usar los scores ya calculados en el state con promedio PONDERADO
-        // Pesos según Excel: FRAGILIDAD FÍSICA: 45%, FRAGILIDAD EN PERSONAS: 10%, EXPOSICIÓN: 45%
-        final Map<String, double> pesos = {
-          'fragilidad_fisica': 0.45,
-          'fragilidad_personas': 0.10,
-          'exposicion': 0.45,
-        };
-        
-        double weightedSum = 0.0;
-        int count = 0;
-        
-        for (final entry in state.subClassificationScores.entries) {
-          final subClassificationId = entry.key;
-          final subScore = entry.value;
-          final peso = pesos[subClassificationId] ?? 0.0;
-          
-          if (subScore > 0 && peso > 0) {
-            weightedSum += (subScore * peso);
-            count++;
-          }
-        }
-        
-        if (count > 0 && weightedSum > 0) {
-          score = weightedSum; // Los pesos ya suman 1.0, no necesitamos dividir
+        // Calcular score de vulnerabilidad con promedio ponderado
+        final vulnResult = _calculateVulnerabilidadScore();
+        if (vulnResult['valid'] == true) {
+          score = vulnResult['score'] as double;
           level = _getLevelFromScore(score);
         } else {
           score = 0.0;
@@ -1046,51 +1361,18 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
         bgColor = globalScoreInfo['amenazaColor'] ?? Colors.grey;
       } else if ((state.selectedClassification ?? '').toLowerCase() == 'vulnerabilidad') {
         // Verificar si hay selecciones REALES del usuario
-        if (state.dynamicSelections.isEmpty) {
+        if (state.dynamicSelections.isEmpty || !_hasValidSelections()) {
           return Colors.black;
         }
         
-        // Verificar si hay al menos una selección no vacía
-        bool hasValidSelections = false;
-        for (final entry in state.dynamicSelections.entries) {
-          if (entry.value.isNotEmpty) {
-            hasValidSelections = true;
-            break;
-          }
-        }
-        
-        if (!hasValidSelections) {
-          return Colors.black;
-        }
-        
-        // Para vulnerabilidad, calcular con promedio PONDERADO
-        // Pesos según Excel: FRAGILIDAD FÍSICA: 45%, FRAGILIDAD EN PERSONAS: 10%, EXPOSICIÓN: 45%
-        final Map<String, double> pesos = {
-          'fragilidad_fisica': 0.45,
-          'fragilidad_personas': 0.10,
-          'exposicion': 0.45,
-        };
-        
-        double weightedSum = 0.0;
-        int count = 0;
-        
-        for (final entry in state.subClassificationScores.entries) {
-          final subClassificationId = entry.key;
-          final subScore = entry.value;
-          final peso = pesos[subClassificationId] ?? 0.0;
-          
-          if (subScore > 0 && peso > 0) {
-            weightedSum += (subScore * peso);
-            count++;
-          }
-        }
-        
-        if (count > 0 && weightedSum > 0) {
-          score = weightedSum; // Los pesos ya suman 1.0
+        // Calcular score de vulnerabilidad con promedio ponderado
+        final vulnResult = _calculateVulnerabilidadScore();
+        if (vulnResult['valid'] == true) {
+          score = vulnResult['score'] as double;
           bgColor = _getColorFromScore(score);
         } else {
           score = 0.0;
-          bgColor = DAGRDColors.outlineVariant;
+          bgColor = ThemeColors.outlineVariant;
         }
       } else {
         final formData = getCurrentFormData();
@@ -1106,7 +1388,7 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
       
       // Retornar color de texto basado en el color de fondo
       // Todos los colores DAGRD usan texto blanco excepto el gris
-      return bgColor == DAGRDColors.outlineVariant ? Colors.black : Colors.white;
+      return bgColor == ThemeColors.outlineVariant ? Colors.black : Colors.white;
     } catch (e) {
       return Colors.black;
     }
@@ -1165,7 +1447,7 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
 
   /// Método centralizado para obtener el color basado en el rating
   Color getColorFromRating(int rating) {
-    return DAGRDColors.getNivelColorFromRating(rating);
+    return ThemeColors.getNivelColorFromRating(rating);
   }
 
   /// Método centralizado para obtener la selección de una categoría
@@ -1182,8 +1464,11 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
   }
 
   /// Método centralizado para calcular el score de una sección
-  String calculateSectionScore(String subClassificationId) {
-    final categories = getCategoriesForCurrentSubClassification(subClassificationId);
+  /// [classificationType] es opcional y permite especificar la clasificación explícitamente
+  String calculateSectionScore(String subClassificationId, [String? classificationType]) {
+    final categories = classificationType != null 
+        ? getCategoriesForSubClassificationById(subClassificationId, classificationType)
+        : getCategoriesForCurrentSubClassification(subClassificationId);
     
     // Si existe un score pre-calculado en el state, usarlo
     if (state.subClassificationScores.containsKey(subClassificationId)) {
@@ -1211,8 +1496,11 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
   }
 
   /// Método centralizado para obtener items de una subclasificación
-  List<Map<String, dynamic>> getItemsForSubClassification(String subClassificationId) {
-    final categories = getCategoriesForCurrentSubClassification(subClassificationId);
+  /// [classificationType] es opcional y permite especificar la clasificación explícitamente
+  List<Map<String, dynamic>> getItemsForSubClassification(String subClassificationId, [String? classificationType]) {
+    final categories = classificationType != null 
+        ? getCategoriesForSubClassificationById(subClassificationId, classificationType)
+        : getCategoriesForCurrentSubClassification(subClassificationId);
     final items = <Map<String, dynamic>>[];
     
     for (final category in categories) {
@@ -1227,7 +1515,20 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
         title = '${category.title} - Sin calificar';
       }
 
-      items.add({'rating': rating, 'title': title, 'color': color});
+      // Obtener detailedItems del RiskLevel correspondiente
+      List<String>? detailedItems;
+      if (rating > 0 && rating <= category.detailedLevels.length) {
+        final levelIndex = rating - 1;
+        final level = category.detailedLevels[levelIndex];
+        detailedItems = level.items;
+      }
+
+      items.add({
+        'rating': rating,
+        'title': title,
+        'color': color,
+        'detailedItems': detailedItems,
+      });
     }
     
     return items;
@@ -1322,13 +1623,13 @@ class RiskThreatAnalysisBloc extends Bloc<RiskThreatAnalysisEvent, RiskThreatAna
     if (score == 0) {
       return Colors.transparent; 
     } else if (score <= 1.75) {
-      return DAGRDColors.nivelBajo; 
+      return ThemeColors.nivelBajo; 
     } else if (score <= 2.50) {
-      return DAGRDColors.nivelMedioBajo; 
+      return ThemeColors.nivelMedioBajo; 
     } else if (score <= 3.25) {
-      return DAGRDColors.nivelMedioAlto; 
+      return ThemeColors.nivelMedioAlto; 
     } else {
-      return DAGRDColors.nivelAlto; 
+      return ThemeColors.nivelAlto; 
     }
   }
 

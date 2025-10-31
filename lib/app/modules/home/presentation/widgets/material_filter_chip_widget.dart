@@ -22,7 +22,7 @@ class MaterialFilterChipWidget extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? DAGRDColors.azulDAGRD : Colors.grey.shade200,
+          color: isSelected ? ThemeColors.azulDAGRD : Colors.grey.shade200,
           borderRadius: BorderRadius.circular(20),
         ),
         child: Center(

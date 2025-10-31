@@ -25,7 +25,7 @@ class AppTheme {
     appBarTheme: _appBarTheme,
     
     // Configuración de Scaffold
-    scaffoldBackgroundColor: DAGRDColors.surface,
+    scaffoldBackgroundColor: ThemeColors.surface,
     
     // Configuración de Cards
     cardTheme: _cardTheme,
@@ -76,45 +76,45 @@ class AppTheme {
 
   static ColorScheme get _colorScheme => const ColorScheme.light(
     // Colores primarios
-    primary: DAGRDColors.azulDAGRD,
-    onPrimary: DAGRDColors.onPrimary,
-    primaryContainer: DAGRDColors.azulSecundario,
-    onPrimaryContainer: DAGRDColors.onPrimary,
+    primary: ThemeColors.azulDAGRD,
+    onPrimary: ThemeColors.onPrimary,
+    primaryContainer: ThemeColors.azulSecundario,
+    onPrimaryContainer: ThemeColors.onPrimary,
     
     // Colores secundarios
-    secondary: DAGRDColors.amarilloDAGRD,
-    onSecondary: DAGRDColors.onSecondary,
-    secondaryContainer: DAGRDColors.amarDAGRD,
-    onSecondaryContainer: DAGRDColors.onSecondary,
+    secondary: ThemeColors.amarilloDAGRD,
+    onSecondary: ThemeColors.onSecondary,
+    secondaryContainer: ThemeColors.amarDAGRD,
+    onSecondaryContainer: ThemeColors.onSecondary,
     
     // Colores de superficie
-    surface: DAGRDColors.surface,
-    onSurface: DAGRDColors.onSurface,
-    surfaceVariant: DAGRDColors.surfaceVariant,
-    onSurfaceVariant: DAGRDColors.onSurfaceVariant,
+    surface: ThemeColors.surface,
+    onSurface: ThemeColors.onSurface,
+    surfaceVariant: ThemeColors.surfaceVariant,
+    onSurfaceVariant: ThemeColors.onSurfaceVariant,
     
     // Colores de fondo
-    background: DAGRDColors.surface,
-    onBackground: DAGRDColors.onSurface,
+    background: ThemeColors.surface,
+    onBackground: ThemeColors.onSurface,
     
     // Colores de error
-    error: DAGRDColors.error,
-    onError: DAGRDColors.onPrimary,
+    error: ThemeColors.error,
+    onError: ThemeColors.onPrimary,
     errorContainer: Color(0xFFFFDAD6),
     onErrorContainer: Color(0xFF410002),
     
     // Colores de outline
-    outline: DAGRDColors.outline,
-    outlineVariant: DAGRDColors.outlineVariant,
+    outline: ThemeColors.outline,
+    outlineVariant: ThemeColors.outlineVariant,
     
     // Colores de sombra
     shadow: Color(0xFF000000),
     scrim: Color(0xFF000000),
     
     // Colores de superficie inversa
-    inverseSurface: DAGRDColors.grisOscuro,
-    onInverseSurface: DAGRDColors.onPrimary,
-    inversePrimary: DAGRDColors.amarilloDAGRD,
+    inverseSurface: ThemeColors.grisOscuro,
+    onInverseSurface: ThemeColors.onPrimary,
+    inversePrimary: ThemeColors.amarilloDAGRD,
   );
 
   // ============================================================================
@@ -122,18 +122,18 @@ class AppTheme {
   // ============================================================================
 
   static AppBarTheme get _appBarTheme => const AppBarTheme(
-    backgroundColor: DAGRDColors.azulDAGRD,
-    foregroundColor: DAGRDColors.onPrimary,
+    backgroundColor: ThemeColors.azulDAGRD,
+    foregroundColor: ThemeColors.onPrimary,
     elevation: 0,
     centerTitle: true,
     titleTextStyle: TextStyle(
-      color: DAGRDColors.onPrimary,
+      color: ThemeColors.onPrimary,
       fontSize: 20,
       fontWeight: FontWeight.w600,
       fontFamily: 'Work Sans',
     ),
     iconTheme: IconThemeData(
-      color: DAGRDColors.onPrimary,
+      color: ThemeColors.onPrimary,
       size: 24,
     ),
     systemOverlayStyle: SystemUiOverlayStyle.light,
@@ -144,9 +144,9 @@ class AppTheme {
   // ============================================================================
 
   static CardThemeData get _cardTheme => CardThemeData(
-    color: DAGRDColors.surface,
+    color: ThemeColors.surface,
     elevation: 2,
-    shadowColor: DAGRDColors.grisOscuro,
+    shadowColor: ThemeColors.grisOscuro,
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(12),
     ),
@@ -159,10 +159,10 @@ class AppTheme {
 
   static ElevatedButtonThemeData get _elevatedButtonTheme => ElevatedButtonThemeData(
     style: ElevatedButton.styleFrom(
-      backgroundColor: DAGRDColors.azulDAGRD,
-      foregroundColor: DAGRDColors.onPrimary,
+      backgroundColor: ThemeColors.azulDAGRD,
+      foregroundColor: ThemeColors.onPrimary,
       elevation: 2,
-      shadowColor: DAGRDColors.grisOscuro,
+      shadowColor: ThemeColors.grisOscuro,
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
@@ -177,7 +177,7 @@ class AppTheme {
 
   static TextButtonThemeData get _textButtonTheme => TextButtonThemeData(
     style: TextButton.styleFrom(
-      foregroundColor: DAGRDColors.azulDAGRD,
+      foregroundColor: ThemeColors.azulDAGRD,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       textStyle: const TextStyle(
         fontSize: 14,
@@ -189,8 +189,8 @@ class AppTheme {
 
   static OutlinedButtonThemeData get _outlinedButtonTheme => OutlinedButtonThemeData(
     style: OutlinedButton.styleFrom(
-      foregroundColor: DAGRDColors.azulDAGRD,
-      side: const BorderSide(color: DAGRDColors.azulDAGRD),
+      foregroundColor: ThemeColors.azulDAGRD,
+      side: const BorderSide(color: ThemeColors.azulDAGRD),
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
@@ -204,8 +204,8 @@ class AppTheme {
   );
 
   static FloatingActionButtonThemeData get _floatingActionButtonTheme => const FloatingActionButtonThemeData(
-    backgroundColor: DAGRDColors.amarilloDAGRD,
-    foregroundColor: DAGRDColors.onSecondary,
+    backgroundColor: ThemeColors.amarilloDAGRD,
+    foregroundColor: ThemeColors.onSecondary,
     elevation: 4,
   );
 
@@ -215,34 +215,34 @@ class AppTheme {
 
   static InputDecorationTheme get _inputDecorationTheme => InputDecorationTheme(
     filled: true,
-    fillColor: DAGRDColors.surface,
+    fillColor: ThemeColors.surface,
     border: OutlineInputBorder(
       borderRadius: BorderRadius.circular(8),
-      borderSide: const BorderSide(color: DAGRDColors.outline),
+      borderSide: const BorderSide(color: ThemeColors.outline),
     ),
     enabledBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(8),
-      borderSide: const BorderSide(color: DAGRDColors.outline),
+      borderSide: const BorderSide(color: ThemeColors.outline),
     ),
     focusedBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(8),
-      borderSide: const BorderSide(color: DAGRDColors.azulDAGRD, width: 2),
+      borderSide: const BorderSide(color: ThemeColors.azulDAGRD, width: 2),
     ),
     errorBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(8),
-      borderSide: const BorderSide(color: DAGRDColors.error),
+      borderSide: const BorderSide(color: ThemeColors.error),
     ),
     focusedErrorBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(8),
-      borderSide: const BorderSide(color: DAGRDColors.error, width: 2),
+      borderSide: const BorderSide(color: ThemeColors.error, width: 2),
     ),
     labelStyle: const TextStyle(
-      color: DAGRDColors.onSurfaceVariant,
+      color: ThemeColors.onSurfaceVariant,
       fontSize: 14,
       fontFamily: 'Work Sans',
     ),
     hintStyle: const TextStyle(
-      color: DAGRDColors.onSurfaceVariant,
+      color: ThemeColors.onSurfaceVariant,
       fontSize: 14,
       fontFamily: 'Work Sans',
     ),
@@ -256,21 +256,21 @@ class AppTheme {
   static TextTheme get _textTheme => const TextTheme(
     // Títulos grandes
     headlineLarge: TextStyle(
-      color: DAGRDColors.onSurface,
+      color: ThemeColors.onSurface,
       fontSize: 32,
       fontWeight: FontWeight.w700,
       fontFamily: 'Work Sans',
       height: 1.25,
     ),
     headlineMedium: TextStyle(
-      color: DAGRDColors.onSurface,
+      color: ThemeColors.onSurface,
       fontSize: 28,
       fontWeight: FontWeight.w600,
       fontFamily: 'Work Sans',
       height: 1.29,
     ),
     headlineSmall: TextStyle(
-      color: DAGRDColors.onSurface,
+      color: ThemeColors.onSurface,
       fontSize: 24,
       fontWeight: FontWeight.w600,
       fontFamily: 'Work Sans',
@@ -279,21 +279,21 @@ class AppTheme {
     
     // Títulos
     titleLarge: TextStyle(
-      color: DAGRDColors.onSurface,
+      color: ThemeColors.onSurface,
       fontSize: 22,
       fontWeight: FontWeight.w600,
       fontFamily: 'Work Sans',
       height: 1.27,
     ),
     titleMedium: TextStyle(
-      color: DAGRDColors.onSurface,
+      color: ThemeColors.onSurface,
       fontSize: 16,
       fontWeight: FontWeight.w600,
       fontFamily: 'Work Sans',
       height: 1.5,
     ),
     titleSmall: TextStyle(
-      color: DAGRDColors.onSurface,
+      color: ThemeColors.onSurface,
       fontSize: 14,
       fontWeight: FontWeight.w600,
       fontFamily: 'Work Sans',
@@ -302,21 +302,21 @@ class AppTheme {
     
     // Texto del cuerpo
     bodyLarge: TextStyle(
-      color: DAGRDColors.onSurface,
+      color: ThemeColors.onSurface,
       fontSize: 16,
       fontWeight: FontWeight.w400,
       fontFamily: 'Work Sans',
       height: 1.5,
     ),
     bodyMedium: TextStyle(
-      color: DAGRDColors.onSurface,
+      color: ThemeColors.onSurface,
       fontSize: 14,
       fontWeight: FontWeight.w400,
       fontFamily: 'Work Sans',
       height: 1.43,
     ),
     bodySmall: TextStyle(
-      color: DAGRDColors.onSurfaceVariant,
+      color: ThemeColors.onSurfaceVariant,
       fontSize: 12,
       fontWeight: FontWeight.w400,
       fontFamily: 'Work Sans',
@@ -325,21 +325,21 @@ class AppTheme {
     
     // Etiquetas
     labelLarge: TextStyle(
-      color: DAGRDColors.onSurface,
+      color: ThemeColors.onSurface,
       fontSize: 14,
       fontWeight: FontWeight.w500,
       fontFamily: 'Work Sans',
       height: 1.43,
     ),
     labelMedium: TextStyle(
-      color: DAGRDColors.onSurface,
+      color: ThemeColors.onSurface,
       fontSize: 12,
       fontWeight: FontWeight.w500,
       fontFamily: 'Work Sans',
       height: 1.33,
     ),
     labelSmall: TextStyle(
-      color: DAGRDColors.onSurfaceVariant,
+      color: ThemeColors.onSurfaceVariant,
       fontSize: 11,
       fontWeight: FontWeight.w500,
       fontFamily: 'Work Sans',
@@ -352,7 +352,7 @@ class AppTheme {
   // ============================================================================
 
   static IconThemeData get _iconTheme => const IconThemeData(
-    color: DAGRDColors.onSurface,
+    color: ThemeColors.onSurface,
     size: 24,
   );
 
@@ -361,7 +361,7 @@ class AppTheme {
   // ============================================================================
 
   static DividerThemeData get _dividerTheme => const DividerThemeData(
-    color: DAGRDColors.outline,
+    color: ThemeColors.outline,
     thickness: 1,
     space: 1,
   );
@@ -371,9 +371,9 @@ class AppTheme {
   // ============================================================================
 
   static BottomNavigationBarThemeData get _bottomNavigationBarTheme => const BottomNavigationBarThemeData(
-    backgroundColor: DAGRDColors.surface,
-    selectedItemColor: DAGRDColors.azulDAGRD,
-    unselectedItemColor: DAGRDColors.onSurfaceVariant,
+    backgroundColor: ThemeColors.surface,
+    selectedItemColor: ThemeColors.azulDAGRD,
+    unselectedItemColor: ThemeColors.onSurfaceVariant,
     type: BottomNavigationBarType.fixed,
     elevation: 8,
   );
@@ -383,9 +383,9 @@ class AppTheme {
   // ============================================================================
 
   static SnackBarThemeData get _snackBarTheme => const SnackBarThemeData(
-    backgroundColor: DAGRDColors.grisOscuro,
+    backgroundColor: ThemeColors.grisOscuro,
     contentTextStyle: TextStyle(
-      color: DAGRDColors.onPrimary,
+      color: ThemeColors.onPrimary,
       fontSize: 14,
       fontFamily: 'Work Sans',
     ),
@@ -400,19 +400,19 @@ class AppTheme {
   // ============================================================================
 
   static DialogThemeData get _dialogTheme => DialogThemeData(
-    backgroundColor: DAGRDColors.surface,
+    backgroundColor: ThemeColors.surface,
     elevation: 8,
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(12),
     ),
     titleTextStyle: const TextStyle(
-      color: DAGRDColors.onSurface,
+      color: ThemeColors.onSurface,
       fontSize: 20,
       fontWeight: FontWeight.w600,
       fontFamily: 'Work Sans',
     ),
     contentTextStyle: const TextStyle(
-      color: DAGRDColors.onSurface,
+      color: ThemeColors.onSurface,
       fontSize: 14,
       fontFamily: 'Work Sans',
     ),
@@ -424,11 +424,11 @@ class AppTheme {
 
   static TooltipThemeData get _tooltipTheme => const TooltipThemeData(
     decoration: BoxDecoration(
-      color: DAGRDColors.grisOscuro,
+      color: ThemeColors.grisOscuro,
       borderRadius: BorderRadius.all(Radius.circular(4)),
     ),
     textStyle: TextStyle(
-      color: DAGRDColors.onPrimary,
+      color: ThemeColors.onPrimary,
       fontSize: 12,
       fontFamily: 'Work Sans',
     ),
@@ -441,15 +441,15 @@ class AppTheme {
   static SwitchThemeData get _switchTheme => SwitchThemeData(
     thumbColor: MaterialStateProperty.resolveWith((states) {
       if (states.contains(MaterialState.selected)) {
-        return DAGRDColors.azulDAGRD;
+        return ThemeColors.azulDAGRD;
       }
-      return DAGRDColors.grisMedio;
+      return ThemeColors.grisMedio;
     }),
     trackColor: MaterialStateProperty.resolveWith((states) {
       if (states.contains(MaterialState.selected)) {
-        return DAGRDColors.azulDAGRD.withOpacity(0.5);
+        return ThemeColors.azulDAGRD.withOpacity(0.5);
       }
-      return DAGRDColors.outline;
+      return ThemeColors.outline;
     }),
   );
 
@@ -460,12 +460,12 @@ class AppTheme {
   static CheckboxThemeData get _checkboxTheme => CheckboxThemeData(
     fillColor: MaterialStateProperty.resolveWith((states) {
       if (states.contains(MaterialState.selected)) {
-        return DAGRDColors.azulDAGRD;
+        return ThemeColors.azulDAGRD;
       }
-      return DAGRDColors.surface;
+      return ThemeColors.surface;
     }),
-    checkColor: MaterialStateProperty.all(DAGRDColors.onPrimary),
-    side: const BorderSide(color: DAGRDColors.outline),
+    checkColor: MaterialStateProperty.all(ThemeColors.onPrimary),
+    side: const BorderSide(color: ThemeColors.outline),
   );
 
   // ============================================================================
@@ -475,9 +475,9 @@ class AppTheme {
   static RadioThemeData get _radioTheme => RadioThemeData(
     fillColor: MaterialStateProperty.resolveWith((states) {
       if (states.contains(MaterialState.selected)) {
-        return DAGRDColors.azulDAGRD;
+        return ThemeColors.azulDAGRD;
       }
-      return DAGRDColors.grisMedio;
+      return ThemeColors.grisMedio;
     }),
   );
 }

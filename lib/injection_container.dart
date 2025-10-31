@@ -7,11 +7,19 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 // Core
 import 'app/core/network/network_info.dart';
+import 'app/core/http/app_interceptors.dart';
+import 'app/core/utils/env.dart';
 
 // Features - Auth
 import 'app/modules/auth/data/repositories_impl/auth_repository_implementation.dart';
 import 'app/modules/auth/domain/repositories/auth_repository_interface.dart';
-import 'app/modules/auth/bloc/auth_bloc.dart';
+import 'app/modules/auth/presentation/bloc/auth_bloc.dart';
+import 'app/modules/auth/data/datasources/auth_local_data_source.dart';
+import 'app/modules/auth/data/datasources/auth_remote_data_source.dart';
+import 'app/modules/auth/domain/usecases/login_usecase.dart';
+import 'app/modules/auth/domain/usecases/logout_usecase.dart';
+import 'app/modules/auth/domain/usecases/get_current_user_usecase.dart';
+import 'app/modules/auth/domain/usecases/get_auth_status_usecase.dart';
 
 // Features - Evaluacion
 import 'app/modules/evaluacion/data/repositories_impl/evaluacion_repository_impl.dart';
@@ -55,7 +63,6 @@ Future<void> initializeDependencies() async {
   final sharedPreferences = await SharedPreferences.getInstance();
   sl.registerLazySingleton(() => sharedPreferences);
   
-  sl.registerLazySingleton(() => Dio());
   sl.registerLazySingleton(() => Connectivity());
 
   // Core
@@ -63,18 +70,40 @@ Future<void> initializeDependencies() async {
     () => NetworkInfoImpl(connectivity: sl()),
   );
 
-
+  // Initialize Hive
+  await Hive.initFlutter();
+  
+  // Open Hive boxes
+  await Hive.openBox(DatabaseConfig.authStorageBox);
+  await Hive.openBox(DatabaseConfig.tutorialHomeKey);
 
   // Data sources
-  // TODO: Register data sources here when moved
+  // Auth Data Sources
+  sl.registerLazySingleton<AuthLocalDataSource>(() => AuthLocalDataSourceImpl());
+  
+  // HTTP Client con interceptores
+  sl.registerLazySingleton<Dio>(() {
+    final dio = Dio(
+      BaseOptions(
+        baseUrl: Environment.apiUrl,
+      ),
+    );
+    dio.interceptors.add(
+      AppInterceptors(authLocalDataSource: sl<AuthLocalDataSource>()),
+    );
+    return dio;
+  });
+  
+  sl.registerLazySingleton<AuthRemoteDataSource>(() => AuthRemoteDataSourceImpl());
 
   // Services
   sl.registerLazySingleton(() => FormPersistenceService());
 
   // Repositories - now with correct interfaces and implementations
-  sl.registerLazySingleton<AuthRepository>(
+  sl.registerLazySingleton<IAuthRepository>(
     () => AuthRepositoryImplementation(
-      sharedPreferences: sl(),
+      authLocalDataSource: sl(),
+      authRemoteDataSource: sl(),
     ),
   );
 
@@ -101,6 +130,12 @@ Future<void> initializeDependencies() async {
   sl.registerLazySingleton(() => ManageFormsUseCase(sl()));
   sl.registerLazySingleton(() => ManageTutorialUseCase(sl()));
   
+  // Auth Use Cases
+  sl.registerLazySingleton(() => LoginUseCase(sl()));
+  sl.registerLazySingleton(() => LogoutUseCase(sl()));
+  sl.registerLazySingleton(() => GetCurrentUserUseCase(sl()));
+  sl.registerLazySingleton(() => GetAuthStatusUseCase(sl()));
+  
   // Risk Threat Analysis Use Cases
   sl.registerLazySingleton(() => SaveRiskAnalysisUseCase(sl()));
   sl.registerLazySingleton(() => LoadRiskAnalysisUseCase(sl()));
@@ -125,7 +160,12 @@ Future<void> initializeDependencies() async {
     validateUnqualifiedVariablesUseCase: sl(),
     calculateGlobalScoreUseCase: sl(),
   ));
-  sl.registerFactory(() => AuthBloc(authRepository: sl()));
+  sl.registerFactory(() => AuthBloc(
+    loginUseCase: sl(),
+    logoutUseCase: sl(),
+    getCurrentUserUseCase: sl(),
+    getAuthStatusUseCase: sl(),
+  ));
   
   // Home BLoC with Clean Architecture
   sl.registerFactory(() => HomeBloc(
@@ -137,12 +177,4 @@ Future<void> initializeDependencies() async {
   
   // Note: EvaluacionGlobalBloc is created directly in MultiBlocProvider 
   // since it requires access to other BLoC instances from context
-
-  await Hive.initFlutter();
-
-  await Hive.openBox(DatabaseConfig.tutorialHomeKey);
-
-
-
-
 }

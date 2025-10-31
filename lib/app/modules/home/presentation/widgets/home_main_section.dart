@@ -10,9 +10,9 @@ import 'package:caja_herramientas/app/shared/widgets/dialogs/forms_in_progress_d
 import 'package:caja_herramientas/app/modules/risk_threat_analysis/presentation/bloc/risk_threat_analysis_bloc.dart';
 import 'package:caja_herramientas/app/modules/risk_threat_analysis/presentation/bloc/risk_threat_analysis_event.dart'
     as risk_events;
-import 'package:caja_herramientas/app/modules/auth/bloc/auth_bloc.dart';
-import 'package:caja_herramientas/app/modules/auth/bloc/auth_state.dart';
-import 'package:caja_herramientas/app/modules/auth/bloc/events/auth_events.dart';
+import 'package:caja_herramientas/app/modules/auth/presentation/bloc/auth_bloc.dart';
+import 'package:caja_herramientas/app/modules/auth/presentation/bloc/auth_state.dart';
+import 'package:caja_herramientas/app/modules/auth/presentation/bloc/events/auth_events.dart';
 import 'package:go_router/go_router.dart';
 
 class HomeMainSection extends StatefulWidget {
@@ -45,7 +45,7 @@ class _HomeMainSectionState extends State<HomeMainSection> {
               'Seleccione una herramienta',
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: DAGRDColors.azulDAGRD,
+                color: ThemeColors.azulDAGRD,
                 fontFamily: 'Work Sans',
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
@@ -57,7 +57,7 @@ class _HomeMainSectionState extends State<HomeMainSection> {
           HomeToolCard(
             title: 'Metodología de Análisis del Riesgo',
             iconAsset: AppIcons.analisisRiesgo,
-            backgroundColor: DAGRDColors.azulDAGRD,
+            backgroundColor: ThemeColors.azulDAGRD,
             onTap: () {
               _handleRiskAnalysisTap(context);
             },
@@ -66,7 +66,7 @@ class _HomeMainSectionState extends State<HomeMainSection> {
           HomeToolCard(
             title: 'Evaluación del daño en edificaciones EDE',
             iconAsset: AppIcons.danoEdificaciones,
-            backgroundColor: DAGRDColors.azulDAGRD,
+            backgroundColor: ThemeColors.azulDAGRD,
             onTap: () {
               context.go('/home_ede');
             },
@@ -75,7 +75,7 @@ class _HomeMainSectionState extends State<HomeMainSection> {
           HomeToolCard(
             title: 'Formulario de caracterización de movimientos en masa',
             iconAsset: AppIcons.danoEdificaciones,
-            backgroundColor: DAGRDColors.azulDAGRD,
+            backgroundColor: ThemeColors.azulDAGRD,
             onTap: () {},
           ),
           const SizedBox(height: 48),
@@ -88,7 +88,7 @@ class _HomeMainSectionState extends State<HomeMainSection> {
               padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: DAGRDColors.amarDAGRD, width: 1),
+                border: Border.all(color: ThemeColors.amarDAGRD, width: 1),
                 color: Colors.white,
               ),
               child: Row(
@@ -99,7 +99,7 @@ class _HomeMainSectionState extends State<HomeMainSection> {
                     width: 24,
                     height: 24,
                     colorFilter: const ColorFilter.mode(
-                      DAGRDColors.onSurface,
+                      ThemeColors.onSurface,
                       BlendMode.srcIn,
                     ),
                   ),
@@ -108,7 +108,7 @@ class _HomeMainSectionState extends State<HomeMainSection> {
                     'Ir a portal SIRMED',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: DAGRDColors.onSurface,
+                      color: ThemeColors.onSurface,
                       fontFamily: 'Work Sans',
                       fontSize: 14,
                       fontWeight: FontWeight.w500,

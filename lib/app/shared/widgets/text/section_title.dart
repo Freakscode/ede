@@ -23,7 +23,7 @@ class SectionTitle extends StatelessWidget {
               title,
               textAlign: TextAlign.center,
               style: const TextStyle(
-                color: DAGRDColors.azulDAGRD,
+                color: ThemeColors.azulDAGRD,
                 fontFamily: 'Work Sans',
                 fontSize: 24,
                 fontWeight: FontWeight.w600,
@@ -35,7 +35,7 @@ class SectionTitle extends StatelessWidget {
           Text(
             title,
             style: const TextStyle(
-              color: DAGRDColors.azulDAGRD,
+              color: ThemeColors.azulDAGRD,
               fontFamily: 'Work Sans',
               fontSize: 24,
               fontWeight: FontWeight.w600,
@@ -50,7 +50,7 @@ class SectionTitle extends StatelessWidget {
               subtitle!,
               textAlign: TextAlign.center,
               style: const TextStyle(
-                color: DAGRDColors.negroDAGRD,
+                color: ThemeColors.negroDAGRD,
                 fontFamily: 'Work Sans',
                 fontSize: 14,
                 fontWeight: FontWeight.w500,

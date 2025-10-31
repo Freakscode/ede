@@ -73,7 +73,7 @@ class CategoriesScreen extends StatelessWidget {
           width: 18,
           height: 17,
           colorFilter: const ColorFilter.mode(
-            DAGRDColors.azulSecundario, // Azul informativo
+            ThemeColors.azulSecundario, // Azul informativo
             BlendMode.srcIn,
           ),
         ),
@@ -107,7 +107,7 @@ class CategoriesScreen extends StatelessWidget {
                         'Metodología de Análisis del Riesgo',
                         textAlign: TextAlign.center,
                         style: const TextStyle(
-                          color: DAGRDColors.azulDAGRD, // AzulDAGRD
+                          color: ThemeColors.azulDAGRD, // AzulDAGRD
                           fontFamily: 'Work Sans',
                           fontSize: 20,
                           fontStyle: FontStyle.normal,
@@ -122,7 +122,7 @@ class CategoriesScreen extends StatelessWidget {
                         'Seleccione una categoría',
                         textAlign: TextAlign.center,
                         style: const TextStyle(
-                          color: DAGRDColors.onSurfaceVariant, // GrisDAGRD
+                          color: ThemeColors.onSurfaceVariant, // GrisDAGRD
                           fontFamily: 'Work Sans',
                           fontSize: 18,
                           fontStyle: FontStyle.normal,
@@ -219,7 +219,7 @@ class CategoriesScreen extends StatelessWidget {
                                               'Complete primero la evaluación de Amenaza',
                                             ),
                                             backgroundColor:
-                                                DAGRDColors.warning,
+                                                ThemeColors.warning,
                                             duration: Duration(seconds: 3),
                                           ),
                                         );
@@ -240,7 +240,7 @@ class CategoriesScreen extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: DAGRDColors.azulClaro,
+                        color: ThemeColors.azulClaro,
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Column(
@@ -251,7 +251,7 @@ class CategoriesScreen extends StatelessWidget {
                               Text(
                                 'Información',
                                 style: const TextStyle(
-                                  color: DAGRDColors.azulSecundario,
+                                  color: ThemeColors.azulSecundario,
                                   fontFamily: 'Work Sans',
                                   fontSize: 13,
                                   fontStyle: FontStyle.normal,
@@ -265,7 +265,7 @@ class CategoriesScreen extends StatelessWidget {
                           Text(
                             'Complete los formularios de Amenaza y Vulnerabilidad para visualizar la evaluación completa del riesgo.',
                             style: const TextStyle(
-                              color: DAGRDColors.azulSecundario,
+                              color: ThemeColors.azulSecundario,
                               fontFamily: 'Work Sans',
                               fontSize: 13,
                               fontStyle: FontStyle.normal,

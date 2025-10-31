@@ -10,19 +10,19 @@ abstract class AuthEvent extends Equatable {
 
 /// Evento para realizar login
 class AuthLoginRequested extends AuthEvent {
-  final String cedula;
+  final String email;
   final String password;
 
   const AuthLoginRequested({
-    required this.cedula,
+    required this.email,
     required this.password,
   });
 
   @override
-  List<Object?> get props => [cedula, password];
+  List<Object?> get props => [email, password];
 
   @override
-  String toString() => 'AuthLoginRequested(cedula: $cedula)';
+  String toString() => 'AuthLoginRequested(email: $email)';
 }
 
 /// Evento para cerrar sesión

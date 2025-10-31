@@ -26,7 +26,7 @@ class ProgressBarWidget extends StatelessWidget {
             Container(
               height: 16,
               decoration: BoxDecoration(
-                color: DAGRDColors.outline,
+                color: ThemeColors.outline,
                 borderRadius: BorderRadius.circular(99),
               ),
               child: ClipRRect(
@@ -36,7 +36,7 @@ class ProgressBarWidget extends StatelessWidget {
                   backgroundColor: Colors.transparent,
                   valueColor: AlwaysStoppedAnimation<Color>(
                     // Color dinámico según la clasificación
-                    DAGRDColors.amarDAGRD
+                    ThemeColors.amarDAGRD
                   ),
                 ),
               ),
@@ -46,7 +46,7 @@ class ProgressBarWidget extends StatelessWidget {
               progressText,
               textAlign: TextAlign.center,
               style: const TextStyle(
-                color: DAGRDColors.grisMedio,
+                color: ThemeColors.grisMedio,
                 fontFamily: 'Work Sans',
                 fontSize: 12,
                 fontWeight: FontWeight.w400,

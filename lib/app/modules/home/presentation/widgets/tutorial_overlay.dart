@@ -227,7 +227,7 @@ class TutorialPosterOverlay extends StatelessWidget {
                                             HomeSetShowTutorial(!(checked ?? false)),
                                           );
                                         },
-                                        activeColor: DAGRDColors.azulDAGRD,
+                                        activeColor: ThemeColors.azulDAGRD,
                                         checkColor: Colors.white,
                                         materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                                         visualDensity: VisualDensity.compact,

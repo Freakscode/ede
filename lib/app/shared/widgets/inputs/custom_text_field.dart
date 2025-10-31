@@ -44,7 +44,7 @@ class CustomTextField extends StatelessWidget {
         Text(
           label,
           style: const TextStyle(
-            color: DAGRDColors.azulDAGRD,
+            color: ThemeColors.azulDAGRD,
             fontFamily: 'Work Sans',
             fontSize: 12,
             fontWeight: FontWeight.w500,
@@ -77,13 +77,13 @@ class CustomTextField extends StatelessWidget {
               height: 1.42857, // 20px / 14px = 1.42857 (142.857%)
             ),
             filled: true,
-            fillColor: DAGRDColors.blancoDAGRD,
+            fillColor: ThemeColors.blancoDAGRD,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
               borderSide: BorderSide(
                 color: errorMessage != null 
                     ? const Color(0xFFE53E3E) // Rojo para error
-                    : DAGRDColors.grisMedio, 
+                    : ThemeColors.grisMedio, 
                 width: 1
               ),
             ),
@@ -92,7 +92,7 @@ class CustomTextField extends StatelessWidget {
               borderSide: BorderSide(
                 color: errorMessage != null 
                     ? const Color(0xFFE53E3E) // Rojo para error
-                    : DAGRDColors.grisMedio, 
+                    : ThemeColors.grisMedio, 
                 width: 1
               ),
             ),
@@ -101,7 +101,7 @@ class CustomTextField extends StatelessWidget {
               borderSide: BorderSide(
                 color: errorMessage != null 
                     ? const Color(0xFFE53E3E) // Rojo para error
-                    : DAGRDColors.azulDAGRD, 
+                    : ThemeColors.azulDAGRD, 
                 width: 2
               ),
             ),

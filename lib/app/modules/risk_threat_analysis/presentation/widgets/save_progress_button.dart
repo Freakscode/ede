@@ -7,7 +7,8 @@ import 'package:caja_herramientas/app/shared/services/form_persistence_service.d
 import 'package:caja_herramientas/app/shared/models/complete_form_data_model.dart';
 import 'package:caja_herramientas/app/shared/widgets/dialogs/custom_action_dialog.dart';
 import 'package:caja_herramientas/app/shared/widgets/snackbars/custom_snackbar.dart';
-import 'package:caja_herramientas/app/modules/auth/services/auth_service.dart';
+import 'package:caja_herramientas/app/modules/auth/domain/repositories/auth_repository_interface.dart';
+import 'package:caja_herramientas/injection_container.dart';
 import 'package:caja_herramientas/app/modules/data_registration/bloc/data_registration_bloc.dart';
 import 'package:caja_herramientas/app/modules/data_registration/bloc/data_registration_state.dart';
 import '../bloc/risk_threat_analysis_bloc.dart';
@@ -43,7 +44,7 @@ class SaveProgressButton extends StatelessWidget {
               width: 20,
               height: 20,
               colorFilter: const ColorFilter.mode(
-                DAGRDColors.blancoDAGRD,
+                ThemeColors.blancoDAGRD,
                 BlendMode.srcIn,
               ),
             ),
@@ -51,7 +52,7 @@ class SaveProgressButton extends StatelessWidget {
               text ?? 'Guardar avance',
               textAlign: TextAlign.center,
               style: const TextStyle(
-                color: DAGRDColors.blancoDAGRD, // #FFF
+                color: ThemeColors.blancoDAGRD, // #FFF
                 fontFamily: 'Work Sans',
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
@@ -59,7 +60,7 @@ class SaveProgressButton extends StatelessWidget {
               ),
             ),
             style: ElevatedButton.styleFrom(
-              backgroundColor: DAGRDColors.azulSecundario,
+              backgroundColor: ThemeColors.azulSecundario,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -76,7 +77,7 @@ class SaveProgressButton extends StatelessWidget {
     final state = bloc.state;
     final homeBloc = context.read<HomeBloc>();
     final homeState = homeBloc.state;
-    final authService = AuthService();
+    final authRepository = sl<IAuthRepository>();
 
    
     
@@ -99,9 +100,10 @@ class SaveProgressButton extends StatelessWidget {
     Map<String, dynamic> contactData = {};
     Map<String, dynamic> inspectionData = {};
     
-    if (authService.isLoggedIn) {
+    final isLoggedIn = await authRepository.isLoggedIn();
+    if (isLoggedIn) {
       // Usuario logueado - datos de contacto vienen de la API
-      final user = authService.currentUser;
+      final user = await authRepository.getCurrentUser();
       contactData = {
         'names': user?.nombre ?? '',
         'cellPhone': user?.cedula ?? '',

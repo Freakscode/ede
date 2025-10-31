@@ -8,8 +8,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../presentation/bloc/home_bloc.dart';
 import '../../presentation/bloc/home_event.dart';
 import '../../presentation/bloc/home_state.dart';
-import 'package:caja_herramientas/app/modules/auth/bloc/auth_bloc.dart';
-import 'package:caja_herramientas/app/modules/auth/bloc/auth_state.dart';
+import 'package:caja_herramientas/app/modules/auth/presentation/bloc/auth_bloc.dart';
+import 'package:caja_herramientas/app/modules/auth/presentation/bloc/auth_state.dart';
 import '../../domain/entities/form_entity.dart';
 import '../../../../shared/services/form_persistence_service.dart';
 import '../../../../shared/models/risk_event_factory.dart';
@@ -20,6 +20,10 @@ import 'package:go_router/go_router.dart';
 import 'package:caja_herramientas/app/shared/widgets/dialogs/custom_action_dialog.dart';
 import 'package:caja_herramientas/app/shared/widgets/snackbars/custom_snackbar.dart';
 import 'package:caja_herramientas/app/modules/home/presentation/widgets/filter_dialog.dart';
+import 'package:caja_herramientas/app/core/data/datasources/remote_datasource.dart';
+import 'package:caja_herramientas/app/shared/services/sire_api_service.dart';
+import 'dart:developer' as developer;
+import 'dart:convert';
 
 class HomeFormsScreen extends StatefulWidget {
   const HomeFormsScreen({super.key});
@@ -291,7 +295,7 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
                   'Mis Formularios',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: DAGRDColors.azulDAGRD,
+                    color: ThemeColors.azulDAGRD,
                     fontFamily: 'Work Sans',
                     fontSize: 20,
                     fontWeight: FontWeight.w600,
@@ -320,8 +324,8 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   color: _tabIndex == 0
-                                      ? DAGRDColors.azulDAGRD
-                                      : DAGRDColors.grisMedio,
+                                      ? ThemeColors.azulDAGRD
+                                      : ThemeColors.grisMedio,
                                   fontFamily: 'Work Sans',
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500,
@@ -340,8 +344,8 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   color: _tabIndex == 1
-                                      ? DAGRDColors.azulDAGRD
-                                      : DAGRDColors.grisMedio,
+                                      ? ThemeColors.azulDAGRD
+                                      : ThemeColors.grisMedio,
                                   fontFamily: 'Work Sans',
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500,
@@ -366,7 +370,7 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
                       child: Container(
                         height: 5,
                         decoration: BoxDecoration(
-                          color: DAGRDColors.azulDAGRD,
+                          color: ThemeColors.azulDAGRD,
                           borderRadius: BorderRadius.circular(2),
                         ),
                       ),
@@ -384,7 +388,7 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
                           Text(
                             'Filtros',
                             style: TextStyle(
-                              color: DAGRDColors.azulDAGRD,
+                              color: ThemeColors.azulDAGRD,
                               fontFamily: 'Work Sans',
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
@@ -398,7 +402,7 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
                               width: 29,
                               height: 27,
                               colorFilter: const ColorFilter.mode(
-                                DAGRDColors.azulDAGRD,
+                                ThemeColors.azulDAGRD,
                                 BlendMode.srcIn,
                               ),
                             ),
@@ -509,7 +513,7 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
                           return CompletedFormCardWidget(
                             form: form,
                             onDownload: () => _showMessage(context, 'Funcionalidad de descarga en desarrollo'),
-                            onAssociateToSIRE: () => _showMessage(context, 'Funcionalidad de asociación a SIRE en desarrollo'),
+                            onAssociateToSIRE: () => _associateFormToSIRE(context, form),
                             onSendEmail: () => _showMessage(context, 'Funcionalidad de envío por email en desarrollo'),
                             onDelete: () => _deleteForm(context, form.id, form.title),
                             getFormProgress: _getFormProgress,
@@ -532,8 +536,14 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
   // Métodos de navegación y acciones
   void _navigateToForm(BuildContext context, FormEntity form) async {
     try {
-      // Obtener datos reales del formulario completo desde SQLite
       final persistenceService = FormPersistenceService();
+      final homeBloc = context.read<HomeBloc>();
+      final riskBloc = context.read<RiskThreatAnalysisBloc>();
+      
+      // Guardar automáticamente el formulario actual si hay uno activo y hay cambios
+      await _saveCurrentFormIfNeeded(context, homeBloc, riskBloc, persistenceService);
+
+      // Obtener datos reales del formulario completo desde SQLite
       final completeForm = await persistenceService.getCompleteForm(form.id);
 
       if (completeForm != null) {
@@ -542,10 +552,6 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
 
         // Check if widget is still mounted before using context
         if (!mounted) return;
-
-        // Get bloc references before async gap
-        final homeBloc = context.read<HomeBloc>();
-        final riskBloc = context.read<RiskThreatAnalysisBloc>();
 
         // No resetear el estado del BLoC aquí para preservar los datos cargados
 
@@ -667,5 +673,330 @@ class _HomeFormsScreenState extends State<HomeFormsScreen> {
       context,
       message: message,
     );
+  }
+
+  /// Asocia un formulario completado a SIRE
+  Future<void> _associateFormToSIRE(BuildContext context, FormEntity form) async {
+    try {
+      // Mostrar diálogo de confirmación
+      final shouldProceed = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Asociar a SIRE'),
+          content: const Text(
+            '¿Está seguro que desea asociar este formulario a SIRE?\n\n'
+            'Esta acción enviará los datos del formulario a la plataforma SIRE.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Cancelar'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: ThemeColors.azulDAGRD,
+              ),
+              child: const Text('Asociar'),
+            ),
+          ],
+        ),
+      );
+
+      if (shouldProceed != true || !mounted) return;
+
+      // Mostrar indicador de carga
+      if (!mounted) return;
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+
+      // Obtener el formulario completo desde la base de datos
+      final persistenceService = FormPersistenceService();
+      final completeForm = await persistenceService.getCompleteForm(form.id);
+
+      if (completeForm == null) {
+        if (!mounted) return;
+        Navigator.of(context).pop(); // Cerrar diálogo de carga
+        CustomSnackBar.showError(
+          context,
+          message: 'No se pudo encontrar el formulario completo',
+          title: 'Error',
+        );
+        return;
+      }
+
+      // Log del JSON completo para debug
+      developer.log(
+        '=== JSON COMPLETO DEL FORMULARIO ===',
+        name: 'HomeFormsScreen',
+      );
+      final formJson = completeForm.toJson();
+      developer.log(
+        'Form JSON (truncado): ${jsonEncode(formJson).substring(0, jsonEncode(formJson).length > 1000 ? 1000 : jsonEncode(formJson).length)}...',
+        name: 'HomeFormsScreen',
+      );
+      developer.log(
+        'amenazaSelections keys: ${completeForm.amenazaSelections.keys.toList()}',
+        name: 'HomeFormsScreen',
+      );
+      developer.log(
+        'amenazaProbabilidadSelections: ${completeForm.amenazaProbabilidadSelections}',
+        name: 'HomeFormsScreen',
+      );
+      developer.log(
+        'amenazaIntensidadSelections: ${completeForm.amenazaIntensidadSelections}',
+        name: 'HomeFormsScreen',
+      );
+      developer.log(
+        'vulnerabilidadSelections keys: ${completeForm.vulnerabilidadSelections.keys.toList()}',
+        name: 'HomeFormsScreen',
+      );
+      
+      // Validar que el formulario tenga datos antes de enviar
+      // NO bloquear el envío - permitir enviar incluso si parece vacío
+      // porque puede haber datos en una estructura diferente o el formulario puede tener datos
+      // que no se están detectando correctamente
+      
+      // Continuar con el proceso sin bloquear - el servicio manejará formularios vacíos
+
+      // Obtener token de autenticación si está disponible
+      String? authToken;
+      try {
+        final authBloc = context.read<AuthBloc>();
+        final authState = authBloc.state;
+        if (authState is AuthAuthenticated) {
+          // Intentar obtener el token desde el repositorio
+          // Necesitamos acceder al repositorio, pero por ahora usaremos null
+          // y el servicio usará autenticación básica como fallback
+        }
+      } catch (e) {
+        developer.log('Error obteniendo token: $e', name: 'HomeFormsScreen');
+      }
+
+      // Crear servicio de API de SIRE
+      final remoteDatasource = await RemoteDatasource.create();
+      final sireApiService = SireApiService(remoteDatasource);
+
+      // Transformar y enviar el formulario (simulado)
+      final response = await sireApiService.sendFormToSIRE(
+        completeForm,
+        authToken: authToken,
+        simulate: true,
+      );
+
+      if (!mounted) return;
+      Navigator.of(context).pop(); // Cerrar diálogo de carga
+
+      // Mostrar mensaje de éxito (simulación)
+      CustomSnackBar.showSuccess(
+        context,
+        message: 'Simulación exitosa: se imprimió el JSON en consola',
+        title: 'Simulado',
+        duration: const Duration(seconds: 3),
+      );
+
+      // Si la respuesta incluye un número SIRE, podríamos actualizarlo en el formulario
+      if (response.containsKey('sireNumber')) {
+        developer.log(
+          'Número SIRE recibido: ${response['sireNumber']}',
+          name: 'HomeFormsScreen',
+        );
+      }
+    } catch (e) {
+      developer.log(
+        'Error asociando formulario a SIRE: $e',
+        name: 'HomeFormsScreen',
+      );
+
+      if (!mounted) return;
+      // Cerrar diálogo de carga si está abierto
+      if (Navigator.of(context).canPop()) {
+        Navigator.of(context).pop();
+      }
+
+      // Mostrar mensaje de error
+      CustomSnackBar.showError(
+        context,
+        message: 'Error al asociar formulario a SIRE: ${e.toString()}',
+        title: 'Error',
+        duration: const Duration(seconds: 4),
+      );
+    }
+  }
+
+  /// Guarda automáticamente el formulario actual si hay cambios pendientes
+  Future<void> _saveCurrentFormIfNeeded(
+    BuildContext context,
+    HomeBloc homeBloc,
+    RiskThreatAnalysisBloc riskBloc,
+    FormPersistenceService persistenceService,
+  ) async {
+    try {
+      final homeState = homeBloc.state;
+      final riskState = riskBloc.state;
+      
+      // Solo guardar si hay un formulario activo y hay datos en el bloc
+      if (homeState.activeFormId == null || 
+          riskState.selectedRiskEvent == null ||
+          riskState.selectedClassification == null) {
+        return; // No hay nada que guardar
+      }
+
+      // Verificar si hay datos mínimos para guardar
+      final formData = riskBloc.getCurrentFormData();
+      if (formData.isEmpty) {
+        return; // No hay datos para guardar
+      }
+
+      developer.log(
+        'Guardando automáticamente formulario ${homeState.activeFormId} antes de navegar',
+        name: 'HomeFormsScreen',
+      );
+
+      // Obtener datos de contacto e inspección si están disponibles
+      // (usar datos por defecto si no están disponibles)
+      Map<String, dynamic> contactData = {};
+      Map<String, dynamic> inspectionData = {};
+      
+      // Intentar obtener datos del formulario guardado anteriormente
+      final existingForm = await persistenceService.getCompleteForm(homeState.activeFormId!);
+      if (existingForm != null) {
+        contactData = existingForm.contactData;
+        inspectionData = existingForm.inspectionData;
+      }
+
+      // Convertir colores a valores serializables
+      final colorsData = formData['subClassificationColors'] as Map<String, Color>? ?? {};
+      final serializableColors = <String, Color>{};
+      colorsData.forEach((key, value) {
+        serializableColors[key] = value;
+      });
+
+      // Obtener scores y filtrar según clasificación
+      final allScores = formData['subClassificationScores'] as Map<String, double>? ?? {};
+      final classification = (riskState.selectedClassification ?? '').toLowerCase();
+
+      CompleteFormDataModel completeForm;
+      final now = DateTime.now();
+
+      // Si el formulario existe, actualizarlo; si no, crear uno nuevo
+      if (existingForm != null) {
+        // Actualizar formulario existente
+        if (classification == 'amenaza') {
+          final amenazaScoresOnly = Map<String, double>.from(existingForm.amenazaScores);
+          if (allScores.containsKey('probabilidad')) {
+            amenazaScoresOnly['probabilidad'] = allScores['probabilidad']!;
+          }
+          if (allScores.containsKey('intensidad')) {
+            amenazaScoresOnly['intensidad'] = allScores['intensidad']!;
+          }
+
+          completeForm = existingForm.copyWith(
+            amenazaSelections: formData['dynamicSelections'] ?? existingForm.amenazaSelections,
+            amenazaScores: amenazaScoresOnly,
+            amenazaColors: serializableColors.isNotEmpty ? serializableColors : existingForm.amenazaColors,
+            amenazaProbabilidadSelections: formData['probabilidadSelections'] ?? existingForm.amenazaProbabilidadSelections,
+            amenazaIntensidadSelections: formData['intensidadSelections'] ?? existingForm.amenazaIntensidadSelections,
+            evidenceImages: riskState.evidenceImages,
+            evidenceCoordinates: riskState.evidenceCoordinates,
+            updatedAt: now,
+          );
+        } else if (classification == 'vulnerabilidad') {
+          final vulnerabilidadScoresOnly = Map<String, double>.from(existingForm.vulnerabilidadScores);
+          final vulnerabilidadKeys = ['fragilidad_fisica', 'fragilidad_personas', 'exposicion'];
+          for (final key in vulnerabilidadKeys) {
+            if (allScores.containsKey(key)) {
+              vulnerabilidadScoresOnly[key] = allScores[key]!;
+            }
+          }
+
+          completeForm = existingForm.copyWith(
+            vulnerabilidadSelections: formData['dynamicSelections'] ?? existingForm.vulnerabilidadSelections,
+            vulnerabilidadScores: vulnerabilidadScoresOnly,
+            vulnerabilidadColors: serializableColors.isNotEmpty ? serializableColors : existingForm.vulnerabilidadColors,
+            vulnerabilidadProbabilidadSelections: formData['probabilidadSelections'] ?? existingForm.vulnerabilidadProbabilidadSelections,
+            vulnerabilidadIntensidadSelections: formData['intensidadSelections'] ?? existingForm.vulnerabilidadIntensidadSelections,
+            evidenceImages: riskState.evidenceImages,
+            evidenceCoordinates: riskState.evidenceCoordinates,
+            updatedAt: now,
+          );
+        } else {
+          // Si no es amenaza ni vulnerabilidad, solo actualizar evidencias
+          completeForm = existingForm.copyWith(
+            evidenceImages: riskState.evidenceImages,
+            evidenceCoordinates: riskState.evidenceCoordinates,
+            updatedAt: now,
+          );
+        }
+      } else {
+        // Crear nuevo formulario
+        final formId = '${riskState.selectedRiskEvent ?? ''}_complete_${DateTime.now().millisecondsSinceEpoch}';
+        
+        Map<String, double> amenazaScores = {};
+        Map<String, double> vulnerabilidadScores = {};
+        
+        if (classification == 'amenaza') {
+          if (allScores.containsKey('probabilidad')) {
+            amenazaScores['probabilidad'] = allScores['probabilidad']!;
+          }
+          if (allScores.containsKey('intensidad')) {
+            amenazaScores['intensidad'] = allScores['intensidad']!;
+          }
+        } else if (classification == 'vulnerabilidad') {
+          final vulnerabilidadKeys = ['fragilidad_fisica', 'fragilidad_personas', 'exposicion'];
+          for (final key in vulnerabilidadKeys) {
+            if (allScores.containsKey(key)) {
+              vulnerabilidadScores[key] = allScores[key]!;
+            }
+          }
+        }
+
+        completeForm = CompleteFormDataModel(
+          id: formId,
+          eventName: riskState.selectedRiskEvent ?? '',
+          contactData: contactData,
+          inspectionData: inspectionData,
+          amenazaSelections: classification == 'amenaza' ? (formData['dynamicSelections'] ?? {}) : {},
+          amenazaScores: amenazaScores,
+          amenazaColors: classification == 'amenaza' ? serializableColors : {},
+          amenazaProbabilidadSelections: classification == 'amenaza' ? (formData['probabilidadSelections'] ?? {}) : {},
+          amenazaIntensidadSelections: classification == 'amenaza' ? (formData['intensidadSelections'] ?? {}) : {},
+          amenazaSelectedProbabilidad: null,
+          amenazaSelectedIntensidad: null,
+          vulnerabilidadSelections: classification == 'vulnerabilidad' ? (formData['dynamicSelections'] ?? {}) : {},
+          vulnerabilidadScores: vulnerabilidadScores,
+          vulnerabilidadColors: classification == 'vulnerabilidad' ? serializableColors : {},
+          vulnerabilidadProbabilidadSelections: classification == 'vulnerabilidad' ? (formData['probabilidadSelections'] ?? {}) : {},
+          vulnerabilidadIntensidadSelections: classification == 'vulnerabilidad' ? (formData['intensidadSelections'] ?? {}) : {},
+          vulnerabilidadSelectedProbabilidad: null,
+          vulnerabilidadSelectedIntensidad: null,
+          evidenceImages: riskState.evidenceImages,
+          evidenceCoordinates: riskState.evidenceCoordinates,
+          createdAt: now,
+          updatedAt: now,
+        );
+      }
+
+      // Guardar el formulario
+      await persistenceService.saveCompleteForm(completeForm);
+      await persistenceService.setActiveFormId(completeForm.id);
+
+      developer.log(
+        'Formulario guardado automáticamente: ${completeForm.id}',
+        name: 'HomeFormsScreen',
+      );
+    } catch (e) {
+      developer.log(
+        'Error guardando formulario automáticamente: $e',
+        name: 'HomeFormsScreen',
+      );
+      // No mostrar error al usuario, solo loguear
+      // Es un guardado automático silencioso
+    }
   }
 }

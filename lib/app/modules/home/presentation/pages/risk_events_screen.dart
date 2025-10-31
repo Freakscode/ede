@@ -27,7 +27,7 @@ class RiskEventsScreen extends StatelessWidget {
               child: Text(
                 'Metodología de Análisis del Riesgo',
                 style: const TextStyle(
-                  color: DAGRDColors.azulDAGRD,
+                  color: ThemeColors.azulDAGRD,
                   fontFamily: 'Work Sans',
                   fontSize: 20,
                   fontWeight: FontWeight.w600,
@@ -41,7 +41,7 @@ class RiskEventsScreen extends StatelessWidget {
                 'Seleccione un evento',
                 textAlign: TextAlign.center,
                 style: const TextStyle(
-                  color: DAGRDColors.grisMedio,
+                  color: ThemeColors.grisMedio,
                   fontFamily: 'Work Sans',
                   fontSize: 16,
                   fontWeight: FontWeight.w600,

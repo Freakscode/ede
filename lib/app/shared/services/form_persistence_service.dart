@@ -202,11 +202,15 @@ class FormPersistenceService {
   // ======= MÉTODOS PARA FORMULARIOS COMPLETOS =======
 
   /// Guarda un formulario completo (evento + amenaza + vulnerabilidad)
+  /// Usa el classification_type basado en isExplicitlyCompleted:
+  /// - Si isExplicitlyCompleted = true: 'complete' (formulario explícitamente completado)
+  /// - Si isExplicitlyCompleted = false: 'in_progress' o el tipo de clasificación actual
   Future<void> saveCompleteForm(CompleteFormDataModel form) async {
     final db = await database;
     
     print('=== DEBUG saveCompleteForm ===');
     print('Form ID: ${form.id}');
+    print('isExplicitlyCompleted: ${form.isExplicitlyCompleted}');
     print('EvidenceImages: ${form.evidenceImages}');
     print('EvidenceCoordinates: ${form.evidenceCoordinates}');
     
@@ -222,12 +226,17 @@ class FormPersistenceService {
     
     final now = DateTime.now().toIso8601String();
     
+    // Determinar el classification_type basado en isExplicitlyCompleted
+    // Solo usar 'complete' si el formulario fue explícitamente marcado como completado
+    // De lo contrario, usar 'in_progress' para formularios en progreso
+    final classificationType = form.isExplicitlyCompleted ? 'complete' : 'in_progress';
+    
     await db.insert(
       'forms',
       {
         'id': form.id,
         'event_name': form.eventName,
-        'classification_type': 'complete', 
+        'classification_type': classificationType,
         'form_data': formDataJson,
         'created_at': now,
         'updated_at': now,
@@ -235,16 +244,18 @@ class FormPersistenceService {
       },
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
-    print('FormPersistenceService: Formulario completo guardado - ${form.id}');
+    print('FormPersistenceService: Formulario guardado - ${form.id} (tipo: $classificationType)');
   }
 
   /// Obtiene un formulario completo por ID
+  /// Busca tanto en formularios completados como en progreso
   Future<CompleteFormDataModel?> getCompleteForm(String formId) async {
     final db = await database;
+    // Buscar sin filtrar por classification_type para obtener cualquier formulario
     final result = await db.query(
       'forms',
-      where: 'id = ? AND classification_type = ?',
-      whereArgs: [formId, 'complete'],
+      where: 'id = ?',
+      whereArgs: [formId],
     );
     if (result.isNotEmpty) {
       final formData = jsonDecode(result.first['form_data'] as String);
@@ -254,33 +265,48 @@ class FormPersistenceService {
   }
 
   /// Obtiene todos los formularios completos
+  /// Retorna tanto los explícitamente completados como los que tienen datos completos
   Future<List<CompleteFormDataModel>> getAllCompleteForms() async {
     final db = await database;
+    // Obtener todos los formularios que usan CompleteFormDataModel
+    // (tanto 'complete' como 'in_progress' con datos completos)
     final results = await db.query(
-      'forms', 
-      where: 'classification_type = ?',
-      whereArgs: ['complete'],
+      'forms',
+      where: 'classification_type IN (?, ?)',
+      whereArgs: ['complete', 'in_progress'],
       orderBy: 'updated_at DESC'
     );
     return results.map((row) {
       final formData = jsonDecode(row['form_data'] as String);
-      return CompleteFormDataModel.fromJson(formData);
-    }).toList();
+      try {
+        return CompleteFormDataModel.fromJson(formData);
+      } catch (e) {
+        // Si no es un CompleteFormDataModel válido, saltarlo
+        print('Error parseando formulario ${row['id']}: $e');
+        return null;
+      }
+    }).whereType<CompleteFormDataModel>().toList();
   }
 
   /// Obtiene formularios completos por evento
+  /// Retorna tanto los explícitamente completados como los en progreso
   Future<List<CompleteFormDataModel>> getCompleteFormsByEvent(String eventName) async {
     final db = await database;
     final results = await db.query(
       'forms',
-      where: 'event_name = ? AND classification_type = ?',
-      whereArgs: [eventName, 'complete'],
+      where: 'event_name = ? AND classification_type IN (?, ?)',
+      whereArgs: [eventName, 'complete', 'in_progress'],
       orderBy: 'updated_at DESC',
     );
     return results.map((row) {
       final formData = jsonDecode(row['form_data'] as String);
-      return CompleteFormDataModel.fromJson(formData);
-    }).toList();
+      try {
+        return CompleteFormDataModel.fromJson(formData);
+      } catch (e) {
+        print('Error parseando formulario ${row['id']}: $e');
+        return null;
+      }
+    }).whereType<CompleteFormDataModel>().toList();
   }
 
   /// Actualiza el progreso de un formulario completo

@@ -1,11 +1,11 @@
 import '../entities/user_entity.dart';
 import '../entities/auth_result_entity.dart';
-import '../../data/models/login_request_model.dart';
+import '../entities/login_params.dart';
 
 /// Interfaz del repositorio de autenticación
-abstract class AuthRepository {
+abstract class IAuthRepository {
   /// Realizar login
-  Future<AuthResultEntity> login(LoginRequestModel loginRequest);
+  Future<AuthResultEntity> login(LoginParams loginParams);
 
   /// Cerrar sesión
   Future<void> logout();

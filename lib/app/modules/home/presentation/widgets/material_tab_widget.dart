@@ -29,7 +29,7 @@ class MaterialTabWidget extends StatelessWidget {
         decoration: BoxDecoration(
           border: Border(
             bottom: BorderSide(
-              color: isSelected ? DAGRDColors.azulDAGRD : Colors.transparent,
+              color: isSelected ? ThemeColors.azulDAGRD : Colors.transparent,
               width: 3,
             ),
           ),
@@ -45,7 +45,7 @@ class MaterialTabWidget extends StatelessWidget {
                   width: 20,
                   height: 20,
                   colorFilter: ColorFilter.mode(
-                    isSelected ? DAGRDColors.azulDAGRD : DAGRDColors.grisMedio,
+                    isSelected ? ThemeColors.azulDAGRD : ThemeColors.grisMedio,
                     BlendMode.srcIn,
                   ),
                 ),
@@ -53,7 +53,7 @@ class MaterialTabWidget extends StatelessWidget {
                 Text(
                   label,
                   style: TextStyle(
-                    color: isSelected ? DAGRDColors.azulDAGRD : DAGRDColors.grisMedio,
+                    color: isSelected ? ThemeColors.azulDAGRD : ThemeColors.grisMedio,
                     fontFamily: 'Work Sans',
                     fontSize: 14,
                     fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,

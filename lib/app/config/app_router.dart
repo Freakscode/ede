@@ -9,10 +9,11 @@ import 'package:caja_herramientas/app/modules/risk_threat_analysis/presentation/
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../modules/auth/ui/pages/login_screen.dart';
+import '../modules/auth/presentation/pages/login_screen.dart';
 import '../modules/splash/presentation/pages/splash_screen.dart';
 import '../modules/home/presentation/pages/home_screen.dart' as home;
 import '../modules/home/presentation/pages/home_forms_screen.dart';
+import '../modules/home/presentation/pages/profile_screen.dart';
 import '../modules/home/presentation/bloc/home_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -52,6 +53,12 @@ GoRouter getAppRouter(BuildContext context) {
           final extra = state.extra as Map<String, dynamic>?;
           return home.HomeScreen(navigationData: extra);
         },
+      ),
+      
+      // Profile - Perfil de usuario
+      GoRoute(
+        path: '/profile',
+        builder: (context, state) => const ProfileScreen(),
       ),
       
       // Home Forms - Formularios en proceso y finalizados

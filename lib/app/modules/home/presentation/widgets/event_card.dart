@@ -14,7 +14,7 @@ class EventCard extends StatelessWidget {
     final card = Container(
       height: 140,
       decoration: BoxDecoration(
-        color: DAGRDColors.azul3DAGRD,
+        color: ThemeColors.azul3DAGRD,
         borderRadius: BorderRadius.circular(4),
       ),
       child: Column(

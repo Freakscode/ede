@@ -24,15 +24,15 @@ class RiskCompletionProgress extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            DAGRDColors.azulSecundario.withOpacity(0.1),
-            DAGRDColors.azulSecundario.withOpacity(0.05),
+            ThemeColors.azulSecundario.withOpacity(0.1),
+            ThemeColors.azulSecundario.withOpacity(0.05),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: DAGRDColors.azulSecundario.withOpacity(0.3),
+          color: ThemeColors.azulSecundario.withOpacity(0.3),
           width: 1,
         ),
       ),
@@ -43,14 +43,14 @@ class RiskCompletionProgress extends StatelessWidget {
             children: [
               Icon(
                 Icons.trending_up,
-                color: DAGRDColors.azulSecundario,
+                color: ThemeColors.azulSecundario,
                 size: 20,
               ),
               const SizedBox(width: 8),
               Text(
                 'Progreso de Completitud',
                 style: TextStyle(
-                  color: DAGRDColors.azulSecundario,
+                  color: ThemeColors.azulSecundario,
                   fontFamily: 'Work Sans',
                   fontSize: 14,
                   fontStyle: FontStyle.normal,
@@ -66,11 +66,11 @@ class RiskCompletionProgress extends StatelessWidget {
               Expanded(
                 child: LinearProgressIndicator(
                   value: progress,
-                  backgroundColor: DAGRDColors.grisClaro,
+                  backgroundColor: ThemeColors.grisClaro,
                   valueColor: AlwaysStoppedAnimation<Color>(
                     progress >= 1.0 
-                        ? DAGRDColors.success 
-                        : DAGRDColors.azulSecundario,
+                        ? ThemeColors.success 
+                        : ThemeColors.azulSecundario,
                   ),
                   minHeight: 8,
                 ),
@@ -79,7 +79,7 @@ class RiskCompletionProgress extends StatelessWidget {
               Text(
                 '$progressPercentage%',
                 style: TextStyle(
-                  color: DAGRDColors.azulSecundario,
+                  color: ThemeColors.azulSecundario,
                   fontFamily: 'Work Sans',
                   fontSize: 14,
                   fontStyle: FontStyle.normal,
@@ -92,7 +92,7 @@ class RiskCompletionProgress extends StatelessWidget {
           Text(
             '$completedCategories de $totalCategories categorías completadas',
             style: TextStyle(
-              color: DAGRDColors.azulSecundario,
+              color: ThemeColors.azulSecundario,
               fontFamily: 'Work Sans',
               fontSize: 12,
               fontStyle: FontStyle.normal,

@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'user_model.dart';
+import '../data/models/user_model.dart';
 
 /// Resultado de autenticación
 /// Value Object que encapsula el resultado de una operación de login

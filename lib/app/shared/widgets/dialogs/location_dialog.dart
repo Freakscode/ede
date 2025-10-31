@@ -34,7 +34,7 @@ class _LocationDialogState extends State<LocationDialog> {
   final TextEditingController _lngController = TextEditingController();
   MapController? _mapController;
   Timer? _coordinateUpdateTimer;
-  
+
   bool _isAutomaticSelected = true;
   bool _isCurrentLocationObtained = false;
   LatLng _currentPosition = const LatLng(4.609700, -74.081700);
@@ -80,18 +80,17 @@ class _LocationDialogState extends State<LocationDialog> {
       // Usar coordenadas GPS como iniciales
       final lat = position.latitude.toString();
       final lng = position.longitude.toString();
-      
+
       _latController.text = lat;
       _lngController.text = lng;
       _currentPosition = LatLng(position.latitude, position.longitude);
       _isCurrentLocationObtained = true;
       _updateMarker(isCurrentLocation: _isCurrentLocationObtained);
-      
+
       // Mover el mapa a la ubicación GPS
       if (_mapController != null) {
         _mapController!.move(_currentPosition, 15.0);
       }
-      
     } catch (e) {
       // Si falla, usar coordenadas por defecto
       _setDefaultCoordinates();
@@ -101,13 +100,13 @@ class _LocationDialogState extends State<LocationDialog> {
   void _setDefaultCoordinates() {
     const lat = '4.609700'; // Bogotá por defecto
     const lng = '-74.081700';
-    
+
     _latController.text = lat;
     _lngController.text = lng;
     _currentPosition = const LatLng(4.609700, -74.081700);
     _isCurrentLocationObtained = false;
     _updateMarker(isCurrentLocation: _isCurrentLocationObtained);
-    
+
     // Mostrar mensaje informativo
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
@@ -118,7 +117,9 @@ class _LocationDialogState extends State<LocationDialog> {
                 Icon(Icons.info_outline, color: Colors.white),
                 SizedBox(width: 12),
                 Expanded(
-                  child: Text('No se pudo obtener tu ubicación GPS. Usando ubicación por defecto.'),
+                  child: Text(
+                    'No se pudo obtener tu ubicación GPS. Usando ubicación por defecto.',
+                  ),
                 ),
               ],
             ),
@@ -154,44 +155,51 @@ class _LocationDialogState extends State<LocationDialog> {
           // El loading ya se maneja en _showLocationLoading()
           return;
         }
-        
+
         if (state.error?.isNotEmpty == true) {
           _showLocationError(state.error!);
           return;
         }
-        
+
         // Sincronizar coordenadas desde el bloc si hay cambios
         if (widget.imageIndex != null && widget.category != null) {
-          final categoryCoordinates = state.evidenceCoordinates[widget.category!];
+          final categoryCoordinates =
+              state.evidenceCoordinates[widget.category!];
           if (categoryCoordinates != null) {
             final coordinates = categoryCoordinates[widget.imageIndex!];
             if (coordinates != null) {
               final lat = coordinates['lat'] ?? '';
               final lng = coordinates['lng'] ?? '';
-              
+
               if (lat.isNotEmpty && lng.isNotEmpty) {
                 // Verificar si las coordenadas cambiaron
                 final currentLat = _latController.text;
                 final currentLng = _lngController.text;
-                
+
                 if (currentLat != lat || currentLng != lng) {
                   _latController.text = lat;
                   _lngController.text = lng;
-                  
+
                   // Actualizar posición en el mapa
                   try {
-                    final newPosition = LatLng(double.parse(lat), double.parse(lng));
+                    final newPosition = LatLng(
+                      double.parse(lat),
+                      double.parse(lng),
+                    );
                     setState(() {
                       _currentPosition = newPosition;
-                      _isCurrentLocationObtained = true; // Marcar como ubicación GPS
-                      _updateMarker(isCurrentLocation: _isCurrentLocationObtained);
+                      _isCurrentLocationObtained =
+                          true; // Marcar como ubicación GPS
+                      _updateMarker(
+                        isCurrentLocation: _isCurrentLocationObtained,
+                      );
                     });
-                    
+
                     // Mover el mapa a la nueva posición
                     if (_mapController != null) {
                       _mapController!.move(newPosition, 15.0);
                     }
-                    
+
                     // Mostrar mensaje de éxito
                     _showLocationSuccess();
                   } catch (e) {
@@ -266,11 +274,7 @@ class _LocationDialogState extends State<LocationDialog> {
           ),
           GestureDetector(
             onTap: () => Navigator.of(context).pop(),
-            child: const Icon(
-              Icons.close,
-              color: Color(0xFF1E1E1E),
-              size: 18,
-            ),
+            child: const Icon(Icons.close, color: Color(0xFF1E1E1E), size: 18),
           ),
         ],
       ),
@@ -393,9 +397,9 @@ class _LocationDialogState extends State<LocationDialog> {
       margin: const EdgeInsets.symmetric(horizontal: 20),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
       decoration: BoxDecoration(
-        color: DAGRDColors.surfaceVariant,
+        color: ThemeColors.surfaceVariant,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: DAGRDColors.outline),
+        border: Border.all(color: ThemeColors.outline),
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(8),
@@ -404,7 +408,9 @@ class _LocationDialogState extends State<LocationDialog> {
           options: MapOptions(
             initialCenter: _currentPosition,
             initialZoom: 15.0,
-            onTap: _isAutomaticSelected ? (tapPosition, point) => _onMapTapped(point) : null,
+            onTap: _isAutomaticSelected
+                ? (tapPosition, point) => _onMapTapped(point)
+                : null,
             interactionOptions: const InteractionOptions(
               flags: InteractiveFlag.all,
             ),
@@ -414,9 +420,7 @@ class _LocationDialogState extends State<LocationDialog> {
               urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
               userAgentPackageName: 'com.example.caja_herramientas',
             ),
-            MarkerLayer(
-              markers: _markers,
-            ),
+            MarkerLayer(markers: _markers),
           ],
         ),
       ),
@@ -452,7 +456,10 @@ class _LocationDialogState extends State<LocationDialog> {
                 borderRadius: BorderRadius.circular(4),
                 borderSide: const BorderSide(color: Color(0xFF232B48)),
               ),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 12,
+              ),
             ),
             style: const TextStyle(
               color: Color(0xFF1E1E1E),
@@ -485,7 +492,10 @@ class _LocationDialogState extends State<LocationDialog> {
                 borderRadius: BorderRadius.circular(4),
                 borderSide: const BorderSide(color: Color(0xFF232B48)),
               ),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 12,
+              ),
             ),
             style: const TextStyle(
               color: Color(0xFF1E1E1E),
@@ -502,159 +512,167 @@ class _LocationDialogState extends State<LocationDialog> {
   Widget _buildActionButtons() {
     return Padding(
       padding: const EdgeInsets.all(20),
-      child: Column(
-        children: [
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: _getCurrentLocation,
-              icon: const Icon(
-                Icons.my_location,
-                color: Color(0xFF232B48),
-                size: 20,
-              ),
-              label: const Text(
-                'Obtener ubicación actual',
-                style: TextStyle(
+      child: SizedBox(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: _getCurrentLocation,
+                icon: const Icon(
+                  Icons.my_location,
                   color: Color(0xFF232B48),
-                  fontFamily: 'Work Sans',
-                  fontSize: 14,
-                  fontStyle: FontStyle.normal,
-                  fontWeight: FontWeight.w500,
-                  height: 1.57,
+                  size: 20,
                 ),
-              ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFFFD700),
-                foregroundColor: const Color(0xFF232B48),
-                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                elevation: 0,
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: DAGRDColors.surfaceVariant,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: DAGRDColors.outline),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Coordenadas actuales',
+                label: const Text(
+                  'Obtener ubicación actual',
                   style: TextStyle(
-                    color: DAGRDColors.grisMedio,
+                    color: Color(0xFF232B48),
                     fontFamily: 'Work Sans',
-                    fontSize: 12,
+                    fontSize: 14,
                     fontStyle: FontStyle.normal,
                     fontWeight: FontWeight.w500,
-                    height: 1.2,
+                    height: 1.57,
                   ),
                 ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Latitud',
-                            style: TextStyle(
-                              color: DAGRDColors.grisOscuro,
-                              fontSize: 11,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                            decoration: BoxDecoration(
-                              color: DAGRDColors.surface,
-                              borderRadius: BorderRadius.circular(6),
-                              border: Border.all(color: DAGRDColors.outlineVariant),
-                            ),
-                            child: Text(
-                              _latController.text.isEmpty ? 'No definida' : _latController.text,
-                              style: TextStyle(
-                                color: _latController.text.isEmpty ? DAGRDColors.grisMedio : DAGRDColors.negroDAGRD,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Longitud',
-                            style: TextStyle(
-                              color: DAGRDColors.grisOscuro,
-                              fontSize: 11,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                            decoration: BoxDecoration(
-                              color: DAGRDColors.surface,
-                              borderRadius: BorderRadius.circular(6),
-                              border: Border.all(color: DAGRDColors.outlineVariant),
-                            ),
-                            child: Text(
-                              _lngController.text.isEmpty ? 'No definida' : _lngController.text,
-                              style: TextStyle(
-                                color: _lngController.text.isEmpty ? DAGRDColors.grisMedio : DAGRDColors.negroDAGRD,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: _saveLocation,
-              icon: const Icon(Icons.save, color: Colors.white, size: 20),
-              label: const Text(
-                'Guardar ubicación',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontFamily: 'Work Sans',
-                  fontSize: 14,
-                  fontStyle: FontStyle.normal,
-                  fontWeight: FontWeight.w500,
-                  height: 1.71,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFFFD700),
+                  foregroundColor: const Color(0xFF232B48),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 12,
+                    horizontal: 16,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  elevation: 0,
                 ),
               ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF232B48),
-                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                elevation: 0,
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Coordenadas actuales',
+              style: TextStyle(
+                color: ThemeColors.grisMedio,
+                fontFamily: 'Work Sans',
+                fontSize: 12,
+                fontStyle: FontStyle.normal,
+                fontWeight: FontWeight.w500,
+                height: 1.2,
               ),
             ),
-          ),
-        ],
+            const SizedBox(height: 8),
+            const Text(
+              'Latitud',
+              style: TextStyle(
+                color: ThemeColors.azulDAGRD,
+                fontFamily: 'Work Sans',
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                height: 1.33333,
+              ),
+            ),
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 10,
+                ),
+                decoration: BoxDecoration(
+                  color: ThemeColors.blancoDAGRD,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: ThemeColors.grisMedio, width: 1),
+                ),
+                child: Text(
+                  _latController.text.isEmpty
+                      ? 'No definida'
+                      : _latController.text,
+                  style: TextStyle(
+                    color: _latController.text.isEmpty
+                        ? const Color(0xFFCCCCCC)
+                        : Colors.black,
+                    fontFamily: 'Work Sans',
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+
+            const Text(
+              'Longitud',
+              style: TextStyle(
+                color: ThemeColors.azulDAGRD,
+                fontFamily: 'Work Sans',
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                height: 1.33333,
+              ),
+            ),
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 10,
+                ),
+                decoration: BoxDecoration(
+                  color: ThemeColors.blancoDAGRD,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: ThemeColors.grisMedio, width: 1),
+                ),
+                child: Text(
+                  _lngController.text.isEmpty
+                      ? 'No definida'
+                      : _lngController.text,
+                  style: TextStyle(
+                    color: _lngController.text.isEmpty
+                        ? const Color(0xFFCCCCCC)
+                        : Colors.black,
+                    fontFamily: 'Work Sans',
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: _saveLocation,
+                icon: const Icon(Icons.save, color: Colors.white, size: 20),
+                label: const Text(
+                  'Guardar ubicación',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontFamily: 'Work Sans',
+                    fontSize: 14,
+                    fontStyle: FontStyle.normal,
+                    fontWeight: FontWeight.w500,
+                    height: 1.71,
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF232B48),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 12,
+                    horizontal: 16,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  elevation: 0,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -672,7 +690,7 @@ class _LocationDialogState extends State<LocationDialog> {
   void _onManualCoordinatesChanged() {
     // Actualización inmediata para coordenadas válidas
     _updateMarkerFromControllers();
-    
+
     // Actualización con delay para evitar demasiadas actualizaciones
     _coordinateUpdateTimer?.cancel();
     _coordinateUpdateTimer = Timer(const Duration(milliseconds: 1000), () {
@@ -684,14 +702,14 @@ class _LocationDialogState extends State<LocationDialog> {
     try {
       final lat = double.parse(_latController.text);
       final lng = double.parse(_lngController.text);
-      
+
       if (lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
         setState(() {
           _currentPosition = LatLng(lat, lng);
           _isCurrentLocationObtained = false; // Ya no es ubicación automática
           _updateMarker(isCurrentLocation: _isCurrentLocationObtained);
         });
-        
+
         if (_mapController != null) {
           _mapController!.move(_currentPosition, 15.0);
         }
@@ -721,7 +739,7 @@ class _LocationDialogState extends State<LocationDialog> {
                       width: 40 + (value * 20),
                       height: 40 + (value * 20),
                       decoration: BoxDecoration(
-                        color: DAGRDColors.success.withOpacity(0.3),
+                        color: ThemeColors.success.withOpacity(0.3),
                         shape: BoxShape.circle,
                       ),
                     );
@@ -732,12 +750,11 @@ class _LocationDialogState extends State<LocationDialog> {
                 width: 50,
                 height: 50,
                 decoration: BoxDecoration(
-                  color: isCurrentLocation ? DAGRDColors.success : DAGRDColors.azulDAGRD,
+                  color: isCurrentLocation
+                      ? ThemeColors.success
+                      : ThemeColors.azulDAGRD,
                   shape: BoxShape.circle,
-                  border: Border.all(
-                    color: DAGRDColors.blancoDAGRD,
-                    width: 3,
-                  ),
+                  border: Border.all(color: ThemeColors.blancoDAGRD, width: 3),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.3),
@@ -748,7 +765,7 @@ class _LocationDialogState extends State<LocationDialog> {
                 ),
                 child: Icon(
                   isCurrentLocation ? Icons.my_location : Icons.location_on,
-                  color: DAGRDColors.blancoDAGRD,
+                  color: ThemeColors.blancoDAGRD,
                   size: 28,
                 ),
               ),
@@ -764,10 +781,10 @@ class _LocationDialogState extends State<LocationDialog> {
       setState(() {
         _isCurrentLocationObtained = true;
       });
-      
+
       // Mostrar indicador de carga
       _showLocationLoading();
-      
+
       // Usar el bloc existente para obtener ubicación
       if (widget.imageIndex != null) {
         context.read<RiskThreatAnalysisBloc>().add(
@@ -799,7 +816,7 @@ class _LocationDialogState extends State<LocationDialog> {
             Text('Obteniendo ubicación GPS...'),
           ],
         ),
-        backgroundColor: DAGRDColors.azulDAGRD,
+        backgroundColor: ThemeColors.azulDAGRD,
         duration: const Duration(seconds: 3),
       ),
     );
@@ -839,16 +856,20 @@ class _LocationDialogState extends State<LocationDialog> {
             Text('Ubicación GPS obtenida exitosamente'),
           ],
         ),
-        backgroundColor: DAGRDColors.success,
+        backgroundColor: ThemeColors.success,
         duration: const Duration(seconds: 2),
       ),
     );
   }
 
   void _saveLocation() {
-    final lat = _isAutomaticSelected ? _latController.text : _latController.text;
-    final lng = _isAutomaticSelected ? _lngController.text : _lngController.text;
-    
+    final lat = _isAutomaticSelected
+        ? _latController.text
+        : _latController.text;
+    final lng = _isAutomaticSelected
+        ? _lngController.text
+        : _lngController.text;
+
     // Actualizar el bloc existente
     if (widget.imageIndex != null && widget.category != null) {
       context.read<RiskThreatAnalysisBloc>().add(
@@ -859,7 +880,7 @@ class _LocationDialogState extends State<LocationDialog> {
         ),
       );
     }
-    
+
     widget.onLocationSelected?.call(lat, lng);
     Navigator.of(context).pop();
   }

@@ -7,10 +7,5 @@ export 'domain/domain.dart';
 // Datos
 export 'data/data.dart';
 
-// Presentación
+// Presentación (incluye BLoC)
 export 'presentation/presentation.dart';
-
-// BLoC
-export 'bloc/auth_bloc.dart';
-export 'bloc/auth_state.dart';
-export 'bloc/events/auth_events.dart';

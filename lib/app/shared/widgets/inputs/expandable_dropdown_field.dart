@@ -101,11 +101,11 @@ class _ExpandableDropdownFieldState extends State<ExpandableDropdownField> {
                 ),
                 decoration: BoxDecoration(
                   color: widget.isSelected
-                      ? DAGRDColors.amarDAGRD
+                      ? ThemeColors.amarDAGRD
                       : (widget.backgroundColor ?? Colors.white),
                   border: Border.all(
                     color: widget.isSelected
-                        ? DAGRDColors.amarDAGRD
+                        ? ThemeColors.amarDAGRD
                         : (widget.borderColor ?? const Color(0xFFD1D5DB)),
                     width: 1,
                   ),

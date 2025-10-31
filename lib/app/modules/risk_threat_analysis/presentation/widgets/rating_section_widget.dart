@@ -23,7 +23,7 @@ class RatingSectionWidget extends StatelessWidget {
           width: double.infinity,
           height: 52,
           decoration: const BoxDecoration(
-            color: DAGRDColors.azulDAGRD,
+            color: ThemeColors.azulDAGRD,
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(8),
               topRight: Radius.circular(8),
@@ -36,7 +36,7 @@ class RatingSectionWidget extends StatelessWidget {
                 Text(
                   title,
                   style: const TextStyle(
-                    color: DAGRDColors.blancoDAGRD,
+                    color: ThemeColors.blancoDAGRD,
                     fontFamily: 'Work Sans',
                     fontSize: 16,
                     fontStyle: FontStyle.normal,
@@ -51,7 +51,7 @@ class RatingSectionWidget extends StatelessWidget {
                     horizontal: 12,
                   ),
                   decoration: BoxDecoration(
-                    color: DAGRDColors.getNivelColorFromScore(score),
+                    color: ThemeColors.getNivelColorFromScore(score),
                     borderRadius: const BorderRadius.all(Radius.circular(12)),
                   ),
                   child: Center(
@@ -78,17 +78,22 @@ class RatingSectionWidget extends StatelessWidget {
               bottomRight: Radius.circular(8),
             ),
             border: Border(
-              left: BorderSide(color: DAGRDColors.outlineVariant, width: 1),
-              right: BorderSide(color: DAGRDColors.outlineVariant, width: 1),
-              bottom: BorderSide(color: DAGRDColors.outlineVariant, width: 1),
+              left: BorderSide(color: ThemeColors.outlineVariant, width: 1),
+              right: BorderSide(color: ThemeColors.outlineVariant, width: 1),
+              bottom: BorderSide(color: ThemeColors.outlineVariant, width: 1),
             ),
           ),
           child: Column(
-            children: items.map((item) => RatingItemWidget(
-              rating: item['rating'] as int,
-              title: item['title'] as String,
-              color: item['color'] as Color,
-            )).toList(),
+            children: [
+              for (int i = 0; i < items.length; i++)
+                RatingItemWidget(
+                  rating: items[i]['rating'] as int,
+                  title: items[i]['title'] as String,
+                  color: items[i]['color'] as Color,
+                  detailedItems: items[i]['detailedItems'] as List<String>?,
+                  isLastItem: i == items.length - 1,
+                ),
+            ],
           ),
         ),
       ],

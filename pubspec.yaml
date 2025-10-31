@@ -28,6 +28,7 @@ dependencies:
   geolocator: ^14.0.2
   geocoding: ^4.0.0
   equatable: ^2.0.7
+  dartz: ^0.10.1
   flutter_speed_dial: ^7.0.0
   dio: ^5.7.0
   shared_preferences: ^2.3.5

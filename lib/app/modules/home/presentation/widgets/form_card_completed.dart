@@ -35,7 +35,7 @@ class FormCardCompleted extends StatelessWidget {
                 width: 24,
                 height: 24,
                 colorFilter: const ColorFilter.mode(
-                  DAGRDColors.azulDAGRD,
+                  ThemeColors.azulDAGRD,
                   BlendMode.srcIn,
                 ),
               ),
@@ -119,7 +119,7 @@ class FormCardCompleted extends StatelessWidget {
             width: double.infinity,
             child: ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
-                backgroundColor: DAGRDColors.azulDAGRD,
+                backgroundColor: ThemeColors.azulDAGRD,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -131,7 +131,7 @@ class FormCardCompleted extends StatelessWidget {
                 width: 29,
                 height: 27,
                 colorFilter: const ColorFilter.mode(
-                  DAGRDColors.blancoDAGRD,
+                  ThemeColors.blancoDAGRD,
                   BlendMode.srcIn,
                 ),
               ),
@@ -139,7 +139,7 @@ class FormCardCompleted extends StatelessWidget {
                 'Descargar',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: DAGRDColors.blancoDAGRD,
+                  color: ThemeColors.blancoDAGRD,
                   fontFamily: 'Work Sans',
                   fontWeight: FontWeight.w500,
                   fontSize: 14,
@@ -153,7 +153,7 @@ class FormCardCompleted extends StatelessWidget {
             width: double.infinity,
             child: ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
-                backgroundColor: DAGRDColors.amarDAGRD,
+                backgroundColor: ThemeColors.amarDAGRD,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -165,7 +165,7 @@ class FormCardCompleted extends StatelessWidget {
                 width: 29,
                 height: 27,
                 colorFilter: const ColorFilter.mode(
-                  DAGRDColors.negroDAGRD,
+                  ThemeColors.negroDAGRD,
                   BlendMode.srcIn,
                 ),
               ),
@@ -173,7 +173,7 @@ class FormCardCompleted extends StatelessWidget {
                 'Asociar a SIRE',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: DAGRDColors.negroDAGRD,
+                  color: ThemeColors.negroDAGRD,
                   fontFamily: 'Work Sans',
                   fontWeight: FontWeight.w500,
                   fontSize: 14,
@@ -188,7 +188,7 @@ class FormCardCompleted extends StatelessWidget {
             width: double.infinity,
             child: ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
-                backgroundColor: DAGRDColors.azul3DAGRD,
+                backgroundColor: ThemeColors.azul3DAGRD,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -200,7 +200,7 @@ class FormCardCompleted extends StatelessWidget {
                 width: 29,
                 height: 27,
                 colorFilter: const ColorFilter.mode(
-                  DAGRDColors.blancoDAGRD,
+                  ThemeColors.blancoDAGRD,
                   BlendMode.srcIn,
                 ),
               ),
@@ -208,7 +208,7 @@ class FormCardCompleted extends StatelessWidget {
                 'Enviar por correo',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: DAGRDColors.blancoDAGRD,
+                  color: ThemeColors.blancoDAGRD,
                   fontFamily: 'Work Sans',
                   fontWeight: FontWeight.w500,
                   fontSize: 14,

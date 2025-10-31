@@ -25,7 +25,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: DAGRDColors.azulDAGRD,
+      backgroundColor: ThemeColors.azulDAGRD,
       elevation: 0,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(bottom: Radius.circular(28)),
@@ -116,7 +116,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           width: 38,
           height: 38,
           decoration: const BoxDecoration(
-            color: DAGRDColors.amarDAGRD,
+            color: ThemeColors.amarDAGRD,
             shape: BoxShape.circle,
           ),
           child: Center(
@@ -124,7 +124,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               assetName,
               width: 26,
               height: 26,
-              color: DAGRDColors.azulDAGRD,
+              color: ThemeColors.azulDAGRD,
             ),
           ),
         ),

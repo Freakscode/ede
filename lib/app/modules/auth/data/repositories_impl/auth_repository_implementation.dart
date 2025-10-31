@@ -1,108 +1,85 @@
-import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../domain/repositories/auth_repository_interface.dart';
 import '../../domain/entities/user_entity.dart';
 import '../../domain/entities/auth_result_entity.dart';
-import '../models/user_model.dart';
+import '../../domain/entities/login_params.dart';
 import '../models/login_request_model.dart';
+import '../datasources/auth_local_data_source.dart';
+import '../datasources/auth_remote_data_source.dart';
 
 /// Implementación del repositorio de autenticación
 /// Maneja la persistencia local y las llamadas a la API
-class AuthRepositoryImplementation implements AuthRepository {
-  final SharedPreferences sharedPreferences;
-  static const String _tokenKey = 'auth_token';
-  static const String _userKey = 'auth_user';
+class AuthRepositoryImplementation implements IAuthRepository {
+  final AuthLocalDataSource _authLocalDataSource;
+  final AuthRemoteDataSource _authRemoteDataSource;
 
   AuthRepositoryImplementation({
-    required this.sharedPreferences,
-  });
+    required AuthLocalDataSource authLocalDataSource,
+    required AuthRemoteDataSource authRemoteDataSource,
+  }) : _authLocalDataSource = authLocalDataSource,
+       _authRemoteDataSource = authRemoteDataSource;
 
   @override
-  Future<AuthResultEntity> login(LoginRequestModel loginRequest) async {
-    try {
-      // Simular delay de red
-      await Future.delayed(const Duration(seconds: 1));
-      
-      // Simular validación de credenciales
-      if (loginRequest.cedula.isEmpty || loginRequest.password.isEmpty) {
-        return AuthResultEntity.failure(
-          message: 'La cédula y contraseña son requeridas',
-          errorType: AuthErrorType.invalidCredentials,
-        );
+  Future<AuthResultEntity> login(LoginParams loginParams) async {
+    // Convertir LoginParams (entidad de dominio) a LoginRequestModel (DTO)
+    final loginRequest = LoginRequestModel(
+      email: loginParams.email,
+      password: loginParams.password,
+    );
+    
+    // Primero intentar autenticación contra la API
+    final loginResult = await _authRemoteDataSource.login(loginRequest);
+    
+    // Si el login fue exitoso, guardar datos localmente
+    if (loginResult.result.isSuccess && loginResult.result.user != null) {
+      if (loginResult.token != null) {
+        await saveToken(loginResult.token!);
       }
-      
-      // Obtener usuario DAGRD simulado usando los nuevos métodos helper
-      final selectedUser = UserModel.getSimulatedDagrdUserByCedula(loginRequest.cedula);
-      
-      // Generar token simulado
-      final simulatedToken = 'simulated_token_${DateTime.now().millisecondsSinceEpoch}';
-      
-      // Guardar datos localmente
-      await saveToken(simulatedToken);
-      await saveUser(selectedUser.toEntity());
-      
-      return AuthResultEntity.success(
-        message: 'Login exitoso (modo simulación)',
-        user: selectedUser.toEntity(),
-      );
-    } catch (e) {
-      return AuthResultEntity.failure(
-        message: 'Error inesperado durante el login simulado',
-        errorType: AuthErrorType.unknown,
-      );
+      await saveUser(loginResult.result.user!);
     }
+    
+    return loginResult.result;
   }
 
   @override
   Future<void> logout() async {
+    // Intentar logout contra la API (no crítico si falla)
+    try {
+      await _authRemoteDataSource.logout();
+    } catch (e) {
+      // Log error but don't throw - logout should succeed locally even if API fails
+    }
+    
+    // Limpiar datos localmente (siempre se ejecuta)
     await clearAuthData();
   }
 
   @override
   Future<String?> getToken() async {
-    return sharedPreferences.getString(_tokenKey);
+    return await _authLocalDataSource.getToken();
   }
 
   @override
   Future<bool> isLoggedIn() async {
-    final token = await getToken();
-    final user = await getCurrentUser();
-    final result = token != null && token.isNotEmpty && user != null;
-    return result;
+    return await _authLocalDataSource.isLoggedIn();
   }
 
   @override
   Future<void> saveToken(String token) async {
-    await sharedPreferences.setString(_tokenKey, token);
+    await _authLocalDataSource.saveToken(token);
   }
 
   @override
   Future<UserEntity?> getCurrentUser() async {
-    try {
-      final userJson = sharedPreferences.getString(_userKey);
-      if (userJson != null) {
-        final userMap = json.decode(userJson) as Map<String, dynamic>;
-        // Reconstruir usuario desde JSON guardado
-        final userModel = UserModel.fromJson(userMap);
-        final user = userModel.toEntity();
-        return user;
-      }
-      return null;
-    } catch (e) {
-      return null;
-    }
+    return await _authLocalDataSource.getCurrentUser();
   }
 
   @override
   Future<void> saveUser(UserEntity user) async {
-    final userModel = UserModel.fromEntity(user);
-    final userMap = userModel.toJson();
-    await sharedPreferences.setString(_userKey, json.encode(userMap));
+    await _authLocalDataSource.saveUser(user);
   }
 
   @override
   Future<void> clearAuthData() async {
-    await sharedPreferences.remove(_tokenKey);
-    await sharedPreferences.remove(_userKey);
+    await _authLocalDataSource.clearAuthData();
   }
 }

@@ -72,7 +72,7 @@ class InfographicCardWidget extends StatelessWidget {
                     height: 40,
                     padding: const EdgeInsets.all(8),
                     decoration: const BoxDecoration(
-                      color: DAGRDColors.azulDAGRD,
+                      color: ThemeColors.azulDAGRD,
                       shape: BoxShape.circle,
                     ),
                     child: SvgPicture.asset(
@@ -101,7 +101,7 @@ class InfographicCardWidget extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w500,
-                          color: DAGRDColors.negroDAGRD,
+                          color: ThemeColors.negroDAGRD,
                           fontFamily: 'Work Sans',
                           height: 16 / 13,
                         ),
@@ -132,7 +132,7 @@ class InfographicCardWidget extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w400,
-                    color: DAGRDColors.negroDAGRD,
+                    color: ThemeColors.negroDAGRD,
                     fontFamily: 'Work Sans',
                     height: 16 / 12,
                   ),
@@ -264,7 +264,7 @@ class _CategoryBadge extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
-          color: DAGRDColors.amarDAGRD,
+          color: ThemeColors.amarDAGRD,
           borderRadius: BorderRadius.circular(100),
         ),
         child: Center(

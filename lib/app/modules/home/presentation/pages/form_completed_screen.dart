@@ -7,8 +7,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../presentation/bloc/home_bloc.dart';
 import '../../presentation/bloc/home_event.dart';
 import '../../presentation/bloc/home_state.dart';
-import '../../../auth/bloc/auth_bloc.dart';
-import '../../../auth/bloc/auth_state.dart';
+import '../../../auth/presentation/bloc/auth_bloc.dart';
+import '../../../auth/presentation/bloc/auth_state.dart';
 
 class FormCompletedScreen extends StatelessWidget {
   const FormCompletedScreen({super.key});
@@ -29,7 +29,7 @@ class FormCompletedScreen extends StatelessWidget {
                 'Formulario finalizado correctamente',
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: DAGRDColors.azulDAGRD,
+              color: ThemeColors.azulDAGRD,
               fontFamily: 'Work Sans',
               fontSize: 20,
               fontWeight: FontWeight.w600,
@@ -44,7 +44,7 @@ class FormCompletedScreen extends StatelessWidget {
             'El formulario ha sido completado. Seleccione la acción que desea realizar a continuación:',
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: DAGRDColors.negroDAGRD,
+              color: ThemeColors.negroDAGRD,
               fontFamily: 'Work Sans',
               fontSize: 13,
               fontWeight: FontWeight.w500,
@@ -59,7 +59,7 @@ class FormCompletedScreen extends StatelessWidget {
             width: double.infinity,
             child: ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
-                backgroundColor: DAGRDColors.azulDAGRD,
+                backgroundColor: ThemeColors.azulDAGRD,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -71,7 +71,7 @@ class FormCompletedScreen extends StatelessWidget {
                 width: 29,
                 height: 27,
                 colorFilter: const ColorFilter.mode(
-                  DAGRDColors.blancoDAGRD,
+                  ThemeColors.blancoDAGRD,
                   BlendMode.srcIn,
                 ),
               ),
@@ -79,7 +79,7 @@ class FormCompletedScreen extends StatelessWidget {
                 'Descargar',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: DAGRDColors.blancoDAGRD,
+                  color: ThemeColors.blancoDAGRD,
                   fontFamily: 'Work Sans',
                   fontWeight: FontWeight.w500,
                   fontSize: 14,
@@ -102,7 +102,7 @@ class FormCompletedScreen extends StatelessWidget {
                       width: double.infinity,
                       child: ElevatedButton.icon(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: DAGRDColors.amarDAGRD,
+                          backgroundColor: ThemeColors.amarDAGRD,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
@@ -114,7 +114,7 @@ class FormCompletedScreen extends StatelessWidget {
                           width: 29,
                           height: 27,
                           colorFilter: const ColorFilter.mode(
-                            DAGRDColors.negroDAGRD,
+                            ThemeColors.negroDAGRD,
                             BlendMode.srcIn,
                           ),
                         ),
@@ -122,7 +122,7 @@ class FormCompletedScreen extends StatelessWidget {
                           'Asociar a SIRE',
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            color: DAGRDColors.negroDAGRD,
+                            color: ThemeColors.negroDAGRD,
                             fontFamily: 'Work Sans',
                             fontWeight: FontWeight.w500,
                             fontSize: 14,
@@ -147,7 +147,7 @@ class FormCompletedScreen extends StatelessWidget {
             width: double.infinity,
             child: ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
-                backgroundColor: DAGRDColors.azul3DAGRD,
+                backgroundColor: ThemeColors.azul3DAGRD,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -159,7 +159,7 @@ class FormCompletedScreen extends StatelessWidget {
                 width: 29,
                 height: 27,
                 colorFilter: const ColorFilter.mode(
-                  DAGRDColors.blancoDAGRD,
+                  ThemeColors.blancoDAGRD,
                   BlendMode.srcIn,
                 ),
               ),
@@ -167,7 +167,7 @@ class FormCompletedScreen extends StatelessWidget {
                 'Enviar por correo',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: DAGRDColors.blancoDAGRD,
+                  color: ThemeColors.blancoDAGRD,
                   fontFamily: 'Work Sans',
                   fontWeight: FontWeight.w500,
                   fontSize: 14,
@@ -184,10 +184,10 @@ class FormCompletedScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: DAGRDColors.amarDAGRD.withOpacity(0.2),
+                color: ThemeColors.amarDAGRD.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(
-                  color: DAGRDColors.amarDAGRD,
+                  color: ThemeColors.amarDAGRD,
                   width: 1,
                 ),
               ),
@@ -231,14 +231,14 @@ class FormCompletedScreen extends StatelessWidget {
               children: const [
                 Icon(
                   Icons.chevron_left,
-                  color: DAGRDColors.negroDAGRD,
+                  color: ThemeColors.negroDAGRD,
                   size: 20,
                 ),
                 SizedBox(width: 4),
                  Text(
                   'Volver al inicio',
                   style: TextStyle(
-                    color: DAGRDColors.negroDAGRD,
+                    color: ThemeColors.negroDAGRD,
                     fontFamily: 'Work Sans',
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
