@@ -1,7 +1,6 @@
 import '../../domain/repositories/auth_repository_interface.dart';
 import '../../domain/entities/user_entity.dart';
 import '../../domain/entities/auth_result_entity.dart';
-import '../models/user_model.dart';
 import '../models/login_request_model.dart';
 import '../datasources/auth_local_data_source.dart';
 import '../datasources/auth_remote_data_source.dart';
@@ -20,38 +19,18 @@ class AuthRepositoryImplementation implements IAuthRepository {
 
   @override
   Future<AuthResultEntity> login(LoginRequestModel loginRequest) async {
-    try {
-      // Simular delay de red
-      await Future.delayed(const Duration(seconds: 1));
-      
-      // Simular validación de credenciales
-      if (loginRequest.cedula.isEmpty || loginRequest.password.isEmpty) {
-        return AuthResultEntity.failure(
-          message: 'La cédula y contraseña son requeridas',
-          errorType: AuthErrorType.invalidCredentials,
-        );
+    // Primero intentar autenticación contra la API
+    final loginResult = await _authRemoteDataSource.login(loginRequest);
+    
+    // Si el login fue exitoso, guardar datos localmente
+    if (loginResult.result.isSuccess && loginResult.result.user != null) {
+      if (loginResult.token != null) {
+        await saveToken(loginResult.token!);
       }
-      
-      // Obtener usuario DAGRD simulado usando los nuevos métodos helper
-      final selectedUser = UserModel.getSimulatedDagrdUserByCedula(loginRequest.cedula);
-      
-      // Generar token simulado
-      final simulatedToken = 'simulated_token_${DateTime.now().millisecondsSinceEpoch}';
-      
-      // Guardar datos localmente
-      await saveToken(simulatedToken);
-      await saveUser(selectedUser.toEntity());
-      
-      return AuthResultEntity.success(
-        message: 'Login exitoso (modo simulación)',
-        user: selectedUser.toEntity(),
-      );
-    } catch (e) {
-      return AuthResultEntity.failure(
-        message: 'Error inesperado durante el login simulado',
-        errorType: AuthErrorType.unknown,
-      );
+      await saveUser(loginResult.result.user!);
     }
+    
+    return loginResult.result;
   }
 
   @override

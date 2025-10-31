@@ -1,27 +1,39 @@
+import 'dart:developer';
+
 import 'package:dio/dio.dart';
+import 'package:caja_herramientas/app/core/http/api.dart';
 import '../../domain/entities/auth_result_entity.dart';
 import '../models/login_request_model.dart';
 import '../models/user_model.dart';
 
+/// Resultado temporal para manejar token desde la API
+class LoginResult {
+  final AuthResultEntity result;
+  final String? token;
+
+  LoginResult({
+    required this.result,
+    this.token,
+  });
+}
+
 /// Interfaz para data source remoto de autenticación
 abstract class AuthRemoteDataSource {
   /// Realizar login contra la API
-  Future<AuthResultEntity> login(LoginRequestModel loginRequest);
+  Future<LoginResult> login(LoginRequestModel loginRequest);
 
   /// Realizar logout contra la API
   Future<void> logout();
 }
 
-class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
-  final Dio dio;
-
-  AuthRemoteDataSourceImpl({required this.dio});
+class AuthRemoteDataSourceImpl extends ApiProvider implements AuthRemoteDataSource {
+  AuthRemoteDataSourceImpl();
 
   @override
-  Future<AuthResultEntity> login(LoginRequestModel loginRequest) async {
+  Future<LoginResult> login(LoginRequestModel loginRequest) async {
     try {
       final response = await dio.post(
-        '/auth/login', // TODO: Configurar endpoint correcto
+        '/auth/login',
         data: {
           'cedula': loginRequest.cedula,
           'password': loginRequest.password,
@@ -30,30 +42,39 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
       if (response.statusCode == 200) {
         final data = response.data;
-        final userData = data['user'];
+        final userData = data['user'] ?? data;
+        final token = data['token'] as String?;
         
         final userModel = UserModel.fromApiResponse(userData);
         
-        return AuthResultEntity.success(
+        final result = AuthResultEntity.success(
           message: 'Login exitoso',
           user: userModel.toEntity(),
         );
+        
+        return LoginResult(result: result, token: token);
       }
       
-      return AuthResultEntity.failure(
+      final result = AuthResultEntity.failure(
         message: 'Error de autenticación',
         errorType: AuthErrorType.invalidCredentials,
       );
+      
+      return LoginResult(result: result);
     } on DioException catch (e) {
-      return AuthResultEntity.failure(
+      final result = AuthResultEntity.failure(
         message: e.response?.data['message'] ?? 'Error de conexión',
         errorType: _mapErrorType(e.type),
       );
+      
+      return LoginResult(result: result);
     } catch (e) {
-      return AuthResultEntity.failure(
+      final result = AuthResultEntity.failure(
         message: 'Error inesperado: $e',
         errorType: AuthErrorType.unknown,
       );
+      
+      return LoginResult(result: result);
     }
   }
 
@@ -65,7 +86,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       );
     } on DioException catch (e) {
       // Log error but don't throw - logout should succeed even if API fails
-      print('Error during logout: ${e.message}');
+      log('Error during logout: ${e.message}', name: 'AuthRemoteDataSource');
     }
   }
 
