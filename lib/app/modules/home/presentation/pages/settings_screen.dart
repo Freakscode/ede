@@ -8,9 +8,9 @@ import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
 import 'package:caja_herramientas/app/modules/home/presentation/bloc/home_bloc.dart';
 import 'package:caja_herramientas/app/modules/home/presentation/bloc/home_event.dart';
 import 'package:caja_herramientas/app/modules/home/presentation/bloc/home_state.dart';
-import 'package:caja_herramientas/app/modules/auth/bloc/auth_bloc.dart';
-import 'package:caja_herramientas/app/modules/auth/bloc/auth_state.dart';
-import 'package:caja_herramientas/app/modules/auth/bloc/events/auth_events.dart';
+import 'package:caja_herramientas/app/modules/auth/presentation/bloc/auth_bloc.dart';
+import 'package:caja_herramientas/app/modules/auth/presentation/bloc/auth_state.dart';
+import 'package:caja_herramientas/app/modules/auth/presentation/bloc/events/auth_events.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});

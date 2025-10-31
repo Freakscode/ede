@@ -7,7 +7,7 @@ import 'package:caja_herramientas/app/shared/services/form_persistence_service.d
 import 'package:caja_herramientas/app/shared/models/complete_form_data_model.dart';
 import 'package:caja_herramientas/app/shared/widgets/dialogs/custom_action_dialog.dart';
 import 'package:caja_herramientas/app/shared/widgets/snackbars/custom_snackbar.dart';
-import 'package:caja_herramientas/app/modules/auth/services/auth_service.dart';
+import 'package:caja_herramientas/app/modules/auth/data/datasources/auth_service.dart';
 import 'package:caja_herramientas/app/modules/data_registration/bloc/data_registration_bloc.dart';
 import 'package:caja_herramientas/app/modules/data_registration/bloc/data_registration_state.dart';
 import '../bloc/risk_threat_analysis_bloc.dart';

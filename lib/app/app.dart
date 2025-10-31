@@ -15,7 +15,7 @@ import 'modules/evaluacion/presentation/bloc/evaluacion_global_bloc.dart';
 import 'modules/risk_threat_analysis/presentation/bloc/risk_threat_analysis_bloc.dart';
 import 'modules/home/presentation/bloc/home_bloc.dart';
 import 'modules/home/presentation/bloc/home_event.dart';
-import 'modules/auth/bloc/auth_bloc.dart';
+import 'modules/auth/presentation/bloc/auth_bloc.dart';
 import 'modules/data_registration/bloc/data_registration_bloc.dart';
 import '../injection_container.dart' as di;
 import 'config/app_router.dart';

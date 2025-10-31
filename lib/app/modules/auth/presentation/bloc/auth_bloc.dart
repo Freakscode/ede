@@ -1,8 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../domain/repositories/auth_repository_interface.dart';
-import '../domain/usecases/login_usecase.dart';
-import '../domain/entities/auth_result_entity.dart';
-import '../data/models/login_request_model.dart';
+import '../../domain/repositories/auth_repository_interface.dart';
+import '../../domain/usecases/login_usecase.dart';
+import '../../domain/entities/auth_result_entity.dart';
+import '../../data/models/login_request_model.dart';
 import 'events/auth_events.dart';
 import 'auth_state.dart';
 

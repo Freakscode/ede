@@ -1,26 +1,21 @@
-import '../interfaces/auth_interface.dart';
 import '../models/user_model.dart';
-import '../models/auth_result.dart';
+import '../../models/auth_result.dart';
 
 /// Servicio de autenticación
-/// Implementación concreta de AuthInterface
-class AuthService implements AuthInterface {
+/// Servicio singleton para gestión de autenticación local
+class AuthService {
   static final AuthService _instance = AuthService._internal();
   factory AuthService() => _instance;
   AuthService._internal();
 
   UserModel? _currentUser;
   
-  @override
   UserModel? get currentUser => _currentUser;
   
-  @override
   bool get isLoggedIn => _currentUser != null;
   
-  @override
   bool get isDagrdUser => _currentUser?.isDagrdUser ?? false;
 
-  @override
   Future<AuthResult> login(String cedula, String password) async {
     try {
       // Simular delay de red
@@ -55,17 +50,14 @@ class AuthService implements AuthInterface {
     }
   }
 
-  @override
   Future<void> logout() async {
     _currentUser = null;
   }
 
-  @override
   bool canAccessDagrdFeatures() {
     return isDagrdUser;
   }
 
-  @override
   bool canAccessGeneralFeatures() {
     return isLoggedIn;
   }

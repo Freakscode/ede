@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
-import '../domain/entities/user_entity.dart';
-import '../domain/entities/auth_result_entity.dart';
+import '../../domain/entities/user_entity.dart';
+import '../../domain/entities/auth_result_entity.dart';
 
 /// Estados del módulo de autenticación
 abstract class AuthState extends Equatable {

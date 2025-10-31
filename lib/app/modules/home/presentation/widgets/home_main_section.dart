@@ -10,9 +10,9 @@ import 'package:caja_herramientas/app/shared/widgets/dialogs/forms_in_progress_d
 import 'package:caja_herramientas/app/modules/risk_threat_analysis/presentation/bloc/risk_threat_analysis_bloc.dart';
 import 'package:caja_herramientas/app/modules/risk_threat_analysis/presentation/bloc/risk_threat_analysis_event.dart'
     as risk_events;
-import 'package:caja_herramientas/app/modules/auth/bloc/auth_bloc.dart';
-import 'package:caja_herramientas/app/modules/auth/bloc/auth_state.dart';
-import 'package:caja_herramientas/app/modules/auth/bloc/events/auth_events.dart';
+import 'package:caja_herramientas/app/modules/auth/presentation/bloc/auth_bloc.dart';
+import 'package:caja_herramientas/app/modules/auth/presentation/bloc/auth_state.dart';
+import 'package:caja_herramientas/app/modules/auth/presentation/bloc/events/auth_events.dart';
 import 'package:go_router/go_router.dart';
 
 class HomeMainSection extends StatefulWidget {

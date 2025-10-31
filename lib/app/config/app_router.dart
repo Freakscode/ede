@@ -9,7 +9,7 @@ import 'package:caja_herramientas/app/modules/risk_threat_analysis/presentation/
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../modules/auth/ui/pages/login_screen.dart';
+import '../modules/auth/presentation/pages/login_screen.dart';
 import '../modules/splash/presentation/pages/splash_screen.dart';
 import '../modules/home/presentation/pages/home_screen.dart' as home;
 import '../modules/home/presentation/pages/home_forms_screen.dart';

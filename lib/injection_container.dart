@@ -11,7 +11,7 @@ import 'app/core/network/network_info.dart';
 // Features - Auth
 import 'app/modules/auth/data/repositories_impl/auth_repository_implementation.dart';
 import 'app/modules/auth/domain/repositories/auth_repository_interface.dart';
-import 'app/modules/auth/bloc/auth_bloc.dart';
+import 'app/modules/auth/presentation/bloc/auth_bloc.dart';
 
 // Features - Evaluacion
 import 'app/modules/evaluacion/data/repositories_impl/evaluacion_repository_impl.dart';

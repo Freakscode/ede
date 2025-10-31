@@ -3,9 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:caja_herramientas/app/shared/widgets/widgets.dart';
 import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
-import '../../bloc/auth_bloc.dart';
-import '../../bloc/auth_state.dart';
-import '../../bloc/events/auth_events.dart';
+import '../bloc/auth_bloc.dart';
+import '../bloc/auth_state.dart';
+import '../bloc/events/auth_events.dart';
 
 /// Pantalla de login
 class LoginScreen extends StatefulWidget {

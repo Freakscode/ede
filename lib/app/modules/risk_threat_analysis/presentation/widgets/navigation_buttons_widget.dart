@@ -6,7 +6,7 @@ import 'package:caja_herramientas/app/shared/widgets/dialogs/custom_action_dialo
 import 'package:caja_herramientas/app/shared/widgets/widgets.dart';
 import 'package:caja_herramientas/app/shared/services/form_persistence_service.dart';
 import 'package:caja_herramientas/app/shared/models/complete_form_data_model.dart';
-import 'package:caja_herramientas/app/modules/auth/services/auth_service.dart';
+import 'package:caja_herramientas/app/modules/auth/data/datasources/auth_service.dart';
 import '../bloc/risk_threat_analysis_bloc.dart';
 import '../bloc/risk_threat_analysis_event.dart';
 import '../bloc/risk_threat_analysis_state.dart';
