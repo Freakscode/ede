@@ -64,58 +64,6 @@ class HomeScreen extends StatelessWidget {
     }
   }
 
-  /// Construye un fallback de error para pestañas no reconocidas
-  Widget _buildErrorFallback(BuildContext context, int invalidIndex) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.error_outline, size: 64, color: Colors.red.shade400),
-            const SizedBox(height: 16),
-            Text(
-              'Error de navegación',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.red.shade700,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Pestaña no válida: $invalidIndex',
-              style: const TextStyle(fontSize: 16, color: Colors.grey),
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton.icon(
-              onPressed: () {
-                // Resetear a la pestaña de inicio de forma segura
-                try {
-                  context.read<HomeBloc>().add(const HomeNavBarTapped(0));
-                } catch (e) {
-                  // Si hay error, navegar directamente
-                  context.go('/');
-                }
-              },
-              icon: const Icon(Icons.home),
-              label: const Text('Volver al inicio'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: DAGRDColors.azulDAGRD,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 12,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  
   @override
   Widget build(BuildContext context) {
     // Manejar datos de navegación después del primer frame
@@ -248,7 +196,62 @@ class HomeScreen extends StatelessWidget {
                     break;
                 }
                 return content ??
-                    _buildErrorFallback(context, homeState.selectedIndex);
+                    Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(24.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.error_outline,
+                              size: 64,
+                              color: Colors.red.shade400,
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              'Error de navegación',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.red.shade700,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              'Pestaña no válida: ${homeState.selectedIndex}',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey,
+                              ),
+                            ),
+                            const SizedBox(height: 24),
+                            ElevatedButton.icon(
+                              onPressed: () {
+                                // Resetear a la pestaña de inicio de forma segura
+                                try {
+                                  context.read<HomeBloc>().add(
+                                    const HomeNavBarTapped(0),
+                                  );
+                                } catch (e) {
+                                  // Si hay error, navegar directamente
+                                  context.go('/');
+                                }
+                              },
+                              icon: const Icon(Icons.home),
+                              label: const Text('Volver al inicio'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: DAGRDColors.azulDAGRD,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 24,
+                                  vertical: 12,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
               }(),
               bottomNavigationBar: CustomBottomNavBar(
                 currentIndex: homeState.isShowingSpecialSection
