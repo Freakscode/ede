@@ -6,7 +6,8 @@ import 'package:caja_herramientas/app/shared/widgets/dialogs/custom_action_dialo
 import 'package:caja_herramientas/app/shared/widgets/widgets.dart';
 import 'package:caja_herramientas/app/shared/services/form_persistence_service.dart';
 import 'package:caja_herramientas/app/shared/models/complete_form_data_model.dart';
-import 'package:caja_herramientas/app/modules/auth/data/datasources/auth_service.dart';
+import 'package:caja_herramientas/app/modules/auth/domain/repositories/auth_repository_interface.dart';
+import 'package:caja_herramientas/injection_container.dart';
 import '../bloc/risk_threat_analysis_bloc.dart';
 import '../bloc/risk_threat_analysis_event.dart';
 import '../bloc/risk_threat_analysis_state.dart';
@@ -374,12 +375,13 @@ class NavigationButtonsWidget extends StatelessWidget {
                                               .toLowerCase();
 
                                       // Obtener datos de contacto e inspección
-                                      final authService = AuthService();
+                                      final authRepository = sl<IAuthRepository>();
                                       Map<String, dynamic> contactData = {};
                                       Map<String, dynamic> inspectionData = {};
 
-                                      if (authService.isLoggedIn) {
-                                        final user = authService.currentUser;
+                                      final isLoggedIn = await authRepository.isLoggedIn();
+                                      if (isLoggedIn) {
+                                        final user = await authRepository.getCurrentUser();
                                         contactData = {
                                           'names': user?.nombre ?? '',
                                           'cellPhone': user?.cedula ?? '',
