@@ -1,4 +1,4 @@
-import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
+import 'package:caja_herramientas/app/core/theme/theme_colors.dart';
 import 'package:caja_herramientas/app/core/icons/app_icons.dart';
 import 'package:caja_herramientas/app/core/utils/logger.dart';
 import 'package:caja_herramientas/app/modules/home/presentation/widgets/category_card.dart';

@@ -2,7 +2,7 @@
 /// Exporta todos los componentes del sistema de temas
 
 // Colores
-export 'dagrd_colors.dart';
+export 'theme_colors.dart';
 
 // Tema principal
 export 'app_theme.dart';

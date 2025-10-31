@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'dagrd_colors.dart';
+import 'theme_colors.dart';
 
 /// Extensiones de tema personalizadas para DAGRD
 /// Permite acceder fácilmente a colores y estilos específicos del tema

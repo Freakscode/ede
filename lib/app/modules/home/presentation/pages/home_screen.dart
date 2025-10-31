@@ -10,7 +10,7 @@ import 'package:caja_herramientas/app/modules/home/presentation/widgets/tutorial
 import 'package:caja_herramientas/app/modules/home/presentation/widgets/home_help_content.dart';
 import 'package:caja_herramientas/app/shared/widgets/layouts/custom_app_bar.dart';
 import 'package:caja_herramientas/app/shared/widgets/dialogs/help_dialog.dart';
-import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
+import 'package:caja_herramientas/app/core/theme/theme_colors.dart';
 import 'package:caja_herramientas/app/core/icons/app_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

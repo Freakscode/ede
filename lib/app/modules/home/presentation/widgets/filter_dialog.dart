@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
+import 'package:caja_herramientas/app/core/theme/theme_colors.dart';
 import 'package:caja_herramientas/app/shared/widgets/inputs/custom_date_picker.dart';
 import 'package:caja_herramientas/app/shared/models/risk_event_factory.dart';
 

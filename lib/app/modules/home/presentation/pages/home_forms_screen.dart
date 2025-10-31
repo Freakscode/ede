@@ -1,6 +1,6 @@
 import 'package:caja_herramientas/app/core/icons/app_icons.dart';
 import 'package:flutter/material.dart';
-import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
+import 'package:caja_herramientas/app/core/theme/theme_colors.dart';
 import 'package:caja_herramientas/app/modules/home/presentation/widgets/form_card_in_progress.dart';
 import 'package:caja_herramientas/app/modules/home/presentation/widgets/completed_form_card_widget.dart';
 import 'package:flutter_svg/svg.dart';

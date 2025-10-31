@@ -1,5 +1,5 @@
 import 'package:caja_herramientas/app/core/icons/app_icons.dart';
-import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
+import 'package:caja_herramientas/app/core/theme/theme_colors.dart';
 import 'package:caja_herramientas/app/modules/auth/presentation/bloc/auth_bloc.dart';
 import 'package:caja_herramientas/app/modules/auth/presentation/bloc/auth_state.dart';
 import 'package:caja_herramientas/app/shared/widgets/layouts/custom_app_bar.dart';

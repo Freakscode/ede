@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'dagrd_colors.dart';
+import 'theme_colors.dart';
 
 /// Tema principal de la aplicación DAGRD
 /// Configuración completa del tema siguiendo Material Design 3

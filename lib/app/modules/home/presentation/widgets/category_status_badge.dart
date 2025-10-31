@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
+import 'package:caja_herramientas/app/core/theme/theme_colors.dart';
 
 /// Widget para mostrar el estado de una categoría con un badge
 class CategoryStatusBadge extends StatelessWidget {
