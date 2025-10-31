@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
+import 'package:caja_herramientas/app/core/theme/theme_colors.dart';
 import '../bloc/risk_threat_analysis_state.dart';
 
 class RiskMatrixWidget extends StatelessWidget {

@@ -1,6 +1,6 @@
 import 'package:caja_herramientas/app/core/constants/app_assets.dart';
 import 'package:caja_herramientas/app/core/icons/app_icons.dart';
-import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
+import 'package:caja_herramientas/app/core/theme/theme_colors.dart';
 import 'package:caja_herramientas/app/core/utils/env.dart';
 import 'package:caja_herramientas/app/shared/widgets/buttons/custom_elevated_button.dart';
 import 'package:caja_herramientas/app/shared/widgets/widgets.dart';

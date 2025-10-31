@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
+import 'package:caja_herramientas/app/core/theme/theme_colors.dart';
 import 'package:caja_herramientas/app/shared/widgets/buttons/custom_elevated_button.dart';
 import 'package:caja_herramientas/app/shared/widgets/inputs/custom_text_field.dart';
 import 'package:caja_herramientas/app/shared/widgets/text/section_title.dart';

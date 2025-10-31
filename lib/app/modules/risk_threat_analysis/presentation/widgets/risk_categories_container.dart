@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:caja_herramientas/app/core/icons/app_icons.dart';
-import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
+import 'package:caja_herramientas/app/core/theme/theme_colors.dart';
 import 'package:caja_herramientas/app/modules/risk_threat_analysis/presentation/widgets/category_card.dart';
 import 'package:caja_herramientas/app/modules/risk_threat_analysis/domain/entities/category_state.dart';
 

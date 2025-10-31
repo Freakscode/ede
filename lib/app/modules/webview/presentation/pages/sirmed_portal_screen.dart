@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
+import 'package:caja_herramientas/app/core/theme/theme_colors.dart';
 import 'package:caja_herramientas/app/shared/widgets/layouts/custom_app_bar.dart';
 import 'package:caja_herramientas/app/modules/webview/presentation/bloc/webview_bloc.dart';
 import 'package:caja_herramientas/app/modules/webview/domain/usecases/get_webview_config_usecase.dart';

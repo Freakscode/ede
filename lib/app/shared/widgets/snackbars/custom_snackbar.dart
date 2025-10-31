@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../../../core/theme/dagrd_colors.dart';
+import '../../../core/theme/theme_colors.dart';
 import '../../../core/icons/app_icons.dart';
 
 /// Widget reutilizable para SnackBars personalizados con el tema DAGRD

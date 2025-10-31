@@ -5,7 +5,7 @@ import 'rating_results_screen.dart';
 import 'final_risk_results_screen.dart';
 import 'categories_screen.dart';
 import 'package:caja_herramientas/app/shared/widgets/layouts/custom_app_bar.dart';
-import 'package:caja_herramientas/app/core/theme/dagrd_colors.dart';
+import 'package:caja_herramientas/app/core/theme/theme_colors.dart';
 import 'package:caja_herramientas/app/shared/widgets/layouts/custom_bottom_nav_bar.dart';
 
 import 'package:flutter/material.dart';
