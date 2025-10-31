@@ -17,6 +17,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:caja_herramientas/app/modules/home/presentation/bloc/home_bloc.dart';
 import 'package:caja_herramientas/app/modules/home/presentation/bloc/home_event.dart';
 import 'package:caja_herramientas/app/modules/home/presentation/bloc/home_state.dart';
+import 'package:caja_herramientas/app/modules/auth/presentation/bloc/auth_bloc.dart';
+import 'package:caja_herramientas/app/modules/auth/presentation/bloc/auth_state.dart';
 import 'package:caja_herramientas/app/shared/widgets/layouts/custom_bottom_nav_bar.dart';
 import 'package:go_router/go_router.dart';
 
@@ -295,18 +297,28 @@ class HomeScreen extends StatelessWidget {
           });
         }
       },
-      builder: (context, state) {
-        return Scaffold(
-          appBar: CustomAppBar(
-            showBack: state.isShowingSpecialSection,
-            onBack: () => _handleBackAction(context, state),
-            showInfo: true,
-            showProfile: true,
-            onProfile: () => context.go('/login'),
-            onInfo: () => _showHelpDialog(context),
-          ),
-          body: _buildBodyContent(context, state),
-          bottomNavigationBar: _buildBottomNavigationBar(context, state),
+      builder: (context, homeState) {
+        return BlocBuilder<AuthBloc, AuthState>(
+          builder: (context, authState) {
+            return Scaffold(
+              appBar: CustomAppBar(
+                showBack: homeState.isShowingSpecialSection,
+                onBack: () => _handleBackAction(context, homeState),
+                showInfo: true,
+                showProfile: true,
+                onProfile: () {
+                  if (authState is AuthAuthenticated) {
+                    context.go('/profile');
+                  } else {
+                    context.go('/login');
+                  }
+                },
+                onInfo: () => _showHelpDialog(context),
+              ),
+              body: _buildBodyContent(context, homeState),
+              bottomNavigationBar: _buildBottomNavigationBar(context, homeState),
+            );
+          },
         );
       },
     );
