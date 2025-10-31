@@ -16,6 +16,8 @@ import 'app/modules/auth/domain/repositories/auth_repository_interface.dart';
 import 'app/modules/auth/presentation/bloc/auth_bloc.dart';
 import 'app/modules/auth/data/datasources/auth_local_data_source.dart';
 import 'app/modules/auth/data/datasources/auth_remote_data_source.dart';
+import 'app/modules/auth/domain/usecases/login_usecase.dart';
+import 'app/modules/auth/domain/usecases/logout_usecase.dart';
 
 // Features - Evaluacion
 import 'app/modules/evaluacion/data/repositories_impl/evaluacion_repository_impl.dart';
@@ -126,6 +128,10 @@ Future<void> initializeDependencies() async {
   sl.registerLazySingleton(() => ManageFormsUseCase(sl()));
   sl.registerLazySingleton(() => ManageTutorialUseCase(sl()));
   
+  // Auth Use Cases
+  sl.registerLazySingleton(() => LoginUseCase(sl()));
+  sl.registerLazySingleton(() => LogoutUseCase(sl()));
+  
   // Risk Threat Analysis Use Cases
   sl.registerLazySingleton(() => SaveRiskAnalysisUseCase(sl()));
   sl.registerLazySingleton(() => LoadRiskAnalysisUseCase(sl()));
@@ -150,7 +156,11 @@ Future<void> initializeDependencies() async {
     validateUnqualifiedVariablesUseCase: sl(),
     calculateGlobalScoreUseCase: sl(),
   ));
-  sl.registerFactory(() => AuthBloc(authRepository: sl()));
+  sl.registerFactory(() => AuthBloc(
+    authRepository: sl(),
+    loginUseCase: sl(),
+    logoutUseCase: sl(),
+  ));
   
   // Home BLoC with Clean Architecture
   sl.registerFactory(() => HomeBloc(

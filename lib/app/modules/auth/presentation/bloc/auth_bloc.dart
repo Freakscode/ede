@@ -1,8 +1,11 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:caja_herramientas/app/core/usecases/usecase.dart';
+import 'package:caja_herramientas/app/core/error/failures.dart';
 import '../../domain/repositories/auth_repository_interface.dart';
 import '../../domain/usecases/login_usecase.dart';
+import '../../domain/usecases/logout_usecase.dart';
 import '../../domain/entities/auth_result_entity.dart';
-import '../../data/models/login_request_model.dart';
+import '../../domain/entities/login_params.dart';
 import 'events/auth_events.dart';
 import 'auth_state.dart';
 
@@ -11,12 +14,15 @@ import 'auth_state.dart';
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final IAuthRepository _authRepository;
   final LoginUseCase _loginUseCase;
+  final LogoutUseCase _logoutUseCase;
 
   AuthBloc({
     required IAuthRepository authRepository,
-    LoginUseCase? loginUseCase,
+    required LoginUseCase loginUseCase,
+    required LogoutUseCase logoutUseCase,
   }) : _authRepository = authRepository,
-       _loginUseCase = loginUseCase ?? LoginUseCase(authRepository),
+       _loginUseCase = loginUseCase,
+       _logoutUseCase = logoutUseCase,
        super(const AuthInitial()) {
     
     // Registrar manejadores de eventos
@@ -30,58 +36,76 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     add(const AuthStatusCheckRequested());
   }
 
-  /// Manejador para login
+  /// Manejador para login usando Either
   Future<void> _onAuthLoginRequested(
     AuthLoginRequested event,
     Emitter<AuthState> emit,
   ) async {
     emit(const AuthLoading());
 
-    try {
-      // Crear request model
-      final loginRequest = LoginRequestModel.fromCredentials(
-        cedula: event.cedula,
-        password: event.password,
-      );
+    // Crear LoginParams (entidad de dominio)
+    final loginParams = LoginParams.fromCredentials(
+      cedula: event.cedula,
+      password: event.password,
+    );
 
-      // Usar caso de uso
-      final result = await _loginUseCase.execute(loginRequest);
-
-      if (result.success && result.user != null) {
-        emit(AuthAuthenticated(
-          user: result.user!,
-          message: result.message,
-        ));
-      } else {
+    // Usar caso de uso con Either
+    final result = await _loginUseCase.call(loginParams);
+    
+    // Fold para manejar Left (error) o Right (éxito)
+    result.fold(
+      (failure) {
         emit(AuthError(
-          message: result.message,
-          errorType: result.errorType ?? AuthErrorType.unknown,
+          message: failure.message,
+          errorType: _mapFailureToAuthErrorType(failure),
         ));
-      }
-    } catch (e) {
-      emit(AuthError(
-        message: 'Error inesperado durante el login',
-        errorType: AuthErrorType.unknown,
-      ));
-    }
+      },
+      (authResult) {
+        if (authResult.success && authResult.user != null) {
+          emit(AuthAuthenticated(
+            user: authResult.user!,
+            message: authResult.message,
+          ));
+        } else {
+          emit(AuthError(
+            message: authResult.message,
+            errorType: authResult.errorType ?? AuthErrorType.unknown,
+          ));
+        }
+      },
+    );
   }
 
-  /// Manejador para logout
+  /// Mapear Failure a AuthErrorType
+  AuthErrorType _mapFailureToAuthErrorType(Failure failure) {
+    if (failure is NetworkFailure) return AuthErrorType.networkError;
+    if (failure is ServerFailure) return AuthErrorType.serverError;
+    if (failure is AuthFailure) return AuthErrorType.invalidCredentials;
+    return AuthErrorType.unknown;
+  }
+
+  /// Manejador para logout usando Either
   Future<void> _onAuthLogoutRequested(
     AuthLogoutRequested event,
     Emitter<AuthState> emit,
   ) async {
     emit(const AuthLoading());
 
-    try {
-      await _authRepository.logout();
-      emit(const AuthUnauthenticated(message: 'Sesión cerrada exitosamente'));
-    } catch (e) {
-      emit(AuthError(
-        message: 'Error al cerrar sesión',
-        errorType: AuthErrorType.unknown,
-      ));
-    }
+    // Usar caso de uso con Either
+    final result = await _logoutUseCase.call(NoParams());
+    
+    // Fold para manejar Left (error) o Right (éxito)
+    result.fold(
+      (failure) {
+        emit(AuthError(
+          message: failure.message,
+          errorType: AuthErrorType.unknown,
+        ));
+      },
+      (_) {
+        emit(const AuthUnauthenticated(message: 'Sesión cerrada exitosamente'));
+      },
+    );
   }
 
   /// Manejador para verificar estado

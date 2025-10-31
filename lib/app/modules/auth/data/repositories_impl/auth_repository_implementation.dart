@@ -1,6 +1,7 @@
 import '../../domain/repositories/auth_repository_interface.dart';
 import '../../domain/entities/user_entity.dart';
 import '../../domain/entities/auth_result_entity.dart';
+import '../../domain/entities/login_params.dart';
 import '../models/login_request_model.dart';
 import '../datasources/auth_local_data_source.dart';
 import '../datasources/auth_remote_data_source.dart';
@@ -18,7 +19,13 @@ class AuthRepositoryImplementation implements IAuthRepository {
        _authRemoteDataSource = authRemoteDataSource;
 
   @override
-  Future<AuthResultEntity> login(LoginRequestModel loginRequest) async {
+  Future<AuthResultEntity> login(LoginParams loginParams) async {
+    // Convertir LoginParams (entidad de dominio) a LoginRequestModel (DTO)
+    final loginRequest = LoginRequestModel(
+      cedula: loginParams.cedula,
+      password: loginParams.password,
+    );
+    
     // Primero intentar autenticación contra la API
     final loginResult = await _authRemoteDataSource.login(loginRequest);
     
