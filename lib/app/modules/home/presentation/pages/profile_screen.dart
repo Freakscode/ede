@@ -145,6 +145,15 @@ class ProfileScreen extends StatelessWidget {
                         label: 'Cédula',
                         value: user.cedula,
                       ),
+                      if (user.cargo != null && user.cargo!.isNotEmpty) ...[
+                        const SizedBox(height: 12),
+                        ProfileInfoTile(
+                          icon: AppIcons.wrench,
+                          iconColor: DAGRDColors.azulSecundario,
+                          label: 'Profesión',
+                          value: user.cargo!,
+                        ),
+                      ],
                       if (user.email != null && user.email!.isNotEmpty) ...[
                         const SizedBox(height: 12),
                         ProfileInfoTile(
