@@ -12,6 +12,8 @@ import 'app/core/network/network_info.dart';
 import 'app/modules/auth/data/repositories_impl/auth_repository_implementation.dart';
 import 'app/modules/auth/domain/repositories/auth_repository_interface.dart';
 import 'app/modules/auth/presentation/bloc/auth_bloc.dart';
+import 'app/modules/auth/data/datasources/auth_local_data_source.dart';
+import 'app/modules/auth/data/datasources/auth_remote_data_source.dart';
 
 // Features - Evaluacion
 import 'app/modules/evaluacion/data/repositories_impl/evaluacion_repository_impl.dart';
@@ -66,15 +68,18 @@ Future<void> initializeDependencies() async {
 
 
   // Data sources
-  // TODO: Register data sources here when moved
+  // Auth Data Sources
+  sl.registerLazySingleton<AuthLocalDataSource>(() => AuthLocalDataSourceImpl());
+  sl.registerLazySingleton<AuthRemoteDataSource>(() => AuthRemoteDataSourceImpl(dio: sl()));
 
   // Services
   sl.registerLazySingleton(() => FormPersistenceService());
 
   // Repositories - now with correct interfaces and implementations
-  sl.registerLazySingleton<AuthRepository>(
+  sl.registerLazySingleton<IAuthRepository>(
     () => AuthRepositoryImplementation(
-      sharedPreferences: sl(),
+      authLocalDataSource: sl(),
+      authRemoteDataSource: sl(),
     ),
   );
 
@@ -140,7 +145,9 @@ Future<void> initializeDependencies() async {
 
   await Hive.initFlutter();
 
+  // Open Hive boxes
   await Hive.openBox(DatabaseConfig.tutorialHomeKey);
+  await Hive.openBox('auth_storage');
 
 
 

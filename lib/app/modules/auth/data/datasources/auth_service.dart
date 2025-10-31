@@ -1,8 +1,8 @@
 import '../models/user_model.dart';
 import '../../models/auth_result.dart';
 
-/// Servicio de autenticación
-/// Servicio singleton para gestión de autenticación local
+/// Servicio de autenticación (Legacy)
+/// Mantiene compatibilidad con código existente
 class AuthService {
   static final AuthService _instance = AuthService._internal();
   factory AuthService() => _instance;
@@ -21,7 +21,7 @@ class AuthService {
       // Simular delay de red
       await Future.delayed(const Duration(seconds: 1));
       
-      // Simularse validación de credenciales
+      // Simular validación de credenciales
       if (cedula.trim().isEmpty || password.trim().isEmpty) {
         return AuthResult.failure(
           message: 'La cédula y contraseña son requeridas',
@@ -29,7 +29,7 @@ class AuthService {
         );
       }
       
-      // Obtener usuario DAGRD simulado usando los nuevos métodos helper
+      // Obtener usuario DAGRD simulado
       final selectedUser = UserModel.getSimulatedDagrdUserByCedula(cedula);
       
       // Guardar usuario actual
@@ -39,8 +39,6 @@ class AuthService {
         message: 'Login exitoso (modo simulación)',
         user: selectedUser,
       );
-      
-    
       
     } catch (e) {
       return AuthResult.failure(
@@ -62,7 +60,6 @@ class AuthService {
     return isLoggedIn;
   }
 
-  /// Método adicional: Verificar permisos específicos
   bool canAccessFeature(String feature) {
     if (!isLoggedIn) return false;
     
@@ -79,7 +76,6 @@ class AuthService {
     }
   }
 
-  /// Método adicional: Obtener información del usuario para debugging
   Map<String, dynamic> getUserInfo() {
     if (_currentUser == null) {
       return {'loggedIn': false};
@@ -97,3 +93,4 @@ class AuthService {
     };
   }
 }
+

@@ -9,11 +9,11 @@ import 'auth_state.dart';
 /// BLoC de autenticación
 /// Maneja la lógica de negocio relacionada con autenticación
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
-  final AuthRepository _authRepository;
+  final IAuthRepository _authRepository;
   final LoginUseCase _loginUseCase;
 
   AuthBloc({
-    required AuthRepository authRepository,
+    required IAuthRepository authRepository,
     LoginUseCase? loginUseCase,
   }) : _authRepository = authRepository,
        _loginUseCase = loginUseCase ?? LoginUseCase(authRepository),

@@ -155,6 +155,19 @@ class UserModel extends Equatable {
     );
   }
 
+  /// Crear usuario desde respuesta de API
+  factory UserModel.fromApiResponse(Map<String, dynamic> data) {
+    return UserModel(
+      cedula: data['cedula'] ?? '',
+      nombre: data['nombre'] ?? '',
+      isDagrdUser: data['isDagrdUser'] ?? false,
+      cargo: data['cargo'],
+      dependencia: data['dependencia'],
+      email: data['email'],
+      telefono: data['telefono'],
+    );
+  }
+
   @override
   List<Object?> get props => [
         cedula,

@@ -4,7 +4,7 @@ import '../../data/models/login_request_model.dart';
 
 /// Caso de uso para login
 class LoginUseCase {
-  final AuthRepository _authRepository;
+  final IAuthRepository _authRepository;
 
   LoginUseCase(this._authRepository);
 
