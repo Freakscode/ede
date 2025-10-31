@@ -14,16 +14,16 @@ class LoginUseCase implements UseCase<AuthResultEntity, LoginParams> {
   @override
   Future<Either<Failure, AuthResultEntity>> call(LoginParams params) async {
     // Validaciones de negocio
-    if (params.cedula.isEmpty) {
-      return Left(ValidationFailure('La email es requerida'));
+    if (params.email.isEmpty) {
+      return Left(ValidationFailure('El email es requerido'));
     }
 
     if (params.password.isEmpty) {
       return Left(ValidationFailure('La contraseña es requerida'));
     }
 
-    if (!params.hasValidCedulaLength) {
-      return Left(ValidationFailure('La cédula debe tener al menos 6 caracteres'));
+    if (!params.hasValidEmailFormat) {
+      return Left(ValidationFailure('El formato del email no es válido'));
     }
 
     try {
@@ -66,11 +66,11 @@ class LoginUseCase implements UseCase<AuthResultEntity, LoginParams> {
 
   /// Ejecutar login con credenciales directas
   Future<Either<Failure, AuthResultEntity>> executeWithCredentials({
-    required String cedula,
+    required String email,
     required String password,
   }) async {
     final loginParams = LoginParams.fromCredentials(
-      cedula: cedula,
+      email: email,
       password: password,
     );
     return await call(loginParams);

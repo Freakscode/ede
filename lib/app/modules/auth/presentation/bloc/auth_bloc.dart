@@ -49,7 +49,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
     // Crear LoginParams (entidad de dominio)
     final loginParams = LoginParams.fromCredentials(
-      cedula: event.cedula,
+      email: event.email,
       password: event.password,
     );
 

@@ -20,7 +20,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _cedulaController = TextEditingController(text: Environment.userBackend);
+  final _emailController = TextEditingController(text: Environment.userBackend);
   final _passwordController = TextEditingController(text: Environment.passwordBackend);
   final _formKey = GlobalKey<FormState>();
   bool _obscurePassword = true;
@@ -158,7 +158,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             const SizedBox(height: 34),
                             TextFormField(
-                              controller: _cedulaController,
+                              controller: _emailController,
                               decoration: InputDecoration(
                                 labelText: 'Usuario',
                                 labelStyle: const TextStyle(
@@ -309,7 +309,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       if (_formKey.currentState?.validate() ?? false) {
                                         context.read<AuthBloc>().add(
                                           AuthLoginRequested(
-                                            cedula: _cedulaController.text.trim(),
+                                            email: _emailController.text.trim(),
                                             password: _passwordController.text.trim(),
                                           ),
                                         );
@@ -350,7 +350,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void dispose() {
-    _cedulaController.dispose();
+    _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }

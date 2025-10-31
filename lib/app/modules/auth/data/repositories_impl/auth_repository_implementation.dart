@@ -22,7 +22,7 @@ class AuthRepositoryImplementation implements IAuthRepository {
   Future<AuthResultEntity> login(LoginParams loginParams) async {
     // Convertir LoginParams (entidad de dominio) a LoginRequestModel (DTO)
     final loginRequest = LoginRequestModel(
-      cedula: loginParams.cedula,
+      email: loginParams.email,
       password: loginParams.password,
     );
     

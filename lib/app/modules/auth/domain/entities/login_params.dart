@@ -3,35 +3,38 @@ import 'package:equatable/equatable.dart';
 /// Entidad de dominio para parámetros de login
 /// Es independiente de la capa de datos
 class LoginParams extends Equatable {
-  final String cedula;
+  final String email;
   final String password;
 
   const LoginParams({
-    required this.cedula,
+    required this.email,
     required this.password,
   });
 
   /// Factory constructor desde credenciales
   factory LoginParams.fromCredentials({
-    required String cedula,
+    required String email,
     required String password,
   }) {
     return LoginParams(
-      cedula: cedula,
+      email: email,
       password: password,
     );
   }
 
   /// Validación básica
-  bool get isValid => cedula.isNotEmpty && password.isNotEmpty;
+  bool get isValid => email.isNotEmpty && password.isNotEmpty;
 
-  /// Validar longitud mínima de cédula
-  bool get hasValidCedulaLength => cedula.length >= 6;
+  /// Validar formato de email
+  bool get hasValidEmailFormat {
+    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    return emailRegex.hasMatch(email);
+  }
 
   @override
-  List<Object> get props => [cedula, password];
+  List<Object> get props => [email, password];
 
   @override
-  String toString() => 'LoginParams(cedula: $cedula)';
+  String toString() => 'LoginParams(email: $email)';
 }
 

@@ -35,7 +35,7 @@ class AuthRemoteDataSourceImpl extends ApiProvider implements AuthRemoteDataSour
       final response = await dio.post(
         '/auth/login',
         data: {
-          'email': loginRequest.cedula,
+          'email': loginRequest.email,
           'password': loginRequest.password,
         },
       );
