@@ -76,14 +76,24 @@ class UserModel extends Equatable {
 
   /// Crear usuario desde respuesta de API
   factory UserModel.fromApiResponse(Map<String, dynamic> data) {
+    // La estructura de la API es:
+    // { id, email, code, persona: { identificacion, nombre_completo, telefonos, profesion } }
+    final persona = data['persona'] as Map<String, dynamic>? ?? {};
+    final telefonos = persona['telefonos'] as List<dynamic>? ?? [];
+    final primerTelefono = telefonos.isNotEmpty ? telefonos[0] as Map<String, dynamic>? : null;
+    
+    // Determinar si es DAGRD basado en la profesión
+    final profesion = persona['profesion'] as String? ?? '';
+    final isDagrd = profesion.toLowerCase().contains('bombero');
+    
     return UserModel(
-      cedula: data['cedula'] ?? '',
-      nombre: data['nombre'] ?? '',
-      isDagrdUser: data['isDagrdUser'] ?? false,
-      cargo: data['cargo'],
-      dependencia: data['dependencia'],
+      cedula: persona['identificacion'] ?? data['code'] ?? '',
+      nombre: persona['nombre_completo'] ?? '',
+      isDagrdUser: isDagrd,
+      cargo: profesion.isNotEmpty ? profesion : null,
+      dependencia: null,
       email: data['email'],
-      telefono: data['telefono'],
+      telefono: primerTelefono?['numero'],
     );
   }
 

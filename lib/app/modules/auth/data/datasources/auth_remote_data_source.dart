@@ -41,14 +41,17 @@ class AuthRemoteDataSourceImpl extends ApiProvider implements AuthRemoteDataSour
       );
 
       if (response.statusCode == 200) {
-        final data = response.data;
-        final userData = data['user'] ?? data;
+        final responseData = response.data;
+        
+        // La respuesta tiene la estructura: { success, message, data: { token, user } }
+        final data = responseData['data'] ?? responseData;
+        final userData = data['user'] ?? {};
         final token = data['token'] as String?;
         
         final userModel = UserModel.fromApiResponse(userData);
         
         final result = AuthResultEntity.success(
-          message: 'Login exitoso',
+          message: responseData['message'] ?? 'Login exitoso',
           user: userModel.toEntity(),
         );
         
