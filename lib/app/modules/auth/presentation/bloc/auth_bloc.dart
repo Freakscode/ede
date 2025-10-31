@@ -1,9 +1,10 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:caja_herramientas/app/core/usecases/usecase.dart';
 import 'package:caja_herramientas/app/core/error/failures.dart';
-import '../../domain/repositories/auth_repository_interface.dart';
 import '../../domain/usecases/login_usecase.dart';
 import '../../domain/usecases/logout_usecase.dart';
+import '../../domain/usecases/get_current_user_usecase.dart';
+import '../../domain/usecases/get_auth_status_usecase.dart';
 import '../../domain/entities/auth_result_entity.dart';
 import '../../domain/entities/login_params.dart';
 import 'events/auth_events.dart';
@@ -12,17 +13,20 @@ import 'auth_state.dart';
 /// BLoC de autenticación
 /// Maneja la lógica de negocio relacionada con autenticación
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
-  final IAuthRepository _authRepository;
   final LoginUseCase _loginUseCase;
   final LogoutUseCase _logoutUseCase;
+  final GetCurrentUserUseCase _getCurrentUserUseCase;
+  final GetAuthStatusUseCase _getAuthStatusUseCase;
 
   AuthBloc({
-    required IAuthRepository authRepository,
     required LoginUseCase loginUseCase,
     required LogoutUseCase logoutUseCase,
-  }) : _authRepository = authRepository,
-       _loginUseCase = loginUseCase,
+    required GetCurrentUserUseCase getCurrentUserUseCase,
+    required GetAuthStatusUseCase getAuthStatusUseCase,
+  }) : _loginUseCase = loginUseCase,
        _logoutUseCase = logoutUseCase,
+       _getCurrentUserUseCase = getCurrentUserUseCase,
+       _getAuthStatusUseCase = getAuthStatusUseCase,
        super(const AuthInitial()) {
     
     // Registrar manejadores de eventos
@@ -113,25 +117,21 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     AuthStatusCheckRequested event,
     Emitter<AuthState> emit,
   ) async {
-    try {
-      final isLoggedIn = await _authRepository.isLoggedIn();
-      
-      if (isLoggedIn) {
-        final user = await _authRepository.getCurrentUser();
-        if (user != null) {
+    final result = await _getAuthStatusUseCase.call(NoParams());
+    
+    result.fold(
+      (_) => emit(const AuthUnauthenticated()),
+      (authStatus) {
+        if (authStatus.isLoggedIn && authStatus.user != null) {
           emit(AuthAuthenticated(
-            user: user,
+            user: authStatus.user!,
             message: 'Usuario autenticado',
           ));
         } else {
           emit(const AuthUnauthenticated());
         }
-      } else {
-        emit(const AuthUnauthenticated());
-      }
-    } catch (e) {
-      emit(const AuthUnauthenticated());
-    }
+      },
+    );
   }
 
   /// Manejador para limpiar errores
@@ -139,24 +139,21 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     AuthErrorCleared event,
     Emitter<AuthState> emit,
   ) async {
-    try {
-      final isLoggedIn = await _authRepository.isLoggedIn();
-      if (isLoggedIn) {
-        final user = await _authRepository.getCurrentUser();
-        if (user != null) {
+    final result = await _getAuthStatusUseCase.call(NoParams());
+    
+    result.fold(
+      (_) => emit(const AuthUnauthenticated()),
+      (authStatus) {
+        if (authStatus.isLoggedIn && authStatus.user != null) {
           emit(AuthAuthenticated(
-            user: user,
+            user: authStatus.user!,
             message: 'Usuario autenticado',
           ));
         } else {
           emit(const AuthUnauthenticated());
         }
-      } else {
-        emit(const AuthUnauthenticated());
-      }
-    } catch (e) {
-      emit(const AuthUnauthenticated());
-    }
+      },
+    );
   }
 
   /// Manejador para verificar permisos
@@ -164,22 +161,23 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     AuthPermissionCheckRequested event,
     Emitter<AuthState> emit,
   ) async {
-    try {
-      final user = await _authRepository.getCurrentUser();
-      final hasPermission = user?.canAccessDagrdFeatures ?? false;
-      
-      emit(AuthPermissionChecked(
-        feature: event.feature,
-        hasPermission: hasPermission,
-        user: user,
-      ));
-    } catch (e) {
-      emit(AuthPermissionChecked(
+    final result = await _getCurrentUserUseCase.call(NoParams());
+    
+    result.fold(
+      (_) => emit(AuthPermissionChecked(
         feature: event.feature,
         hasPermission: false,
         user: null,
-      ));
-    }
+      )),
+      (user) {
+        final hasPermission = user?.canAccessDagrdFeatures ?? false;
+        emit(AuthPermissionChecked(
+          feature: event.feature,
+          hasPermission: hasPermission,
+          user: user,
+        ));
+      },
+    );
   }
 
   /// Métodos de conveniencia para acceder a información del usuario
