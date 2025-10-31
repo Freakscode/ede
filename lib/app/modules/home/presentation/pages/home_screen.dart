@@ -22,14 +22,11 @@ import 'package:caja_herramientas/app/modules/auth/presentation/bloc/auth_state.
 import 'package:caja_herramientas/app/shared/widgets/layouts/custom_bottom_nav_bar.dart';
 import 'package:go_router/go_router.dart';
 
-/// Pantalla principal de la aplicación que maneja la navegación
-/// entre diferentes secciones y herramientas de la caja de herramientas.
 class HomeScreen extends StatelessWidget {
   final Map<String, dynamic>? navigationData;
 
   const HomeScreen({super.key, this.navigationData});
 
-  /// Muestra el overlay de tutorial cuando es necesario
   Future<void> _showTutorialOverlay(BuildContext context) async {
     await showDialog(
       context: context,
@@ -42,7 +39,6 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  /// Maneja la lógica de navegación basada en los datos de navegación
   void _handleNavigationData(BuildContext context) {
     if (navigationData == null) return;
 
@@ -241,7 +237,7 @@ class HomeScreen extends StatelessWidget {
                               label: const Text('Volver al inicio'),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: DAGRDColors.azulDAGRD,
-                                foregroundColor: Colors.white,
+                                foregroundColor: DAGRDColors.blancoDAGRD,
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 24,
                                   vertical: 12,
@@ -279,9 +275,9 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ],
                 backgroundColor: DAGRDColors.azulDAGRD,
-                selectedColor: Colors.white,
+                selectedColor: DAGRDColors.blancoDAGRD,
                 unselectedColor: Colors.white60,
-                selectedIconBgColor: Colors.white,
+                selectedIconBgColor: DAGRDColors.blancoDAGRD,
               ),
             );
           },
